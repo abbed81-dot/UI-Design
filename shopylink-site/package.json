@@ -1,0 +1,36 @@
+{
+  "name": "next16-claude-starter",
+  "version": "0.1.0",
+  "private": true,
+  "license": "Unlicense",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@react-spring/web": "^10.1.2",
+    "lenis": "^1.3.26",
+    "next": "16.3.1",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "resize-observer-polyfill": "^1.5.1",
+    "spring-text-engine": "^0.1.5",
+    "zod": "^4.4.3",
+    "zustand": "^5.0.15"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/node": "^24",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "eslint": "^9.39.4",
+    "eslint-config-next": "16.3.1",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=20.19.0"
+  }
+}

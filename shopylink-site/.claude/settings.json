@@ -1,0 +1,90 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '{\"hookSpecificOutput\":{\"hookEventName\":\"SessionStart\",\"additionalContext\":\"PROJECT GUIDE \u2014 next16-claude-starter. All project documentation lives in the obsidian/ vault, which is the single source of truth. Before doing project work this session, read obsidian/README.md (the Map of Content) and obsidian/workflows/ai-agent-guide.md (the hard rules), then open the topic note relevant to the task before writing code.\"}}'",
+            "statusMessage": "Loading project guide"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '{\"hookSpecificOutput\":{\"hookEventName\":\"UserPromptSubmit\",\"additionalContext\":\"VAULT REMINDER: consult the relevant obsidian/ guide before acting on this request \u2014 e.g. obsidian/frontend/animation-system.md for animation work, obsidian/workflows/new-page.md to build a page, obsidian/frontend/component-conventions.md for components. If your work changes code, behaviour, dependencies, or architecture, update the matching vault docs in the SAME turn: catalog notes under obsidian/frontend/, obsidian/meta/changelog.md, and obsidian/meta/decisions-log.md.\"}}'"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "M=\"${TMPDIR:-/tmp}/claude-vault-stop-$(jq -r .session_id 2>/dev/null)\"; if [ -f \"$M\" ]; then rm -f \"$M\"; exit 0; fi; touch \"$M\"; echo '{\"decision\":\"block\",\"reason\":\"Before finishing this turn: if you changed code, behaviour, dependencies, or architecture, update the matching obsidian/ vault docs now \u2014 catalog notes under obsidian/frontend/ for components, hooks and utils; obsidian/meta/changelog.md for notable changes; obsidian/meta/decisions-log.md for new architectural decisions. If the vault already reflects everything done this turn, stop.\"}'",
+            "statusMessage": "Checking vault docs are in sync"
+          }
+        ]
+      }
+    ]
+  },
+  "permissions": {
+    "allow": [
+      "Bash(.claude/scripts/verify.sh:*)",
+      "Bash(yarn lint)",
+      "Bash(yarn build)",
+      "Bash(yarn dev)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(grep:*)",
+      "Bash(rg:*)",
+      "Bash(find:*)",
+      "Bash(file:*)",
+      "Bash(ls:*)",
+      "WebFetch(domain:nextjs.org)",
+      "WebFetch(domain:payloadcms.com)",
+      "WebFetch(domain:supabase.com)",
+      "WebFetch(domain:tailwindcss.com)",
+      "WebFetch(domain:developer.mozilla.org)",
+      "WebFetch(domain:schema.org)"
+    ],
+    "ask": [
+      "Bash(rm:*)",
+      "Bash(rmdir:*)",
+      "Bash(mv:*)",
+      "Bash(dd:*)",
+      "Bash(chmod:*)",
+      "Bash(chown:*)",
+      "Bash(yarn add:*)",
+      "Bash(yarn remove:*)",
+      "Bash(npm install:*)",
+      "Bash(npx:*)",
+      "Bash(pnpm:*)",
+      "Bash(git push:*)",
+      "Bash(git reset:*)",
+      "Bash(git checkout:*)",
+      "Bash(git commit:*)",
+      "Bash(vercel:*)",
+      "Bash(supabase db push:*)",
+      "Bash(supabase db reset:*)",
+      "Bash(payload migrate:*)",
+      "Bash(yarn payload migrate:*)",
+      "Bash(kill:*)",
+      "Bash(killall:*)",
+      "Bash(pkill:*)"
+    ],
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.local)",
+      "Read(./.env.production)",
+      "Read(./**/*.pem)",
+      "Read(./**/*.key)"
+    ]
+  }
+}
