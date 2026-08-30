@@ -1,32 +1,29 @@
-# React + TypeScript + Vite
+# ShopyLink operations console (v2 source)
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+The console is a **window and a carrier**, not a second design. It draws no
+form of its own: every service page shows the package's own module file,
+decompressed and mounted on the same origin, so the module keeps its design,
+its validation and its act — and reads and writes the very same `SL_*`
+channels the console reads. That sharing is the wiring.
 
-Currently, two official plugins are available:
+## Build
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```sh
+node tools/embed_modules.mjs      # gzips the 24 module files into src/lib/modules_html.ts
+npx tsc --noEmit --ignoreDeprecations 6.0
+SKILL=/mnt/skills/examples/web-artifacts-builder ./build.sh
+node test_carry.cjs               # the behaviour contract, against the built bundle
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+`src/lib/modules_html.ts` is **generated** (~1.9 MB of base64) and is not kept
+in the repository: the module files it carries are the source of truth, and a
+copy checked in beside them would be a second one that silently goes stale.
+Regenerate it with `tools/embed_modules.mjs`, which reads the module list out
+of `src/lib/modules.ts` and fails loudly on any file it cannot find.
+
+## What clears a queue row
+
+Not a button. The modules append to `SL_EVENTS_V1`; the console watches that
+log (storage event, with a poll beside it) and when a record lands naming the
+reference the person came for, the row leaves the queue and the toast names
+the record that did it. The console files nothing itself.

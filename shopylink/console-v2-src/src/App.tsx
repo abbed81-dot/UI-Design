@@ -12,9 +12,10 @@ import { LOCKUP_EN } from '@/lib/lockup_en';
 import { MARK_LIGHT } from '@/lib/mark';
 import {
   dayTasks, dayFigures, dayMe, dayThreads, denseTasks, dayNews, dayTrail, dayDetails,
-  dayStaff, weekIntake, weekMeasured, weekLate, GROUP_META, intakeToTask, nextRef, openTrips, type Task, type NewsItem, type Intake,
+  dayStaff, weekIntake, weekMeasured, weekLate, GROUP_META, type Task, type NewsItem,
 } from '@/lib/day';
 import { readState, writeState, type SavedState } from '@/lib/store';
+import { loadModule, hasModule, watchEvents, eventTouches } from '@/lib/carry';
 
 /* ─────────────────────────────────────────────────────────────────────
    ShopyLink operations console · v2.1 · screen one: the operator's home.
@@ -70,7 +71,6 @@ export default function App() {
      inside the console, in one language, and the ONLY bridge between the two
      experiences is the language toggle */
   const [view, setView] = useState<{ t: 'home' } | { t: 'svc'; file: string; focus?: Task }>({ t: 'home' });
-  const [intakes, setIntakes] = useState<Intake[]>(saved.intakes ?? []);
   const ar = lang === 'ar';
 
   useEffect(() => {
@@ -78,7 +78,7 @@ export default function App() {
     document.documentElement.setAttribute('lang', lang);
   }, [ar, lang]);
 
-  useEffect(() => { writeState({ lang, pinned, rail, whoId: dayMe.id, intakes }); }, [lang, pinned, rail, intakes]);
+  useEffect(() => { writeState({ lang, pinned, rail, whoId: dayMe.id }); }, [lang, pinned, rail]);
 
   useEffect(() => {
     if (!toast) return; const t = setTimeout(() => setToast(null), 5000); return () => clearTimeout(t);
@@ -104,13 +104,6 @@ export default function App() {
     });
   }, [ar]);
 
-  const registerIntake = useCallback((f: Omit<Intake, 'ref' | 'at'>) => {
-    const ref = nextRef(intakes.map(i => i.ref).concat(dayTasks.map(x => x.ref)));
-    setIntakes(list => [{ ...f, ref, at: Date.now() }, ...list]);
-    setToast({ text: t('سُجّل الاستلام — ', 'Intake recorded — ') + ref + t(' وينتظر القياس في طابورك', ' and awaits measuring on your queue') });
-    return ref;
-  }, [intakes, t]);
-
   const openService = useCallback((file: string) => {
     setView({ t: 'svc', file });
     setDrawer(null); setListDrawer(null);
@@ -122,10 +115,9 @@ export default function App() {
   }, []);
 
   const tasks: Task[] = useMemo(() => {
-    const mine = intakes.map(intakeToTask);
-    const base = preview === 'empty' ? [] : preview === 'dense' ? denseTasks() : [...mine, ...dayTasks];
+    const base = preview === 'empty' ? [] : preview === 'dense' ? denseTasks() : dayTasks;
     return base.filter(x => !done[x.id]);
-  }, [preview, done, intakes]);
+  }, [preview, done]);
 
   /* the queue, grouped: the home shows the shape of the day; a group opens
      onto its complete list — five hundred rows stay one row here */
@@ -146,16 +138,26 @@ export default function App() {
     setView({ t: 'svc', file: task.open, focus: task });
   }, []);
 
-  /* completing the flow on the service page is the only thing that clears the
-     row — and the toast carries an undo, because a real act needs a real way back */
-  const completeTask = useCallback((task: Task, text: string) => {
-    setDone(d => ({ ...d, [task.id]: true }));
-    setView(v => (v.t === 'svc' ? { t: 'svc', file: v.file } : v));
-    setToast({
-      text,
-      undo: () => { setDone(d => ({ ...d, [task.id]: false })); setToast(null); },
+  /* WHAT CLEARS A ROW is the module's own record, not a button this console
+     drew. The modules append to SL_EVENTS_V1 on the same origin; when an event
+     lands naming the reference the person came here for, the row goes — and the
+     toast says which module declared it. The console files nothing itself. */
+  useEffect(() => {
+    if (view.t !== 'svc' || !view.focus) return;
+    const task = view.focus;
+    if (done[task.id]) return;
+    return watchEvents(events => {
+      const hit = events.filter(e => eventTouches(e, task.ref)).slice(-1)[0];
+      if (!hit) return;
+      setDone(d => ({ ...d, [task.id]: true }));
+      setView(v => (v.t === 'svc' ? { t: 'svc', file: v.file } : v));
+      setToast({
+        text: t('سجّلت الوحدة ', 'The module recorded ') + (hit.type || '') + ' — ' + task.ref +
+          t(' خرج من طابورك', ' left your queue'),
+        undo: () => { setDone(d => ({ ...d, [task.id]: false })); setToast(null); },
+      });
     });
-  }, []);
+  }, [view, done, t]);
 
   const allItems = useMemo(() => CATEGORIES.flatMap(c => c.items), []);
   const pinnedItems = useMemo(() => pinned.map(f => allItems.filter(i => i.file === f)[0]).filter(Boolean), [pinned, allItems]);
@@ -325,10 +327,8 @@ export default function App() {
             <ServiceView file={view.file} ar={ar} t={t}
               tasks={tasks.filter(x => x.open === view.file)}
               focus={view.focus && !done[view.focus.id] ? view.focus : undefined}
-              onComplete={completeTask}
               onAct={goAct}
               onChat={task => setDrawer({ task, tab: 'chat' })}
-              onRegister={view.file === 'ShopyLink_Action_01_ReceiveParcel.html' ? registerIntake : undefined}
               onBack={() => setView({ t: 'home' })}
               onOpenFile={HAS_MODULES ? openModuleFile : undefined} />
           ) : (
@@ -524,10 +524,7 @@ export default function App() {
         boxShadow: drawer ? 'var(--sh-2)' : 'none', zIndex: 26,
       }}>
         {drawer && <TaskDrawer task={drawer.task} tab={drawer.tab} ar={ar} t={t}
-          detailsOf={ref => {
-            const i = intakes.filter(x => x.ref === ref)[0];
-            return i ? { client: i.client, route: i.from + ' ← ' + i.to, weight: i.weight.toFixed(1) + ' kg', cartons: i.cartons } : dayDetails[ref];
-          }}
+          detailsOf={ref => dayDetails[ref]}
           onClose={() => setDrawer(null)} onAct={goAct}
           onOpenModule={HAS_MODULES ? () => openModuleFile(drawer.task.open) : undefined}
           onMention={names => setToast(
@@ -1057,12 +1054,10 @@ function GroupLabel({ children }: { children: React.ReactNode }) {
       own live work (act, open, thread — the same rows as the home), and the
       intake service carries the registering form itself. The experience never
       changes language or leaves the page. ─────────────────────────────────── */
-function ServiceView({ file, ar, t, tasks, focus, onComplete, onAct, onChat, onRegister, onBack, onOpenFile }: {
+function ServiceView({ file, ar, t, tasks, focus, onAct, onChat, onBack, onOpenFile }: {
   file: string; ar: boolean; t: (a: string, e: string) => string;
   tasks: Task[]; focus?: Task;
-  onComplete: (x: Task, text: string) => void;
   onAct: (x: Task) => void; onChat: (x: Task) => void;
-  onRegister?: (f: { client: string; from: string; to: string; mode: 'air' | 'land' | 'sea'; weight: number; cartons: number }) => string;
   onBack: () => void; onOpenFile?: (f: string) => void;
 }) {
   const cat = CATEGORIES.filter(c => c.items.some(i => i.file === file))[0];
@@ -1110,9 +1105,44 @@ function ServiceView({ file, ar, t, tasks, focus, onComplete, onAct, onChat, onR
         </div>
       </section>
 
-      {focus && <ActFlow task={focus} ar={ar} t={t} onComplete={onComplete} />}
+      {/* which task brought him here — the console's own signpost, no act on it:
+          the act is the module's, and finishing it there clears the row */}
+      {focus && (
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 'var(--s3)', flexWrap: 'wrap',
+          background: 'var(--sky-tint)', border: '1.5px solid var(--sky)',
+          borderRadius: 'var(--radius)', padding: 'var(--s3) var(--s4)', marginBottom: 'var(--s4)',
+        }}>
+          <span aria-hidden style={{
+            width: 26, height: 26, borderRadius: 'var(--radius-sm)', background: 'var(--sky)',
+            color: 'var(--ink)', display: 'flex', alignItems: 'center', justifyContent: 'center', flex: '0 0 auto',
+          }}><Timer size={14} /></span>
+          <span style={{ flex: 1, minWidth: 180, lineHeight: 1.3 }}>
+            <span style={{ display: 'block', fontSize: 'var(--fs-eyebrow)', color: 'var(--sky-deep)', fontWeight: 800, letterSpacing: '.08em', textTransform: 'uppercase' }}>
+              {t('جئت من أجل', 'You came for')}
+            </span>
+            <span style={{ display: 'block', fontSize: 'var(--fs-body)', fontWeight: 800 }}>{ar ? focus.ar : focus.en}</span>
+          </span>
+          <span className="machine" style={{ fontSize: 'var(--fs-hint)', fontWeight: 700, color: 'var(--n7)' }}>{focus.ref}</span>
+          <span style={{ fontSize: 'var(--fs-eyebrow)', color: 'var(--n6)', flexBasis: '100%' }}>
+            {t('نفّذها في الوحدة أدناه — حين تُسجّلها هناك تخرج من طابورك هنا.',
+               'Do it in the module below — the moment it is recorded there, it leaves your queue here.')}
+          </span>
+        </div>
+      )}
 
-      {onRegister && <IntakeForm ar={ar} t={t} onRegister={onRegister} />}
+      {/* the package's own file, carried and shown — nothing redrawn */}
+      {hasModule(file)
+        ? <ModuleFrame file={file} ar={ar} t={t} title={ar ? item.ar : item.en} />
+        : (
+          <div style={{
+            background: 'var(--amber-tint)', color: 'var(--amber-deep)', border: '1.5px solid var(--amber)',
+            borderRadius: 'var(--radius)', padding: 'var(--s5)', fontSize: 'var(--fs-hint)', fontWeight: 700,
+            marginBottom: 'var(--s5)',
+          }}>
+            {t('هذه الخدمة لم يُسلَّم لها ملف وحدة بعد.', 'No module file has been handed over for this service yet.')}
+          </div>
+        )}
 
       <Panel
         icon={<Timer size={14} />}
@@ -1138,253 +1168,76 @@ function ServiceView({ file, ar, t, tasks, focus, onComplete, onAct, onChat, onR
   );
 }
 
-/* ── registering an intake: the act itself, workable in the prototype ──── */
-function IntakeForm({ ar, t, onRegister }: {
-  ar: boolean; t: (a: string, e: string) => string;
-  onRegister: (f: { client: string; from: string; to: string; mode: 'air' | 'land' | 'sea'; weight: number; cartons: number }) => string;
+/* ── the real module, carried ───────────────────────────────────────────
+   The console draws no form of its own. It decompresses the package's own
+   file and shows it here, on this origin, so the module keeps its design,
+   its validation and its act — and writes to the same SL_* channels the
+   console reads. That sharing is the wiring; a form the console redrew
+   would be a second place the truth lives. */
+function ModuleFrame({ file, ar, t, title }: {
+  file: string; ar: boolean; t: (a: string, e: string) => string; title: string;
 }) {
-  const [f, setF] = useState({ client: '', from: 'Dubai', to: 'Damascus', mode: 'air' as 'air' | 'land' | 'sea', weight: '', cartons: '1' });
+  const [html, setHtml] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
-  const [last, setLast] = useState<string | null>(null);
-  const field = (k: keyof typeof f) => (e: { target: { value: string } }) => { setF(v => ({ ...v, [k]: e.target.value })); setErr(null); };
-  const submit = () => {
-    /* refusal says WHICH field displeased it — a greyed button explains nothing */
-    if (!f.client.trim()) { setErr(t('اسم العميل مطلوب — الطرد يُسجَّل على صاحبه.', "The client's name is required — a parcel is recorded to its owner.")); return; }
-    const wt = parseFloat(f.weight);
-    if (!(wt > 0)) { setErr(t('الوزن مطلوب ويكون أكبر من صفر.', 'A weight above zero is required.')); return; }
-    const ct = parseInt(f.cartons, 10);
-    if (!(ct > 0)) { setErr(t('عدد الطرود يكون واحداً فأكثر.', 'Cartons must be one or more.')); return; }
-    const ref = onRegister({ client: f.client.trim(), from: f.from, to: f.to, mode: f.mode, weight: wt, cartons: ct });
-    setLast(ref);
-    setF(v => ({ ...v, client: '', weight: '', cartons: '1' }));
-  };
-  const box: React.CSSProperties = {
-    height: 'var(--ctl-h)', padding: '0 var(--s3)', border: '1.5px solid var(--n3)',
-    borderRadius: 'var(--radius-sm)', fontSize: 'var(--fs-body)', fontFamily: 'inherit',
-    background: 'var(--paper)', width: '100%',
-  };
-  const lbl: React.CSSProperties = { fontSize: 'var(--fs-eyebrow)', color: 'var(--n6)', fontWeight: 800, letterSpacing: '.06em', textTransform: 'uppercase', display: 'block', marginBottom: 'var(--s1)' };
+  const frame = useRef<HTMLIFrameElement | null>(null);
+
+  useEffect(() => {
+    let live = true;
+    setHtml(null); setErr(null);
+    loadModule(file).then(
+      h => { if (live) setHtml(h); },
+      e => {
+        if (!live) return;
+        setErr((e as Error).message === 'no-decompressor'
+          ? t('متصفّحك لا يفكّ الضغط المضمَّن — افتح الوحدة من ملفّها.',
+              'This browser cannot unpack the carried file — open the module from its own file.')
+          : t('تعذّر تحميل الوحدة.', 'The module could not be loaded.'));
+      },
+    );
+    return () => { live = false; };
+  }, [file, t]);
+
+  /* the module owns its own language switch; the console only tells it which
+     language the person is working in, so one toggle moves the whole console */
+  const syncLang = useCallback(() => {
+    try {
+      const w = frame.current?.contentWindow as (Window & { setLang?: (l: string) => void }) | null;
+      w?.setLang?.(ar ? 'ar' : 'en');
+    } catch { /* a frame that is not ready yet is not an error */ }
+  }, [ar]);
+  useEffect(() => { syncLang(); }, [syncLang, html]);
+
+  if (err) {
+    return (
+      <div role="alert" style={{
+        background: 'var(--red-tint)', color: 'var(--red-deep)', border: '1.5px solid var(--red)',
+        borderRadius: 'var(--radius)', padding: 'var(--s5)', fontSize: 'var(--fs-hint)', fontWeight: 700,
+      }}>{err}</div>
+    );
+  }
+  if (!html) {
+    return (
+      <div style={{
+        background: 'var(--paper)', border: '1px solid var(--n3)', borderRadius: 'var(--radius)',
+        padding: 'var(--s6)', display: 'flex', flexDirection: 'column', gap: 'var(--s3)',
+      }}>
+        <div className="skeleton" style={{ height: 18, width: '42%' }} />
+        <div className="skeleton" style={{ height: 220 }} />
+      </div>
+    );
+  }
   return (
-    <section style={{
+    <div style={{
       background: 'var(--paper)', border: '1px solid var(--n3)', borderRadius: 'var(--radius)',
       boxShadow: 'var(--sh-1)', overflow: 'hidden', marginBottom: 'var(--s5)',
     }}>
-      <header style={{ display: 'flex', alignItems: 'center', gap: 'var(--s3)', padding: 'var(--s3) var(--s4)', borderBottom: '1px solid var(--n2)' }}>
-        <span aria-hidden style={{ width: 26, height: 26, borderRadius: 'var(--radius-sm)', background: 'var(--green-tint)', color: 'var(--green-deep)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Boxes size={14} />
-        </span>
-        <div style={{ flex: 1, lineHeight: 1.2 }}>
-          <div style={{ fontSize: 'var(--fs-eyebrow)', color: 'var(--n5)', fontWeight: 800, letterSpacing: '.08em', textTransform: 'uppercase' }}>{t('الفعل', 'The act')}</div>
-          <div style={{ fontSize: 'var(--fs-lead)', fontWeight: 800 }}>{t('سجّل استلام طرد', 'Record a parcel intake')}</div>
-        </div>
-        {last && <span className="machine" style={{ fontSize: 'var(--fs-eyebrow)', color: 'var(--green-deep)', background: 'var(--green-tint)', padding: '3px 9px', borderRadius: 'var(--radius-pill)', fontWeight: 800 }}>{last}</span>}
-      </header>
-      <div style={{ padding: 'var(--s4) var(--s5)' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 'var(--s3)' }}>
-          <div style={{ gridColumn: '1 / -1' }}>
-            <label style={lbl}>{t('العميل', 'Client')}</label>
-            <input value={f.client} onChange={field('client')} onKeyDown={e => { if (e.key === 'Enter') submit(); }}
-              placeholder={t('اسم صاحب الطرد', "The parcel owner's name")} style={box} />
-          </div>
-          <div>
-            <label style={lbl}>{t('من', 'From')}</label>
-            <select value={f.from} onChange={field('from')} style={box}>
-              {['Dubai', 'Istanbul', 'Yiwu', 'Charlotte'].map(x => <option key={x} value={x}>{x}</option>)}
-            </select>
-          </div>
-          <div>
-            <label style={lbl}>{t('إلى', 'To')}</label>
-            <select value={f.to} onChange={field('to')} style={box}>
-              {['Damascus', 'Aleppo', 'Homs', 'Latakia'].map(x => <option key={x} value={x}>{x}</option>)}
-            </select>
-          </div>
-          <div>
-            <label style={lbl}>{t('الوسيلة', 'Mode')}</label>
-            <select value={f.mode} onChange={field('mode')} style={box}>
-              <option value="air">{t('جوي', 'Air')}</option>
-              <option value="land">{t('بري', 'Land')}</option>
-              <option value="sea">{t('بحري', 'Sea')}</option>
-            </select>
-          </div>
-          <div>
-            <label style={lbl}>{t('الوزن kg', 'Weight kg')}</label>
-            <input value={f.weight} onChange={field('weight')} inputMode="decimal" placeholder="0.0" className="machine" style={box} />
-          </div>
-          <div>
-            <label style={lbl}>{t('الطرود', 'Cartons')}</label>
-            <input value={f.cartons} onChange={field('cartons')} inputMode="numeric" className="machine" style={box} />
-          </div>
-        </div>
-        {err && (
-          <div role="alert" style={{
-            marginTop: 'var(--s3)', fontSize: 'var(--fs-hint)', fontWeight: 700,
-            color: 'var(--red-deep)', background: 'var(--red-tint)',
-            padding: 'var(--s2) var(--s3)', borderRadius: 'var(--radius-sm)',
-          }}>{err}</div>
-        )}
-        <div style={{ marginTop: 'var(--s4)' }}>
-          <button onClick={submit} style={{
-            height: 'var(--ctl-h)', padding: '0 var(--s6)', background: 'var(--sky)', color: 'var(--ink)',
-            borderRadius: 'var(--radius-sm)', fontSize: 'var(--fs-body)', fontWeight: 800,
-            transition: 'filter var(--t-state) var(--ease)',
-          }}
-            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.filter = 'brightness(1.06)'; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.filter = ''; }}>
-            {t('سجّل الاستلام', 'Record the intake')}
-          </button>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ── the act, performed where it belongs ────────────────────────────────
-   The verb on a queue row brings the person HERE, to the owning service,
-   with the task in hand. The flow below is the act itself — pick the trip,
-   record the measure, decide the failed delivery — and only completing it
-   clears the row from the queue. */
-function ActFlow({ task, ar, t, onComplete }: {
-  task: Task; ar: boolean; t: (a: string, e: string) => string;
-  onComplete: (x: Task, text: string) => void;
-}) {
-  const [tripPick, setTripPick] = useState(openTrips[0].ref);
-  const [wt, setWt] = useState('');
-  const [reason, setReason] = useState('');
-  const [err, setErr] = useState<string | null>(null);
-  const box: React.CSSProperties = {
-    height: 'var(--ctl-h)', padding: '0 var(--s3)', border: '1.5px solid var(--n3)',
-    borderRadius: 'var(--radius-sm)', fontSize: 'var(--fs-body)', fontFamily: 'inherit', background: 'var(--paper)',
-  };
-  const primary: React.CSSProperties = {
-    height: 'var(--ctl-h)', padding: '0 var(--s5)', background: 'var(--sky)', color: 'var(--ink)',
-    borderRadius: 'var(--radius-sm)', fontSize: 'var(--fs-body)', fontWeight: 800,
-  };
-  const done = (txtAr: string, txtEn: string) =>
-    onComplete(task, (ar ? txtAr : txtEn) + ' — ' + task.ref + (ar ? ' خرج من طابورك' : ' left your queue'));
-  return (
-    <section aria-label={t('تنفيذ', 'Act')} style={{
-      background: 'var(--paper)', border: '1.5px solid var(--sky)', borderRadius: 'var(--radius)',
-      boxShadow: 'var(--sh-2)', overflow: 'hidden', marginBottom: 'var(--s5)',
-    }}>
-      <header style={{
-        display: 'flex', alignItems: 'center', gap: 'var(--s3)',
-        padding: 'var(--s3) var(--s4)', background: 'var(--sky-tint)', borderBottom: '1px solid var(--n2)',
-      }}>
-        <span aria-hidden style={{
-          width: 26, height: 26, borderRadius: 'var(--radius-sm)', background: 'var(--sky)',
-          color: 'var(--ink)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-        }}><Timer size={14} /></span>
-        <div style={{ flex: 1, lineHeight: 1.25 }}>
-          <div style={{ fontSize: 'var(--fs-eyebrow)', color: 'var(--sky-deep)', fontWeight: 800, letterSpacing: '.08em', textTransform: 'uppercase' }}>
-            {t('المهمة بين يديك', 'The task in hand')}
-          </div>
-          <div style={{ fontSize: 'var(--fs-lead)', fontWeight: 800 }}>{ar ? task.ar : task.en}</div>
-        </div>
-        <span className="machine" style={{ fontSize: 'var(--fs-hint)', color: 'var(--n6)' }}>{task.ref}</span>
-      </header>
-
-      <div style={{ padding: 'var(--s4) var(--s5)' }}>
-        {task.kind === 'document' && task.open === 'ShopyLink_Action_03_CreateTrip.html' && (
-          <>
-            <div style={{ fontSize: 'var(--fs-hint)', color: 'var(--n6)', marginBottom: 'var(--s3)' }}>
-              {t('أضف الحمولة إلى رحلة ما تزال تُحمَّل، أو أنشئ رحلة جديدة لها.', 'Add the load to a trip still boarding, or create a new trip for it.')}
-            </div>
-            <div role="radiogroup" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--s2)', marginBottom: 'var(--s4)' }}>
-              {openTrips.map(tr => (
-                <label key={tr.ref} style={{
-                  display: 'flex', alignItems: 'center', gap: 'var(--s3)', padding: 'var(--s3) var(--s4)',
-                  border: '1.5px solid ' + (tripPick === tr.ref ? 'var(--sky)' : 'var(--n3)'),
-                  borderRadius: 'var(--radius-sm)', cursor: 'pointer',
-                  background: tripPick === tr.ref ? 'var(--sky-tint)' : 'var(--paper)',
-                  transition: 'border-color var(--t-state) var(--ease), background var(--t-state) var(--ease)',
-                }}>
-                  <input type="radio" name="trip" checked={tripPick === tr.ref} onChange={() => setTripPick(tr.ref)} style={{ accentColor: 'var(--sky)' }} />
-                  <span className="machine" style={{ fontWeight: 700 }}>{tr.ref}</span>
-                  <span style={{ flex: 1, fontSize: 'var(--fs-hint)', color: 'var(--n7)' }}>{tr.to} · {ar ? tr.departsAr : tr.departsEn}</span>
-                </label>
-              ))}
-            </div>
-            <div style={{ display: 'flex', gap: 'var(--s3)', flexWrap: 'wrap' }}>
-              <button style={primary} onClick={() => done('حُمِّلت على ' + tripPick, 'Loaded onto ' + tripPick)}>
-                {t('أضفها إلى هذه الرحلة', 'Add it to this trip')}
-              </button>
-              <button style={{ ...primary, background: 'var(--paper)', border: '1.5px solid var(--n3)', color: 'var(--n7)', fontWeight: 700 }}
-                onClick={() => {
-                  const ref = 'TRP-' + String(new Date().getMonth() + 1).padStart(2, '0') + String(new Date().getDate()).padStart(2, '0') + '-0' + (openTrips.length + 1);
-                  done('أُنشئت الرحلة ' + ref + ' وحُمِّلت عليها', 'Trip ' + ref + ' created and loaded');
-                }}>
-                {t('أنشئ رحلة جديدة وأضفها', 'Create a new trip and add it')}
-              </button>
-            </div>
-          </>
-        )}
-
-        {task.kind === 'measure' && (
-          <>
-            <div style={{ fontSize: 'var(--fs-hint)', color: 'var(--n6)', marginBottom: 'var(--s3)' }}>
-              {t('سجّل الوزن المقيس — القياس هو ما يُفوتَر عليه.', 'Record the measured weight — the measure is what gets invoiced.')}
-            </div>
-            <div style={{ display: 'flex', gap: 'var(--s3)', alignItems: 'flex-end', flexWrap: 'wrap' }}>
-              <div>
-                <label style={{ fontSize: 'var(--fs-eyebrow)', color: 'var(--n6)', fontWeight: 800, display: 'block', marginBottom: 'var(--s1)' }}>{t('الوزن kg', 'Weight kg')}</label>
-                <input value={wt} onChange={e => { setWt(e.target.value); setErr(null); }} inputMode="decimal" placeholder="0.0" className="machine" style={{ ...box, width: 140 }} />
-              </div>
-              <button style={primary} onClick={() => {
-                const v = parseFloat(wt);
-                if (!(v > 0)) { setErr(t('الوزن مطلوب ويكون أكبر من صفر.', 'A weight above zero is required.')); return; }
-                done('سُجّل القياس ' + v.toFixed(1) + ' kg', 'Measured at ' + v.toFixed(1) + ' kg');
-              }}>{t('سجّل القياس', 'Record the measure')}</button>
-            </div>
-          </>
-        )}
-
-        {task.kind === 'deliver' && (
-          <>
-            <div style={{ fontSize: 'var(--fs-hint)', color: 'var(--n6)', marginBottom: 'var(--s3)' }}>
-              {t('محاولتان أخفقتا — القرار لك.', 'Two attempts failed — the decision is yours.')}
-            </div>
-            <div style={{ display: 'flex', gap: 'var(--s3)', flexWrap: 'wrap', alignItems: 'flex-end' }}>
-              <button style={primary} onClick={() => done('جُدولت محاولة ثالثة', 'A third attempt is scheduled')}>
-                {t('جدولة محاولة ثالثة', 'Schedule a third attempt')}
-              </button>
-              <div style={{ display: 'flex', gap: 'var(--s2)', alignItems: 'flex-end' }}>
-                <div>
-                  <label style={{ fontSize: 'var(--fs-eyebrow)', color: 'var(--n6)', fontWeight: 800, display: 'block', marginBottom: 'var(--s1)' }}>{t('سبب الإرجاع', 'Return reason')}</label>
-                  <input value={reason} onChange={e => { setReason(e.target.value); setErr(null); }}
-                    placeholder={t('إلزامي عند الإرجاع', 'Required to return')} style={{ ...box, width: 220 }} />
-                </div>
-                <button style={{ ...primary, background: 'var(--red-tint)', color: 'var(--red-deep)' }} onClick={() => {
-                  if (!reason.trim()) { setErr(t('الإرجاع يحتاج سبباً مكتوباً.', 'A return needs a written reason.')); return; }
-                  done('أُرجعت إلى المرسل: ' + reason.trim(), 'Returned to sender: ' + reason.trim());
-                }}>{t('إرجاع إلى المرسل', 'Return to sender')}</button>
-              </div>
-            </div>
-          </>
-        )}
-
-        {task.kind === 'approve' && (
-          <button style={primary} onClick={() => done('وُقّع الطلب', 'Signed')}>{t('وقّع', 'Sign')}</button>
-        )}
-
-        {task.kind === 'document' && task.open !== 'ShopyLink_Action_03_CreateTrip.html' && (
-          <>
-            <div style={{ fontSize: 'var(--fs-hint)', color: 'var(--n6)', marginBottom: 'var(--s3)' }}>
-              {t('نفّذ الخطوة هنا ثم سجّل إتمامها — التسجيل هو ما يُخرجها من الطابور.', 'Do the step here, then record it done — the record is what clears the queue.')}
-            </div>
-            <button style={primary} onClick={() => done('سُجّل الإتمام', 'Recorded done')}>
-              {t('سجّل الإتمام', 'Record it done')}
-            </button>
-          </>
-        )}
-
-        {err && (
-          <div role="alert" style={{
-            marginTop: 'var(--s3)', fontSize: 'var(--fs-hint)', fontWeight: 700,
-            color: 'var(--red-deep)', background: 'var(--red-tint)',
-            padding: 'var(--s2) var(--s3)', borderRadius: 'var(--radius-sm)',
-          }}>{err}</div>
-        )}
-      </div>
-    </section>
+      <iframe
+        ref={frame}
+        title={title}
+        srcDoc={html}
+        onLoad={syncLang}
+        style={{ display: 'block', width: '100%', height: '78vh', minHeight: 560, border: 0, background: 'var(--paper)' }}
+      />
+    </div>
   );
 }
