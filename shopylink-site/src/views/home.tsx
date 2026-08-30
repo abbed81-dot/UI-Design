@@ -1,7 +1,7 @@
 import { Curtain } from "@/components/site/curtain";
 import { CityExplorer } from "@/components/site/city-explorer";
 import { CityRunway } from "@/components/site/city-runway";
-import { GlobeCanvas } from "@/components/site/globe-canvas";
+import { SceneMount } from "@/components/site/scene-mount";
 import { Hero } from "@/components/site/hero";
 import { Steps } from "@/components/site/steps";
 
@@ -19,7 +19,7 @@ import { Steps } from "@/components/site/steps";
 export const HomeView = () => {
   return (
     <>
-      <GlobeCanvas />
+      <SceneMount />
       <CityExplorer />
       <Curtain />
       <main className="relative">

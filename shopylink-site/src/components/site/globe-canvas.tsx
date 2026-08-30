@@ -17,15 +17,9 @@ export const GlobeCanvas = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    // tier the device once — DPR, counts and the frame budget all read from here
-    const coarse = window.matchMedia("(pointer: coarse)").matches;
-
+    // the scene tiers itself from src/lib/scene/device.ts — one module owns it
     const handle = createGlobeScene({
       canvas,
-      reducedMotion: reduced,
-      maxFps: coarse ? 30 : 0,
-      dotCount: coarse ? 9000 : undefined,
       onReady: () => useSite.getState().setSceneReady(true),
     });
     handleRef.current = handle;
@@ -59,11 +53,16 @@ export const GlobeCanvas = () => {
 
     read();
     window.addEventListener("scroll", read, { passive: true });
-    window.addEventListener("resize", onResize);
+    // §13: on touch, iOS fires `resize` every time the URL bar collapses during
+    // scroll, and rebuilding the framebuffer mid-scroll reads as a whole-scene
+    // flash. Rotation still needs a re-fit, so listen for THAT instead.
+    const touch = window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+    const resizeEvent = touch ? "orientationchange" : "resize";
+    window.addEventListener(resizeEvent, onResize);
 
     return () => {
       window.removeEventListener("scroll", read);
-      window.removeEventListener("resize", onResize);
+      window.removeEventListener(resizeEvent, onResize);
       handle.dispose();
       setGlobeHandle(null);
       handleRef.current = null;
@@ -74,7 +73,11 @@ export const GlobeCanvas = () => {
     <canvas
       ref={canvasRef}
       aria-hidden="true"
-      className="pointer-events-none fixed inset-0 -z-10 h-lvh w-full"
+      /* §13: its own compositor layer — without it a neighbouring fixed element
+         repainting during scroll invalidates the WebGL composite on WebKit and
+         the whole scene flickers. `lvh` so a collapsing URL bar never
+         re-allocates the framebuffer. */
+      className="pointer-events-none fixed inset-0 -z-10 h-lvh w-full transform-gpu backface-hidden will-change-transform"
     />
   );
 };

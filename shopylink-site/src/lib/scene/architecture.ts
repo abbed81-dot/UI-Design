@@ -60,6 +60,9 @@ const getShadowTexture = (): THREE.CanvasTexture => {
   return shadowTexture;
 };
 
+/** §3: the loader must upload this before the first scroll frame samples it. */
+export const contactShadowTexture = (): THREE.CanvasTexture | null => shadowTexture;
+
 export const contactShadow = (radius: number, palette: ArchPalette, opacity = 0.22) => {
   const plane = new THREE.Mesh(
     new THREE.PlaneGeometry(radius * 2, radius * 2),

@@ -19,8 +19,17 @@ import {
   buildLandmark,
   buildStoreForm,
   contactShadow,
+  contactShadowTexture,
   type ArchPalette,
 } from "@/lib/scene/architecture";
+import {
+  getDotCount,
+  getFrameBudget,
+  getPixelRatio,
+  getRendererFlags,
+  getTier,
+  sceneShouldFreeze,
+} from "@/lib/scene/device";
 
 export type GlobeConfig = {
   bgColor: string;
@@ -264,30 +273,26 @@ export type GlobeHandle = {
 
 export type GlobeOptions = {
   canvas: HTMLCanvasElement;
-  /** cut fill, not detail — fewer surface dots on a phone */
-  dotCount?: number;
   /** fired after the first DRAWN frame — a resolved promise is not readiness */
   onReady?: () => void;
-  reducedMotion?: boolean;
-  /** frame budget in fps; 0 means uncapped */
-  maxFps?: number;
 };
 
-export const createGlobeScene = ({
-  canvas,
-  onReady,
-  reducedMotion = false,
-  maxFps = 0,
-  dotCount = CONFIG.dotCount,
-}: GlobeOptions): GlobeHandle => {
+export const createGlobeScene = ({ canvas, onReady }: GlobeOptions): GlobeHandle => {
   syncConfigFromTokens();
 
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-  // a 3× phone renders 9× the fragments
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  // §2: one module decides what "mobile" means; everything below reads from it
+  const tier = getTier();
+  const reducedMotion = sceneShouldFreeze(tier);
+  const dotCount = getDotCount(tier);
+  const frameGap = getFrameBudget(tier) / 1000;
+
+  const renderer = new THREE.WebGLRenderer({ canvas, ...getRendererFlags(tier) });
+  renderer.setPixelRatio(getPixelRatio(tier));
   renderer.setSize(window.innerWidth, window.innerHeight, false);
 
   const scene = new THREE.Scene();
+  // the context is opaque now (alpha: false), so the canvas paints the ground
+  scene.background = new THREE.Color(CONFIG.bgColor);
   const camera = new THREE.PerspectiveCamera(38, window.innerWidth / window.innerHeight, 0.1, 100);
 
   // fewest lights the look survives — a light-count change recompiles every program
@@ -690,9 +695,9 @@ export const createGlobeScene = ({
   canvas.addEventListener("pointercancel", onPointerUp);
   canvas.addEventListener("wheel", onWheel, { passive: false });
   let lastFrame = 0;
-  const frameGap = maxFps > 0 ? 1 / maxFps : 0;
 
   const applyConfig = () => {
+    scene.background = new THREE.Color(CONFIG.bgColor);
     body.material.color.set(CONFIG.sphereColor);
     rim.material.uniforms.uColor.value.copy(hexToVec3(CONFIG.rimColor));
     rim.material.uniforms.uPower.value = CONFIG.rimPower;
@@ -713,8 +718,32 @@ export const createGlobeScene = ({
   const resize = () => {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(getPixelRatio(tier));
     renderer.setSize(window.innerWidth, window.innerHeight, false);
+  };
+
+  /**
+   * §3: after the loader hands off, the frame loop must compile nothing.
+   *
+   * The districts are `visible = false` at load, and an invisible object's
+   * material is exactly what gets compiled the first time it is shown — which
+   * is mid-scroll, on the boundary where a city arrives. Everything is made
+   * visible for the compile, then put back.
+   */
+  const prewarm = () => {
+    const wasVisible = dioramas.map((g) => g.visible);
+    for (const g of dioramas) {
+      g.visible = true;
+      g.scale.set(1, 1, 1);
+    }
+    const shadow = contactShadowTexture();
+    if (shadow) renderer.initTexture(shadow);
+    renderer.compile(scene, camera);
+    renderer.render(scene, camera); // one real frame through the whole graph
+    dioramas.forEach((g, i) => {
+      g.visible = wasVisible[i];
+      g.scale.set(1, 0.001, 1);
+    });
   };
 
   const frame = () => {
@@ -873,6 +902,8 @@ export const createGlobeScene = ({
     renderer.render(scene, camera);
 
     if (!ready) {
+      // warm the whole graph BEFORE telling the loader it may leave
+      prewarm();
       ready = true;
       onReady?.();
     }
@@ -880,11 +911,12 @@ export const createGlobeScene = ({
 
   renderer.setAnimationLoop(frame);
 
+  // §4: one viewport of margin, so the scene is already warm when it arrives
   const observer = new IntersectionObserver(
     ([entry]) => {
       visible = entry.isIntersecting;
     },
-    { threshold: 0 },
+    { threshold: 0, rootMargin: "100% 0px" },
   );
   observer.observe(canvas);
 

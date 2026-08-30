@@ -460,3 +460,50 @@ contributors and AI agents no structured map of the system.
 **When building.** Docs are maintained alongside code — see [[meta/README]] for
 the maintenance rules, and [[agent-harness]] for how the vault and `.claude/`
 divide the work.
+
+---
+
+## ADR-0015 — Tier the globe scene, and warm it inside the loader
+
+**Status:** Accepted · ShopyLink
+
+**Decision.** `src/lib/scene/device.ts` is the single authority on what "mobile"
+means; DPR, renderer flags, the frame budget and surface-dot counts all read
+from it. The scene compiles its entire graph — including the four districts that
+are `visible = false` — before the loader is allowed to hand off. `three` is
+code-split behind `SceneMount` so it is never in the first-load bundle.
+
+**Why.** Measured on a production build, before and after (counted quantities
+only — SwiftShader is not a GPU, so fps from headless Chrome would be a lie):
+
+| | before | after |
+|---|---|---|
+| desktop drawing buffer | 5.76 Mpx | 3.24 Mpx |
+| phone drawing buffer | 1.32 Mpx | 0.33 Mpx |
+| phone antialias | on | off |
+| shader programs linked during scroll | **2** | **0** |
+| last program link | 13041 ms | 811 ms |
+
+The two programs linking mid-scroll were the districts: an invisible object's
+material compiles the first time it is shown, which here is exactly the moment a
+city arrives. That is the micro-freeze, and it is now impossible.
+
+**The trade-offs, stated.**
+
+- Mobile DPR stops at **1.0, not 0.85**. The usual advice goes below 1.0 for
+  soft sprites; this scene is hard-edged — building corners, 1px district
+  outlines, the spire's needle — and those alias visibly.
+- **No bot poster.** The skill's §1 also wants a static poster served to
+  crawlers behind a UA check, which would opt `/` out of static prerendering
+  (`○` → `ƒ`). Not taken: the canvas is `aria-hidden` decoration behind a page
+  whose copy, headings and links are all real DOM, so a crawler with no
+  JavaScript already sees everything that matters, and the share card is the
+  Open Graph image. The route stays static.
+- **No `resize` listener on touch.** iOS fires `resize` every time the URL bar
+  collapses during scroll, and rebuilding the framebuffer mid-scroll reads as a
+  whole-scene flash. Rotation still needs a re-fit, so touch listens for
+  `orientationchange` instead.
+
+**Not measured.** Frame timings under a throttled CPU, Lighthouse, and the feel
+on real hardware. Fill-rate wins are invisible in a profiler and obvious in the
+hand — this needs a look on an actual phone before launch.

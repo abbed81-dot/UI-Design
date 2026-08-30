@@ -4,7 +4,7 @@ const b = await chromium.launch({ executablePath:'/opt/pw-browsers/chromium-1194
   proxy:{ server: process.env.HTTPS_PROXY, bypass:'127.0.0.1,localhost' }});
 const p = await b.newPage({ viewport:{width:1440,height:900} });
 const errs=[]; p.on('pageerror',e=>errs.push('PAGEERROR: '+e.message));
-await p.goto('http://127.0.0.1:3171/', { waitUntil:'load' });
+await p.goto('http://127.0.0.1:3190/', { waitUntil:'load' });
 await p.waitForTimeout(9000); // software rendering in CI: the loader honestly waits for the scene
 const reject = p.getByRole('button', { name: /reject all/i });
 if (await reject.count()) { await reject.first().click(); await p.waitForTimeout(700); }

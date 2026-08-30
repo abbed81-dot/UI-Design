@@ -89,3 +89,30 @@
 - **Changed** `siteConfig` from the starter's placeholders to real ShopyLink
   values. `twitterHandle` is deliberately EMPTY: a guessed handle in
   `twitter:site` credits the share card to whoever owns that name.
+
+## ShopyLink — the 3D performance pass
+
+Ran the `optimize-3d-scene` skill in its own order (AGENTS.md hard rule #13),
+measured on a production build before and after. Counted quantities only.
+
+| | before | after |
+|---|---|---|
+| desktop drawing buffer | 5.76 Mpx | 3.24 Mpx |
+| phone drawing buffer | 1.32 Mpx | 0.33 Mpx |
+| programs linked during scroll | 2 | 0 |
+| last program link | 13041 ms | 811 ms |
+
+- **Added** `src/lib/scene/device.ts` (§2) — tier, DPR, frame budget, renderer
+  flags, dot count, `prefersReducedMotion`, `isEnergySaver`, `sceneShouldFreeze`.
+- **Added** `prewarm()` in the scene (§3) — `initTexture`, `compile` and one full
+  frame with every district visible, before the loader hands off.
+- **Added** `SceneMount` (§1) — `three` code-split out of the first-load bundle;
+  `/` stays statically prerendered.
+- **Changed** the observer to a one-viewport `rootMargin` (§4), the renderer to
+  per-tier flags (§7), and the resize listener to `orientationchange` on touch
+  (§13). The canvas is its own compositor layer.
+- **Added** `scenes/audit-3d.mjs` — the §0 harness, so the numbers above can be
+  re-measured rather than believed.
+
+Not measured: throttled-CPU frame timings, Lighthouse, and the feel on real
+hardware. See ADR-0015.
