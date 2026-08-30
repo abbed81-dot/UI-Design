@@ -1,0 +1,72 @@
+/* A demonstration day for the operator's home — rich enough to judge the
+   design by. Nothing here is reference data: names, prices and routes are
+   invented, and the page says so in its chrome whenever it draws from this
+   file rather than from a published register. */
+import type { Person } from './channels';
+
+const H = 3600000;
+const now = Date.now();
+
+export type Task = {
+  id: string;
+  ar: string; en: string;
+  ref: string;
+  lateMs: number;              /* <0 = due soon, not yet late */
+  verbAr: string; verbEn: string;
+  open: string;                /* the module that owns the act */
+  kind: 'measure' | 'deliver' | 'approve' | 'document';
+};
+
+export const dayTasks: Task[] = [
+  { id: 'T1', ar: 'تسليم أخفق مرّتين — يقرَّر مصيره', en: 'A delivery that failed twice — decide it', ref: 'CON-240703-02', lateMs: 26 * H, verbAr: 'قرِّر', verbEn: 'Decide', open: 'ShopyLink_Action_08_Delivery.html', kind: 'deliver' },
+  { id: 'T2', ar: 'طرد مستلَم ينتظر القياس', en: 'A parcel received, waiting to be measured', ref: 'CON-240712-01', lateMs: 9 * H, verbAr: 'قِس', verbEn: 'Measure', open: 'ShopyLink_Action_01_ReceiveParcel.html', kind: 'measure' },
+  { id: 'T3', ar: 'حمولة مجمَّعة تنتظر رحلة', en: 'A consolidated load waiting for a trip', ref: 'CON-240711-04', lateMs: 6 * H, verbAr: 'جمِّع', verbEn: 'Consolidate', open: 'ShopyLink_Action_02_Consolidation.html', kind: 'document' },
+  { id: 'T4', ar: 'طرد وصل مركزك اليوم', en: 'A parcel that reached your centre today', ref: 'CON-240712-03', lateMs: 3 * H, verbAr: 'قِس', verbEn: 'Measure', open: 'ShopyLink_Action_01_ReceiveParcel.html', kind: 'measure' },
+  { id: 'T5', ar: 'طرد ثانٍ ينتظر القياس', en: 'A second parcel waiting to be measured', ref: 'CON-240712-05', lateMs: 1 * H, verbAr: 'قِس', verbEn: 'Measure', open: 'ShopyLink_Action_01_ReceiveParcel.html', kind: 'measure' },
+  { id: 'T6', ar: 'شحنة تصل خلال ساعتين — جهّز الرصيف', en: 'A shipment arriving within two hours — clear the dock', ref: 'TRP-2608-014', lateMs: -2 * H, verbAr: 'جهّز', verbEn: 'Prepare', open: 'ShopyLink_Action_06_ArrivalReceive.html', kind: 'document' },
+];
+
+export const dayNotice = {
+  kind: 'policy',
+  ar: 'من هذا الشهر كل حساب أعمال بالدفع المسبق ما لم يُمنح تسهيل ائتماني كتابةً.',
+  en: 'From this month every business account is prepaid unless a credit facility is granted in writing.',
+  by: 'Omar Al-Masri',
+  at: '2026-08-28',
+};
+
+export const dayFigures = [
+  { ar: 'استلمتُ اليوم', en: 'Taken in today', n: 7, tone: 'green' as const },
+  { ar: 'ينتظر قياسي', en: 'Waiting on my measure', n: 3, tone: 'amber' as const },
+  { ar: 'متأخّر عليّ', en: 'Late on me', n: 1, tone: 'red' as const },
+];
+
+export const dayMe: Person = {
+  id: 'U-02', name: 'Khaled Omar', role: 'wh', level: 1, status: 'active', onLeave: false,
+  perms: ['b1_ind', 'b1_biz', 'b2_con'], duties: ['measure'],
+  dutyAr: 'يقيس ويزن ويصوّر كل قطعة تصل مركزه', dutyEn: 'Measures, weighs and photographs every piece reaching his centre',
+  reportsTo: 'hubsup', scope: { type: 'list', countries: [], hubs: ['H-DAM'] },
+};
+
+/* seed thread per task ref — the console shows it; writing goes through D1 */
+export const dayThreads: Record<string, { by: string; at: string; ar: string; en: string }[]> = {
+  'CON-240703-02': [
+    { by: 'Mona Said', at: '09:12', ar: 'المحاولة الثانية رفضها العميل — الهاتف مغلق.', en: 'Second attempt refused — phone unreachable.' },
+    { by: 'Khaled Omar', at: '09:40', ar: 'أُعيدت إلى الرفّ C-4 بانتظار القرار.', en: 'Back on shelf C-4 pending the decision.' },
+  ],
+};
+
+/* the dense state: five hundred rows, generated rather than shipped */
+export function denseTasks(): Task[] {
+  const out: Task[] = [];
+  for (let i = 0; i < 500; i++) {
+    out.push({
+      id: 'D' + i,
+      ar: 'تسليم أخفق مرّتين — يقرَّر مصيره', en: 'A delivery that failed twice — decide it',
+      ref: 'CON-9' + String(100000 + i).slice(1) + '-01',
+      lateMs: (500 - i) * 0.5 * H,
+      verbAr: 'قرِّر', verbEn: 'Decide',
+      open: 'ShopyLink_Action_08_Delivery.html', kind: 'deliver',
+    });
+  }
+  return out;
+}

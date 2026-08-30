@@ -1,0 +1,109 @@
+/* ShopyLink — the identity's tokens, verbatim from ShopyLink_Tokens.html.
+   Not one colour, size or duration below is invented. Two stated deviations:
+   the panel transition is capped at 200ms (the brief's ceiling; the sheet
+   says 240ms), and the console commits to the identity's LIGHT tone — the
+   brand guide's own note reads "Tone: LIGHT. Do not flip." — so backgrounds
+   are painted explicitly and there is deliberately no dark theme. */
+
+:root {
+  /* ground */
+  --cream: #F7F4EC;
+  --paper: #FFFFFF;
+  --clean: #F4FBFF;
+  --ink:   #0B2A3B;
+
+  /* the neutral ramp */
+  --n1: #F7F4EC; --n2: #EDE9E0; --n3: #DDD8CD; --n4: #BFC5C9;
+  --n5: #95A1A9; --n6: #62707A; --n7: #44555F; --n8: #0B2A3B;
+
+  /* states — each with a tint to sit on and a deep to read in */
+  --sky: #0EA5E9;   --sky-tint: #E6F4FE;   --sky-deep: #0B6E9B;
+  --green: #10B981; --green-tint: #DCF5E9; --green-deep: #0A7250;
+  --amber: #F59E0B; --amber-tint: #FDF0D5; --amber-deep: #8A5A06;
+  --red: #E1483B;   --red-tint: #FBE3E1;   --red-deep: #B23429;
+  --deep: #0A4A6B;
+  --acc: #38BDF8;   /* decorative on dark ground only */
+
+  /* type — the identity's four faces */
+  --disp: 'Bricolage Grotesque', 'Manrope', system-ui, sans-serif;
+  --body: 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --ar:   'Tajawal', 'Noto Kufi Arabic', system-ui, sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --fs-eyebrow: 10.5px; --fs-hint: 12.5px; --fs-body: 14px;
+  --fs-lead: 15.5px; --fs-title: 19px; --fs-figure: 26px;
+
+  /* the sheet's spacing scale */
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px;
+  --s5: 20px; --s6: 24px; --s7: 32px; --s8: 48px;
+
+  --ctl-h: 42px;
+  --row-h: 38px;
+  --radius: 12px;
+  --radius-sm: 9px;
+  --radius-pill: 999px;
+
+  --sh-1: 0 1px 2px rgba(11,42,59,.06);
+  --sh-2: 0 14px 34px -14px rgba(11,42,59,.40);
+
+  --t-state: 150ms;
+  --t-panel: 200ms; /* sheet: 240ms — capped per the brief's 120–200ms rule */
+  --ease: cubic-bezier(.2,.7,.3,1);
+
+  /* layout masses */
+  --sb-w: 248px;
+  --rail-w: 56px;
+  --panel-w: 384px;
+  --top-h: 48px;
+}
+
+html, body, #root { height: 100%; }
+
+body {
+  margin: 0;
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: var(--fs-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Arabic carries the interface by default */
+[dir="rtl"] body { font-family: var(--ar); }
+
+/* Machine values stay left-to-right under RTL: ids, codes, money, dates. */
+.machine {
+  direction: ltr;
+  unicode-bidi: isolate;
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+/* display face for large Latin figures */
+.disp { font-family: var(--disp); font-variant-numeric: tabular-nums; }
+
+:focus-visible { outline: 2px solid var(--sky); outline-offset: 2px; border-radius: 2px; }
+
+button { cursor: pointer; }
+button:disabled { cursor: default; }
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { background: var(--n4); border-radius: var(--radius-pill); }
+::-webkit-scrollbar-thumb:hover { background: var(--n5); }
+::-webkit-scrollbar-track { background: transparent; }
+::selection { background: var(--sky-tint); }
+
+/* the skeleton's breath — the one ambient motion, and it dies with the setting */
+@keyframes sl-shimmer {
+  0% { opacity: .55; } 50% { opacity: 1; } 100% { opacity: .55; }
+}
+.skeleton {
+  background: var(--n2);
+  border-radius: var(--radius-sm);
+  animation: sl-shimmer 1.2s var(--ease) infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
