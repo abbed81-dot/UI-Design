@@ -6,11 +6,19 @@
     "axes": {
       "dimensionality": "3d",
       "tone": "light",
-      "mood": ["calm", "technical", "luxe"],
+      "mood": [
+        "calm",
+        "technical",
+        "luxe"
+      ],
       "motionEnergy": "lively",
       "density": "balanced"
     },
-    "bilingual": { "en": "Bricolage Grotesque", "ar": "Tajawal", "dir": "ltr+rtl" }
+    "bilingual": {
+      "en": "Bricolage Grotesque",
+      "ar": "Tajawal",
+      "dir": "ltr+rtl"
+    }
   },
   "brand": {
     "source": "ShopyLink Brand Guide A4.html (:root), commit 5f3f06f",
@@ -29,10 +37,36 @@
     "use": "--deep #0A4A6B with white (9.52:1 AAA) for solid CTAs; --ink #0B2A3B on --pri (5.38:1 AA)"
   },
   "decisions": {
-    "styleId": null,
-    "templateId": null,
-    "target": null,
-    "note": "Style + template awaiting user pick. Target unresolved: existing ShopyLink prototype is no-framework vanilla HTML."
+    "styleId": "auralis-style",
+    "templateId": "auralis",
+    "target": "starter",
+    "rationale": "Auralis is Next-native; a 4-act WebGL scroll film does not survive hand-translation to vanilla HTML."
   },
-  "sectionsPlaced": []
+  "sectionsPlaced": [],
+  "environment": {
+    "starter": "shopylink-site/ (next16-claude-starter, git detached, fresh init)",
+    "node": "v22.22.2",
+    "yarn": "1.22.22",
+    "starterFileCount": 163
+  },
+  "reskinPlan": {
+    "tokenFile": "src/app/globals.css",
+    "sceneTintFile": "src/components/common/scene/scene.config.ts",
+    "note": "Auralis ground is fog, not a swatch. Retint must move fog, backdrop bottom and --scene-backdrop together or a seam appears at the horizon.",
+    "accentSwap": "Auralis violet #b552ff (emitted light only) -> ShopyLink #0EA5E9 / glow #38BDF8",
+    "typeSwap": "Google Sans Flex -> Bricolage Grotesque (display) + Manrope (body) + Tajawal (Arabic)"
+  },
+  "blocked": {
+    "reason": "Egress proxy returns 403 CONNECT for mcp.getlayers.ai and storage.getlayers.ai",
+    "consequence": "7 binary assets unreachable; text source still reachable via getlayers_source over MCP",
+    "files": [
+      "public/assets/hand/points.bin",
+      "public/assets/tree/points.bin",
+      "public/assets/lights/light_1.png",
+      "public/assets/lights/light_2.png",
+      "public/assets/lights/light_3.png",
+      "src/app/fonts/GoogleSansFlex_9pt-{ExtraLight,Light,Regular}.ttf"
+    ],
+    "fix": "Allowlist both hosts in the environment network policy, then build.downloadProject fetches the whole project in one request."
+  }
 }
