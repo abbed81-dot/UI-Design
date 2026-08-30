@@ -82,7 +82,8 @@
       "composition": "noema-hero",
       "why": "Its headline is ONE WORD pinned to the left edge and one to the right with the scene in the empty centre — which is the ShopyLink wordmark exactly: shopy ⛓ link, the chain in the seam. The globe becomes the link. In RTL it mirrors to شوبي (right) · لينك (left), which is what the Brand Guide already specifies.",
       "asset": "shopylink-globe (authored, scenes/shopylink-globe.html)",
-      "rule": "This composition only works if the centre stays empty — so lookAtOffsetX is 0 and every DOM element is edge-pinned."
+      "rule": "This composition only works if the centre stays empty — so lookAtOffsetX is 0 and every DOM element is edge-pinned.",
+      "clock": "noema-hero's masthead specifies a meta group (clock + contact) inset from the wordmark. The clock opens on Damascus and re-zones as the camera arrives at each city, with the offset from home — the useful fact about a warehouse eleven zones away is what o'clock it is there now."
     },
     {
       "section": "city-runway",
@@ -114,12 +115,13 @@
     "BUG FOUND IN QA: the curtain took ~8s to clear and covered the masthead the whole time. Stiffened the exit spring and added a hard removal deadline, since onRest can be starved when the frame budget is.",
     "BUG FOUND IN QA: TextEngine mode=\"once\" does not replay when the copy changes under it, so words that exist only in the new language stayed hidden after a locale switch. Fixed by keying each engine on the locale.",
     "The scene's palette is pulled from the CSS design tokens at startup, so colour has one source of truth and re-skinning the site re-skins the globe.",
-    "verify.sh's duration-fast check was a false positive — its pattern matched inside the very form its message prescribes. Fixed the pattern, not the code."
+    "verify.sh's duration-fast check was a false positive — its pattern matched inside the very form its message prescribes. Fixed the pattern, not the code.",
+    "The scene's city markers are now derived from the content module, so a city cannot drift between the copy and the globe."
   ],
   "openItems": [
     "The starter's cookie banner is English-only and shows on the Arabic page — it needs localising.",
     "Its privacy-policy link 404s; that page does not exist yet.",
     "Locale is a client switch, not /ar and /en routes. Real routes would be better for SEO and hreflang.",
-    "homeLat/homeLon default to Riyadh — confirm the market you actually deliver into."
+    "HOME is now Damascus (Asia/Damascus) — both the routes' convergence point and the clock's reference read the same constant in src/content/site.ts."
   ]
 }

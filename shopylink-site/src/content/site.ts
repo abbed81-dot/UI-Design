@@ -17,12 +17,27 @@ export const DIRECTION: Record<Locale, "rtl" | "ltr"> = {
 
 export type CityKey = "dubai" | "guangzhou" | "istanbul" | "newyork";
 
+/**
+ * Home — the door every route converges on, and the clock's reference.
+ * Change this and both the scene's convergence point and the masthead clock
+ * follow it; they read the same constant.
+ */
+export const HOME = {
+  lat: 33.51,
+  lon: 36.29,
+  timezone: "Asia/Damascus",
+  name: { ar: "دمشق", en: "Damascus" },
+  country: { ar: "سوريا", en: "Syria" },
+} as const;
+
 export type City = {
   key: CityKey;
   /** index in the scene's station order — station 0 is the world view */
   station: number;
   lat: number;
   lon: number;
+  /** IANA zone — the masthead clock switches to this when the camera arrives */
+  timezone: string;
   name: Record<Locale, string>;
   country: Record<Locale, string>;
   /** what you actually shop there */
@@ -36,6 +51,7 @@ export const CITIES: readonly City[] = [
     station: 1,
     lat: 25.2,
     lon: 55.27,
+    timezone: "Asia/Dubai",
     name: { ar: "دبي", en: "Dubai" },
     country: { ar: "الإمارات", en: "UAE" },
     markets: {
@@ -52,6 +68,7 @@ export const CITIES: readonly City[] = [
     station: 2,
     lat: 23.13,
     lon: 113.26,
+    timezone: "Asia/Shanghai",
     name: { ar: "قوانغجو", en: "Guangzhou" },
     country: { ar: "الصين", en: "China" },
     markets: {
@@ -68,6 +85,7 @@ export const CITIES: readonly City[] = [
     station: 3,
     lat: 41.01,
     lon: 28.98,
+    timezone: "Europe/Istanbul",
     name: { ar: "إسطنبول", en: "Istanbul" },
     country: { ar: "تركيا", en: "Türkiye" },
     markets: {
@@ -84,6 +102,7 @@ export const CITIES: readonly City[] = [
     station: 4,
     lat: 40.71,
     lon: -74.01,
+    timezone: "America/New_York",
     name: { ar: "نيويورك", en: "New York" },
     country: { ar: "أمريكا", en: "USA" },
     markets: {
@@ -118,6 +137,10 @@ export const COPY = {
   ctaSecondary: { ar: "تابع طردًا", en: "Track a parcel" },
 
   scroll: { ar: "مرّر", en: "Scroll" },
+  localTime: { ar: "التوقيت", en: "Local time" },
+  aheadOfYou: { ar: "متقدّمة", en: "ahead" },
+  behindYou: { ar: "متأخّرة", en: "behind" },
+  sameTime: { ar: "نفس توقيتك", en: "same as you" },
   marketsLabel: { ar: "الأسواق", en: "Markets" },
   stepsLabel: { ar: "كيف تعمل", en: "How it works" },
 

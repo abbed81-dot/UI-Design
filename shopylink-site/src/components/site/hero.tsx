@@ -4,6 +4,7 @@ import TextEngine from "spring-text-engine";
 import { Inview } from "@/components/animation/springs/in-view";
 import { COPY } from "@/content/site";
 import { useSite } from "@/lib/site-store";
+import { LocalClock } from "@/components/site/local-clock";
 import { LocaleToggle } from "@/components/site/locale-toggle";
 
 /**
@@ -26,11 +27,15 @@ export const Hero = () => {
   return (
     <section className="relative flex h-lvh flex-col justify-between p-5 md:p-7">
       {/* masthead — a hairline rule, wordmark far-start, actions far-end */}
-      <header className="flex items-baseline justify-between border-b border-line pb-3">
-        <span className="font-display text-sm font-extrabold tracking-display">
-          shopy<span className="text-accent">link</span>
-        </span>
-        <span className="hidden font-mono text-[10px] uppercase tracking-label text-foreground-subtle md:inline">
+      <header className="flex items-baseline justify-between gap-4 border-b border-line pb-3">
+        {/* wordmark far-start, with the meta group inset from it */}
+        <div className="flex items-baseline gap-6">
+          <span className="font-display text-sm font-extrabold tracking-display">
+            shopy<span className="text-accent">link</span>
+          </span>
+          <LocalClock />
+        </div>
+        <span className="hidden font-mono text-[10px] uppercase tracking-label text-foreground-subtle lg:inline">
           {COPY.tagline[locale]}
         </span>
         <LocaleToggle />

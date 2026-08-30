@@ -14,6 +14,8 @@
  */
 import * as THREE from "three";
 
+import { CITIES, HOME } from "@/content/site";
+
 export type GlobeConfig = {
   bgColor: string;
   sphereColor: string;
@@ -109,9 +111,10 @@ export const CONFIG: GlobeConfig = {
    *  profile rather than end-on down their own normal */
   cityPitch: 0.4,
 
-  /** the customer's door — every route converges here */
-  homeLat: 24.71,
-  homeLon: 46.68,
+  /** the customer's door — every route converges here. Sourced from HOME in
+   *  src/content/site.ts, so the masthead clock and the scene agree. */
+  homeLat: HOME.lat,
+  homeLon: HOME.lon,
 };
 
 /**
@@ -157,13 +160,11 @@ export const syncConfigFromTokens = (root: HTMLElement = document.documentElemen
 
 type Marker = { lat: number; lon: number };
 
-/** Station order must match `station` in src/content/site.ts. */
-const CITY_MARKERS: readonly Marker[] = [
-  { lat: 25.2, lon: 55.27 },
-  { lat: 23.13, lon: 113.26 },
-  { lat: 41.01, lon: 28.98 },
-  { lat: 40.71, lon: -74.01 },
-];
+/** Derived from the content module, so a city cannot drift between the copy
+ *  and the globe. Station order is `station` ascending. */
+const CITY_MARKERS: readonly Marker[] = [...CITIES]
+  .sort((a, b) => a.station - b.station)
+  .map((c) => ({ lat: c.lat, lon: c.lon }));
 
 /** Stylised land as lat/lon boxes — a paper model of the world, not a survey map. */
 const LAND: readonly (readonly [number, number, number, number])[] = [

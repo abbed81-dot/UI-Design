@@ -10,3 +10,13 @@
   bowed off the sphere with parcels riding them, and a miniature skyline that rises
   on its plinth as one scroll clock flies the camera city to city.
 - **Added** `yarn scene:vendor` / `yarn scene:preview`.
+
+## ShopyLink — masthead clock
+
+- **Added** `LocalClock` in the hero masthead — `noema-hero`'s own meta slot. It
+  opens on the reader's time in Damascus and re-zones to each city as the camera
+  arrives, showing the offset from home. Verified live: Dubai +1, Guangzhou +5,
+  Istanbul same, New York −7.
+- **Added** `HOME` and a `timezone` per city in `src/content/site.ts`. The scene's
+  route convergence point and the clock's reference now read the same constant,
+  and the globe's city markers are derived from `CITIES` rather than duplicated.
