@@ -132,7 +132,10 @@
     "The landmark forms are abstractions of a city's massing — a tapered spire, a domed mass with minarets, a stepped setback tower. They are deliberately not models of named buildings.",
     "BUG FOUND IN QA: Box3.setFromObject works in WORLD space, so measuring a building after parenting it to a district on the side of a rotating sphere gave a meaningless label height. Forms are measured before they are parented.",
     "First framing attempt pulled the camera back for tall landmarks, which shrank the streets for no gain. The distance is set by the plate (identical in every city); the look-at height is what varies with the landmark.",
-    "Everything was white on white until a three-step tonal hierarchy was introduced: the ground is darkest, background blocks sit between, and the landmark plus the four stores are the only pure white."
+    "Everything was white on white until a three-step tonal hierarchy was introduced: the ground is darkest, background blocks sit between, and the landmark plus the four stores are the only pure white.",
+    "New York's landmark is the Liberty figure, not a setback tower — the statue is the city's real silhouette. Like the other three it is an abstraction of the massing, not a replica.",
+    "Two proportion passes were needed. The first robe tapered to a point, so it read as a rocket and the arm sprang from the apex instead of a shoulder; the second gave the figure a shoulder shelf, a neck and a head. Then the pedestal was still swallowed — a 0.06-module step between cornice and hem is not a step — so the pedestal was raised and the hem narrowed until the two masses read apart.",
+    "The torch flame is the one place the accent is allowed to be a solid rather than a hairline: it is the focal point of the whole district, so it earns it."
   ],
   "openItems": [
     "Its privacy-policy link 404s; that page does not exist yet.",

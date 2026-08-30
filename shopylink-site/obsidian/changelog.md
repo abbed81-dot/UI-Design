@@ -61,3 +61,12 @@
 - **Changed** the city framing to be per-city: the distance is set by the plate,
   which is the same in every district, and the look-at height by that city's
   landmark.
+
+## ShopyLink — New York's landmark
+
+- **Changed** New York's signature landmark from the stepped setback tower to
+  `libertyFigure` — a robed figure on a star fort, arm raised to a torch. Four
+  cues carry the silhouette and nothing else is added: the raised torch arm, the
+  seven-ray crown, the triangular flare of the robe, and the star pedestal.
+- `decoTower` stays in the kit as an available form; it is simply no longer the
+  one New York uses.

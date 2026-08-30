@@ -180,7 +180,7 @@ export const CITIES: readonly City[] = [
       ar: ["الجادة الخامسة", "سوهو", "بروكلين", "المتاجر الإلكترونية"],
       en: ["Fifth Ave", "SoHo", "Brooklyn", "US online stores"],
     },
-    landmark: "decoTower",
+    landmark: "libertyFigure",
     stores: [
       { id: "fifth-ave", x: -0.46, z: -0.26, form: "loftBlock",
         name: { ar: "الجادة الخامسة", en: "Fifth Avenue" },

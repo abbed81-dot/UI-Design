@@ -498,6 +498,149 @@ export const terraceRow = (M: number, palette: ArchPalette, units = 4) => {
   return g;
 };
 
+
+/**
+ * New York — a robed figure on a star fort, arm raised to a torch.
+ *
+ * Four cues carry this silhouette, and nothing else is needed: the raised torch
+ * arm, the seven-ray crown, the triangular flare of the robe, and the star
+ * pedestal. Get those and it is recognised at a glance; add face, folds or
+ * fingers and it stops being a model and starts being a doll.
+ */
+export const libertyFigure = (M: number, palette: ArchPalette) => {
+  const g = new THREE.Group();
+  const bodyMat = mat(palette.body, 0.66);
+  const capMat = mat(palette.cap, 0.6);
+
+  /* ── the star fort ── */
+  const points = 11;
+  const star = new THREE.Shape();
+  for (let i = 0; i < points * 2; i++) {
+    const r = i % 2 === 0 ? M * 0.92 : M * 0.56;
+    const a = (i / (points * 2)) * Math.PI * 2 - Math.PI / 2;
+    const x = Math.cos(a) * r;
+    const y = Math.sin(a) * r;
+    if (i === 0) star.moveTo(x, y);
+    else star.lineTo(x, y);
+  }
+  star.closePath();
+  const fort = new THREE.Mesh(
+    new THREE.ExtrudeGeometry(star, { depth: M * 0.3, bevelEnabled: false }),
+    capMat,
+  );
+  fort.rotation.x = -Math.PI / 2;
+  fort.position.y = M * 0.3 + 0.006;
+  g.add(fort);
+
+  /* ── the pedestal. It must read WIDER than the robe's hem, or the figure
+        looks like it is growing out of the ground rather than standing on
+        something built for it. ── */
+  const pedestal = outline(
+    new THREE.Mesh(new THREE.CylinderGeometry(M * 0.52, M * 0.66, M * 1.35, 4, 1), bodyMat),
+    palette,
+    0.3,
+  );
+  pedestal.rotation.y = Math.PI / 4;
+  pedestal.position.y = M * 0.3 + M * 0.675 + 0.006;
+  g.add(pedestal);
+
+  const cornice = new THREE.Mesh(
+    new THREE.CylinderGeometry(M * 0.6, M * 0.6, M * 0.11, 4, 1),
+    capMat,
+  );
+  cornice.rotation.y = Math.PI / 4;
+  cornice.position.y = M * 0.3 + M * 1.35 + M * 0.055 + 0.006;
+  g.add(cornice);
+
+  const plinthTop = M * 0.3 + M * 1.35 + M * 0.11 + 0.006;
+
+  /* ── the robe. A gentle taper, NOT a point: a hem twice the width of the
+        shoulders reads as a standing figure, a hem four times their width
+        reads as a cone. ── */
+  const robeHeight = M * 1.9;
+  const profile: THREE.Vector2[] = [];
+  const steps = 18;
+  for (let i = 0; i <= steps; i++) {
+    const t = i / steps;
+    const r = M * (0.42 - 0.19 * t + 0.03 * Math.sin(t * Math.PI * 1.4));
+    profile.push(new THREE.Vector2(r, t * robeHeight));
+  }
+  const robe = new THREE.Mesh(new THREE.LatheGeometry(profile, 22), bodyMat);
+  robe.position.y = plinthTop;
+  g.add(robe);
+
+  const shoulderY = plinthTop + robeHeight;
+
+  // a shoulder shelf, so the head sits ON something and the arm has an origin
+  const shoulders = new THREE.Mesh(
+    new THREE.CylinderGeometry(M * 0.27, M * 0.24, M * 0.09, 20),
+    bodyMat,
+  );
+  shoulders.position.y = shoulderY + M * 0.045;
+  g.add(shoulders);
+
+  const neck = new THREE.Mesh(
+    new THREE.CylinderGeometry(M * 0.09, M * 0.1, M * 0.13, 12),
+    bodyMat,
+  );
+  neck.position.y = shoulderY + M * 0.155;
+  g.add(neck);
+
+  const headY = shoulderY + M * 0.36;
+  const head = new THREE.Mesh(new THREE.SphereGeometry(M * 0.15, 16, 12), bodyMat);
+  head.position.y = headY;
+  g.add(head);
+
+  /* ── the seven-ray crown ── */
+  for (let i = 0; i < 7; i++) {
+    const a = -Math.PI / 2 + (i / 6) * Math.PI; // a half turn, facing forward
+    const lean = 0.72;
+    const ray = new THREE.Mesh(new THREE.ConeGeometry(M * 0.026, M * 0.36, 5), capMat);
+    ray.position.set(
+      Math.cos(a) * M * 0.19,
+      headY + M * 0.15,
+      Math.sin(a) * M * 0.19,
+    );
+    ray.rotation.z = -Math.cos(a) * lean;
+    ray.rotation.x = Math.sin(a) * lean;
+    g.add(ray);
+  }
+
+  /* ── the raised arm, springing from the shoulder — not from the apex ── */
+  const shoulderPoint = new THREE.Vector3(M * 0.24, shoulderY - M * 0.05, 0);
+  const torchPoint = new THREE.Vector3(M * 0.72, shoulderY + M * 1.0, 0);
+  const armDir = torchPoint.clone().sub(shoulderPoint);
+  const arm = new THREE.Mesh(
+    new THREE.CylinderGeometry(M * 0.062, M * 0.08, armDir.length(), 10),
+    bodyMat,
+  );
+  arm.position.copy(shoulderPoint).addScaledVector(armDir, 0.5);
+  arm.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), armDir.clone().normalize());
+  g.add(arm);
+
+  const cup = new THREE.Mesh(new THREE.CylinderGeometry(M * 0.13, M * 0.075, M * 0.15, 12), capMat);
+  cup.position.copy(torchPoint);
+  g.add(cup);
+
+  // the one place the accent is allowed to be a solid — and it is the focal
+  // point of the whole district, so it earns it
+  const flame = new THREE.Mesh(
+    new THREE.ConeGeometry(M * 0.085, M * 0.26, 8),
+    mat(palette.accent, 0.4),
+  );
+  flame.position.set(torchPoint.x, torchPoint.y + M * 0.2, torchPoint.z);
+  g.add(flame);
+
+  /* ── the tablet, held across the body ── */
+  const tablet = new THREE.Mesh(new THREE.BoxGeometry(M * 0.36, M * 0.5, M * 0.09), capMat);
+  tablet.position.set(-M * 0.26, shoulderY - M * 0.5, M * 0.2);
+  tablet.rotation.set(0.3, 0.4, 0.34);
+  g.add(tablet);
+
+  g.add(contactShadow(M * 1.6, palette));
+  return g;
+};
+
 export type StoreForm =
   | "podium"
   | "vaultedHall"
@@ -523,7 +666,7 @@ export const buildStoreForm = (form: StoreForm, M: number, palette: ArchPalette)
   }
 };
 
-export type LandmarkForm = "spire" | "latticeTower" | "domedMass" | "decoTower";
+export type LandmarkForm = "spire" | "latticeTower" | "domedMass" | "decoTower" | "libertyFigure";
 
 export const buildLandmark = (form: LandmarkForm, M: number, palette: ArchPalette) => {
   switch (form) {
@@ -535,5 +678,7 @@ export const buildLandmark = (form: LandmarkForm, M: number, palette: ArchPalett
       return domedMass(M, palette);
     case "decoTower":
       return decoTower(M, palette);
+    case "libertyFigure":
+      return libertyFigure(M, palette);
   }
 };
