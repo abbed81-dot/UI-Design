@@ -4,10 +4,14 @@
 import Link from "next/link";
 import { animated, useTransition } from "@react-spring/web";
 
+import { COOKIE } from "@/content/site";
+import { useSite } from "@/lib/site-store";
+
 import { CookieButton } from "./CookieButton";
 import { useCookieStore } from "./cookieStore";
 
 export const CookieBanner = () => {
+  const locale = useSite((s) => s.locale);
   const consent = useCookieStore((s) => s.consent);
   const hydrated = useCookieStore((s) => s.hydrated);
   const modalOpen = useCookieStore((s) => s.modalOpen);
@@ -31,41 +35,39 @@ export const CookieBanner = () => {
   return transitions((style, show) =>
     show ? (
       <animated.section
-        aria-label="Cookie consent"
+        aria-label={COOKIE.bannerLabel[locale]}
         style={{
           opacity: style.opacity,
           transform: style.y.to((v) => `translateY(${v}px)`),
         }}
-        className="fixed bottom-4 left-4 right-4 z-50 flex flex-col gap-3 rounded-xl border border-foreground/10 bg-background/95 p-5 font-sans text-foreground shadow-2xl backdrop-blur-xl sm:bottom-12 sm:left-auto sm:right-12 sm:w-[420px] sm:p-6"
+        className="fixed bottom-4 start-4 end-4 z-50 flex flex-col gap-3 rounded-xl border border-foreground/10 bg-background/95 p-5 font-sans text-foreground shadow-2xl backdrop-blur-xl sm:bottom-12 sm:start-auto sm:end-12 sm:w-[420px] sm:p-6"
       >
         <h2 className="text-base font-medium leading-snug sm:text-lg">
-          This website uses cookies
+          {COOKIE.title[locale]}
         </h2>
         <p className="text-sm leading-relaxed text-foreground/70">
-          We use cookies to keep the site working, learn how it&apos;s used, and
-          improve what we ship next. Accept everything, reject the non-essential,
-          or pick category by category. See our{" "}
+          {COOKIE.bannerBody[locale]}
           <Link
             href="/privacy-policy"
             target="_blank"
             rel="noopener noreferrer"
             className="underline underline-offset-2 hover:text-foreground/70"
           >
-            privacy policy
+            {COOKIE.privacyLink[locale]}
           </Link>
           .
         </p>
         <div className="mt-1 flex flex-wrap items-center gap-2">
-          <CookieButton onClick={acceptAll}>Accept all</CookieButton>
+          <CookieButton onClick={acceptAll}>{COOKIE.acceptAll[locale]}</CookieButton>
           <CookieButton variant="secondary" onClick={rejectAll}>
-            Reject all
+            {COOKIE.rejectAll[locale]}
           </CookieButton>
           <button
             type="button"
             onClick={openModal}
             className="px-2 py-2 text-sm font-medium leading-none text-foreground underline underline-offset-2 hover:text-foreground/70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
           >
-            Manage preferences
+            {COOKIE.manage[locale]}
           </button>
         </div>
       </animated.section>

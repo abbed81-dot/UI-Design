@@ -116,10 +116,10 @@
     "BUG FOUND IN QA: TextEngine mode=\"once\" does not replay when the copy changes under it, so words that exist only in the new language stayed hidden after a locale switch. Fixed by keying each engine on the locale.",
     "The scene's palette is pulled from the CSS design tokens at startup, so colour has one source of truth and re-skinning the site re-skins the globe.",
     "verify.sh's duration-fast check was a false positive — its pattern matched inside the very form its message prescribes. Fixed the pattern, not the code.",
-    "The scene's city markers are now derived from the content module, so a city cannot drift between the copy and the globe."
+    "The scene's city markers are now derived from the content module, so a city cannot drift between the copy and the globe.",
+    "The starter's cookie banner and preferences modal shipped their English strings in the markup, which hard rule #4 forbids; the copy is now a bilingual block in the content module and both surfaces read it. The banner was also pinned to the physical right and the switch knob to the physical left — both now use logical inset so they mirror with the document, and the knob's spring travel is negated in RTL because a CSS transform is never flipped by dir."
   ],
   "openItems": [
-    "The starter's cookie banner is English-only and shows on the Arabic page — it needs localising.",
     "Its privacy-policy link 404s; that page does not exist yet.",
     "Locale is a client switch, not /ar and /en routes. Real routes would be better for SEO and hreflang.",
     "HOME is now Damascus (Asia/Damascus) — both the routes' convergence point and the clock's reference read the same constant in src/content/site.ts."

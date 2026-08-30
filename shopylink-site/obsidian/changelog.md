@@ -20,3 +20,13 @@
 - **Added** `HOME` and a `timezone` per city in `src/content/site.ts`. The scene's
   route convergence point and the clock's reference now read the same constant,
   and the globe's city markers are derived from `CITIES` rather than duplicated.
+
+## ShopyLink — bilingual cookie consent
+
+- **Changed** `CookieBanner` and `CookiePreferencesModal` to read their copy from
+  `COOKIE` in `src/content/site.ts` instead of carrying English strings in the
+  markup (hard rule #4). Both now follow the site locale.
+- **Fixed** two RTL bugs in the same components: the banner was pinned with
+  physical `right`, and the switch knob with physical `left`; both now use logical
+  inset. The knob's spring travel is negated under RTL, since a CSS transform is
+  not flipped by `dir`.

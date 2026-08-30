@@ -8,39 +8,28 @@ import { animated, useSpring, useTransition } from "@react-spring/web";
 import { useScroll } from "@/hooks/smooth-scroll/use-scroll";
 
 import { CookieButton } from "./CookieButton";
+import { COOKIE, DIRECTION } from "@/content/site";
+import { useSite } from "@/lib/site-store";
+
 import { useCookieStore } from "./cookieStore";
 
 type CategoryKey = "necessary" | "analytics" | "marketing";
 
-interface Category {
+type Category = {
   key: CategoryKey;
-  title: string;
-  body: string;
   required?: boolean;
-}
+};
 
 const CATEGORIES: Category[] = [
-  {
-    key: "necessary",
-    title: "Strictly necessary",
-    body: "Required for the site to work — sign-in, security, page navigation. These can't be turned off.",
-    required: true,
-  },
-  {
-    key: "analytics",
-    title: "Analytics",
-    body: "Anonymised usage stats so we know which pages help and which fall flat. No personal profile is built.",
-  },
-  {
-    key: "marketing",
-    title: "Marketing",
-    body: "Lets us measure ad performance and re-show content you didn't get to finish reading. Opt out anytime.",
-  },
+  { key: "necessary", required: true },
+  { key: "analytics" },
+  { key: "marketing" },
 ];
 
 const TITLE_ID = "cookie-preferences-title";
 
 export const CookiePreferencesModal = () => {
+  const locale = useSite((s) => s.locale);
   const open = useCookieStore((s) => s.modalOpen);
   const consent = useCookieStore((s) => s.consent);
   const closeModal = useCookieStore((s) => s.closeModal);
@@ -116,12 +105,12 @@ export const CookiePreferencesModal = () => {
         >
           <header className="flex items-start justify-between gap-3">
             <h2 id={TITLE_ID} className="text-xl font-medium leading-tight">
-              Cookie preferences
+              {COOKIE.modalTitle[locale]}
             </h2>
             <button
               type="button"
               onClick={closeModal}
-              aria-label="Close cookie preferences"
+              aria-label={COOKIE.modalClose[locale]}
               className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-foreground/10 text-foreground hover:bg-foreground/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
             >
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
@@ -136,15 +125,14 @@ export const CookiePreferencesModal = () => {
           </header>
 
           <p className="text-sm leading-relaxed text-foreground/60">
-            Choose which categories of cookies we&apos;re allowed to use. You can
-            change this any time. See our{" "}
+            {COOKIE.modalBody[locale]}
             <Link
               href="/privacy-policy"
               target="_blank"
               rel="noopener noreferrer"
               className="text-foreground underline underline-offset-2"
             >
-              privacy policy
+              {COOKIE.privacyLink[locale]}
             </Link>
             .
           </p>
@@ -163,21 +151,25 @@ export const CookiePreferencesModal = () => {
                   : c.key === "marketing"
                     ? setMarketing
                     : undefined;
+              const copy = COOKIE.categories[c.key];
               return (
                 <div
                   key={c.key}
                   className="flex items-start justify-between gap-4 rounded-[10px] border border-foreground/10 px-4 py-3.5"
                 >
                   <div className="flex min-w-0 flex-col gap-1">
-                    <h3 className="text-sm font-medium leading-snug">{c.title}</h3>
+                    <h3 className="text-sm font-medium leading-snug">
+                      {copy.title[locale]}
+                    </h3>
                     <p className="text-xs leading-relaxed text-foreground/60">
-                      {c.body}
+                      {copy.body[locale]}
                     </p>
                   </div>
                   <Toggle
                     on={value}
                     disabled={c.required}
-                    label={c.title}
+                    label={copy.title[locale]}
+                    rtl={DIRECTION[locale] === "rtl"}
                     onChange={setValue ? () => setValue((v) => !v) : undefined}
                   />
                 </div>
@@ -187,13 +179,13 @@ export const CookiePreferencesModal = () => {
 
           <footer className="mt-1 flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-between">
             <CookieButton variant="secondary" onClick={rejectAll}>
-              Reject all
+              {COOKIE.rejectAll[locale]}
             </CookieButton>
             <div className="flex flex-col-reverse gap-2 sm:flex-row sm:items-center">
               <CookieButton variant="secondary" onClick={handleSave}>
-                Save preferences
+                {COOKIE.save[locale]}
               </CookieButton>
-              <CookieButton onClick={acceptAll}>Accept all</CookieButton>
+              <CookieButton onClick={acceptAll}>{COOKIE.acceptAll[locale]}</CookieButton>
             </div>
           </footer>
         </animated.div>
@@ -209,11 +201,17 @@ interface ToggleProps {
   disabled?: boolean;
   onChange?: () => void;
   label: string;
+  rtl?: boolean;
 }
 
-const Toggle = ({ on, disabled, onChange, label }: ToggleProps) => {
+const Toggle = ({ on, disabled, onChange, label, rtl = false }: ToggleProps) => {
   // Knob slides on a spring — track colour snaps (a state change, not motion).
-  const knob = useSpring({ x: on ? 20 : 0, config: { tension: 320, friction: 26 } });
+  // A CSS transform is never flipped by `dir`, so the travel is negated by hand;
+  // the knob's resting edge is logical (`start`) and mirrors on its own.
+  const knob = useSpring({
+    x: on ? (rtl ? -20 : 20) : 0,
+    config: { tension: 320, friction: 26 },
+  });
 
   return (
     <button
@@ -230,7 +228,7 @@ const Toggle = ({ on, disabled, onChange, label }: ToggleProps) => {
     >
       <animated.span
         style={{ transform: knob.x.to((v) => `translateX(${v}px)`) }}
-        className="absolute left-[3px] top-[3px] block h-[18px] w-[18px] rounded-full bg-background shadow"
+        className="absolute start-[3px] top-[3px] block h-[18px] w-[18px] rounded-full bg-background shadow"
       />
     </button>
   );
