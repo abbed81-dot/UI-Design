@@ -1,0 +1,5 @@
+# Python bytecode: regenerated on every run of the skill scripts, so it
+# reappears as a modification after any search and dirties an otherwise
+# clean tree. It is a build artifact, not source.
+__pycache__/
+*.pyc
