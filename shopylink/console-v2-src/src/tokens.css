@@ -12,6 +12,12 @@
   --clean: #F4FBFF;
   --ink:   #0B2A3B;
 
+  /* The neutral ramp. A note earned by measurement: n5 reads at 2.6:1 on paper
+     and n4 at 2.2:1 — both below AA for text of any size. They are LINE and
+     DECORATION colours; n6 (4.6:1) is the lightest that may carry a word on
+     paper, and on the ink sidebar the relation inverts: there n4 reads at 8:1
+     and n6 at 2.9:1, so the light end of the ramp carries text and the dark end
+     does not. */
   /* the neutral ramp */
   --n1: #F7F4EC; --n2: #EDE9E0; --n3: #DDD8CD; --n4: #BFC5C9;
   --n5: #95A1A9; --n6: #62707A; --n7: #44555F; --n8: #0B2A3B;
@@ -126,6 +132,37 @@ button:disabled { cursor: default; }
 @media (max-width: 900px) {
   .sl-demo-badge { display: none; }
 }
+/* ── typographic rhythm ────────────────────────────────────────────────
+   The scale was already the brand's; what was missing was the RELATION between
+   its steps. Line-height is set once, by role, so a paragraph of Arabic and a
+   row of Latin figures sit on the same rhythm: 1.5 for prose, because Tajawal's
+   descenders need it, and 1.25 for headings, where a looser measure would break
+   a two-line title into two unrelated lines. Tracking is negative only on the
+   display face, which is drawn for it, and never on Arabic, which is not. */
+body { line-height: 1.5; }
+h1, h2, h3 { line-height: 1.25; margin: 0; }
+h1 { font-size: var(--fs-figure); font-weight: 800; }
+h2 { font-size: var(--fs-title); font-weight: 800; }
+h3 { font-size: var(--fs-lead); font-weight: 800; }
+p  { margin: 0; }
+[dir="ltr"] h1, [dir="ltr"] h2 { letter-spacing: -0.015em; }
+[dir="rtl"] h1, [dir="rtl"] h2 { letter-spacing: 0; }
+/* an eyebrow is a label, not prose: it is read as a block, so it is tracked out */
+.sl-eyebrow {
+  font-size: var(--fs-eyebrow); font-weight: 800; line-height: 1.4;
+  letter-spacing: .08em; text-transform: uppercase; color: var(--n6);
+}
+
+/* ── targets ───────────────────────────────────────────────────────────
+   WCAG 2.2 asks 24×24 CSS pixels of target, and a 14px icon with 4px around it
+   is 22. Every icon-only control in the console is given the room, without
+   growing the 44px row it sits in: the box grows, the icon does not. */
+.sl-icon-btn {
+  width: 28px; height: 28px; display: inline-flex; align-items: center;
+  justify-content: center; border-radius: var(--radius-sm); flex: 0 0 auto;
+  transition: color var(--t-state) var(--ease), background var(--t-state) var(--ease);
+}
+
 /* ── the queue row is the door ─────────────────────────────────────────
    The whole line navigates, so the line must SAY it does: a quiet clean-blue
    wash on hover, and the chevron takes the state colour and leans one step
@@ -134,7 +171,7 @@ button:disabled { cursor: default; }
 .sl-row:hover, .sl-row:focus-visible { background: var(--clean); }
 .sl-row:hover .sl-row-go, .sl-row:focus-visible .sl-row-go { color: var(--sky-deep); transform: translateX(2px); }
 [dir="rtl"] .sl-row:hover .sl-row-go, [dir="rtl"] .sl-row:focus-visible .sl-row-go { transform: translateX(-2px); }
-.sl-row-chat { transition: color var(--t-state) var(--ease), background var(--t-state) var(--ease); }
+.sl-row-chat { width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; border-radius: var(--radius-sm); flex: 0 0 auto; transition: color var(--t-state) var(--ease), background var(--t-state) var(--ease); }
 .sl-row-chat:hover { color: var(--sky-deep); background: var(--sky-tint); }
 
 .sl-drawer {

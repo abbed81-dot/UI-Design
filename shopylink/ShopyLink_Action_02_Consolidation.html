@@ -4319,5 +4319,85 @@ document.querySelector('.sl-overlay').onclick = function () {
 };
 go('s1');
 </script>
+
+<script>
+/* ── SL Arabic sweep ─────────────────────────────────────────────────────
+   Added so the Arabic build is Arabic all the way down. Text that never went
+   through t() is translated here from T_b2 plus
+   SL_GLOSS below; anything without an entry is left untouched, and machine
+   values — codes, money, units, dates — are skipped by rule, not by luck. */
+(function () {
+  var EXACT = {"Name or phone":"الاسم أو الهاتف","Enter the customer's full name or +963… phone number":"أدخل اسم العميل الكامل أو رقم هاتفه ‎+963…","Select":"اختيار","Packing":"التعبئة","Review":"المراجعة","Use a barcode scanner or type the ID manually":"امسح الباركود أو اكتب المعرّف يدوياً","Add":"إضافة","Ready to consolidate":"جاهزة للتجميع","Held":"محجوزة","Select 2+ shipments to consolidate":"اختر شحنتين فأكثر للتجميع","🗺 Route":"🗺 المسار","Route":"المسار","Select departure hub first":"اختر مركز المغادرة أولاً","Complete route and trip type":"أكمل المسار ونوع الرحلة","FOCUS":"تركيز","BUSINESS":"أعمال","arrived":"وصلت","per page":"لكل صفحة","‹ Previous":"‹ السابق","Next ›":"التالي ›","system":"النظام","shipment or customer":"شحنة أو عميل","unattributed - no signed-in user":"غير منسوب — لا مستخدم مسجَّل","message to docs":"رسالة إلى التوثيق","message to ops+customs":"رسالة إلى التشغيل والتخليص","read-only · signature gates delivered · all shipments prepaid":"للقراءة فقط · التوقيع يفتح بوابة التسليم · كل الشحنات مدفوعة مسبقاً","one delivery per customer address · a shipment is never split across drivers":"تسليم واحد لكل عنوان عميل · ولا تُقسَّم الشحنة بين سائقين","each supplier shipment is invoiced on its own · business charge log = its draft invoice":"كل شحنة مورّد تُفوتَر وحدها · وسجلّ رسوم الأعمال هو مسوّدة فاتورتها","L×W×H cm":"الطول×العرض×الارتفاع سم","Print":"طباعة","Declare it sent":"أعلِن إرسالها","Every figure here is read from the registers. Nothing is typed in, so nothing can be certified that was not weighed.":"كل رقم هنا مقروء من السجلّات. لا شيء يُكتب يدوياً، فلا يُشهَد على ما لم يُوزَن.","Verified Gross Mass":"الوزن الإجمالي المُوثَّق","VERIFIED GROSS MASS":"الوزن الإجمالي المُوثَّق","SOLAS VI/2 — declared by the shipper before loading":"سولاس VI/2 — يُعلنه الشاحن قبل التحميل","Shipper":"الشاحن","Trip":"الرحلة","not on the record":"غير مسجَّل","Vehicle / container":"المركبة / الحاوية","Port of loading":"ميناء التحميل","Method of determination":"طريقة التحديد","Method 1 — the packed unit was WEIGHED":"الطريقة ١ — وُزنت الوحدة المعبّأة كاملةً","Shipment":"الشحنة","Client":"العميل","Weight":"الوزن","this trip carries nothing the register knows":"لا تحمل هذه الرحلة شيئاً يعرفه السجلّ","Cargo":"البضاعة","Tare of the vehicle":"وزن المركبة فارغة","cannot be certified":"لا يمكن التصديق","This cannot be signed as it stands — no trip":"لا يمكن توقيع هذه كما هي — لا رحلة","Signed for the shipper":"التوقيع عن الشاحن","name, position and date":"الاسم والمنصب والتاريخ","Weighbridge / weighing party":"جسر الوزن / الجهة الوازنة","certificate reference":"مرجع الشهادة","Shipments":"الشحنات","Receive parcel":"استلام طرد","USA":"الولايات المتحدة"};
+  var FRAG = {"shipments":"شحنات","shipment":"شحنة","cartons":"كراتين","carton":"كرتونة","crossings":"عبور","already expired":"منتهية أصلاً","Status = planned":"الحالة = مخطّطة","status = dispatched":"الحالة = مُرسَلة","status = arrived · tap to open & unseal":"الحالة = وصلت · انقر للفتح وفكّ الختم","attached si":"أُرفقت فاتورة مبدئية","attached vgm":"أُرفقت شهادة وزن","attached loading":"أُرفق بيان تحميل","attached invoice":"أُرفقت فاتورة","attached packing":"أُرفقت قائمة تعبئة","attached exportdec":"أُرفق بيان تصدير","cost booked truck":"قُيّدت كلفة شاحنة","cost booked border":"قُيّدت كلفة حدود","cost booked customs":"قُيّدت كلفة تخليص","cost booked ocean":"قُيّدت كلفة شحن بحري","edited truck":"عُدّلت الشاحنة","edited driver":"عُدّل السائق","maintenance":"صيانة","suspended agent":"أُوقف الوكيل","suspended":"أُوقف","granted":"مُنح","approved":"اعتُمد","rejected":"رُفض","settled crossing":"سُوّي عبور","deactivated zone":"عُطّلت منطقة","credit note":"إشعار دائن","synced supplier catalogue":"زُومن كتالوج المورّد","denominations":"فئات","cards":"بطاقات","extra fees on":"رسوم إضافية على","exceptional discount":"خصم استثنائي","cancel a trip":"إلغاء رحلة","invoices":"فواتير","claims":"مطالبات","budget":"الميزانية","on":"على","page":"صفحة","of":"من","Step":"الخطوة","Assign runs (B7)":"إسناد الجولات (B7)","Aleppo Centre":"مركز حلب","Homs Centre":"مركز حمص","Damascus South Hub":"مركز دمشق الجنوبي","Dubai Hub → Latakia Port":"مركز دبي ← ميناء اللاذقية","Latakia Centre":"مركز اللاذقية","Damascus Hub":"مركز دمشق","Aleppo Hub":"مركز حلب","Istanbul Hub":"مركز إسطنبول","Dubai Hub":"مركز دبي","Guangzhou Hub":"مركز قوانغتشو","Sharjah Hub":"مركز الشارقة","Yiwu Hub":"مركز ييوو","Shenzhen Hub":"مركز شنجن","Latakia Hub":"مركز اللاذقية","Latakia Port":"ميناء اللاذقية","TRACKING_EVENTs":"أحداث التتبّع","no signed-in user":"لا مستخدم مسجَّل","Damascus":"دمشق","Aleppo":"حلب","Homs":"حمص","Latakia":"اللاذقية","Tartus":"طرطوس","Deir ez-Zor":"دير الزور","Istanbul":"إسطنبول","Gaziantep":"غازي عنتاب","Mersin":"مرسين","Dubai":"دبي","Sharjah":"الشارقة","Guangzhou":"قوانغتشو","Yiwu":"ييوو","Shenzhen":"شنجن","Mazzeh":"المزة","Mezzeh":"المزة","Midan":"الميدان","Jaramana":"جرمانا","Corniche":"الكورنيش","Rural":"ريف","Bab al-Hawa":"باب الهوى","Bab al-Salama":"باب السلامة","Omar Al-Masri":"عمر المصري","Rana Yousef":"رنا يوسف","Khaled Omar":"خالد عمر","Mona Said":"منى سعيد","Fadi Nassar":"فادي نصار","Samer Haddad":"سامر حداد","Tarek Aziz":"طارق عزيز","Ziad Mardini":"زياد مارديني","Layla Al-Rifai":"ليلى الرفاعي","Ahmad Al-Hassan":"أحمد الحسن","Ahmad Khalil":"أحمد خليل","Omar Khalil":"عمر خليل","Khaled Noureddine":"خالد نور الدين","Rima Faris":"ريما فارس","Sara Al-Ahmad":"سارة الأحمد","Hadi Mansour":"هادي منصور","Yara Salem":"يارا سالم","Adel Rifai":"عادل الرفاعي","Rim Halabi":"ريم الحلبي","Farah Zein":"فرح زين","Salma Idris":"سلمى إدريس","Fatima Noor":"فاطمة نور","issued":"صدرت","today":"اليوم","yesterday":"أمس","gate":"بوابة","RUN":"جولة","Port":"ميناء","Centre":"مركز","Hub":"مركز","Lina Hamwi":"لينا الحموي","Bassel Rahal":"باسل رحال","Nour Katan":"نور قطان","Hani Barakat":"هاني بركات","Wael Shami":"وائل شامي","Majd Kurdi":"مجد الكردي","Alia Naji":"علياء ناجي","Sami Deeb":"سامي ديب","Maya Attar":"مايا العطار","Murat Kaya":"مراد كايا","Selim Arslan":"سليم أرسلان","Chen Wei":"تشن وي","Rami Odeh":"رامي عودة","Ali Marsou":"علي مرسو","Aug":"آب"};
+  var own = (typeof T_b2 !== 'undefined') ? T_b2 : null;
+  /* the module's own dictionary always wins: it is the vocabulary its authors chose */
+  if (own) for (var k in own) if (!EXACT[k]) EXACT[k] = own[k];
+
+  var SKIP = /^[\s\d.,:%×\/+\-–—·|()\[\]]*$/;              /* pure machine value */
+  var CODE = /^[A-Z]{2,5}[-–][A-Z0-9-]+$/;                      /* SL-9701, TRP-8842 */
+  var ARABIC = /[\u0600-\u06FF]/;
+  var busy = false;
+
+  function phrase(s) {
+    var t = s.trim();
+    /* an address, a link or a filename is not prose: translating a word inside
+       one breaks the thing it points at, so they are left exactly as written */
+    if (!t || SKIP.test(t) || CODE.test(t) || ARABIC.test(t)) return null;
+    if (/@|https?:|www.|.(com|net|org|ae|html|js|css)/i.test(t)) return null;
+    if (EXACT[t]) return s.replace(t, EXACT[t]);
+    /* a composed line — "3 shipments · 16 cartons" — keeps its figures and
+       proper names and takes Arabic only where the glossary knows the word */
+    var out = t, hit = false;
+    for (var f in FRAG) {
+      var re = new RegExp('(^|[^A-Za-z])' + f.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?![A-Za-z])', 'g');
+      if (re.test(out)) { out = out.replace(re, function (m, p) { return p + FRAG[f]; }); hit = true; }
+    }
+    return hit ? s.replace(t, out) : null;
+  }
+
+  function sweep() {
+    if (busy) return;
+    var lang = document.documentElement.getAttribute('lang');
+    if (lang !== 'ar') return;
+    busy = true;
+    try {
+      var w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT), n;
+      while ((n = w.nextNode())) {
+        var p = n.parentNode;
+        if (!p || p.nodeName === 'SCRIPT' || p.nodeName === 'STYLE' || p.nodeName === 'TEXTAREA') continue;
+        var v = phrase(n.nodeValue || '');
+        if (v !== null) n.nodeValue = v;
+      }
+      var els = document.querySelectorAll('[placeholder],[aria-label],[title]');
+      for (var i = 0; i < els.length; i++) {
+        var e = els[i];
+        ['placeholder', 'aria-label', 'title'].forEach(function (a) {
+          var raw = e.getAttribute(a);
+          if (!raw) return;
+          var t2 = phrase(raw);
+          if (t2 !== null) e.setAttribute(a, t2);
+        });
+      }
+    } finally { busy = false; }
+  }
+
+  /* after the module's own language switch, and after every re-render it does */
+  if (typeof window.setLang === 'function') {
+    var prev = window.setLang;
+    window.setLang = function (l) { prev(l); setTimeout(sweep, 0); };
+  }
+  var obs = new MutationObserver(function () { if (!busy) setTimeout(sweep, 0); });
+  /* a module with no language switch of its own — the VGM certificate — is told
+     which language it is in by whoever shows it, so the sweep watches for that */
+  var langObs = new MutationObserver(function () { setTimeout(sweep, 0); });
+  function start() {
+    obs.observe(document.body, { childList: true, subtree: true, characterData: true });
+    langObs.observe(document.documentElement, { attributes: true, attributeFilter: ['lang', 'dir'] });
+    sweep();
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
+  else start();
+})();
+</script>
 </body>
 </html>

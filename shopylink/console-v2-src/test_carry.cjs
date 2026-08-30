@@ -120,7 +120,32 @@ function makeStorage() {
   click(btnByText('يومي')); await tick(300);
   ok(txt().indexOf('طرد مستلَم ينتظر القياس') === -1, 'the measured parcel left the home queue');
 
-  /* ── 6 · every carried module decompresses to a real document ───────── */
+  /* ── 6 · the news board reads the register that owns it ─────────────── */
+  ok(txt().indexOf('الدفع المسبق لحسابات الأعمال') > -1, 'the seeded notice shows while the register is silent');
+  store.setItem('SL_NOTICES_V1', JSON.stringify({ at: Date.now(), notices: [{
+    id: 'NB-1', at: '2026-08-30', by: 'عمر المصري', kind: 'policy',
+    audience: { all: true },
+    ar: 'إغلاق مركز حلب يوم الجمعة — لا استلام ولا تسليم.',
+    en: 'Aleppo hub closed on Friday — no intake, no delivery.',
+  }] }));
+  /* the board is read once, at mount, so the page is reloaded the way a person
+     would meet it tomorrow morning */
+  const dom2 = new JSDOM(html, {
+    runScripts: 'dangerously', url: 'https://console.test/bundle.html', pretendToBeVisual: true,
+    beforeParse(w2) {
+      Object.defineProperty(w2, 'localStorage', { value: store });
+      w2.ResizeObserver = class { observe() {} unobserve() {} disconnect() {} };
+      w2.Element.prototype.scrollIntoView = function () {};
+      w2.DecompressionStream = globalThis.DecompressionStream;
+      w2.Blob = globalThis.Blob; w2.Response = globalThis.Response; w2.atob = globalThis.atob;
+    },
+  });
+  await tick(500);
+  const t2 = (dom2.window.document.getElementById('root') || dom2.window.document.body).textContent || '';
+  ok(t2.indexOf('إغلاق مركز حلب') > -1, 'the published notice reaches the board');
+  ok(t2.indexOf('الدفع المسبق لحسابات الأعمال') === -1, 'and the seed steps aside once the register answers');
+
+  /* ── 7 · every carried module decompresses to a real document ───────── */
   const map = {};
   const re = /["'](ShopyLink_[A-Za-z0-9_]+\.html)["']\s*:\s*["']([A-Za-z0-9+/=]{200,})["']/g;
   let m;

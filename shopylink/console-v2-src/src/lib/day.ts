@@ -30,7 +30,7 @@ export const dayNotice = {
   kind: 'policy',
   ar: 'من هذا الشهر كل حساب أعمال بالدفع المسبق ما لم يُمنح تسهيل ائتماني كتابةً.',
   en: 'From this month every business account is prepaid unless a credit facility is granted in writing.',
-  by: 'Omar Al-Masri',
+  by: 'Omar Al-Masri', byAr: 'عمر المصري',
   at: '2026-08-28',
 };
 
@@ -40,8 +40,13 @@ export const dayFigures = [
   { ar: 'متأخّر عليّ', en: 'Late on me', n: 1, tone: 'red' as const },
 ];
 
-export const dayMe: Person = {
-  id: 'U-02', name: 'Khaled Omar', role: 'wh', level: 1, status: 'active', onLeave: false,
+/* A person's own name and position are the first thing he reads on his screen;
+   leaving them in Latin under an Arabic console is the one place the language
+   toggle was not honoured. Both forms are carried, and the screen picks one. */
+export const dayMe: Person & { nameAr: string; roleAr: string; roleEn: string } = {
+  id: 'U-02', name: 'Khaled Omar', nameAr: 'خالد عمر',
+  roleAr: 'أمين مستودع', roleEn: 'Warehouse clerk',
+  role: 'wh', level: 1, status: 'active', onLeave: false,
   perms: ['b1_ind', 'b1_biz', 'b2_con'], duties: ['measure'],
   dutyAr: 'يقيس ويزن ويصوّر كل قطعة تصل مركزه', dutyEn: 'Measures, weighs and photographs every piece reaching his centre',
   reportsTo: 'hubsup', scope: { type: 'list', countries: [], hubs: ['H-DAM'] },
@@ -50,8 +55,8 @@ export const dayMe: Person = {
 /* seed thread per task ref — the console shows it; writing goes through D1 */
 export const dayThreads: Record<string, { by: string; at: string; ar: string; en: string }[]> = {
   'CON-240703-02': [
-    { by: 'Mona Said', at: '09:12', ar: 'المحاولة الثانية رفضها العميل — الهاتف مغلق.', en: 'Second attempt refused — phone unreachable.' },
-    { by: 'Khaled Omar', at: '09:40', ar: 'أُعيدت إلى الرفّ C-4 بانتظار القرار — @منى سعيد للتأكيد.', en: 'Back on shelf C-4 pending the decision — @Mona Said to confirm.' },
+    { by: 'Mona Said', byAr: 'منى سعيد', at: '09:12', ar: 'المحاولة الثانية رفضها العميل — الهاتف مغلق.', en: 'Second attempt refused — phone unreachable.' },
+    { by: 'Khaled Omar', byAr: 'خالد عمر', at: '09:40', ar: 'أُعيدت إلى الرفّ C-4 بانتظار القرار — @منى سعيد للتأكيد.', en: 'Back on shelf C-4 pending the decision — @Mona Said to confirm.' },
   ],
 };
 
@@ -81,6 +86,7 @@ export const GROUP_META: Record<Task['kind'], { ar: string; en: string; tone: 'r
 };
 
 export type NewsItem = {
+  byAr?: string;
   id: string; kind: string;
   titleAr: string; titleEn: string;
   ar: string; en: string;
@@ -94,7 +100,7 @@ export const dayNews: NewsItem[] = [
     titleAr: 'الدفع المسبق لحسابات الأعمال', titleEn: 'Prepaid business accounts',
     ar: 'من هذا الشهر كل حساب أعمال بالدفع المسبق ما لم يُمنح تسهيل ائتماني كتابةً.',
     en: 'From this month every business account is prepaid unless a credit facility is granted in writing.',
-    by: 'Omar Al-Masri', at: '2026-08-28', image: 'brand',
+    by: 'Omar Al-Masri', byAr: 'عمر المصري', at: '2026-08-28', image: 'brand',
   },
   {
     id: 'N2', kind: 'notice',

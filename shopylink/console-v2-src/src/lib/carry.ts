@@ -11,6 +11,7 @@ import { MODULE_GZ } from './modules_html';
 export const EVENTS_KEY = 'SL_EVENTS_V1';
 export const SHIPMENTS_KEY = 'SL_SHIPMENTS_V1';
 export const TRIPS_KEY = 'SL_TRIPS_V1';
+export const NOTICES_KEY = 'SL_NOTICES_V1';
 
 export function hasModule(file: string): boolean {
   return Object.prototype.hasOwnProperty.call(MODULE_GZ, file);
@@ -145,4 +146,31 @@ export function watchEvents(onChange: (events: LogEvent[]) => void): () => void 
   window.addEventListener('storage', onStorage);
   const timer = window.setInterval(check, 900);
   return () => { window.removeEventListener('storage', onStorage); window.clearInterval(timer); };
+}
+
+/* ── the management's word, from the register that owns it ───────────────
+   D1 publishes the notice board on SL_NOTICES_V1 and, until now, nobody read
+   it: a fact declared into an empty room. The console's news board reads it,
+   and its own seed steps aside the moment the register answers — a seed that
+   refuses to move is how a screen comes to show yesterday. */
+export type Notice = {
+  id?: string; at?: string | number; by?: string; kind?: string;
+  ar?: string; en?: string;
+  audience?: { all?: boolean; roles?: string[]; hubs?: string[]; countries?: string[] };
+};
+
+export function readNotices(): Notice[] {
+  return readList<Notice>(NOTICES_KEY, 'notices');
+}
+
+/* A notice is addressed. One that names roles, hubs or countries reaches the
+   people it names and nobody else; one that names none is for everybody. */
+export function noticeReaches(n: Notice, role: string, hub: string): boolean {
+  const a = n.audience;
+  if (!a || a.all) return true;
+  const named = (a.roles?.length || 0) + (a.hubs?.length || 0) + (a.countries?.length || 0);
+  if (named === 0) return true;
+  if (a.roles?.length && a.roles.indexOf(role) > -1) return true;
+  if (a.hubs?.length && a.hubs.indexOf(hub) > -1) return true;
+  return false;
 }

@@ -15,7 +15,7 @@ import {
   dayStaff, weekIntake, weekMeasured, weekLate, GROUP_META, type Task, type NewsItem,
 } from '@/lib/day';
 import { readState, writeState, type SavedState } from '@/lib/store';
-import { loadModule, hasModule, watchEvents, eventTouches } from '@/lib/carry';
+import { loadModule, hasModule, watchEvents, eventTouches, readNotices, noticeReaches } from '@/lib/carry';
 
 /* ─────────────────────────────────────────────────────────────────────
    ShopyLink operations console · v2.1 · screen one: the operator's home.
@@ -159,6 +159,24 @@ export default function App() {
     });
   }, [view, done, t]);
 
+  /* D1 owns the notice board and publishes it; this reads what it published,
+     addressed to this person, and falls back to the seed only while the
+     register has said nothing — a seed that will not step aside is how a
+     screen comes to show yesterday's word as today's. */
+  const newsItems = useMemo<NewsItem[]>(() => {
+    const published = readNotices().filter(x => noticeReaches(x, dayMe.role, 'H-DAM'));
+    if (!published.length) return dayNews;
+    return published.map((x, i) => ({
+      id: x.id || 'N' + i,
+      kind: x.kind || 'notice',
+      titleAr: (x.ar || '').split('—')[0].split('.')[0].slice(0, 60) || 'إعلان',
+      titleEn: (x.en || '').split('—')[0].split('.')[0].slice(0, 60) || 'Notice',
+      ar: x.ar || x.en || '', en: x.en || x.ar || '',
+      by: x.by || '', at: String(x.at || '').slice(0, 10),
+      image: i === 0 ? 'brand' : undefined,
+    }));
+  }, []);
+
   const allItems = useMemo(() => CATEGORIES.flatMap(c => c.items), []);
   const pinnedItems = useMemo(() => pinned.map(f => allItems.filter(i => i.file === f)[0]).filter(Boolean), [pinned, allItems]);
 
@@ -236,7 +254,7 @@ export default function App() {
                   {open && <span aria-hidden style={{ position: 'absolute', insetInlineStart: -8, top: 8, bottom: 8, width: 3, borderRadius: 'var(--radius-pill)', background: 'var(--acc)' }} />}
                   <Icon size={rail ? 18 : 15} strokeWidth={rail ? 1.75 : 2} style={{ flex: '0 0 auto' }} />
                   {!rail && <span style={{ flex: 1, textAlign: 'start' }}>{ar ? c.ar : c.en}</span>}
-                  {!rail && <ChevronDown size={13} style={{ transform: open ? 'rotate(180deg)' : 'none', transition: 'transform var(--t-panel) var(--ease)', color: 'var(--n5)' }} />}
+                  {!rail && <ChevronDown size={13} style={{ transform: open ? 'rotate(180deg)' : 'none', transition: 'transform var(--t-panel) var(--ease)', color: 'var(--n6)' }} />}
                 </button>
                 {!rail && (
                   <div style={{ display: 'grid', gridTemplateRows: open ? '1fr' : '0fr', transition: 'grid-template-rows var(--t-panel) var(--ease)' }}>
@@ -262,7 +280,7 @@ export default function App() {
           }}>
             <Search size={rail ? 18 : 15} strokeWidth={rail ? 1.75 : 2} />
             {!rail && <span style={{ flex: 1, textAlign: 'start' }}>{t('بحث شامل', 'Search everything')}</span>}
-            {!rail && <kbd className="machine" style={{ fontSize: 10, color: 'var(--n6)' }}>⌘K</kbd>}
+            {!rail && <kbd className="machine" style={{ fontSize: 10, color: 'var(--n4)' }}>⌘K</kbd>}
           </button>
         </nav>
 
@@ -270,7 +288,7 @@ export default function App() {
           <button onClick={() => setRail(v => !v)} title={t('طيّ الشريط', 'Collapse')} style={{
             display: 'flex', alignItems: 'center', justifyContent: rail ? 'center' : 'flex-start',
             gap: 'var(--s3)', width: '100%', height: 'var(--row-h)', padding: rail ? 0 : '0 var(--s2)',
-            borderRadius: 'var(--radius-sm)', color: 'var(--n5)', fontSize: 'var(--fs-hint)', fontWeight: 700,
+            borderRadius: 'var(--radius-sm)', color: 'var(--n4)', fontSize: 'var(--fs-hint)', fontWeight: 700,
           }}>
             {rail ? <PanelRightOpen size={18} strokeWidth={1.75} /> : <PanelRightClose size={15} />}
             {!rail && <span>{t('طيّ', 'Collapse')}</span>}
@@ -288,13 +306,13 @@ export default function App() {
         }}>
           <button onClick={() => setFinder(true)} style={{
             display: 'flex', alignItems: 'center', gap: 'var(--s2)', height: 32,
-            width: 'clamp(150px, 26vw, 260px)', minWidth: 0,
+            width: 'clamp(150px, 34vw, 420px)', minWidth: 0,
             padding: '0 var(--s3)', border: '1.5px solid var(--n3)', borderRadius: 'var(--radius-sm)',
             color: 'var(--n6)', fontSize: 'var(--fs-hint)', background: 'var(--cream)',
           }}>
             <Search size={14} style={{ flex: '0 0 auto' }} />
             <span className="sl-nowrap" style={{ flex: 1, textAlign: 'start', overflow: 'hidden', textOverflow: 'ellipsis' }}>{t('خدمة أو شحنة برقمها…', 'A service, or a shipment by its number…')}</span>
-            <kbd className="machine" style={{ fontSize: 10, color: 'var(--n5)' }}>⌘K</kbd>
+            <kbd className="machine" style={{ fontSize: 10, color: 'var(--n6)' }}>⌘K</kbd>
           </button>
           <div style={{ flex: 1 }} />
           <span className="sl-demo-badge sl-nowrap" style={{
@@ -314,10 +332,12 @@ export default function App() {
               width: 30, height: 30, borderRadius: 'var(--radius-pill)', background: 'var(--sky-tint)',
               color: 'var(--sky-deep)', display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontWeight: 800, fontSize: 'var(--fs-hint)',
-            }}>{dayMe.name.slice(0, 1)}</span>
+            }}>{(ar ? dayMe.nameAr : dayMe.name).slice(0, 1)}</span>
             <div style={{ textAlign: ar ? 'left' : 'right', lineHeight: 1.3, flex: '0 0 auto' }}>
-              <div className="sl-nowrap" style={{ fontSize: 'var(--fs-hint)', fontWeight: 800 }}>{dayMe.name}</div>
-              <div className="machine sl-nowrap" style={{ fontSize: 'var(--fs-eyebrow)', color: 'var(--n6)' }}>{dayMe.role} · L{dayMe.level}</div>
+              <div className="sl-nowrap" style={{ fontSize: 'var(--fs-hint)', fontWeight: 800, lineHeight: 1.3 }}>{ar ? dayMe.nameAr : dayMe.name}</div>
+              <div className="sl-nowrap" style={{ fontSize: 'var(--fs-eyebrow)', color: 'var(--n6)', lineHeight: 1.3 }}>
+                {ar ? dayMe.roleAr : dayMe.roleEn} · <span className="machine">L{dayMe.level}</span>
+              </div>
             </div>
           </div>
         </header>
@@ -332,7 +352,7 @@ export default function App() {
               onBack={() => setView({ t: 'home' })}
               onOpenFile={HAS_MODULES ? openModuleFile : undefined} />
           ) : (
-          <div style={{ maxWidth: 1160, marginInline: 'auto' }}>
+          <div style={{ maxWidth: 1240, marginInline: 'auto' }}>
 
             {/* page header — the five-second answer */}
             <div style={{ display: 'flex', alignItems: 'flex-end', gap: 'var(--s4)', marginBottom: 'var(--s5)', flexWrap: 'wrap' }}>
@@ -343,7 +363,7 @@ export default function App() {
                 <h1 style={{ font: `800 24px/1.25 ${ar ? 'var(--ar)' : 'var(--disp)'}`, margin: 'var(--s1) 0 0' }}>
                   {t('يومك، خالد', 'Your day, Khaled')}
                 </h1>
-                <div style={{ fontSize: 'var(--fs-hint)', color: 'var(--n6)', marginTop: 'var(--s1)' }}>
+                <div style={{ fontSize: 'var(--fs-body)', color: 'var(--n6)', marginTop: 'var(--s1)' }}>
                   {preview === 'empty'
                     ? t('لا شيء ينتظر فعلك.', 'Nothing waits on you.')
                     : <>
@@ -443,7 +463,7 @@ export default function App() {
                           padding: '3px 9px', borderRadius: 'var(--radius-pill)',
                           color: TONES[worst.tone].fg, background: TONES[worst.tone].bg,
                         }}>{worst.text}</span>
-                        <ChevronDown size={14} style={{ color: 'var(--n5)', transform: open ? 'rotate(180deg)' : 'none', transition: 'transform var(--t-panel) var(--ease)' }} />
+                        <ChevronDown size={14} style={{ color: 'var(--n6)', transform: open ? 'rotate(180deg)' : 'none', transition: 'transform var(--t-panel) var(--ease)' }} />
                       </button>
                       {open && (
                         <TaskList tasks={g.items} ar={ar} t={t} limit={3}
@@ -456,19 +476,25 @@ export default function App() {
                 })}
               </Panel>
 
+              {/* the second column, one piece: the management's word and then
+                  his figures. Kept together so the column fills its own height
+                  instead of leaving a row of tiles stranded under a page of air. */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--s5)', minWidth: 0 }}>
+
               {/* ② the news board — the management's word, with a face */}
               <Panel
                 icon={<Megaphone size={14} />}
                 eyebrow={t('من الإدارة', 'From the management')}
                 title={t('لوح الأخبار', 'The news board')}
-                meta={<span className="machine" style={{ fontSize: 'var(--fs-hint)', color: 'var(--n6)' }}>{news + 1} / {dayNews.length}</span>}
+                meta={<span className="machine" style={{ fontSize: 'var(--fs-hint)', color: 'var(--n6)' }}>{news + 1} / {newsItems.length}</span>}
               >
-                <NewsBoard ar={ar} t={t} index={news} onIndex={setNews} />
+                <NewsBoard ar={ar} t={t} index={news} onIndex={setNews} items={newsItems} />
               </Panel>
-            </div>
 
-            {/* ③ his figures, last — sparklines and doors */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 'var(--s4)', marginTop: 'var(--s5)' }}>
+              {/* ③ his figures, last — and beside the news rather than below
+                  everything, so the column fills its height instead of leaving
+                  a stranded row under a page of air */}
+              <div style={{ display: 'grid', gap: 'var(--s3)', marginTop: 'var(--s5)' }}>
               {dayFigures.map((f, fi) => {
                 const series = fi === 0 ? weekIntake : fi === 1 ? weekMeasured : weekLate;
                 const tone = TONES[f.tone === 'green' ? 'green' : f.tone === 'amber' ? 'amber' : 'red'];
@@ -478,20 +504,24 @@ export default function App() {
                     onClick={() => setListDrawer({ title: ar ? f.ar : f.en, tasks: backing })}
                     style={{
                       textAlign: 'start', background: 'var(--paper)', border: '1px solid var(--n3)',
-                      borderRadius: 'var(--radius)', padding: 'var(--s4) var(--s4) var(--s2)',
+                      borderRadius: 'var(--radius)', padding: 'var(--s3) var(--s4) 0',
                       boxShadow: 'var(--sh-1)', transition: 'border-color var(--t-state) var(--ease)',
+                      display: 'grid', gridTemplateColumns: '1fr auto', alignItems: 'center',
+                      columnGap: 'var(--s3)',
                     }}
                     onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--n5)'; }}
                     onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--n3)'; }}>
-                    <div style={{ fontSize: 'var(--fs-eyebrow)', color: 'var(--n6)', fontWeight: 800, letterSpacing: '.08em', textTransform: 'uppercase' }}>
-                      {ar ? f.ar : f.en}
+                    <div style={{ minWidth: 0 }}>
+                      <div style={{ fontSize: 'var(--fs-eyebrow)', color: 'var(--n6)', fontWeight: 800, letterSpacing: '.08em', textTransform: 'uppercase', lineHeight: 1.4 }}>
+                        {ar ? f.ar : f.en}
+                      </div>
+                      <div style={{ fontSize: 'var(--fs-eyebrow)', color: 'var(--n6)', lineHeight: 1.4 }}>{t('٧ أيام', '7 days')}</div>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--s3)', marginTop: 'var(--s1)' }}>
-                      <span className="disp machine" style={{ fontSize: 'var(--fs-figure)', fontWeight: 800, lineHeight: 1.05 }}>{f.n}</span>
-                      <span aria-hidden style={{ width: 8, height: 8, borderRadius: 'var(--radius-pill)', background: tone.dot }} />
-                      <span style={{ flex: 1 }} />
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--s2)' }}>
+                      <span aria-hidden style={{ width: 8, height: 8, borderRadius: 'var(--radius-pill)', background: tone.dot, alignSelf: 'center' }} />
+                      <span className="disp machine" style={{ fontSize: 'var(--fs-figure)', fontWeight: 800, lineHeight: 1 }}>{f.n}</span>
                     </div>
-                    <div style={{ height: 40, margin: '0 calc(-1 * var(--s2))' }} aria-hidden>
+                    <div style={{ height: 30, gridColumn: '1 / -1', margin: '0 calc(-1 * var(--s3))' }} aria-hidden>
                       <ResponsiveContainer width="100%" height="100%">
                         <AreaChart data={spark(series)} margin={{ top: 4, right: 0, left: 0, bottom: 0 }}>
                           <defs>
@@ -505,13 +535,13 @@ export default function App() {
                         </AreaChart>
                       </ResponsiveContainer>
                     </div>
-                    <div style={{ fontSize: 'var(--fs-eyebrow)', color: 'var(--n5)', textAlign: 'end' }}>
-                      {t('٧ أيام', '7 days')}
-                    </div>
                   </button>
                 );
               })}
             </div>
+              </div>
+            </div>
+
           </div>
           )}
         </main>
@@ -615,7 +645,7 @@ function Panel({ icon, eyebrow, title, meta, children }: {
           color: 'var(--sky-deep)', display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>{icon}</span>
         <div style={{ flex: 1, lineHeight: 1.2 }}>
-          <div style={{ fontSize: 'var(--fs-eyebrow)', color: 'var(--n5)', fontWeight: 800, letterSpacing: '.08em', textTransform: 'uppercase' }}>{eyebrow}</div>
+          <div style={{ fontSize: 'var(--fs-eyebrow)', color: 'var(--n6)', fontWeight: 800, letterSpacing: '.08em', textTransform: 'uppercase' }}>{eyebrow}</div>
           <div style={{ fontSize: 'var(--fs-lead)', fontWeight: 800 }}>{title}</div>
         </div>
         {meta}
@@ -660,7 +690,7 @@ function TaskList({ tasks, ar, t, onChat, onAct, limit, onMore }: {
             <span className="machine" style={{ fontSize: 'var(--fs-eyebrow)', color: 'var(--n6)' }}>{task.ref}</span>
             <span style={{ fontSize: 'var(--fs-eyebrow)', fontWeight: 800, whiteSpace: 'nowrap', padding: '2px 8px', borderRadius: 'var(--radius-pill)', color: tone.fg, background: tone.bg }}>{late.text}</span>
             <button onClick={e => { e.stopPropagation(); onChat(task); }} title={t('المحادثة', 'Thread')} aria-label={t('المحادثة', 'Thread')}
-              className="sl-row-chat" style={{ color: 'var(--n5)', display: 'flex', padding: 4, borderRadius: 'var(--radius-sm)' }}>
+              className="sl-row-chat" style={{ color: 'var(--n6)' }}>
               <MessageSquare size={14} />
             </button>
             <span aria-hidden className="sl-row-go" style={{ color: 'var(--n4)', display: 'flex', transition: 'color var(--t-state) var(--ease), transform var(--t-state) var(--ease)' }}>
@@ -695,13 +725,22 @@ function TaskList({ tasks, ar, t, onChat, onAct, limit, onMore }: {
   );
 }
 
+/* the eyebrow on a news slide names the KIND of notice; it is the console's
+   own word, so it has an Arabic twin like every other warm string here */
+const NEWS_KIND_AR: Record<string, string> = {
+  policy: 'سياسة', notice: 'إعلان', advisory: 'تنبيه',
+  outage: 'انقطاع', change: 'تغيير', reminder: 'تذكير',
+};
+
 /* ── the news board: a slide per item, image and title and all ───────── */
-function NewsBoard({ ar, t, index, onIndex }: {
+function NewsBoard({ ar, t, index, onIndex, items }: {
   ar: boolean; t: (a: string, e: string) => string; index: number; onIndex: (i: number) => void;
+  items: NewsItem[];
 }) {
-  const n: NewsItem = dayNews[index];
-  const prev = () => onIndex((index - 1 + dayNews.length) % dayNews.length);
-  const next = () => onIndex((index + 1) % dayNews.length);
+  const list = items.length ? items : dayNews;
+  const n: NewsItem = list[Math.min(index, list.length - 1)];
+  const prev = () => onIndex((index - 1 + list.length) % list.length);
+  const next = () => onIndex((index + 1) % list.length);
   return (
     <div>
       {/* the slide */}
@@ -721,7 +760,7 @@ function NewsBoard({ ar, t, index, onIndex }: {
             fontSize: 'var(--fs-eyebrow)', color: 'var(--sky-deep)', fontWeight: 800,
             letterSpacing: '.08em', textTransform: 'uppercase', background: 'var(--sky-tint)',
             padding: '2px 8px', borderRadius: 'var(--radius-pill)',
-          }}>{n.kind}</span>
+          }}>{ar ? (NEWS_KIND_AR[n.kind] || n.kind) : n.kind}</span>
           {/* the headline reads as a HEADLINE: the display face in Latin, a
               heavy Tajawal in Arabic, a full step up the type scale */}
           <h3 style={{
@@ -736,7 +775,7 @@ function NewsBoard({ ar, t, index, onIndex }: {
             {ar ? n.ar : n.en}
           </p>
           <div style={{ fontSize: 'var(--fs-eyebrow)', color: 'var(--n6)', marginTop: 'var(--s3)' }}>
-            {n.by} · <span className="machine">{n.at}</span>
+            {(ar && n.byAr) ? n.byAr : n.by} · <span className="machine">{n.at}</span>
           </div>
         </div>
       </div>
@@ -834,7 +873,7 @@ function TaskDrawer({ task, tab, ar, t, onClose, onAct, onOpenModule, onMention,
                   <span aria-hidden style={{ width: 7, height: 7, borderRadius: 'var(--radius-pill)', background: i === trail.length - 1 ? 'var(--sky)' : 'var(--n4)', marginTop: 5, flex: '0 0 auto' }} />
                   <div style={{ fontSize: 'var(--fs-hint)', lineHeight: 1.5 }}>
                     <div>{ar ? e.ar : e.en}</div>
-                    <div className="machine" style={{ fontSize: 'var(--fs-eyebrow)', color: 'var(--n5)' }}>{e.at}</div>
+                    <div className="machine" style={{ fontSize: 'var(--fs-eyebrow)', color: 'var(--n6)' }}>{e.at}</div>
                   </div>
                 </div>
               ))}
@@ -854,7 +893,7 @@ function TaskDrawer({ task, tab, ar, t, onClose, onAct, onOpenModule, onMention,
                     border: '1px solid ' + (mine ? 'rgba(14,165,233,.4)' : 'var(--n2)'),
                     borderRadius: 'var(--radius)', padding: 'var(--s2) var(--s3)', fontSize: 'var(--fs-hint)', lineHeight: 1.55,
                   }}><MsgText text={ar ? m.ar : m.en} ar={ar} /></div>
-                  <div style={{ fontSize: 'var(--fs-eyebrow)', color: 'var(--n5)', marginTop: 2, paddingInline: 'var(--s1)' }}>
+                  <div style={{ fontSize: 'var(--fs-eyebrow)', color: 'var(--n6)', marginTop: 2, paddingInline: 'var(--s1)' }}>
                     {m.by} · <span className="machine">{m.at}</span>
                   </div>
                 </div>
@@ -883,7 +922,7 @@ function TaskDrawer({ task, tab, ar, t, onClose, onAct, onOpenModule, onMention,
                       fontSize: 'var(--fs-eyebrow)', fontWeight: 800,
                     }}>{(ar ? p.ar : p.en).slice(0, 1)}</span>
                     <span style={{ flex: 1, fontWeight: 700 }}>{ar ? p.ar : p.en}</span>
-                    <span className="machine" style={{ fontSize: 'var(--fs-eyebrow)', color: 'var(--n5)' }}>{p.role}</span>
+                    <span className="machine" style={{ fontSize: 'var(--fs-eyebrow)', color: 'var(--n6)' }}>{p.role}</span>
                   </button>
                 ))}
               </div>
@@ -950,12 +989,12 @@ function MsgText({ text, ar }: { text: string; ar: boolean }) {
 }
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
-  return <div style={{ fontSize: 'var(--fs-eyebrow)', color: 'var(--n5)', fontWeight: 800, letterSpacing: '.1em', textTransform: 'uppercase', marginBottom: 'var(--s2)' }}>{children}</div>;
+  return <div style={{ fontSize: 'var(--fs-eyebrow)', color: 'var(--n6)', fontWeight: 800, letterSpacing: '.1em', textTransform: 'uppercase', marginBottom: 'var(--s2)' }}>{children}</div>;
 }
 function Field({ k, v, machine }: { k: string; v: string; machine?: boolean }) {
   return (
     <div>
-      <div style={{ fontSize: 'var(--fs-eyebrow)', color: 'var(--n5)', fontWeight: 700 }}>{k}</div>
+      <div style={{ fontSize: 'var(--fs-eyebrow)', color: 'var(--n6)', fontWeight: 700 }}>{k}</div>
       <div className={machine ? 'machine' : undefined} style={{ fontWeight: 700 }}>{v}</div>
     </div>
   );
@@ -1009,11 +1048,11 @@ function Finder({ ar, t, onClose, onOpen }: {
         border: '1px solid var(--n3)', boxShadow: 'var(--sh-2)', overflow: 'hidden',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--s3)', padding: '0 var(--s4)', borderBottom: '1px solid var(--n2)' }}>
-          <Search size={16} style={{ color: 'var(--n5)' }} />
+          <Search size={16} style={{ color: 'var(--n6)' }} />
           <input ref={input} value={q} onChange={e => setQ(e.target.value)}
             placeholder={t('خدمة أو شحنة برقمها…', 'A service, or a shipment by its number…')}
             style={{ flex: 1, height: 46, border: 'none', outline: 'none', fontSize: 'var(--fs-body)', background: 'transparent', fontFamily: 'inherit' }} />
-          <kbd className="machine" style={{ fontSize: 10, color: 'var(--n5)' }}>esc</kbd>
+          <kbd className="machine" style={{ fontSize: 10, color: 'var(--n6)' }}>esc</kbd>
         </div>
         <div style={{ maxHeight: '46vh', overflowY: 'auto', padding: 'var(--s2)' }}>
           {refHit && (
@@ -1047,7 +1086,7 @@ const rowStyle: React.CSSProperties = {
   borderRadius: 'var(--radius-sm)', fontSize: 'var(--fs-body)',
 };
 function GroupLabel({ children }: { children: React.ReactNode }) {
-  return <div style={{ fontSize: 'var(--fs-eyebrow)', color: 'var(--n5)', fontWeight: 800, letterSpacing: '.1em', textTransform: 'uppercase', padding: 'var(--s2) var(--s3) var(--s1)' }}>{children}</div>;
+  return <div style={{ fontSize: 'var(--fs-eyebrow)', color: 'var(--n6)', fontWeight: 800, letterSpacing: '.1em', textTransform: 'uppercase', padding: 'var(--s2) var(--s3) var(--s1)' }}>{children}</div>;
 }
 
 /* ── one service, inside the console — and WORKABLE: it shows the service's
@@ -1065,7 +1104,7 @@ function ServiceView({ file, ar, t, tasks, focus, onAct, onChat, onBack, onOpenF
   const Icon = cat ? (CAT_ICONS[cat.id] || Inbox) : Inbox;
   if (!item || !cat) return null;
   return (
-    <div style={{ maxWidth: 1400, marginInline: 'auto', display: 'flex', flexDirection: 'column', height: '100%' }}>
+    <div style={{ maxWidth: 1240, marginInline: 'auto', display: 'flex', flexDirection: 'column', height: '100%' }}>
       <nav aria-label={t('مسار', 'Breadcrumb')} style={{
         display: 'flex', alignItems: 'center', gap: 'var(--s2)',
         fontSize: 'var(--fs-hint)', color: 'var(--n6)', marginBottom: 'var(--s4)',
@@ -1088,7 +1127,7 @@ function ServiceView({ file, ar, t, tasks, focus, onAct, onChat, onBack, onOpenF
           color: 'var(--sky-deep)', display: 'flex', alignItems: 'center', justifyContent: 'center', flex: '0 0 auto',
         }}><Icon size={16} /></span>
         <span style={{ minWidth: 0, lineHeight: 1.25 }}>
-          <span className="sl-nowrap" style={{ display: 'block', fontSize: 'var(--fs-eyebrow)', color: 'var(--n5)', fontWeight: 800, letterSpacing: '.08em', textTransform: 'uppercase' }}>
+          <span className="sl-nowrap" style={{ display: 'block', fontSize: 'var(--fs-eyebrow)', color: 'var(--n6)', fontWeight: 800, letterSpacing: '.08em', textTransform: 'uppercase' }}>
             {ar ? cat.ar : cat.en}
           </span>
           <span style={{ display: 'block', fontSize: 'var(--fs-lead)', fontWeight: 800 }}>{ar ? item.ar : item.en}</span>
@@ -1101,7 +1140,7 @@ function ServiceView({ file, ar, t, tasks, focus, onAct, onChat, onBack, onOpenF
         </span>
         {tasks.length > 0 && (
           <button onClick={() => onChat(tasks[0])} title={t('عمل هذه الخدمة', "This service's work")}
-            className="sl-row-chat" style={{ color: 'var(--n5)', display: 'flex', padding: 4, borderRadius: 'var(--radius-sm)' }}>
+            className="sl-row-chat" style={{ color: 'var(--n6)' }}>
             <MessageSquare size={15} />
           </button>
         )}
@@ -1159,7 +1198,7 @@ function ServiceView({ file, ar, t, tasks, focus, onAct, onChat, onBack, onOpenF
             background: 'var(--paper)', border: '1px solid var(--n3)', borderRadius: 'var(--radius)',
             padding: 'var(--s2) var(--s4)', fontSize: 'var(--fs-hint)', fontWeight: 800,
           }}>
-            <Timer size={14} style={{ color: 'var(--n5)' }} />
+            <Timer size={14} style={{ color: 'var(--n6)' }} />
             {t('عمل هذه الخدمة اليوم', "This service's work today")}
             <span className="machine" style={{ color: 'var(--n6)' }}>{tasks.length}</span>
           </summary>
@@ -1217,9 +1256,26 @@ function ModuleFrame({ file, ar, t, title, fill }: {
       try {
         const doc = frame.current?.contentDocument;
         const w = frame.current?.contentWindow as (Window & { setLang?: (l: string) => void }) | null;
-        if (!doc || typeof w?.setLang !== 'function') return false;
-        w.setLang(want);
-        return doc.documentElement.getAttribute('lang') === want;
+        if (!doc) return false;
+        if (typeof w?.setLang === 'function') {
+          w.setLang(want);
+          return doc.documentElement.getAttribute('lang') === want;
+        }
+        /* A body exists as soon as <body> is parsed, long before the scripts at
+           the end of it define setLang. Deciding "this file has no switch" then
+           was deciding it too early: the attribute was set, the module booted a
+           moment later and set it back, and nobody asked again — which is how a
+           module sat in English under an Arabic console. Only a document that
+           has FINISHED parsing can be said to have no switch of its own — and
+           an iframe's FIRST document is a blank one that is already 'complete'
+           and never had a setLang to find, so stamping that one stamps a page
+           about to be thrown away. The document must be the module itself,
+           which a blank document never is. */
+        if (doc.readyState !== 'complete') return false;
+        if (!doc.body || doc.body.children.length === 0) return false;
+        doc.documentElement.setAttribute('lang', want);
+        doc.documentElement.setAttribute('dir', want === 'ar' ? 'rtl' : 'ltr');
+        return true;
       } catch { return false; }   /* a frame still parsing is not an error */
     };
     if (tell()) return;
