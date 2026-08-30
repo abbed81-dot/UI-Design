@@ -12,7 +12,7 @@ import { LOCKUP_EN } from '@/lib/lockup_en';
 import { MARK_LIGHT } from '@/lib/mark';
 import {
   dayTasks, dayFigures, dayMe, dayThreads, denseTasks, dayNews, dayTrail, dayDetails,
-  weekIntake, weekMeasured, weekLate, GROUP_META, type Task, type NewsItem,
+  dayStaff, weekIntake, weekMeasured, weekLate, GROUP_META, type Task, type NewsItem,
 } from '@/lib/day';
 import { readState, writeState, type SavedState } from '@/lib/store';
 
@@ -416,7 +416,8 @@ export default function App() {
                         <ChevronDown size={14} style={{ color: 'var(--n5)', transform: open ? 'rotate(180deg)' : 'none', transition: 'transform var(--t-panel) var(--ease)' }} />
                       </button>
                       {open && (
-                        <TaskList tasks={g.items} ar={ar} t={t}
+                        <TaskList tasks={g.items} ar={ar} t={t} limit={3}
+                          onMore={() => setListDrawer({ title: ar ? meta.ar : meta.en, tasks: g.items })}
                           onOpen={task => setDrawer({ task, tab: 'info' })}
                           onChat={task => setDrawer({ task, tab: 'chat' })} />
                       )}
@@ -495,7 +496,10 @@ export default function App() {
       }}>
         {drawer && <TaskDrawer task={drawer.task} tab={drawer.tab} ar={ar} t={t}
           onClose={() => setDrawer(null)} onAct={act}
-          onOpenModule={HAS_MODULES ? () => openModuleFile(drawer.task.open) : undefined} />}
+          onOpenModule={HAS_MODULES ? () => openModuleFile(drawer.task.open) : undefined}
+          onMention={names => setToast(
+            (ar ? 'وُسم ' : 'Mentioned ') + names.map(n => '@' + n).join(ar ? ' و' : ', ') +
+            (ar ? ' — يصله التنبيه عبر لوحة التحكم' : ' — notified through the control board'))} />}
       </aside>
 
       {/* ══ LIST DRAWER — the list behind a figure ═══════════════════ */}
@@ -515,7 +519,7 @@ export default function App() {
             <div style={{ flex: 1, overflowY: 'auto' }}>
               {listDrawer.tasks.length === 0
                 ? <div style={{ padding: 'var(--s6)', color: 'var(--n6)', fontSize: 'var(--fs-hint)', textAlign: 'center' }}>{t('لا شيء هنا — وهذا هو المقصود.', 'Nothing here — which is the point.')}</div>
-                : <TaskList tasks={listDrawer.tasks} ar={ar} t={t} compact
+                : <TaskList tasks={listDrawer.tasks} ar={ar} t={t}
                     onOpen={task => { setListDrawer(null); setDrawer({ task, tab: 'info' }); }}
                     onChat={task => { setListDrawer(null); setDrawer({ task, tab: 'chat' }); }} />}
             </div>
@@ -583,50 +587,68 @@ function Panel({ icon, eyebrow, title, meta, children }: {
   );
 }
 
-/* ── the complete list of a group — virtualized, so 500 rows scroll clean ── */
-function TaskList({ tasks, ar, t, onOpen, onChat, compact }: {
+/* ── a list of tasks. Inline in a group it shows the first THREE and a
+      "more" button — the home shows the shape of the day, the drawer holds the
+      day itself. In the drawer it reveals progressively, 120 at a time, so the
+      500-row state scrolls clean without a wall of nodes. ─────────────────── */
+function TaskList({ tasks, ar, t, onOpen, onChat, limit, onMore }: {
   tasks: Task[]; ar: boolean; t: (a: string, e: string) => string;
-  onOpen: (x: Task) => void; onChat: (x: Task) => void; compact?: boolean;
+  onOpen: (x: Task) => void; onChat: (x: Task) => void;
+  limit?: number; onMore?: () => void;
 }) {
-  const ROW = 44;
-  const viewH = compact ? undefined : Math.min(tasks.length * ROW, 420);
-  const [scroll, setScroll] = useState(0);
-  const big = tasks.length > 60 && !compact;
-  const start = big ? Math.max(0, Math.floor(scroll / ROW) - 6) : 0;
-  const end = big ? Math.min(tasks.length, start + Math.ceil((viewH || 420) / ROW) + 12) : tasks.length;
-  const slice = tasks.slice(start, end);
+  const [cap, setCap] = useState(120);
+  useEffect(() => { setCap(120); }, [tasks]);
+  const shown = tasks.slice(0, limit ?? cap);
+  const hiddenByLimit = limit !== undefined && tasks.length > limit;
+  const hiddenByCap = limit === undefined && tasks.length > cap;
   return (
-    <div
-      onScroll={big ? e => setScroll((e.target as HTMLElement).scrollTop) : undefined}
-      style={{ maxHeight: viewH, overflowY: viewH ? 'auto' : undefined, background: 'var(--n1)' }}
-    >
-      <div style={big ? { height: tasks.length * ROW, position: 'relative' } : undefined}>
-        {slice.map((task, i) => {
-          const late = lateLabel(task.lateMs, ar);
-          const tone = TONES[late.tone];
-          return (
-            <div key={task.id} style={{
-              ...(big ? { position: 'absolute' as const, top: (start + i) * ROW, insetInline: 0 } : {}),
-              display: 'flex', alignItems: 'center', gap: 'var(--s3)', height: ROW,
-              padding: '0 var(--s4)', borderBottom: '1px solid var(--n2)', position: big ? 'absolute' : 'relative',
-            }}>
-              <span aria-hidden style={{ position: 'absolute', insetInlineStart: 0, top: 8, bottom: 8, width: 3, borderRadius: 'var(--radius-pill)', background: tone.dot }} />
-              <button onClick={() => onOpen(task)} style={{ flex: 1, minWidth: 0, textAlign: 'start', fontSize: 'var(--fs-hint)', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', paddingInlineStart: 'var(--s2)' }}>
-                {ar ? task.ar : task.en}
-              </button>
-              <span className="machine" style={{ fontSize: 'var(--fs-eyebrow)', color: 'var(--n6)' }}>{task.ref}</span>
-              <span style={{ fontSize: 'var(--fs-eyebrow)', fontWeight: 800, whiteSpace: 'nowrap', padding: '2px 8px', borderRadius: 'var(--radius-pill)', color: tone.fg, background: tone.bg }}>{late.text}</span>
-              <button onClick={() => onChat(task)} title={t('المحادثة', 'Thread')} aria-label={t('المحادثة', 'Thread')} style={{ color: 'var(--n5)', display: 'flex' }}>
-                <MessageSquare size={14} />
-              </button>
-              <button onClick={() => onOpen(task)} style={{
-                height: 24, padding: '0 var(--s3)', background: 'var(--sky)', color: 'var(--ink)',
-                borderRadius: 'var(--radius-sm)', fontSize: 'var(--fs-eyebrow)', fontWeight: 800,
-              }}>{ar ? task.verbAr : task.verbEn}</button>
-            </div>
-          );
-        })}
-      </div>
+    <div style={{ background: 'var(--n1)' }}>
+      {shown.map(task => {
+        const late = lateLabel(task.lateMs, ar);
+        const tone = TONES[late.tone];
+        return (
+          <div key={task.id} style={{
+            position: 'relative', display: 'flex', alignItems: 'center', gap: 'var(--s3)',
+            height: 44, padding: '0 var(--s4)', borderBottom: '1px solid var(--n2)',
+          }}>
+            <span aria-hidden style={{ position: 'absolute', insetInlineStart: 0, top: 8, bottom: 8, width: 3, borderRadius: 'var(--radius-pill)', background: tone.dot }} />
+            <button onClick={() => onOpen(task)} style={{ flex: 1, minWidth: 0, textAlign: 'start', fontSize: 'var(--fs-hint)', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', paddingInlineStart: 'var(--s2)' }}>
+              {ar ? task.ar : task.en}
+            </button>
+            <span className="machine" style={{ fontSize: 'var(--fs-eyebrow)', color: 'var(--n6)' }}>{task.ref}</span>
+            <span style={{ fontSize: 'var(--fs-eyebrow)', fontWeight: 800, whiteSpace: 'nowrap', padding: '2px 8px', borderRadius: 'var(--radius-pill)', color: tone.fg, background: tone.bg }}>{late.text}</span>
+            <button onClick={() => onChat(task)} title={t('المحادثة', 'Thread')} aria-label={t('المحادثة', 'Thread')} style={{ color: 'var(--n5)', display: 'flex' }}>
+              <MessageSquare size={14} />
+            </button>
+            <button onClick={() => onOpen(task)} style={{
+              height: 24, padding: '0 var(--s3)', background: 'var(--sky)', color: 'var(--ink)',
+              borderRadius: 'var(--radius-sm)', fontSize: 'var(--fs-eyebrow)', fontWeight: 800,
+            }}>{ar ? task.verbAr : task.verbEn}</button>
+          </div>
+        );
+      })}
+      {hiddenByLimit && onMore && (
+        <button onClick={onMore} style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--s2)',
+          width: '100%', height: 38, fontSize: 'var(--fs-hint)', fontWeight: 800,
+          color: 'var(--sky-deep)', borderBottom: '1px solid var(--n2)',
+          transition: 'background var(--t-state) var(--ease)',
+        }}
+          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'var(--sky-tint)'; }}
+          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = ''; }}>
+          {t('المزيد', 'More')}
+          <span className="machine">+{tasks.length - (limit ?? 0)}</span>
+        </button>
+      )}
+      {hiddenByCap && (
+        <button onClick={() => setCap(c => c + 120)} style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--s2)',
+          width: '100%', height: 38, fontSize: 'var(--fs-hint)', fontWeight: 800, color: 'var(--sky-deep)',
+        }}>
+          {t('أظهر المزيد', 'Show more')}
+          <span className="machine">{Math.min(120, tasks.length - cap)} / {tasks.length - cap}</span>
+        </button>
+      )}
     </div>
   );
 }
@@ -658,7 +680,14 @@ function NewsBoard({ ar, t, index, onIndex }: {
             letterSpacing: '.08em', textTransform: 'uppercase', background: 'var(--sky-tint)',
             padding: '2px 8px', borderRadius: 'var(--radius-pill)',
           }}>{n.kind}</span>
-          <h3 style={{ font: `800 var(--fs-lead)/1.4 inherit`, fontFamily: 'inherit', margin: 'var(--s2) 0 var(--s1)' }}>
+          {/* the headline reads as a HEADLINE: the display face in Latin, a
+              heavy Tajawal in Arabic, a full step up the type scale */}
+          <h3 style={{
+            fontSize: 'var(--fs-title)', fontWeight: 800, lineHeight: 1.35,
+            fontFamily: ar ? 'var(--ar)' : 'var(--disp)',
+            letterSpacing: ar ? 0 : '-0.01em', color: 'var(--ink)',
+            margin: 'var(--s2) 0 var(--s1)',
+          }}>
             {ar ? n.titleAr : n.titleEn}
           </h3>
           <p style={{ fontSize: 'var(--fs-hint)', color: 'var(--n7)', lineHeight: 1.65, margin: 0 }}>
@@ -697,9 +726,10 @@ function NewsBoard({ ar, t, index, onIndex }: {
 }
 
 /* ── the task drawer: what it is, its trail, its thread, and the act ─── */
-function TaskDrawer({ task, tab, ar, t, onClose, onAct, onOpenModule }: {
+function TaskDrawer({ task, tab, ar, t, onClose, onAct, onOpenModule, onMention }: {
   task: Task; tab: 'info' | 'chat'; ar: boolean; t: (a: string, e: string) => string;
   onClose: () => void; onAct: (x: Task) => void; onOpenModule?: () => void;
+  onMention?: (names: string[]) => void;
 }) {
   const late = lateLabel(task.lateMs, ar);
   const d = dayDetails[task.ref];
@@ -707,10 +737,26 @@ function TaskDrawer({ task, tab, ar, t, onClose, onAct, onOpenModule }: {
   const thread = dayThreads[task.ref] || [];
   const [draft, setDraft] = useState('');
   const [sent, setSent] = useState<{ by: string; at: string; ar: string; en: string }[]>([]);
+  const [pick, setPick] = useState(0);
   const chatRef = useRef<HTMLDivElement>(null);
-  useEffect(() => { if (tab === 'chat') chatRef.current?.scrollIntoView(); }, [tab]);
+  useEffect(() => { if (tab === 'chat') chatRef.current?.scrollIntoView?.(); }, [tab]);
   const all = [...thread, ...sent];
-  const send = () => { if (draft.trim()) { setSent(s => [...s, { by: dayMe.name, at: t('الآن', 'now'), ar: draft, en: draft }]); setDraft(''); } };
+  /* an open mention: the text ends in @ plus a fragment with no space yet */
+  const frag = /@([^\s@]*)$/.exec(draft);
+  const people = frag
+    ? dayStaff.filter(p => (ar ? p.ar : p.en).startsWith(frag[1]) || (ar ? p.en : p.ar).toLowerCase().startsWith(frag[1].toLowerCase())).slice(0, 5)
+    : [];
+  useEffect(() => { setPick(0); }, [draft]);
+  const choose = (name: string) => {
+    setDraft(d => d.replace(/@([^\s@]*)$/, '@' + name + ' '));
+  };
+  const send = () => {
+    if (!draft.trim()) return;
+    const named = dayStaff.filter(p => draft.indexOf('@' + p.ar) > -1 || draft.indexOf('@' + p.en) > -1);
+    setSent(s => [...s, { by: dayMe.name, at: t('الآن', 'now'), ar: draft, en: draft }]);
+    setDraft('');
+    if (named.length) onMention?.(named.map(p => (ar ? p.ar : p.en)));
+  };
   return (
     <div style={{ width: 'var(--panel-w)', height: '100%', display: 'flex', flexDirection: 'column' }}>
       <div style={{ padding: 'var(--s4) var(--s5)', borderBottom: '1px solid var(--n2)', display: 'flex', gap: 'var(--s2)', alignItems: 'flex-start' }}>
@@ -764,7 +810,7 @@ function TaskDrawer({ task, tab, ar, t, onClose, onAct, onOpenModule }: {
                     background: mine ? 'var(--sky-tint)' : 'var(--n1)',
                     border: '1px solid ' + (mine ? 'rgba(14,165,233,.4)' : 'var(--n2)'),
                     borderRadius: 'var(--radius)', padding: 'var(--s2) var(--s3)', fontSize: 'var(--fs-hint)', lineHeight: 1.55,
-                  }}>{ar ? m.ar : m.en}</div>
+                  }}><MsgText text={ar ? m.ar : m.en} ar={ar} /></div>
                   <div style={{ fontSize: 'var(--fs-eyebrow)', color: 'var(--n5)', marginTop: 2, paddingInline: 'var(--s1)' }}>
                     {m.by} · <span className="machine">{m.at}</span>
                   </div>
@@ -772,9 +818,44 @@ function TaskDrawer({ task, tab, ar, t, onClose, onAct, onOpenModule }: {
               );
             })}
           </div>
-          <div style={{ display: 'flex', gap: 'var(--s2)', marginTop: 'var(--s3)' }}>
-            <input value={draft} onChange={e => setDraft(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') send(); }}
-              placeholder={t('اكتب — تُسجَّل عبر لوحة التحكم', 'Write — recorded through the control board')}
+          <div style={{ position: 'relative', display: 'flex', gap: 'var(--s2)', marginTop: 'var(--s3)' }}>
+            {people.length > 0 && (
+              <div role="listbox" aria-label={t('وسم شخصاً', 'Mention someone')} style={{
+                position: 'absolute', bottom: 'calc(100% + 6px)', insetInlineStart: 0,
+                width: 'min(280px, 100%)', background: 'var(--paper)', border: '1px solid var(--n3)',
+                borderRadius: 'var(--radius-sm)', boxShadow: 'var(--sh-2)', overflow: 'hidden', zIndex: 5,
+              }}>
+                {people.map((p, i) => (
+                  <button key={p.en} role="option" aria-selected={i === pick}
+                    onMouseDown={e => { e.preventDefault(); choose(ar ? p.ar : p.en); }}
+                    onMouseEnter={() => setPick(i)}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 'var(--s2)', width: '100%',
+                      padding: 'var(--s2) var(--s3)', textAlign: 'start', fontSize: 'var(--fs-hint)',
+                      background: i === pick ? 'var(--sky-tint)' : 'transparent',
+                    }}>
+                    <span aria-hidden style={{
+                      width: 22, height: 22, borderRadius: 'var(--radius-pill)', background: 'var(--n2)',
+                      color: 'var(--n7)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 'var(--fs-eyebrow)', fontWeight: 800,
+                    }}>{(ar ? p.ar : p.en).slice(0, 1)}</span>
+                    <span style={{ flex: 1, fontWeight: 700 }}>{ar ? p.ar : p.en}</span>
+                    <span className="machine" style={{ fontSize: 'var(--fs-eyebrow)', color: 'var(--n5)' }}>{p.role}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+            <input value={draft} onChange={e => setDraft(e.target.value)}
+              onKeyDown={e => {
+                if (people.length) {
+                  if (e.key === 'ArrowDown') { e.preventDefault(); setPick(v => (v + 1) % people.length); return; }
+                  if (e.key === 'ArrowUp') { e.preventDefault(); setPick(v => (v - 1 + people.length) % people.length); return; }
+                  if (e.key === 'Enter' || e.key === 'Tab') { e.preventDefault(); choose(ar ? people[pick].ar : people[pick].en); return; }
+                  if (e.key === 'Escape') { e.stopPropagation(); setDraft(d => d.replace(/@([^\s@]*)$/, '')); return; }
+                }
+                if (e.key === 'Enter') send();
+              }}
+              placeholder={t('اكتب — و@ لوسم شخص', 'Write — @ mentions someone')}
               style={{ flex: 1, height: 34, padding: '0 var(--s3)', border: '1.5px solid var(--n3)', borderRadius: 'var(--radius-sm)', fontSize: 'var(--fs-hint)', fontFamily: 'inherit', background: 'var(--paper)' }} />
             <button onClick={send} title={t('أرسل', 'Send')} aria-label={t('أرسل', 'Send')} style={{
               width: 34, height: 34, display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -802,6 +883,29 @@ function TaskDrawer({ task, tab, ar, t, onClose, onAct, onOpenModule }: {
     </div>
   );
 }
+/* a known name after @ becomes a chip — the thread names a person, and the
+   name reads as one thing, not as text that happens to start with a sign */
+function MsgText({ text, ar }: { text: string; ar: boolean }) {
+  const names = dayStaff.map(p => (ar ? p.ar : p.en))
+    .concat(dayStaff.map(p => (ar ? p.en : p.ar)));   /* either language sticks */
+  const esc = (x: string) => x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const re = new RegExp('@(' + names.map(esc).join('|') + ')', 'g');
+  const parts: React.ReactNode[] = [];
+  let last = 0; let m: RegExpExecArray | null; let k = 0;
+  while ((m = re.exec(text))) {
+    if (m.index > last) parts.push(text.slice(last, m.index));
+    parts.push(
+      <span key={k++} style={{
+        background: 'var(--sky-tint)', color: 'var(--sky-deep)', fontWeight: 800,
+        borderRadius: 'var(--radius-pill)', padding: '0 6px', unicodeBidi: 'isolate',
+      }}>@{m[1]}</span>,
+    );
+    last = m.index + m[0].length;
+  }
+  if (last < text.length) parts.push(text.slice(last));
+  return <>{parts}</>;
+}
+
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return <div style={{ fontSize: 'var(--fs-eyebrow)', color: 'var(--n5)', fontWeight: 800, letterSpacing: '.1em', textTransform: 'uppercase', marginBottom: 'var(--s2)' }}>{children}</div>;
 }

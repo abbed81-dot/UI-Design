@@ -51,7 +51,7 @@ export const dayMe: Person = {
 export const dayThreads: Record<string, { by: string; at: string; ar: string; en: string }[]> = {
   'CON-240703-02': [
     { by: 'Mona Said', at: '09:12', ar: 'المحاولة الثانية رفضها العميل — الهاتف مغلق.', en: 'Second attempt refused — phone unreachable.' },
-    { by: 'Khaled Omar', at: '09:40', ar: 'أُعيدت إلى الرفّ C-4 بانتظار القرار.', en: 'Back on shelf C-4 pending the decision.' },
+    { by: 'Khaled Omar', at: '09:40', ar: 'أُعيدت إلى الرفّ C-4 بانتظار القرار — @منى سعيد للتأكيد.', en: 'Back on shelf C-4 pending the decision — @Mona Said to confirm.' },
   ],
 };
 
@@ -137,3 +137,13 @@ export const dayDetails: Record<string, { client: string; route: string; weight:
 export const weekIntake = [4, 6, 3, 8, 5, 9, 7];
 export const weekMeasured = [3, 6, 3, 7, 5, 8, 6];
 export const weekLate = [1, 0, 2, 1, 0, 1, 1];
+
+/* the people a thread can name — the demonstration roster, bilingual */
+export const dayStaff: { ar: string; en: string; role: string }[] = [
+  { ar: 'خالد عمر',    en: 'Khaled Omar',   role: 'wh' },
+  { ar: 'طارق عزيز',   en: 'Tarek Aziz',    role: 'hubsup' },
+  { ar: 'منى سعيد',    en: 'Mona Said',     role: 'disp' },
+  { ar: 'عمر المصري',  en: 'Omar Al-Masri', role: 'admin' },
+  { ar: 'رنا يوسف',    en: 'Rana Yousef',   role: 'acct' },
+  { ar: 'لينا حموي',   en: 'Lina Hamwi',    role: 'customs' },
+];
