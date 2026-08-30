@@ -196,16 +196,10 @@ export default function App() {
         transition: 'width var(--t-panel) var(--ease)', overflow: 'hidden',
       }}>
         <div style={{
-          /* the plate that answers the page's heading band across the screen:
-             the same height, so the menu below it starts on the same line the
-             panels do. Collapsed to the rail, it shrinks back to the top band —
-             a rail has no composition to mirror. */
-          height: rail ? 'var(--top-h)' : 'calc(var(--top-h) + var(--head-h))',
-          flex: '0 0 auto', display: 'flex', alignItems: 'center',
+          height: 'var(--top-h)', flex: '0 0 auto', display: 'flex', alignItems: 'center',
           justifyContent: rail ? 'center' : 'flex-start',
           padding: rail ? 0 : '0 var(--gutter-sb)',
           borderBottom: '1px solid rgba(244,251,255,.08)',
-          transition: 'height var(--t-panel) var(--ease)',
         }}>
           {rail
             ? <img src={MARK_LIGHT} alt="ShopyLink" style={{ height: 18, width: 'auto', display: 'block' }} />
@@ -361,10 +355,7 @@ export default function App() {
           <div style={{ maxWidth: 1240, marginInline: 'auto' }}>
 
             {/* page header — the five-second answer */}
-            <div style={{
-              display: 'flex', alignItems: 'flex-end', gap: 'var(--s4)', flexWrap: 'wrap',
-              minHeight: 'calc(var(--head-h) - var(--gutter-pg))', paddingBottom: 'var(--s5)',
-            }}>
+            <div style={{ display: 'flex', alignItems: 'flex-end', gap: 'var(--s4)', marginBottom: 'var(--s5)', flexWrap: 'wrap' }}>
               <div style={{ flex: 1, minWidth: 260 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--s2)', color: 'var(--n6)', fontSize: 'var(--fs-eyebrow)', fontWeight: 800, letterSpacing: '.08em', textTransform: 'uppercase' }}>
                   <CalendarDays size={12} /> <span>{today}</span>
