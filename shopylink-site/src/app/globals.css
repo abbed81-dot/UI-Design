@@ -1,0 +1,122 @@
+/* `source("../")` limits class detection to `src/` (this file lives in src/app).
+   Without it Tailwind v4 scans the whole repo — including obsidian/ and .claude/,
+   where documented class *patterns* like duration-[var(--duration-*)] parse as
+   real candidates and emit CSS warnings. Docs are not a source of utilities. */
+@import "tailwindcss" source("../");
+
+/* ---------------------------------------------------------------------------
+   TIER 1 — PRIMITIVES  (`--raw-*`)
+   Raw literal values. The only tier allowed to contain a hex/px/ms literal.
+   Never referenced in markup, never bound into @theme. Rename freely.
+   Grammar: --raw-<category>-<name>[-<shade>]
+   See obsidian/frontend/design-system.md → "Token naming convention".
+   --------------------------------------------------------------------------- */
+:root {
+  --raw-color-white: #ffffff;
+  --raw-color-neutral-100: #ededed;
+  --raw-color-neutral-900: #171717;
+  --raw-color-neutral-950: #0a0a0a;
+
+  --raw-duration-fast: 150ms;
+  --raw-duration-normal: 250ms;
+}
+
+/* ---------------------------------------------------------------------------
+   TIER 2 — SEMANTIC  (role names, no namespace prefix)
+   Purpose, not appearance. Always `var(--raw-*)` — never a literal.
+   This is the themeable layer: dark mode overrides happen HERE, which is why
+   these are separate from the @theme bindings below (see the note there).
+   Grammar: --<role>[-<variant>][-<state>]
+   --------------------------------------------------------------------------- */
+:root {
+  --background: var(--raw-color-white);
+  --foreground: var(--raw-color-neutral-900);
+
+  --duration-fast: var(--raw-duration-fast);
+  --duration-normal: var(--raw-duration-normal);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: var(--raw-color-neutral-950);
+    --foreground: var(--raw-color-neutral-100);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   THEME BINDINGS — map semantic tokens into Tailwind namespaces.
+   Every entry is exactly `--<tw-namespace>-<role>: var(--<role>)`.
+   `inline` is required: it inlines the var() into each utility, so the
+   dark-mode overrides on the Tier 2 tokens above cascade. Binding a literal
+   here instead would freeze the value and break theming.
+
+   Only these namespaces generate utilities (verified against tailwindcss
+   v4.3.3): --color-* --spacing-* --radius-* --leading-* --tracking-* --text-*
+   --font-* --ease-* --breakpoint-* --container-* --shadow-* --blur-* --animate-*
+   NOTE: there is NO --duration-* namespace in v4 — `duration-fast` compiles to
+   nothing. Durations stay Tier 2 only and are used as duration-[var(--duration-fast)].
+   --------------------------------------------------------------------------- */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-onest);
+
+  /* Leading floor for clipped TextEngine reveals — see
+     obsidian/frontend/text-engine.md → "Alignment & line-height". */
+  --leading-display: 1.1;
+
+  --ease-entrance: cubic-bezier(0.2, 0, 0, 1);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  width: 100vw;
+}
+
+@layer base {
+  /* Adaptive scaling grid — scales the root font-size with the viewport so a
+     rem-based layout stays proportional. Each breakpoint divides FONT_BASE
+     (16px) by the design base width its range was laid out at:
+       font-size: 16 * 100 / baseWidth  (vw)
+     Above 1920px the AdaptiveGrid component takes over (scale-up).
+     Keep in sync with src/components/common/grid/grid.config.ts. */
+  html {
+    font-size: 16px;
+  }
+
+  @media (max-width: 1920px) {
+    html {
+      font-size: 0.833333vw; /* 16 * 100 / 1920 */
+    }
+  }
+
+  @media (max-width: 1440px) {
+    html {
+      font-size: 1.111111vw; /* 16 * 100 / 1440 */
+    }
+  }
+
+  @media (max-width: 1024px) {
+    html {
+      font-size: 1.5625vw; /* 16 * 100 / 1024 */
+    }
+  }
+
+  @media (max-width: 640px) {
+    html {
+      font-size: 4.444444vw; /* 16 * 100 / 360 */
+    }
+  }
+}
+
+@layer utilities {
+}
+
+@layer components {
+}

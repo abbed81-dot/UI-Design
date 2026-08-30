@@ -1,0 +1,147 @@
+---
+tags: [architecture, stable]
+updated: 2026-05-21
+---
+
+# Tech Stack
+
+Every dependency in `package.json`, what it does, and why it is here.
+Package name: `next16-claude-starter` · version `0.1.0` · private.
+
+## Core framework
+
+| Package | Version | Role |
+|---------|---------|------|
+| `next` | `16.3.1` | App Router framework. ⚠️ See warning below. |
+| `react` / `react-dom` | `19.2.8` | UI runtime |
+| `typescript` | `^5` | Type system — `any` is banned |
+
+> [!warning] This is not the Next.js you may know
+> `AGENTS.md` warns: APIs, conventions, and file structure may differ from older
+> Next.js knowledge. Always check [[routing]] before writing routing code, and
+> heed deprecation notices.
+
+## Styling
+
+| Package | Version | Role |
+|---------|---------|------|
+| `tailwindcss` | `^4` | Utility CSS — **no `tailwind.config.js`** |
+| `@tailwindcss/postcss` | `^4` | PostCSS integration |
+
+Tailwind v4 is configured entirely in `src/app/globals.css` via `@theme inline`.
+See [[design-system]].
+
+## Animation (the heart of the starter)
+
+| Package | Version | Role |
+|---------|---------|------|
+| `@react-spring/web` | `^10.1.2` | Spring physics — drives **all** motion |
+| `spring-text-engine` | `^0.1.5` | Scroll-aware spring text animation |
+
+No `framer-motion`, no CSS transitions/keyframes. See [[animation-system]] and
+[[text-engine]]. ADR: [[decisions-log]] ADR-0002.
+
+## Scroll & state
+
+| Package | Version | Role |
+|---------|---------|------|
+| `lenis` | `^1.3.26` | Smooth scrolling |
+| `zustand` | `^5.0.15` | Lightweight global state (scroll store) |
+| `resize-observer-polyfill` | `^1.5.1` | ResizeObserver fallback for animation hooks |
+| `zod` | `^4.4.3` | Schema validation — env (`src/env.ts`) + API payloads. See [[api-architecture]] |
+
+See [[smooth-scroll]] and [[data-flow]].
+
+## Misc
+
+No miscellaneous runtime dependencies. Cookie consent is an in-house component
+(`src/components/common/Cookie/`) built on Zustand + `@react-spring/web` — the
+former `react-cookie-consent` package was removed. See [[components/common]].
+
+## Tooling
+
+| Package | Role |
+|---------|------|
+| `eslint` `^9` + `eslint-config-next` | Linting — run `yarn lint` before commits |
+| `@types/*` | Type definitions for node/react |
+
+## Scripts
+
+```bash
+yarn dev      # next dev — local development
+yarn build    # next build — production build
+yarn start    # next start — serve production build
+yarn lint     # eslint
+```
+
+Package manager: **Yarn** (`yarn.lock` is committed).
+
+## Runtime
+
+**Node ≥ 20.19.0**, declared in `package.json` `engines` and pinned for local dev
+by `.nvmrc` (24.16.0). Next 16 itself only needs ≥ 20.9, but the ESLint 9
+toolchain pulls `eslint-visitor-keys@5`, which requires
+`^20.19.0 || ^22.13.0 || >=24` — on Node 20.17 `yarn install` **fails outright**,
+which is why the floor is declared rather than left implicit.
+
+## Deliberately held back
+
+Three dependencies are **not** on latest, each for a verified reason (ADR-0022).
+Re-test these periodically rather than assuming they are still blocked:
+
+| Package | Held at | Latest | Why |
+|---------|---------|--------|-----|
+| `typescript` | `^5.9.3` | `7.0.2` | `eslint-config-next` depends on `typescript-eslint@8`, whose peer range is `typescript >=4.8.4 <6.1.0`. TS 7 (the native Go compiler, GA July 2026) would break linting. Revisit when typescript-eslint supports it. |
+| `eslint` | `^9.39.4` | `10.8.1` | **Tested and reverted.** ESLint 10 crashes `eslint-plugin-react` (`context.getFilename()` was removed): `TypeError: contextOrFilename.getFilename is not a function`. Three of Next's bundled plugins still declare `eslint ^9` peers. |
+| `@types/node` | `^24` | `26.2.0` | Tracks the Node major actually in use (24), not the newest published. |
+
+## Not in the starter — chosen, but added per project
+
+The starter stays dependency-light; these are the **decided** defaults, installed
+only when a project needs them (ADR-0020):
+
+| Need | Choice | Playbook |
+|------|--------|----------|
+| CMS | Payload (in-app, Next-native) | [[cms-payload]] · `/cms` |
+| Database | Supabase Postgres | [[database-supabase]] · `/db` |
+| File storage | Supabase Storage (S3-compatible) | [[cms-payload]] |
+| Auth | Supabase Auth (`@supabase/ssr`) — only with real user accounts | [[database-supabase]] |
+
+> [!note] Payload compatibility — satisfied as of 2026-08-18
+> `@payloadcms/next` 3.88 peer-requires `next >=16.2.6 <17`. The starter is on
+> `16.3.1`, so it now satisfies that range. Re-check when either side moves.
+
+Still undecided: payments, i18n, data-fetching libraries, testing. Document here
+when adopted and add an ADR to [[decisions-log]].
+
+## Related
+
+[[system-overview]] · [[folder-structure]]
+
+## 3D — added for ShopyLink
+
+The starter itself ships **no** `three` dependency (see [[optimize-3d-scene]]).
+This project adds one, because its hero is a WebGL globe.
+
+| Package | Version | Role |
+|---------|---------|------|
+| `three` | `0.169.0` | WebGL renderer for the `shopylink-globe` scene |
+| `@types/three` | `^0.169` | Types — `any` is banned, so these are required |
+| `playwright` (dev) | `^1.62` | Headless render check for the scene; see `scenes/verify-scene.mjs` |
+
+> [!important] Performance work on the globe goes through the skill
+> `three` is now in `package.json`, so AGENTS.md hard rule #13 is live: any
+> performance / jank / ship-readiness request must invoke `optimize-3d-scene`
+> first and follow its order of fixes. See [[optimize-3d-scene]].
+
+### The scene source of truth
+
+`scenes/shopylink-globe.html` is the authored scene, written to the GetLayers
+house contract: every colour is an `#rrggbb` string inside one `CONFIG` object,
+every art-direction number is hoisted beside it, and `applyConfig()` pushes them
+into the live uniforms. **Re-tint by editing `CONFIG`, never the shader.**
+
+Preview it with `yarn scene:preview` (it needs an HTTP origin — ES modules are
+blocked over `file://`), then open `http://127.0.0.1:8899/shopylink-globe.html`
+and press `P` for the config panel. `scenes/vendor/` is gitignored and rebuilt by
+`yarn scene:vendor`.

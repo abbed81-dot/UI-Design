@@ -1,0 +1,101 @@
+{
+  "project": "ShopyLink — bilingual landing site",
+  "target": "starter",
+  "committedStyle": "dantora-style",
+  "styleNote": "Dantora committed as the structural Style: white ground that stays white, frosted panels at three strengths over 10px blur, ONE accent + ONE counter-accent that never appear apart, cap-trimmed type, no shadows, blur-rise reveal as the single motion vocabulary. Its colour roles are re-dressed to the ShopyLink Brand Guide (Issue 02, 2026) — this is a re-skin of the Style's palette, not a second Style.",
+  "brand": {
+    "source": "../ShopyLink Brand Guide A4.html",
+    "ink": "#0B2A3B",
+    "sky500": "#0EA5E9",
+    "sky400": "#38BDF8",
+    "sky200": "#BAE6FD",
+    "sky100": "#E0F2FE",
+    "clean": "#F4FBFF",
+    "cream": "#F7F4EC",
+    "sand": "#E8DCC3",
+    "deep": "#0A4A6B",
+    "usageBalance": "55% cream · 22% ink · 15% sky · 5% accent · 3% sand",
+    "contrastRule": "Ink on cream and Clean on ink both pass AA. NEVER set Ink type on Sky 500."
+  },
+  "tokenMap": {
+    "gl-bg": "#F7F4EC",
+    "gl-bg-alt": "#E0F2FE",
+    "gl-surface": "#FFFFFFCC",
+    "gl-surface-raised": "#FFFFFFE6",
+    "gl-ink": "#0B2A3B",
+    "gl-ink-muted": "#0B2A3B8C",
+    "gl-ink-subtle": "#0B2A3B66",
+    "gl-accent": "#0EA5E9",
+    "gl-accent-ink": "#FFFFFF",
+    "gl-line": "#0B2A3B24",
+    "gl-glow": "#38BDF8",
+    "gl-counter-accent": "#E8DCC3",
+    "gl-font-display": "'Bricolage Grotesque', system-ui, sans-serif",
+    "gl-font-display-ar": "'Tajawal', system-ui, sans-serif",
+    "gl-font-body": "'Manrope', system-ui, sans-serif",
+    "gl-font-mono": "'JetBrains Mono', ui-monospace, monospace",
+    "gl-tracking-display": "-0.04em",
+    "gl-radius": "1.5rem",
+    "gl-ease": "cubic-bezier(0.2, 0, 0, 1)"
+  },
+  "brief": {
+    "axes": {
+      "dimensionality": "3d",
+      "mood": [
+        "calm",
+        "luxe",
+        "technical"
+      ],
+      "tone": "light",
+      "motionEnergy": [
+        "subtle",
+        "lively"
+      ],
+      "density": "balanced"
+    },
+    "languages": [
+      "ar",
+      "en"
+    ],
+    "direction": "bilingual with a true dir=rtl mirror; tagline and arrows flip to point ←",
+    "heroConcept": "ONE scene, not four. A light stylised globe carrying four cities as glowing points — Dubai · Guangzhou · Istanbul · New York — with shipping-route arcs between them and the customer's door. A miniature architectural diorama rises at each point as one scroll clock flies the camera city to city; each city panel names that city's markets.",
+    "userWords": "نريد استنساخ لمدن في اميركا ودبي و الصين تركيا و الانتقال بينها و في كل مدينة اسواقها",
+    "hybridOf": [
+      "globe with routes",
+      "miniature city dioramas"
+    ]
+  },
+  "libraryFindings": {
+    "noCitySceneExists": "Searched scenes for skylines, streets, urban blocks, flying between cities — the library has no city scene. The hero is therefore authored original via scene-lab.",
+    "referenceScenes": {
+      "planet": "spinning earth, drifting clouds, city lights on the dark side — dark, 42 knobs",
+      "container-yard": "shipping containers in a clean WHITE studio — light tone, logistics, 77 knobs",
+      "slipstream": "warp-speed light streaks toward a vanishing point — light variant, useful for city-to-city transitions"
+    },
+    "referenceTemplate": {
+      "ascend": "ONE fixed WebGL earth with radar-ping markers behind four glass sections on a single scroll clock that zooms and swings the planet. This is exactly the architecture wanted — studied for TECHNIQUE only; it is dark and we build light."
+    }
+  },
+  "placed": [
+    {
+      "section": "hero",
+      "composition": "noema-hero",
+      "why": "Its headline is ONE WORD pinned to the left edge and one to the right with the scene in the empty centre — which is the ShopyLink wordmark exactly: shopy ⛓ link, the chain in the seam. The globe becomes the link. In RTL it mirrors to شوبي (right) · لينك (left), which is what the Brand Guide already specifies.",
+      "asset": "shopylink-globe (authored, scenes/shopylink-globe.html)",
+      "rule": "This composition only works if the centre stays empty — so lookAtOffsetX is 0 and every DOM element is edge-pinned."
+    }
+  ],
+  "decisions": [
+    "One scene above the fold, at most two on the page — four separate city scenes was rejected as a hard GetLayers rule violation.",
+    "The scene is authored light from the start rather than re-tinting a dark-baked scene, which would turn to mud.",
+    "Reveal choreography is the house default: immersive loader → gate flipped at the START of the curtain's exit → staggered content reveal → scene entrance."
+  ],
+  "sceneLog": [
+    "Authored light from the start rather than re-tinting a dark scene.",
+    "BUG FOUND IN RENDER: writing globe.rotation.z in the frame loop rebuilt the quaternion from euler every frame and destroyed the slerp, landing each city at the frame edge. The axial tilt now lives on a parent group.",
+    "Station quaternions aim through the tilt (Qglobe·dir = Qtilt⁻¹·axis), or every city sits short of centre by exactly the tilt angle.",
+    "cityPitch lifts a city ABOVE the camera axis: parked on the axis it is viewed straight down its own normal and the towers collapse to flat flakes.",
+    "No bloom — on a cream ground it washes to white. Cheaper and more honest.",
+    "prefers-reduced-motion stops the spin, pings and parcels itself; a canvas loop is not covered by an animation library's global flag."
+  ]
+}

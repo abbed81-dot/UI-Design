@@ -1,0 +1,647 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ShopyLink — World to Door</title>
+<style>
+  :root { color-scheme: light; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { height:100%; }
+  body {
+    background:#F7F4EC;
+    font-family:'JetBrains Mono', ui-monospace, monospace;
+    color:#0B2A3B;
+    overflow-x:hidden;
+  }
+  /* The canvas is fixed; the document scrolls behind it and drives the one clock. */
+  #gl { position:fixed; inset:0; width:100%; height:100%; display:block; }
+  #runway { position:relative; height:500vh; pointer-events:none; }
+
+  /* dev panel */
+  #panel {
+    position:fixed; top:12px; right:12px; z-index:9;
+    width:250px; max-height:88vh; overflow:auto;
+    background:rgba(255,255,255,.82); backdrop-filter:blur(10px);
+    border:1px solid rgba(11,42,59,.14); border-radius:12px;
+    padding:12px; font-size:10px; letter-spacing:.02em;
+    display:none;
+  }
+  #panel.on { display:block; }
+  #panel h4 { font-size:9px; letter-spacing:.18em; text-transform:uppercase;
+    color:rgba(11,42,59,.55); margin-bottom:8px; font-weight:500; }
+  #panel label { display:flex; align-items:center; gap:8px; margin-bottom:5px; }
+  #panel label span { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  #panel input[type=range] { width:88px; }
+  #panel input[type=color] { width:28px; height:18px; border:none; background:none; padding:0; }
+  #panel .val { width:38px; text-align:right; color:rgba(11,42,59,.55); }
+  #hint { position:fixed; left:12px; bottom:12px; z-index:9;
+    font-size:9px; letter-spacing:.18em; text-transform:uppercase; color:rgba(11,42,59,.40); }
+</style>
+<script type="importmap">
+{ "imports": { "three": "./vendor/three.module.js" } }
+</script>
+</head>
+<body>
+<canvas id="gl"></canvas>
+<div id="runway"></div>
+<div id="panel"><h4>Scene config</h4></div>
+<div id="hint">scroll · press P for config</div>
+
+<script type="module">
+import * as THREE from 'three';
+
+/* ────────────────────────────────────────────────────────────────
+   CONFIG — every colour is an '#rrggbb' string, everything else a
+   number. Tint the scene by editing THIS, never the shader.
+   Palette roles map to the ShopyLink Brand Guide (Issue 02, 2026).
+   ──────────────────────────────────────────────────────────────── */
+const CONFIG = {
+  // ground + globe body
+  bgColor:          '#F7F4EC',  // Cream — the page ground
+  sphereColor:      '#FDFCF6',  // the paper-model body
+  rimColor:         '#38BDF8',  // Sky 400 — atmosphere edge
+  rimPower:         2.6,
+  rimStrength:      0.55,
+
+  // the dotted surface
+  landColor:        '#0EA5E9',  // Sky 500 — land dots
+  seaColor:         '#BAE6FD',  // Sky 200 — sea dots
+  dotCount:         16000,
+  landDotSize:      0.019,
+  seaDotSize:       0.012,
+  seaOpacity:       0.55,
+
+  // city beacons
+  beaconColor:      '#0EA5E9',
+  pingColor:        '#38BDF8',
+  beaconSize:       0.013,
+  pingSize:         0.062,
+  pingSpeed:        0.42,
+  pingOpacity:      0.34,
+
+  // shipping routes
+  arcColor:         '#38BDF8',
+  arcOpacity:       0.58,
+  arcLift:          0.34,   // how high the arc bows off the sphere
+  arcWidth:         0.0075,
+
+  // parcels travelling the routes
+  parcelColor:      '#0B2A3B',  // Ink — the only near-black in the scene
+  parcelSize:       0.020,
+  parcelsPerRoute:  3,
+  parcelSpeed:      0.085,
+
+  // the miniature city dioramas
+  dioramaColor:     '#F4FBFF',
+  dioramaEdge:      '#0EA5E9',
+  dioramaHeight:    0.230,
+  dioramaSpread:    0.060,
+  dioramaBlocks:    14,
+
+  // globe + camera
+  globeRadius:      1.0,
+  tilt:             0.22,
+  autoSpin:         0.045,
+  farDistance:      3.50,   // station 0 — the world view
+  nearDistance:     2.62,   // stations 1-4 — a city
+  cameraDamp:       3.2,    // τ ≈ 312ms. THIS LAG IS THE WEIGHT.
+  lookAtOffsetX:    0.0,    // noema-hero wants the scene dead centre, framed by the split headline
+  openLat:          20.0,   // the world view's opening framing
+  openLon:          58.0,
+  cityPitch:        0.40,   // radians a city is lifted ABOVE the camera axis, so its
+                            // towers read in profile instead of end-on down the normal
+
+  // the customer's door — the point every route converges on.
+  // CHANGE THESE to the market you actually deliver into.
+  homeLat:          24.71,  // Riyadh
+  homeLon:          46.68,
+};
+
+/* The four shopping capitals, in scroll order. */
+const CITIES = [
+  { key:'dubai',     lat:25.20, lon:55.27, en:'Dubai',    ar:'دبي',       market:'Dubai Mall · Deira · Dragon Mart' },
+  { key:'guangzhou', lat:23.13, lon:113.26, en:'Guangzhou', ar:'قوانغجو',  market:'Baiyun · Shahe · Canton Fair' },
+  { key:'istanbul',  lat:41.01, lon:28.98, en:'Istanbul',  ar:'إسطنبول',  market:'Grand Bazaar · Laleli · Osmanbey' },
+  { key:'newyork',   lat:40.71, lon:-74.01, en:'New York',  ar:'نيويورك',  market:'Fifth Ave · SoHo · Brooklyn' },
+];
+
+/* Stylised land, as lat/lon boxes. A paper model of the world, not a survey map. */
+const LAND = [
+  // North America
+  [49,71,-168,-95],[49,73,-95,-58],[30,49,-125,-70],[16,31,-112,-86],[8,17,-92,-77],
+  [60,82,-52,-22],                                    // Greenland
+  // South America
+  [-5,12,-80,-58],[-20,-5,-78,-35],[-35,-20,-72,-46],[-55,-35,-74,-58],
+  // Africa
+  [12,35,-17,32],[4,13,-16,45],[-12,5,8,42],[-35,-12,12,40],[-25,-12,43,50],
+  // Europe
+  [36,60,-10,30],[55,71,4,31],[44,60,30,58],
+  // Asia
+  [40,75,30,180],[30,45,45,75],[13,32,35,60],[8,35,68,90],
+  [20,45,90,122],[30,46,126,146],[0,20,95,110],[-10,6,95,141],[5,19,118,127],
+  // Oceania + the ice
+  [-39,-11,113,154],[-47,-34,166,179],[-90,-66,-180,180],
+];
+
+/* ────────────────────────────────────────────────────────────────
+   Shared rig
+   ──────────────────────────────────────────────────────────────── */
+const DEFAULTS = { ...CONFIG };
+try {
+  const saved = localStorage.getItem('shopylink-globe');
+  if (saved) Object.assign(CONFIG, JSON.parse(saved));
+} catch { /* private mode — defaults are fine */ }
+
+const hexToVec3 = (hex) => {
+  const c = new THREE.Color(hex);
+  return new THREE.Vector3(c.r, c.g, c.b);
+};
+
+const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const canvas   = document.getElementById('gl');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:false });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // a 3× phone renders 9× the fragments
+renderer.setSize(window.innerWidth, window.innerHeight);
+
+const scene  = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(38, window.innerWidth/window.innerHeight, 0.1, 100);
+
+/* One key + one hemisphere fill. A light-count change recompiles every program. */
+scene.add(new THREE.HemisphereLight(0xffffff, 0xeef4f8, 2.15));
+const key = new THREE.DirectionalLight(0xffffff, 0.55);
+key.position.set(2.4, 2.0, 3.4);
+scene.add(key);
+
+/* ────────────────────────────────────────────────────────────────
+   Geometry helpers
+   ──────────────────────────────────────────────────────────────── */
+const D2R = Math.PI / 180;
+
+function latLonToVec3(lat, lon, r) {
+  const phi   = (90 - lat) * D2R;
+  const theta = (lon + 180) * D2R;
+  return new THREE.Vector3(
+    -r * Math.sin(phi) * Math.cos(theta),
+     r * Math.cos(phi),
+     r * Math.sin(phi) * Math.sin(theta),
+  );
+}
+
+function isLand(lat, lon) {
+  for (const [a, b, c, d] of LAND) {
+    if (lat >= a && lat <= b && lon >= c && lon <= d) return true;
+  }
+  return false;
+}
+
+/* A great-circle-ish arc bowed off the sphere, longer hops bowing higher. */
+function arcCurve(aLat, aLon, bLat, bLon, r, lift) {
+  const a = latLonToVec3(aLat, aLon, r);
+  const b = latLonToVec3(bLat, bLon, r);
+  const angle = a.angleTo(b);
+  const h = r * (1 + lift * (angle / Math.PI) * 2.0);
+  const m1 = a.clone().lerp(b, 0.25).normalize().multiplyScalar(h * 0.94);
+  const m2 = a.clone().lerp(b, 0.75).normalize().multiplyScalar(h * 0.94);
+  return new THREE.CubicBezierCurve3(a, m1, m2, b);
+}
+
+/* ────────────────────────────────────────────────────────────────
+   The Scene class — the only bespoke part.
+   Contract: constructor(scene), resize(), render()
+   ──────────────────────────────────────────────────────────────── */
+class Scene {
+  constructor(root) {
+    this.root = root;
+    // The axial tilt lives on a PARENT group. Writing globe.rotation.z in the
+    // frame loop would rebuild the quaternion from euler and destroy the slerp.
+    this.tiltGroup = new THREE.Group();
+    this.tiltGroup.rotation.z = CONFIG.tilt;
+    this.globe = new THREE.Group();
+    this.tiltGroup.add(this.globe);
+    root.add(this.tiltGroup);
+
+    this.clock = new THREE.Clock();
+    this.progress = 0;        // 0..1, the one scroll clock
+    this.smoothed = 0;        // low-passed once, upstream
+    this.camPos = new THREE.Vector3(0, 0, CONFIG.farDistance);
+    this.lookAt = new THREE.Vector3(0, 0, 0);
+    this.qTarget = new THREE.Quaternion();
+    this.ready = false;
+
+    this._buildBody();
+    this._buildDots();
+    this._buildRoutes();
+    this._buildBeacons();
+    this._buildDioramas();
+    this.tiltGroup.updateMatrixWorld(true);
+    this._buildStations();
+  }
+
+  /* The paper-model body plus a soft blue atmosphere edge. */
+  _buildBody() {
+    const R = CONFIG.globeRadius;
+
+    this.body = new THREE.Mesh(
+      new THREE.SphereGeometry(R * 0.988, 96, 96),
+      new THREE.MeshStandardMaterial({
+        color: new THREE.Color(CONFIG.sphereColor),
+        roughness: 1.0, metalness: 0.0,
+      }),
+    );
+    this.globe.add(this.body);
+
+    this.rim = new THREE.Mesh(
+      new THREE.SphereGeometry(R * 1.045, 64, 64),
+      new THREE.ShaderMaterial({
+        transparent: true, side: THREE.BackSide, depthWrite: false,
+        uniforms: {
+          uColor:    { value: hexToVec3(CONFIG.rimColor) },
+          uPower:    { value: CONFIG.rimPower },
+          uStrength: { value: CONFIG.rimStrength },
+        },
+        vertexShader: `
+          varying vec3 vN; varying vec3 vP;
+          void main(){
+            vN = normalize(normalMatrix * normal);
+            vec4 mv = modelViewMatrix * vec4(position,1.0);
+            vP = mv.xyz;
+            gl_Position = projectionMatrix * mv;
+          }`,
+        fragmentShader: `
+          uniform vec3 uColor; uniform float uPower; uniform float uStrength;
+          varying vec3 vN; varying vec3 vP;
+          void main(){
+            float f = 1.0 - abs(dot(normalize(vN), normalize(-vP)));
+            gl_FragColor = vec4(uColor, pow(f, uPower) * uStrength);
+          }`,
+      }),
+    );
+    this.globe.add(this.rim);
+  }
+
+  /* Fibonacci sphere, coloured land vs sea. The continents are the mask. */
+  _buildDots() {
+    const N = Math.floor(CONFIG.dotCount);
+    const R = CONFIG.globeRadius;
+    const land = [], sea = [];
+    const golden = Math.PI * (3 - Math.sqrt(5));
+
+    for (let i = 0; i < N; i++) {
+      const y     = 1 - (i / (N - 1)) * 2;
+      const rad   = Math.sqrt(Math.max(0, 1 - y * y));
+      const theta = golden * i;
+      const v = new THREE.Vector3(Math.cos(theta) * rad, y, Math.sin(theta) * rad);
+
+      const lat = Math.asin(v.y) / D2R;
+      let lon = Math.atan2(v.z, -v.x) / D2R - 180;
+      if (lon < -180) lon += 360;
+
+      (isLand(lat, lon) ? land : sea).push(v.multiplyScalar(R * 1.004));
+    }
+
+    this.landDots = this._points(land, CONFIG.landColor, CONFIG.landDotSize, 1.0);
+    this.seaDots  = this._points(sea,  CONFIG.seaColor,  CONFIG.seaDotSize,  CONFIG.seaOpacity);
+    this.globe.add(this.landDots, this.seaDots);
+  }
+
+  _points(list, color, size, opacity) {
+    const g = new THREE.BufferGeometry().setFromPoints(list);
+    return new THREE.Points(g, new THREE.PointsMaterial({
+      color: new THREE.Color(color),
+      size, sizeAttenuation: true,
+      transparent: opacity < 1, opacity,
+      depthWrite: opacity >= 1,
+    }));
+  }
+
+  /* Every city routes to the door; the cities also chain to each other. */
+  _buildRoutes() {
+    const R = CONFIG.globeRadius;
+    this.routes = [];
+    this.routeGroup = new THREE.Group();
+
+    const pairs = [];
+    for (const c of CITIES) pairs.push([c.lat, c.lon, CONFIG.homeLat, CONFIG.homeLon]);
+    for (let i = 0; i < CITIES.length - 1; i++) {
+      pairs.push([CITIES[i].lat, CITIES[i].lon, CITIES[i+1].lat, CITIES[i+1].lon]);
+    }
+
+    const mat = new THREE.MeshBasicMaterial({
+      color: new THREE.Color(CONFIG.arcColor),
+      transparent: true, opacity: CONFIG.arcOpacity, depthWrite: false,
+    });
+
+    for (const [aLat, aLon, bLat, bLon] of pairs) {
+      const curve = arcCurve(aLat, aLon, bLat, bLon, R, CONFIG.arcLift);
+      const tube = new THREE.Mesh(
+        new THREE.TubeGeometry(curve, 72, CONFIG.arcWidth, 6, false), mat,
+      );
+      this.routeGroup.add(tube);
+      this.routes.push(curve);
+    }
+    this.globe.add(this.routeGroup);
+
+    // parcels — small motes riding the routes
+    const per = Math.max(1, Math.floor(CONFIG.parcelsPerRoute));
+    this.parcelOffsets = [];
+    const pts = [];
+    for (let r = 0; r < this.routes.length; r++) {
+      for (let k = 0; k < per; k++) {
+        this.parcelOffsets.push({ route: r, offset: (k / per) + r * 0.13 });
+        pts.push(new THREE.Vector3());
+      }
+    }
+    this.parcels = new THREE.Points(
+      new THREE.BufferGeometry().setFromPoints(pts),
+      new THREE.PointsMaterial({
+        color: new THREE.Color(CONFIG.parcelColor),
+        size: CONFIG.parcelSize, sizeAttenuation: true,
+      }),
+    );
+    this.globe.add(this.parcels);
+  }
+
+  /* A beacon per city, plus the door, each under a slow radar ping. */
+  _buildBeacons() {
+    const R = CONFIG.globeRadius;
+    this.pings = [];
+    const bMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(CONFIG.beaconColor) });
+    const pMat = new THREE.MeshBasicMaterial({
+      color: new THREE.Color(CONFIG.pingColor),
+      transparent: true, opacity: CONFIG.pingOpacity, side: THREE.DoubleSide, depthWrite: false,
+    });
+
+    const marks = CITIES.map(c => [c.lat, c.lon])
+      .concat([[CONFIG.homeLat, CONFIG.homeLon]]);
+
+    marks.forEach(([lat, lon], i) => {
+      const p = latLonToVec3(lat, lon, R * 1.012);
+      const dot = new THREE.Mesh(new THREE.SphereGeometry(CONFIG.beaconSize, 16, 16), bMat);
+      dot.position.copy(p);
+      this.globe.add(dot);
+
+      const ring = new THREE.Mesh(new THREE.RingGeometry(0.6, 1.0, 40), pMat.clone());
+      ring.position.copy(p);
+      ring.lookAt(p.clone().multiplyScalar(2));
+      ring.userData.phase = i * 0.37;
+      this.globe.add(ring);
+      this.pings.push(ring);
+    });
+  }
+
+  /* A miniature skyline that rises out of the sphere when its city is framed. */
+  _buildDioramas() {
+    const R = CONFIG.globeRadius;
+    this.dioramas = [];
+    const n = Math.max(3, Math.floor(CONFIG.dioramaBlocks));
+
+    CITIES.forEach((c, ci) => {
+      const group = new THREE.Group();
+      const anchor = latLonToVec3(c.lat, c.lon, R);
+      const up = anchor.clone().normalize();
+
+      group.position.copy(anchor);
+      group.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), up);
+
+      // deterministic per city, so the skyline never re-rolls between frames
+      let seed = ci * 977 + 13;
+      const rnd = () => ((seed = (seed * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff);
+
+      for (let i = 0; i < n; i++) {
+        const h = CONFIG.dioramaHeight * (0.34 + rnd() * 1.0);
+        const w = CONFIG.dioramaSpread * (0.22 + rnd() * 0.26);
+        const box = new THREE.Mesh(
+          new THREE.BoxGeometry(w, h, w),
+          new THREE.MeshStandardMaterial({
+            color: new THREE.Color(CONFIG.dioramaColor),
+            roughness: 0.55, metalness: 0.0,
+          }),
+        );
+        const a = rnd() * Math.PI * 2;
+        const rr = Math.sqrt(rnd()) * CONFIG.dioramaSpread;
+        box.position.set(Math.cos(a) * rr, h / 2, Math.sin(a) * rr);
+        box.rotation.y = rnd() * Math.PI;
+
+        const edge = new THREE.LineSegments(
+          new THREE.EdgesGeometry(box.geometry),
+          new THREE.LineBasicMaterial({
+            color: new THREE.Color(CONFIG.dioramaEdge), transparent: true, opacity: 0.92,
+          }),
+        );
+        box.add(edge);
+        group.add(box);
+      }
+
+      const plinth = new THREE.Mesh(
+        new THREE.CylinderGeometry(CONFIG.dioramaSpread * 1.55, CONFIG.dioramaSpread * 1.55, 0.006, 48),
+        new THREE.MeshStandardMaterial({
+          color: new THREE.Color(CONFIG.dioramaColor), roughness: 0.85, metalness: 0.0,
+        }),
+      );
+      plinth.position.y = 0.003;
+      group.add(plinth);
+
+      group.scale.set(1, 0.001, 1);
+      group.visible = false;
+      this.globe.add(group);
+      this.dioramas.push(group);
+    });
+  }
+
+  /* Five stations: the world view, then one per city. */
+  _buildStations() {
+    // The axial tilt sits on the parent, so the camera axis expressed in the
+    // globe's own frame is the tilt's inverse applied to +Z. Aiming at a plain
+    // +Z would leave every city short of centre by exactly the tilt angle.
+    const invTilt = this.tiltGroup.quaternion.clone().invert();
+    const worldAxis = new THREE.Vector3(0, 0, 1).applyQuaternion(invTilt);
+    // A city parked exactly on the camera axis is viewed straight down its own
+    // normal — its towers point at the lens and collapse to flat flakes. Lift it
+    // above the axis and the skyline is seen in profile against the body.
+    const cityAxis = new THREE.Vector3(0, Math.sin(CONFIG.cityPitch), Math.cos(CONFIG.cityPitch))
+      .normalize().applyQuaternion(invTilt);
+
+    // Station 0 opens facing the corridor the business actually runs on —
+    // the Gulf and Asia — rather than an empty ocean.
+    this.worldBase = new THREE.Quaternion().setFromUnitVectors(
+      latLonToVec3(CONFIG.openLat, CONFIG.openLon, 1).normalize(), worldAxis,
+    );
+    this.spinQuat = new THREE.Quaternion();
+    this.stationQuats = [this.worldBase.clone()];
+    for (const c of CITIES) {
+      const dir = latLonToVec3(c.lat, c.lon, 1).normalize();
+      this.stationQuats.push(new THREE.Quaternion().setFromUnitVectors(dir, cityAxis));
+    }
+    this.stations = this.stationQuats.length;      // 5
+    this.legs = this.stations - 1;                 // 4 — one panel of scroll per leg
+  }
+
+  setProgress(p) { this.progress = Math.min(1, Math.max(0, p)); }
+
+  resize() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  }
+
+  render() {
+    const delta = Math.min(this.clock.getDelta(), 0.1);  // clamp so a tab-restore can't teleport
+    const t = this.clock.getElapsedTime();
+
+    // one low-pass, upstream — everything downstream reads this value
+    this.smoothed += (this.progress - this.smoothed) * (REDUCED ? 1 : 0.26);
+
+    // ── the one clock, quantised the same way for camera and content ──
+    const legT = this.smoothed * this.legs;
+    const i    = Math.min(this.legs - 1, Math.floor(legT));
+    const f    = legT - i;
+    const e    = f * f * (3 - 2 * f);                     // smoothstep
+
+    // station 0 keeps turning; the city stations are fixed framings
+    if (!REDUCED) {
+      // spin in the globe's OWN frame, then reorient — so it turns on its axis
+      this.spinQuat.setFromAxisAngle(new THREE.Vector3(0, 1, 0), t * CONFIG.autoSpin);
+      this.stationQuats[0].copy(this.worldBase).multiply(this.spinQuat);
+    }
+    this.qTarget.copy(this.stationQuats[i]).slerp(this.stationQuats[i + 1], e);
+    this.globe.quaternion.slerp(this.qTarget, REDUCED ? 1 : 1 - Math.exp(-4.0 * delta));
+
+    // ── camera: interpolate linearly, damp ONCE. That lag is the weight. ──
+    const dist = THREE.MathUtils.lerp(
+      i === 0 ? CONFIG.farDistance : CONFIG.nearDistance,
+      CONFIG.nearDistance, e,
+    );
+    const targetPos = new THREE.Vector3(0, 0, dist);
+    const cityFramed = Math.min(1, legT);   // 0 at the world view, 1 once at a city
+    const targetLook = new THREE.Vector3(
+      CONFIG.lookAtOffsetX,
+      Math.sin(CONFIG.cityPitch) * 0.92 * cityFramed,
+      0,
+    );
+
+    const k = REDUCED ? 1 : 1 - Math.exp(-CONFIG.cameraDamp * delta);
+    this.camPos.lerp(targetPos, k);
+    this.lookAt.lerp(targetLook, k);                      // damped separately, so framing swings
+    camera.position.copy(this.camPos);
+    camera.lookAt(this.lookAt);
+
+    // ── dioramas rise where the camera is looking ──
+    this.dioramas.forEach((g, ci) => {
+      const station = ci + 1;
+      const a = Math.max(0, 1 - Math.abs(legT - station));
+      const eased = a * a * (3 - 2 * a);
+      g.visible = eased > 0.002;
+      if (g.visible) g.scale.set(1, Math.max(0.001, eased), 1);
+    });
+
+    // ── ambient life: pings and parcels ──
+    if (!REDUCED) {
+      this.pings.forEach((ring) => {
+        const u = (t * CONFIG.pingSpeed + ring.userData.phase) % 1;
+        const s = 0.12 + u * CONFIG.pingSize;
+        ring.scale.set(s, s, s);
+        ring.material.opacity = (1 - u) * CONFIG.pingOpacity;
+      });
+
+      const pos = this.parcels.geometry.attributes.position;
+      this.parcelOffsets.forEach((p, idx) => {
+        const u = (t * CONFIG.parcelSpeed + p.offset) % 1;
+        const v = this.routes[p.route].getPoint(u);
+        pos.setXYZ(idx, v.x, v.y, v.z);
+      });
+      pos.needsUpdate = true;
+    }
+
+    renderer.render(scene, camera);
+
+    // "ready" means one DRAWN frame — not a resolved promise
+    if (!this.ready) {
+      this.ready = true;
+      window.dispatchEvent(new CustomEvent('scene:ready'));
+    }
+  }
+}
+
+/* ────────────────────────────────────────────────────────────────
+   Wiring
+   ──────────────────────────────────────────────────────────────── */
+const sceneInstance = new Scene(scene);
+
+function applyConfig() {
+  scene.background = new THREE.Color(CONFIG.bgColor);
+  document.body.style.background = CONFIG.bgColor;
+
+  sceneInstance.body.material.color.set(CONFIG.sphereColor);
+  sceneInstance.rim.material.uniforms.uColor.value.copy(hexToVec3(CONFIG.rimColor));
+  sceneInstance.rim.material.uniforms.uPower.value = CONFIG.rimPower;
+  sceneInstance.rim.material.uniforms.uStrength.value = CONFIG.rimStrength;
+
+  sceneInstance.landDots.material.color.set(CONFIG.landColor);
+  sceneInstance.landDots.material.size = CONFIG.landDotSize;
+  sceneInstance.seaDots.material.color.set(CONFIG.seaColor);
+  sceneInstance.seaDots.material.size = CONFIG.seaDotSize;
+  sceneInstance.seaDots.material.opacity = CONFIG.seaOpacity;
+
+  sceneInstance.routeGroup.children.forEach((m) => {
+    m.material.color.set(CONFIG.arcColor);
+    m.material.opacity = CONFIG.arcOpacity;
+  });
+  sceneInstance.parcels.material.color.set(CONFIG.parcelColor);
+  sceneInstance.parcels.material.size = CONFIG.parcelSize;
+  sceneInstance.pings.forEach((r) => r.material.color.set(CONFIG.pingColor));
+
+  try { localStorage.setItem('shopylink-globe', JSON.stringify(CONFIG)); } catch {}
+}
+applyConfig();
+
+const onScroll = () => {
+  const max = document.documentElement.scrollHeight - window.innerHeight;
+  sceneInstance.setProgress(max > 0 ? window.scrollY / max : 0);
+};
+window.addEventListener('scroll', onScroll, { passive: true });
+window.addEventListener('resize', () => sceneInstance.resize());
+onScroll();
+
+renderer.setAnimationLoop(() => sceneInstance.render());
+
+/* ────────────────────────────────────────────────────────────────
+   Dev panel — reflect over CONFIG
+   ──────────────────────────────────────────────────────────────── */
+const panel = document.getElementById('panel');
+for (const k of Object.keys(CONFIG)) {
+  const v = CONFIG[k];
+  const row = document.createElement('label');
+  const name = document.createElement('span'); name.textContent = k; row.appendChild(name);
+
+  if (typeof v === 'string' && /^#[0-9a-f]{6}$/i.test(v)) {
+    const inp = document.createElement('input');
+    inp.type = 'color'; inp.value = v;
+    inp.oninput = () => { CONFIG[k] = inp.value; applyConfig(); };
+    row.appendChild(inp);
+  } else {
+    const def = DEFAULTS[k];
+    const inp = document.createElement('input');
+    inp.type = 'range';
+    inp.min = 0;
+    inp.max = String(Math.abs(def) < 1 ? Math.max(1, Math.abs(def) * 4) : Math.abs(def) * 3);
+    inp.step = String(Math.abs(def) < 1 ? 0.001 : 1);
+    inp.value = String(v);
+    const out = document.createElement('em'); out.className = 'val'; out.textContent = String(v);
+    inp.oninput = () => {
+      CONFIG[k] = parseFloat(inp.value);
+      out.textContent = inp.value;
+      applyConfig();
+    };
+    row.appendChild(inp); row.appendChild(out);
+  }
+  panel.appendChild(row);
+}
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'p' || e.key === 'P') panel.classList.toggle('on');
+});
+</script>
+</body>
+</html>
