@@ -76,6 +76,19 @@
   --top-h: 48px;
   --gutter-sb: 14px;   /* the sidebar's inset: its own column is narrower */
   --gutter-pg: var(--s6);  /* the page's inset */
+
+  /* ── the second rule ─────────────────────────────────────────────────
+     The top band gave the screen one horizontal line. This gives it the
+     other: the band that carries the day's heading on the page, and the
+     brand plate that mirrors it in the sidebar, are the same height — so
+     the menu begins on exactly the line the panels begin on, and the two
+     columns read as one composition rather than two lists that happen to
+     sit side by side. It is a fixed measure on purpose: the Arabic and
+     English headings wrap to different depths (124px against 119px when
+     left to themselves), and a rule that moves with the language is not
+     a rule. 128px is the smallest step of the spacing grid that clears
+     both without crowding the heading. */
+  --head-h: 128px;
 }
 
 html, body, #root { height: 100%; }
