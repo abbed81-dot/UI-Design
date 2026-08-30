@@ -70,3 +70,22 @@
   seven-ray crown, the triangular flare of the robe, and the star pedestal.
 - `decoTower` stays in the kit as an available form; it is simply no longer the
   one New York uses.
+
+## ShopyLink — the phone
+
+- **Fixed** the scene's framing on portrait viewports. The camera stored fixed
+  DISTANCES, but the distance that fits a subject depends on the viewport: a
+  portrait phone has a far narrower horizontal field than a 16:9 desktop at the
+  same distance. Both the hero globe and the city districts overflowed the screen
+  on a 390x844 phone, with two store labels off-frame entirely. The scene now
+  stores RADII and converts with `fitDistance` from the live aspect every frame,
+  so rotating the device re-frames correctly too.
+- **Added** `portraitFill` — fitting both axes on a phone pushes the camera about
+  twice as far back as the vertical needs. On a narrow screen the district now
+  fits slightly less than the full plate, letting the outermost filler blocks run
+  off; no store and no label sits in that ring.
+- **Changed** the hero's copy block to sit on a frosted panel below `md`, where it
+  falls over the dotted globe and grey-on-busy is unreadable.
+- **Changed** `siteConfig` from the starter's placeholders to real ShopyLink
+  values. `twitterHandle` is deliberately EMPTY: a guessed handle in
+  `twitter:site` credits the share card to whoever owns that name.

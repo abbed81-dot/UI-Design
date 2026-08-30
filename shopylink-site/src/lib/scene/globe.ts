@@ -56,8 +56,7 @@ export type GlobeConfig = {
   districtSpread: number;
   storeyHeight: number;
   cityDistance: number;
-  cityMinDistance: number;
-  cityMaxDistance: number;
+  portraitFill: number;
   dioramaColor: string;
   dioramaEdge: string;
   dioramaSpread: number;
@@ -65,8 +64,8 @@ export type GlobeConfig = {
   globeRadius: number;
   tilt: number;
   autoSpin: number;
-  farDistance: number;
-  nearDistance: number;
+  worldRadius: number;
+  stationRadius: number;
   cameraDamp: number;
   lookAtOffsetX: number;
   openLat: number;
@@ -118,9 +117,13 @@ export const CONFIG: GlobeConfig = {
   awningColor: "#0ea5e9",
   districtSpread: 1.8,
   storeyHeight: 0.020,
-  cityDistance: 0.42,
-  cityMinDistance: 0.20,
-  cityMaxDistance: 0.78,
+  cityDistance: 0.13,   // fallback RADIUS, if a city has no computed framing
+  /* Fitting BOTH axes on a portrait phone pushes the camera back roughly twice
+     as far as the vertical needs, leaving the district small in a field of
+     empty ground. The outermost ring of a district is filler blocks — no store
+     sits there and no label — so on a narrow screen we fit slightly less than
+     the full plate and let those edges run off. */
+  portraitFill: 0.84,
   dioramaColor: "#f4fbff",
   dioramaEdge: "#0ea5e9",
   dioramaSpread: 0.06,
@@ -129,8 +132,13 @@ export const CONFIG: GlobeConfig = {
   globeRadius: 1,
   tilt: 0.22,
   autoSpin: 0.045,
-  farDistance: 3.5,
-  nearDistance: 2.62,
+  /* These are RADII, not distances. The distance that fits a radius depends on
+     the viewport: a portrait phone has a far narrower horizontal field than a
+     16:9 desktop at the same distance, which is why a fixed distance overflowed
+     the screen on a phone. `fitDistance` converts, every frame, from the live
+     aspect — so rotating the device re-frames correctly too. */
+  worldRadius: 1.22,
+  stationRadius: 0.9,
   cameraDamp: 3.2,
   lookAtOffsetX: 0,
   openLat: 20,
@@ -448,7 +456,7 @@ export const createGlobeScene = ({
   /** One framing per city. A fixed distance cannot serve both a district whose
    *  landmark is a needle and one whose landmark is a dome — the first leaves
    *  the frame, the second is lost in it. */
-  const cityFrameDist: number[] = [];
+  const cityFrameRadius: number[] = [];
   const cityFrameLook: number[] = [];
 
   const districtMat = (color: string, roughness: number) =>
@@ -524,12 +532,7 @@ export const createGlobeScene = ({
     // a higher look-at, so the tower is centred in the frame instead of leaving
     // through the top. Pulling back for height shrinks the streets for no gain.
     const districtRadius = U * 1.75;
-    cityFrameDist.push(
-      Math.min(
-        CONFIG.cityMaxDistance,
-        Math.max(CONFIG.cityMinDistance, Math.max(districtRadius * 3.3, landmarkTop * 2.4)),
-      ),
-    );
+    cityFrameRadius.push(Math.max(districtRadius * 1.15, landmarkTop * 0.82));
     cityFrameLook.push(landmarkTop * 0.45);
 
     const anchors: THREE.Vector3[] = [];
@@ -609,7 +612,13 @@ export const createGlobeScene = ({
 
   /* ── the loop ── */
   const clock = new THREE.Clock();
-  const camPos = new THREE.Vector3(0, 0, CONFIG.farDistance);
+  /** the distance at which a sphere of this radius fits BOTH axes of the frame */
+  const fitDistance = (radius: number) => {
+    const vTan = Math.tan((camera.fov * Math.PI) / 360);
+    return Math.max(radius / vTan, radius / (vTan * camera.aspect));
+  };
+
+  const camPos = new THREE.Vector3(0, 0, fitDistance(CONFIG.worldRadius));
   const lookAt = new THREE.Vector3(0, 0, 0);
   const qTarget = new THREE.Quaternion();
   const spinAxis = new THREE.Vector3(0, 1, 0);
@@ -624,7 +633,8 @@ export const createGlobeScene = ({
   let cityBlend = 0;
   let orbitAz = 0.6;
   let orbitEl = 0.55;
-  let orbitDist = CONFIG.cityDistance;
+  /** a multiplier on the city's fitted distance, driven by the wheel */
+  let orbitZoom = 1;
   let labelEls: (HTMLElement | null)[] = [];
   let dragging = false;
   let lastX = 0;
@@ -671,10 +681,7 @@ export const createGlobeScene = ({
   const onWheel = (e: WheelEvent) => {
     if (activeCity < 0) return;
     e.preventDefault();
-    orbitDist = Math.min(
-      CONFIG.cityMaxDistance,
-      Math.max(CONFIG.cityMinDistance, orbitDist + e.deltaY * 0.0006),
-    );
+    orbitZoom = Math.min(2.0, Math.max(0.55, orbitZoom + e.deltaY * 0.0016));
   };
 
   canvas.addEventListener("pointerdown", onPointerDown);
@@ -735,9 +742,10 @@ export const createGlobeScene = ({
     globe.quaternion.slerp(qTarget, reducedMotion ? 1 : 1 - Math.exp(-4 * delta));
 
     // interpolate linearly, damp ONCE — that lag is the weight
+    const stationDist = fitDistance(CONFIG.stationRadius);
     const dist = THREE.MathUtils.lerp(
-      i === 0 ? CONFIG.farDistance : CONFIG.nearDistance,
-      CONFIG.nearDistance,
+      i === 0 ? fitDistance(CONFIG.worldRadius) : stationDist,
+      stationDist,
       e,
     );
     const cityFramed = Math.min(1, legT);
@@ -759,6 +767,10 @@ export const createGlobeScene = ({
       eastVec.normalize();
       northVec.copy(upVec).cross(eastVec).normalize();
 
+      const framedIdx = activeCity >= 0 ? activeCity : lastCity;
+      const framedRadius = cityFrameRadius[framedIdx] ?? CONFIG.cityDistance;
+      const fill = camera.aspect < 0.8 ? CONFIG.portraitFill : 1;
+      const orbitDist = fitDistance(framedRadius * fill) * orbitZoom;
       const ce = Math.cos(orbitEl);
       const se = Math.sin(orbitEl);
       cityPos
@@ -885,7 +897,7 @@ export const createGlobeScene = ({
       lastCity = index;
       orbitAz = 0.6;
       orbitEl = 0.55;
-      orbitDist = cityFrameDist[index] ?? CONFIG.cityDistance;
+      orbitZoom = 1;
       canvas.style.pointerEvents = "auto";
       canvas.style.cursor = "grab";
       // without this a touch drag scrolls the page instead of orbiting the city

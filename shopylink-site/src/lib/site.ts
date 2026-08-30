@@ -7,17 +7,27 @@
 import { publicEnv } from "@/env";
 
 export const siteConfig = {
-  name: "New Project",
-  description: "New Project",
+  name: "ShopyLink · شوبي لينك",
+  description:
+    "عنوان لك في كل عواصم التسوّق — الإمارات والصين وأمريكا وتركيا. نستلم ونجمّع ونوصّل طردك إلى بابك.",
   /**
    * Public origin, no trailing slash. Drives canonical URLs, OG tags, the
    * sitemap, and JSON-LD. Set `NEXT_PUBLIC_SITE_URL` in production.
    */
-  url: publicEnv.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
-  /** Default Open Graph / Twitter share image (path under `public/`). */
+  url: publicEnv.NEXT_PUBLIC_SITE_URL ?? "https://shopylink.co",
+  /**
+   * Default Open Graph / Twitter share image (path under `public/`).
+   * The file exists but is still the starter's placeholder artwork — replace it
+   * with a ShopyLink card (900x600) before launch, or every WhatsApp and X
+   * share shows someone else's design.
+   */
   ogImage: "/open-graph.png",
-  twitterHandle: "@newproject",
-  author: "New Project",
-  /** Browser theme-color (address bar / PWA). */
-  themeColor: "#000000",
+  /**
+   * Left empty deliberately. A guessed handle in `twitter:site` credits the
+   * card to whoever actually owns that name — set the real one before launch.
+   */
+  twitterHandle: "",
+  author: "ShopyLink",
+  /** Browser theme-color (address bar / PWA) — the brand's Cream ground. */
+  themeColor: "#f7f4ec",
 } as const;

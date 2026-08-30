@@ -5,7 +5,7 @@ const b = await chromium.launch({ executablePath:'/opt/pw-browsers/chromium-1194
 // a mid-range Android, which is what this audience actually carries
 const p = await b.newPage({ viewport:{width:390,height:844}, deviceScaleFactor:2, isMobile:true, hasTouch:true });
 const errs=[]; p.on('pageerror',e=>errs.push('PAGEERROR: '+e.message));
-await p.goto('http://127.0.0.1:3160/', { waitUntil:'load' });
+await p.goto('http://127.0.0.1:3171/', { waitUntil:'load' });
 await p.waitForTimeout(11000);
 const rj = p.getByRole('button', { name:/رفض الكل/ }); if (await rj.count()) { await rj.first().click(); await p.waitForTimeout(700); }
 await p.screenshot({ path:'qa-m1-hero.png' });

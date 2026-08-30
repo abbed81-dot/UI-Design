@@ -74,7 +74,10 @@ export const Hero = () => {
 
       {/* base row — copy and actions at the start, one opaque card at the end */}
       <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-        <div className="max-w-[36ch]">
+        {/* On a phone this copy sits directly over the dotted globe, where grey
+            on a busy ground is unreadable. It gets a frosted panel below md;
+            on a wide screen the scene is small enough to leave it plain. */}
+        <div className="max-w-[36ch] rounded-md bg-surface p-4 backdrop-blur-[10px] md:bg-transparent md:p-0 md:backdrop-blur-none">
           <TextEngine
             key={`promise-${locale}`}
             tag="p"
