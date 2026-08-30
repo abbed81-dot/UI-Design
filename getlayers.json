@@ -1,0 +1,38 @@
+{
+  "project": "ShopyLink marketing site",
+  "brief": {
+    "subject": "Freight-forwarding platform — world-to-door shipping",
+    "mode": "build-site",
+    "axes": {
+      "dimensionality": "3d",
+      "tone": "light",
+      "mood": ["calm", "technical", "luxe"],
+      "motionEnergy": "lively",
+      "density": "balanced"
+    },
+    "bilingual": { "en": "Bricolage Grotesque", "ar": "Tajawal", "dir": "ltr+rtl" }
+  },
+  "brand": {
+    "source": "ShopyLink Brand Guide A4.html (:root), commit 5f3f06f",
+    "tokens": "brand/tokens.css",
+    "logo": {
+      "en": "brand/logo/lockup_en.png",
+      "ar": "brand/logo/lockup_ar.png",
+      "onDark": "brand/logo/lockup_white.png"
+    },
+    "tagline": "WORLD · TO · DOOR"
+  },
+  "contrastRules": {
+    "verified": "WCAG 2.1 computed, not assumed",
+    "never": "#FFFFFF text on --pri #0EA5E9 (2.77:1) or --acc #38BDF8 (2.14:1)",
+    "never2": "#0EA5E9 as body text on light ground (2.77:1)",
+    "use": "--deep #0A4A6B with white (9.52:1 AAA) for solid CTAs; --ink #0B2A3B on --pri (5.38:1 AA)"
+  },
+  "decisions": {
+    "styleId": null,
+    "templateId": null,
+    "target": null,
+    "note": "Style + template awaiting user pick. Target unresolved: existing ShopyLink prototype is no-framework vanilla HTML."
+  },
+  "sectionsPlaced": []
+}

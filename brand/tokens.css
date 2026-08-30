@@ -1,0 +1,41 @@
+/* ShopyLink — brand tokens mapped to GetLayers gl-* names.
+   Source of truth: "ShopyLink Brand Guide A4.html" :root block.
+   Tone: LIGHT (per brand guide). Do not flip — GetLayers bakes
+   scene contrast into its shaders. */
+
+:root {
+  /* ── ground ── */
+  --gl-bg:             #FFFFFF;              /* --paper */
+  --gl-bg-alt:         #F7F4EC;              /* --cream */
+  --gl-surface:        #F4FBFF;              /* --clean */
+  --gl-surface-raised: #FFFFFF;              /* --paper */
+
+  /* ── ink ── */
+  --gl-ink:            #0B2A3B;              /* --ink   14.91:1 on paper (AAA) */
+  --gl-ink-muted:      rgba(11,42,59,.55);
+  --gl-ink-subtle:     rgba(11,42,59,.40);
+
+  /* ── accent ── */
+  --gl-accent:         #0EA5E9;              /* --pri  */
+  --gl-accent-ink:     #0B2A3B;              /* ink on pri = 5.38:1 (AA).
+                                                NOT #FFF — that is 2.77:1, fails. */
+  --gl-accent-deep:    #0A4A6B;              /* --deep  9.52:1 w/ white (AAA) */
+  --gl-glow:           #38BDF8;              /* --acc — decorative only on light */
+
+  /* ── line ── */
+  --gl-line:           rgba(11,42,59,.14);
+  --gl-line-soft:      rgba(11,42,59,.07);
+
+  /* ── type ── */
+  --gl-font-display:   'Bricolage Grotesque', system-ui, sans-serif;
+  --gl-font-body:      'Manrope', system-ui, sans-serif;
+  --gl-font-arabic:    'Tajawal', system-ui, sans-serif;   /* RTL */
+  --gl-font-mono:      'JetBrains Mono', ui-monospace, monospace;
+}
+
+/* Dark band (secondary treatment, from .page.dark in the brand guide) */
+.sl-dark {
+  --gl-bg:   #0B2A3B;
+  --gl-ink:  #F4FBFF;   /* 14.26:1 (AAA) */
+  --gl-accent: #38BDF8; /* 6.96:1 on ink (AA) */
+}
