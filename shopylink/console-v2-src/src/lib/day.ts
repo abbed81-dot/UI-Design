@@ -70,3 +70,70 @@ export function denseTasks(): Task[] {
   }
   return out;
 }
+
+/* ── the day, structured for the redesigned home ─────────────────────── */
+
+export const GROUP_META: Record<Task['kind'], { ar: string; en: string; tone: 'red' | 'amber' | 'sky' | 'green' }> = {
+  deliver:  { ar: 'تسليم متعثّر',   en: 'Stalled deliveries', tone: 'red' },
+  measure:  { ar: 'قياس واستلام',   en: 'Measure & intake',   tone: 'amber' },
+  document: { ar: 'تجميع وتجهيز',   en: 'Consolidate & prepare', tone: 'sky' },
+  approve:  { ar: 'موافقات',        en: 'Approvals',          tone: 'green' },
+};
+
+export type NewsItem = {
+  id: string; kind: string;
+  titleAr: string; titleEn: string;
+  ar: string; en: string;
+  by: string; at: string;
+  image?: 'brand' | undefined;   /* 'brand' renders the ink band with the rings */
+};
+
+export const dayNews: NewsItem[] = [
+  {
+    id: 'N1', kind: 'policy',
+    titleAr: 'الدفع المسبق لحسابات الأعمال', titleEn: 'Prepaid business accounts',
+    ar: 'من هذا الشهر كل حساب أعمال بالدفع المسبق ما لم يُمنح تسهيل ائتماني كتابةً.',
+    en: 'From this month every business account is prepaid unless a credit facility is granted in writing.',
+    by: 'Omar Al-Masri', at: '2026-08-28', image: 'brand',
+  },
+  {
+    id: 'N2', kind: 'notice',
+    titleAr: 'جرد منتصف الشهر يوم الخميس', titleEn: 'Mid-month count on Thursday',
+    ar: 'الجرد الدوري في مركز دمشق صباح الخميس — الاستلام يتوقف من الثامنة حتى العاشرة.',
+    en: 'Periodic count at the Damascus hub Thursday morning — intake pauses from eight to ten.',
+    by: 'Tarek Aziz', at: '2026-08-29',
+  },
+  {
+    id: 'N3', kind: 'advisory',
+    titleAr: 'معبر باب الهوى: تفتيش موسّع', titleEn: 'Bab al-Hawa: extended inspection',
+    ar: 'تفتيش موسّع على الشاحنات الواردة هذا الأسبوع — أضيفوا ثلاث ساعات لتقدير الوصول.',
+    en: 'Extended inspection on inbound trucks this week — add three hours to arrival estimates.',
+    by: 'Lina Hamwi', at: '2026-08-30',
+  },
+];
+
+/* a small event trail per reference, for the task drawer */
+export const dayTrail: Record<string, { at: string; ar: string; en: string }[]> = {
+  'CON-240703-02': [
+    { at: '08-28 14:10', ar: 'خرجت للتوصيل — الجولة RUN-260828-03', en: 'Out for delivery — run RUN-260828-03' },
+    { at: '08-28 17:42', ar: 'محاولة أولى أخفقت: العنوان مغلق', en: 'First attempt failed: premises closed' },
+    { at: '08-29 11:05', ar: 'محاولة ثانية أخفقت: الهاتف لا يجيب', en: 'Second attempt failed: phone unreachable' },
+  ],
+  'CON-240712-01': [
+    { at: '09:02', ar: 'استُلمت في مركز دمشق — 3 كراتين', en: 'Received at the Damascus hub — 3 cartons' },
+  ],
+};
+
+export const dayDetails: Record<string, { client: string; route: string; weight: string; cartons: number }> = {
+  'CON-240703-02': { client: 'Lama Sultan',   route: 'Istanbul ← Aleppo',  weight: '44.0 kg', cartons: 3 },
+  'CON-240712-01': { client: 'Rana Sabbagh',  route: 'Dubai ← Damascus',   weight: '58.1 kg', cartons: 3 },
+  'CON-240711-04': { client: 'Nour Haddad',   route: 'Istanbul ← Damascus', weight: '210.4 kg', cartons: 12 },
+  'CON-240712-03': { client: 'Firas Antaki',  route: 'Dubai ← Damascus',   weight: '12.5 kg', cartons: 1 },
+  'CON-240712-05': { client: 'Sahar Textiles', route: 'Yiwu ← Damascus',   weight: '96.0 kg', cartons: 5 },
+  'TRP-2608-014':  { client: '—',             route: 'Yiwu ← Aleppo',      weight: '1,840 kg', cartons: 60 },
+};
+
+/* seven days of intake, for the KPI sparklines — invented, like all of it */
+export const weekIntake = [4, 6, 3, 8, 5, 9, 7];
+export const weekMeasured = [3, 6, 3, 7, 5, 8, 6];
+export const weekLate = [1, 0, 2, 1, 0, 1, 1];

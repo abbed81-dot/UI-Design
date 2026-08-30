@@ -44,16 +44,30 @@ async function artifact() {
 }
 
 let timer: ReturnType<typeof setTimeout> | null = null;
+/* What the document loaded with. A publish reloads every open view of the
+   artifact — so publishing state the page merely LOADED puts it in a reload
+   loop that swallows every click. That is precisely what the first build
+   shipped: the state effect ran on mount, published, the view reloaded,
+   mounted, published… Nothing is published unless the state differs from
+   what was loaded and from what was last published. */
+let lastPublished: string | null = null;   /* set by the first write — see below */
 
 export function writeState(next: SavedState) {
   /* localStorage immediately — cheap, per-viewer */
   try { window.localStorage.setItem(KEY, JSON.stringify(next)); } catch (e) { /* fine */ }
   /* artifact publish, debounced: rapid pin clicks become one version */
+  const json = JSON.stringify(next);
+  /* The mount effect always writes once, carrying exactly the loaded (or
+     default) state. That first write is the BASELINE, not a change — publishing
+     it reloads every view and puts the page in the reload loop that swallowed
+     every click in the first build. A real change only ever comes later. */
+  if (lastPublished === null) { lastPublished = json; return; }
+  if (json === lastPublished) return;   /* nothing changed — no version */
   if (timer) clearTimeout(timer);
   timer = setTimeout(async () => {
     const ns = await artifact();
     if (!ns) return;
-    const json = JSON.stringify(next);
+    if (json === lastPublished) return;
     let html = pristine;
     /* the minifier strips attribute quotes (id=sl-state), so both the block
        and the root div are matched tolerantly */
@@ -61,6 +75,6 @@ export function writeState(next: SavedState) {
     html = re.test(html)
       ? html.replace(re, '$1' + json + '$2')
       : html.replace(/<div id="?root"?>/, '<script id="' + BLOCK_ID + '" type="application/json">' + json + '</script><div id=root>');
-    try { await ns.publish(html); } catch (e) { /* conflict is routine — the winner reloads us */ }
+    try { await ns.publish(html); lastPublished = json; } catch (e) { /* conflict is routine — the winner reloads us */ }
   }, 1200);
 }
