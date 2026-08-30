@@ -342,7 +342,7 @@ export default function App() {
           </div>
         </header>
 
-        <main style={{ flex: 1, overflowY: 'auto', padding: 'var(--gutter-pg)' }}>
+        <main style={{ flex: 1, overflowY: 'auto', padding: 'var(--gutter-pg)', minHeight: 0 }}>
           {view.t === 'svc' ? (
             <ServiceView file={view.file} ar={ar} t={t}
               tasks={tasks.filter(x => x.open === view.file)}
@@ -352,7 +352,7 @@ export default function App() {
               onBack={() => setView({ t: 'home' })}
               onOpenFile={HAS_MODULES ? openModuleFile : undefined} />
           ) : (
-          <div style={{ maxWidth: 1240, marginInline: 'auto' }}>
+          <div className="sl-fit" style={{ maxWidth: 1240, marginInline: 'auto' }}>
 
             {/* page header — the five-second answer */}
             <div style={{ display: 'flex', alignItems: 'flex-end', gap: 'var(--s4)', marginBottom: 'var(--s5)', flexWrap: 'wrap' }}>
@@ -363,7 +363,34 @@ export default function App() {
                 <h1 style={{ font: `800 24px/1.25 ${ar ? 'var(--ar)' : 'var(--disp)'}`, margin: 'var(--s1) 0 0' }}>
                   {t('يومك، خالد', 'Your day, Khaled')}
                 </h1>
-                <div style={{ fontSize: 'var(--fs-body)', color: 'var(--n6)', marginTop: 'var(--s1)' }}>
+                {/* The shape of the day, in one line. The sentence below says how
+                    much is waiting; this says what KIND of waiting it is and how
+                    heavily each kind weighs — the same figures, read in a tenth
+                    of the time, and each band opens its own group. It is the one
+                    piece of this page drawn rather than written, and it earns the
+                    space by answering a question the words cannot answer as fast:
+                    is today mostly deliveries, or mostly measuring? */}
+                {groups.length > 0 && preview !== 'loading' && (
+                  <div style={{ display: 'flex', gap: 2, marginTop: 'var(--s3)', height: 8 }}>
+                    {groups.map(g => {
+                      const meta = GROUP_META[g.kind]; const tone = TONES[meta.tone];
+                      return (
+                        <button key={g.kind}
+                          onClick={() => setOpenGroups(o => ({ ...o, [g.kind]: true }))}
+                          title={(ar ? meta.ar : meta.en) + ' — ' + g.items.length}
+                          aria-label={(ar ? meta.ar : meta.en) + ' — ' + g.items.length}
+                          style={{
+                            flex: g.items.length, height: '100%', background: tone.dot,
+                            borderRadius: 'var(--radius-pill)', opacity: .9,
+                            transition: 'opacity var(--t-state) var(--ease)',
+                          }}
+                          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.opacity = '1'; }}
+                          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.opacity = '.9'; }} />
+                      );
+                    })}
+                  </div>
+                )}
+                <div style={{ fontSize: 'var(--fs-body)', color: 'var(--n6)', marginTop: 'var(--s2)' }}>
                   {preview === 'empty'
                     ? t('لا شيء ينتظر فعلك.', 'Nothing waits on you.')
                     : <>
@@ -426,6 +453,8 @@ export default function App() {
                   </div>
                 )}
 
+                {/* the list scrolls inside the panel: the panel keeps its head
+                    and its height, and five hundred rows change neither */}
                 {preview !== 'loading' && groups.map(g => {
                   const meta = GROUP_META[g.kind]; const tone = TONES[meta.tone];
                   const KIcon = KIND_ICONS[g.kind];
@@ -438,7 +467,7 @@ export default function App() {
                         aria-expanded={open}
                         style={{
                           display: 'flex', alignItems: 'center', gap: 'var(--s3)', width: '100%',
-                          minHeight: 52, padding: 'var(--s2) var(--s4)', textAlign: 'start',
+                          height: 48, padding: '0 var(--s5)', textAlign: 'start',
                           transition: 'background var(--t-state) var(--ease)',
                         }}
                         onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'var(--n1)'; }}
@@ -474,12 +503,26 @@ export default function App() {
                     </div>
                   );
                 })}
+
+                {/* the foot of the queue. An operations board's empty space is
+                    itself a fact — it means the day is not heavy — and saying so
+                    is worth more than leaving a white field that reads as a page
+                    that failed to load. */}
+                {preview !== 'loading' && preview !== 'error' && groups.length > 0 && (
+                  <div style={{
+                    display: 'flex', alignItems: 'center', gap: 'var(--s2)', justifyContent: 'center',
+                    padding: 'var(--s5)', color: 'var(--n6)', fontSize: 'var(--fs-hint)',
+                  }}>
+                    <CircleCheckBig size={13} style={{ color: 'var(--green)' }} />
+                    {t('هذا كل ما ينتظرك — لا شيء تحته.', "That is everything waiting on you — nothing below it.")}
+                  </div>
+                )}
               </Panel>
 
               {/* the second column, one piece: the management's word and then
                   his figures. Kept together so the column fills its own height
                   instead of leaving a row of tiles stranded under a page of air. */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--s5)', minWidth: 0 }}>
+              <div className="sl-scroll-col" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--s5)', minWidth: 0 }}>
 
               {/* ② the news board — the management's word, with a face */}
               <Panel
@@ -494,7 +537,11 @@ export default function App() {
               {/* ③ his figures, last — and beside the news rather than below
                   everything, so the column fills its height instead of leaving
                   a stranded row under a page of air */}
-              <div style={{ display: 'grid', gap: 'var(--s3)', marginTop: 'var(--s5)' }}>
+              <div style={{
+                display: 'grid', marginTop: 'var(--s5)',
+                background: 'var(--paper)', border: '1px solid var(--n3)',
+                borderRadius: 'var(--radius)', overflow: 'hidden',
+              }}>
               {dayFigures.map((f, fi) => {
                 const series = fi === 0 ? weekIntake : fi === 1 ? weekMeasured : weekLate;
                 const tone = TONES[f.tone === 'green' ? 'green' : f.tone === 'amber' ? 'amber' : 'red'];
@@ -503,14 +550,15 @@ export default function App() {
                   <button key={f.en}
                     onClick={() => setListDrawer({ title: ar ? f.ar : f.en, tasks: backing })}
                     style={{
-                      textAlign: 'start', background: 'var(--paper)', border: '1px solid var(--n3)',
-                      borderRadius: 'var(--radius)', padding: 'var(--s3) var(--s4) 0',
-                      boxShadow: 'var(--sh-1)', transition: 'border-color var(--t-state) var(--ease)',
+                      textAlign: 'start', background: 'var(--paper)',
+                      borderTop: fi === 0 ? 'none' : '1px solid var(--n2)',
+                      padding: 'var(--s3) var(--s5) 0',
+                      transition: 'background var(--t-state) var(--ease)',
                       display: 'grid', gridTemplateColumns: '1fr auto', alignItems: 'center',
                       columnGap: 'var(--s3)',
                     }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--n5)'; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--n3)'; }}>
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'var(--clean)'; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'var(--paper)'; }}>
                     <div style={{ minWidth: 0 }}>
                       <div style={{ fontSize: 'var(--fs-eyebrow)', color: 'var(--n6)', fontWeight: 800, letterSpacing: '.08em', textTransform: 'uppercase', lineHeight: 1.4 }}>
                         {ar ? f.ar : f.en}
@@ -632,25 +680,28 @@ function Panel({ icon, eyebrow, title, meta, children }: {
   icon: React.ReactNode; eyebrow: string; title: string; meta?: React.ReactNode; children: React.ReactNode;
 }) {
   return (
+    /* A panel is a SURFACE, not a raised card. Everything on this page used to
+       be a white box with a border and a shadow on cream, which flattened the
+       difference between the thing that needs you and the thing that is merely
+       context — a page of equal boxes has no hierarchy at all. The shadow is
+       gone, the border is a hairline, and the title carries the weight instead
+       of the container. */
     <section style={{
       background: 'var(--paper)', border: '1px solid var(--n3)', borderRadius: 'var(--radius)',
-      boxShadow: 'var(--sh-1)', overflow: 'hidden',
+      overflow: 'hidden', display: 'flex', flexDirection: 'column', minHeight: 0,
     }}>
       <header style={{
-        display: 'flex', alignItems: 'center', gap: 'var(--s3)',
-        padding: 'var(--s3) var(--s4)', borderBottom: '1px solid var(--n2)', background: 'var(--paper)',
+        display: 'flex', alignItems: 'baseline', gap: 'var(--s3)', flex: '0 0 auto',
+        padding: 'var(--s4) var(--s5) var(--s3)',
       }}>
-        <span aria-hidden style={{
-          width: 26, height: 26, borderRadius: 'var(--radius-sm)', background: 'var(--sky-tint)',
-          color: 'var(--sky-deep)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-        }}>{icon}</span>
-        <div style={{ flex: 1, lineHeight: 1.2 }}>
-          <div style={{ fontSize: 'var(--fs-eyebrow)', color: 'var(--n6)', fontWeight: 800, letterSpacing: '.08em', textTransform: 'uppercase' }}>{eyebrow}</div>
-          <div style={{ fontSize: 'var(--fs-lead)', fontWeight: 800 }}>{title}</div>
+        <span aria-hidden style={{ color: 'var(--n5)', alignSelf: 'center', display: 'flex' }}>{icon}</span>
+        <div style={{ flex: 1, lineHeight: 1.25, minWidth: 0 }}>
+          <div className="sl-eyebrow">{eyebrow}</div>
+          <div style={{ fontSize: 'var(--fs-title)', fontWeight: 800 }}>{title}</div>
         </div>
         {meta}
       </header>
-      {children}
+      <div className="sl-panel-body" style={{ flex: 1 }}>{children}</div>
     </section>
   );
 }
@@ -681,14 +732,19 @@ function TaskList({ tasks, ar, t, onChat, onAct, limit, onMore }: {
             onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onAct(task); } }}
             style={{
               position: 'relative', display: 'flex', alignItems: 'center', gap: 'var(--s3)',
-              height: 44, padding: '0 var(--s4)', borderBottom: '1px solid var(--n2)', cursor: 'pointer',
+              height: 40, padding: '0 var(--s5)', borderBottom: '1px solid var(--n2)', cursor: 'pointer',
             }}>
             <span aria-hidden style={{ position: 'absolute', insetInlineStart: 0, top: 8, bottom: 8, width: 3, borderRadius: 'var(--radius-pill)', background: tone.dot }} />
             <span style={{ flex: 1, minWidth: 0, fontSize: 'var(--fs-hint)', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', paddingInlineStart: 'var(--s2)' }}>
               {ar ? task.ar : task.en}
             </span>
             <span className="machine" style={{ fontSize: 'var(--fs-eyebrow)', color: 'var(--n6)' }}>{task.ref}</span>
-            <span style={{ fontSize: 'var(--fs-eyebrow)', fontWeight: 800, whiteSpace: 'nowrap', padding: '2px 8px', borderRadius: 'var(--radius-pill)', color: tone.fg, background: tone.bg }}>{late.text}</span>
+            <span style={{
+              fontSize: 'var(--fs-eyebrow)', fontWeight: 800, whiteSpace: 'nowrap',
+              padding: '2px 8px', borderRadius: 'var(--radius-pill)', color: tone.fg, background: tone.bg,
+              /* a fixed column: every row's state sits on the same vertical line */
+              minWidth: 92, textAlign: 'center', flex: '0 0 auto',
+            }}>{late.text}</span>
             <button onClick={e => { e.stopPropagation(); onChat(task); }} title={t('المحادثة', 'Thread')} aria-label={t('المحادثة', 'Thread')}
               className="sl-row-chat" style={{ color: 'var(--n6)' }}>
               <MessageSquare size={14} />

@@ -143,6 +143,23 @@ button:disabled { cursor: default; }
 @media (max-width: 1180px) {
   .sl-main-grid { grid-template-columns: 1fr; }
 }
+
+/* ── the page fits the screen, and the columns scroll inside it ─────────
+   A console is watched, not read down: a page that scrolls as a whole makes
+   the operator lose the queue to reach a figure, and leaves one column short
+   while the other runs past the fold — which is how the queue ended with a
+   band of dead air under it and the figures ended clipped. Above the two-
+   column breakpoint the page takes exactly the height it has and each column
+   carries its own scroll, so both are always full and neither is cut. Below
+   it the page goes back to scrolling as one, because a single narrow column
+   with its own scrollbar is worse than the fold. */
+@media (min-width: 1181px) {
+  .sl-fit { height: 100%; display: flex; flex-direction: column; min-height: 0; }
+  .sl-fit .sl-main-grid { flex: 1; min-height: 0; align-items: stretch; }
+  .sl-fit .sl-main-grid > * { min-height: 0; }
+  .sl-scroll-col { overflow-y: auto; overscroll-behavior: contain; }
+  .sl-panel-body { overflow-y: auto; overscroll-behavior: contain; min-height: 0; }
+}
 .sl-nowrap { white-space: nowrap; }
 @media (max-width: 900px) {
   .sl-demo-badge { display: none; }
