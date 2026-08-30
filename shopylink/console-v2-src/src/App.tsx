@@ -756,7 +756,7 @@ function NewsBoard({ ar, t, index, onIndex, items }: {
           </div>
         )}
         <div style={{ padding: 'var(--s4) var(--s5)' }}>
-          <span className="machine" style={{
+          <span className={ar ? '' : 'machine'} style={{
             fontSize: 'var(--fs-eyebrow)', color: 'var(--sky-deep)', fontWeight: 800,
             letterSpacing: '.08em', textTransform: 'uppercase', background: 'var(--sky-tint)',
             padding: '2px 8px', borderRadius: 'var(--radius-pill)',

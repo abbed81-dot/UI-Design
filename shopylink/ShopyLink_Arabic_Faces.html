@@ -1,0 +1,182 @@
+<title>خطوط كونسول شوبي‑لينك</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Noto+Sans+Arabic:wght@400;500;700;800&family=Readex+Pro:wght@300;400;500;600;700&family=Cairo:wght@400;500;700;900&family=Almarai:wght@400;700;800&family=Alexandria:wght@400;500;700;800&family=Rubik:wght@400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* ShopyLink's own tokens. This page exists to judge Arabic faces against the
+   console they would live in, so it borrows that console's ground, ink and
+   state colours verbatim rather than inventing a palette to compete with them.
+   The brand guide reads "Tone: LIGHT. Do not flip." — this page commits to the
+   same single world on purpose, and paints every colour explicitly so it holds
+   on any host ground. */
+:root {
+  --cream:#F7F4EC; --paper:#FFFFFF; --clean:#F4FBFF; --ink:#0B2A3B;
+  --n2:#EDE9E0; --n3:#DDD8CD; --n4:#BFC5C9; --n6:#62707A; --n7:#44555F;
+  --sky:#0EA5E9; --sky-tint:#E6F4FE; --sky-deep:#0B6E9B;
+  --red:#E1483B; --red-tint:#FBE3E1; --red-deep:#B23429;
+  --amber-tint:#FDF0D5; --amber-deep:#8A5A06;
+  --green:#10B981; --green-tint:#DCF5E9; --green-deep:#0A7250;
+  --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+  --ui:'Tajawal','Noto Sans Arabic',system-ui,sans-serif;
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:20px; --s6:24px; --s7:32px; --s8:48px;
+  --r:12px; --r-sm:9px;
+}
+* { box-sizing:border-box; }
+body {
+  margin:0; background:var(--cream); color:var(--ink);
+  font-family:var(--ui); font-size:14px; line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+/* Arabic is joined: it is never tracked anywhere on this page, which is the
+   very defect the page was made to explain. */
+[dir="rtl"] * { letter-spacing:normal; }
+.machine { direction:ltr; unicode-bidi:isolate; font-family:var(--mono); font-variant-numeric:tabular-nums; }
+.wrap { max-width:900px; margin-inline:auto; padding:var(--s7) var(--s5) var(--s8); }
+
+header.top { border-bottom:2px solid var(--ink); padding-bottom:var(--s5); margin-bottom:var(--s6); }
+.kicker { font-size:11.5px; font-weight:800; color:var(--sky-deep); }
+h1 { font-size:30px; font-weight:800; line-height:1.2; margin:var(--s2) 0 var(--s3); text-wrap:balance; }
+.lede { font-size:15.5px; color:var(--n7); max-width:60ch; }
+
+/* the cause, stated once, shown once */
+.cause { display:grid; grid-template-columns:1fr 1fr; gap:var(--s4); margin:var(--s6) 0 var(--s7); }
+@media (max-width:680px){ .cause { grid-template-columns:1fr; } }
+.cause figure { margin:0; background:var(--paper); border:1px solid var(--n3); border-radius:var(--r); padding:var(--s4) var(--s5); }
+.cause figcaption { font-size:11.5px; font-weight:800; margin-bottom:var(--s3); }
+.bad figcaption { color:var(--red-deep); }
+.good figcaption { color:var(--green-deep); }
+.spec-line { font-size:26px; font-weight:700; }
+.bad .spec-line { letter-spacing:.08em; }
+.cause p { margin:var(--s3) 0 0; font-size:13px; color:var(--n6); }
+
+h2 { font-size:19px; font-weight:800; margin:var(--s7) 0 var(--s2); }
+.sub { font-size:13px; color:var(--n6); margin:0 0 var(--s5); max-width:62ch; }
+
+/* one card per candidate — the whole card is set in the face it argues for */
+.face { background:var(--paper); border:1px solid var(--n3); border-radius:var(--r); overflow:hidden; margin-bottom:var(--s4); }
+.face > header {
+  display:flex; align-items:baseline; gap:var(--s3); flex-wrap:wrap;
+  padding:var(--s3) var(--s5); background:var(--clean); border-bottom:1px solid var(--n2);
+}
+.face h3 { margin:0; font-size:16px; font-weight:800; }
+.face .verdict { font-size:12px; color:var(--n6); flex:1; min-width:200px; }
+.rank { font-family:var(--mono); font-size:11px; font-weight:600; color:var(--paper); background:var(--ink); border-radius:999px; padding:2px 8px; }
+.rank.now { background:var(--amber-deep); }
+.body { padding:var(--s5); display:grid; gap:var(--s4); }
+.scale { display:flex; align-items:baseline; gap:var(--s4); flex-wrap:wrap; }
+.scale span { display:block; }
+.sz { font-family:var(--mono); font-size:10px; color:var(--n4); }
+.e { font-size:11.5px; font-weight:800; color:var(--n6); }
+.t { font-size:19px; font-weight:800; }
+.b { font-size:14px; color:var(--n7); max-width:58ch; }
+.fig { font-size:26px; font-weight:800; }
+
+/* a real queue row, the densest thing the console asks of a face */
+.row {
+  display:flex; align-items:center; gap:var(--s3); height:44px;
+  padding:0 var(--s4); border:1px solid var(--n2); border-radius:var(--r-sm); background:var(--paper);
+  position:relative;
+}
+.row::before { content:""; position:absolute; inset-inline-start:0; top:8px; bottom:8px; width:3px; border-radius:999px; background:var(--red); }
+.row .title { flex:1; min-width:0; font-size:13px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; padding-inline-start:var(--s2); }
+.row .ref { font-size:11.5px; color:var(--n6); }
+.row .late { font-size:11.5px; font-weight:800; white-space:nowrap; padding:2px 8px; border-radius:999px; color:var(--red-deep); background:var(--red-tint); }
+.css { font-family:var(--mono); font-size:11px; color:var(--n6); background:var(--n2); border-radius:var(--r-sm); padding:var(--s2) var(--s3); overflow-x:auto; white-space:nowrap; }
+
+.note { background:var(--sky-tint); border:1px solid var(--sky); border-radius:var(--r); padding:var(--s4) var(--s5); margin-top:var(--s7); font-size:13.5px; }
+.note b { color:var(--sky-deep); }
+footer { margin-top:var(--s7); padding-top:var(--s4); border-top:1px solid var(--n3); font-size:12px; color:var(--n6); }
+</style>
+
+<div class="wrap" dir="rtl" lang="ar">
+
+<header class="top">
+  <div class="kicker">تشخيص وقرار</div>
+  <h1>لماذا بدا الخط مكسّراً، وأيّ خطّ بعده</h1>
+  <p class="lede">التكسّر لم يكن من الخطّ. كان من خاصيّة <span class="machine">letter-spacing</span> مطبَّقة على تسع تسميات عربية — والعربية خطّ متّصل، فالتباعد يفكّ وصلات الحروف. أُصلح ذلك. ما تبقّى هو سؤال آخر: أيّ خطّ يخدم لوحة كثيفة كهذه أفضل من الحالي.</p>
+</header>
+
+<section class="cause">
+  <figure class="bad">
+    <figcaption>ما كان يحدث · تباعد ٠٫٨px</figcaption>
+    <div class="spec-line">حمولة مجمَّعة تنتظر رحلة</div>
+    <p>الحروف انفصلت عن بعضها. العين تقرأ قِطعاً لا كلمة.</p>
+  </figure>
+  <figure class="good">
+    <figcaption>بعد الإصلاح · بلا تباعد</figcaption>
+    <div class="spec-line">حمولة مجمَّعة تنتظر رحلة</div>
+    <p>الوصلات عادت. الكلمة كلمة واحدة.</p>
+  </figure>
+</section>
+
+<h2>المرشَّحون، بنصوص الكونسول ومقاساته</h2>
+<p class="sub">كل بطاقة مرسومة بخطّها كاملةً، وبالأحجام نفسها التي يستعملها الكونسول: تسمية ١١٫٥px، عنوان ١٩px، نصّ ١٤px، رقم ٢٦px، وصفّ طابور بارتفاع ٤٤px — وهو أقسى ما يُطلب من خطٍّ هنا.</p>
+
+<!-- specimens are generated below so the same real strings run through every face -->
+<div id="faces"></div>
+
+<div class="note">
+  <b>ملاحظة تخصّ العلامة:</b> دليل شوبي‑لينك يسمّي <b>Tajawal</b> خطّ الواجهة العربية. تغييره قرار علامة لا قرار تنفيذ — أنا أعرض، وأنت تقرّر. وإن بقي Tajawal، فإصلاح التباعد وحده يحلّ التكسّر الذي رأيته.
+</div>
+
+<footer>
+  النصوص أعلاه من الكونسول نفسه. كل الخطوط من Google Fonts وتُحمَّل مباشرةً، فما تراه هنا هو ما سيظهر في اللوحة.
+</footer>
+</div>
+
+<script>
+const FACES = [
+  { name:'IBM Plex Sans Arabic', css:"'IBM Plex Sans Arabic'", rank:'الأوضح', w:700,
+    verdict:'مرسوم أصلاً للواجهات والبيانات التقنية. عيونه مفتوحة فيبقى مقروءاً عند ١١–١٣px، وله شقيق لاتيني ومونو من العائلة نفسها — وهو ما تحتاجه لوحة مليئة بالأرقام والرموز.' },
+  { name:'Readex Pro', css:"'Readex Pro'", rank:'الأمتن', w:600,
+    verdict:'صُمِّم للقراءة أولاً، والعربية فيه ليست إضافة على لاتيني بل أصلٌ مُصمَّم. متغيّر الأوزان، ومساحاته الداخلية سخيّة — يريح في النصوص الطويلة.' },
+  { name:'Noto Sans Arabic', css:"'Noto Sans Arabic'", rank:'الأأمن', w:700,
+    verdict:'الأوسع تغطيةً والأكثر حياداً. لا شخصية قويّة — وهذه ميزة في لوحة تشغيل: الخطّ لا ينافس البيانات على الانتباه.' },
+  { name:'Almarai', css:"'Almarai'", rank:'الأنظف', w:700,
+    verdict:'نظيف وهادئ، بأربعة أوزان تكفي واجهةً. جميل في العناوين والصفوف، وأقلّ مرونة حين تحتاج تدرّجاً دقيقاً في الأوزان.' },
+  { name:'Alexandria', css:"'Alexandria'", rank:'الأحدث', w:700,
+    verdict:'هندسي معاصر قريب من روح Tajawal لكن بعيون أوسع قليلاً. خيار جيّد إن أردت تغييراً لا يقلب مزاج العلامة.' },
+  { name:'Cairo', css:"'Cairo'", rank:'الأشيَع', w:700,
+    verdict:'الأكثر استعمالاً في المنطقة، قويّ في العناوين. عند ١٢px تضيق عيونه فيثقل قليلاً في الصفوف الكثيفة.' },
+  { name:'Rubik', css:"'Rubik'", rank:'الأدفأ', w:700,
+    verdict:'زواياه مستديرة قليلاً فيبدو ودوداً. ودّه في غير محلّه على لوحة تشغيل يقرؤها الناس تحت ضغط.' },
+  { name:'Tajawal', css:"'Tajawal'", rank:'الحالي', now:true, w:800,
+    verdict:'خطّ العلامة الحالي. هندسي وأنيق في العناوين، لكن عيونه أضيق من غيره عند ١١–١٣px، وهناك يبدأ الإرهاق في لوحة تُقرأ طوال اليوم.' },
+];
+
+const STR = {
+  eyebrow:'الطابور',
+  title:'يحتاج إجراء',
+  body:'من هذا الشهر كل حساب أعمال بالدفع المسبق ما لم يُمنح تسهيل ائتماني كتابةً.',
+  figLabel:'استلمتُ اليوم',
+  rowTitle:'تسليم أخفق مرّتين — يقرَّر مصيره',
+  ref:'CON-240703-02',
+  late:'متأخّر يومًا',
+};
+
+document.getElementById('faces').innerHTML = FACES.map(f => `
+  <article class="face" style="font-family:${f.css},'Noto Sans Arabic',system-ui,sans-serif">
+    <header>
+      <h3>${f.name}</h3>
+      <span class="rank${f.now ? ' now' : ''}">${f.rank}</span>
+      <span class="verdict">${f.verdict}</span>
+    </header>
+    <div class="body">
+      <div class="scale">
+        <span><span class="sz">11.5</span><span class="e">${STR.eyebrow}</span></span>
+        <span><span class="sz">19</span><span class="t">${STR.title}</span></span>
+        <span><span class="sz">26</span><span class="fig"><span class="machine">٧</span> ${STR.figLabel}</span></span>
+      </div>
+      <div><span class="sz">14</span><p class="b">${STR.body}</p></div>
+      <div>
+        <span class="sz">44px row</span>
+        <div class="row">
+          <span class="title">${STR.rowTitle}</span>
+          <span class="ref machine">${STR.ref}</span>
+          <span class="late">${STR.late}</span>
+        </div>
+      </div>
+      <code class="css">--ar: ${f.css}, 'Noto Sans Arabic', system-ui, sans-serif;</code>
+    </div>
+  </article>
+`).join('');
+</script>

@@ -141,6 +141,27 @@ button:disabled { cursor: default; }
 @media (max-width: 900px) {
   .sl-demo-badge { display: none; }
 }
+/* ── Arabic is a JOINED script ──────────────────────────────────────────
+   Letter-spacing is a Latin device: it opens the gaps between letters that
+   already stand apart. Arabic letters are drawn joined, so the same property
+   SEVERS them — the word stops being a word and becomes a row of pieces. That
+   is exactly what "broken type" looks like, and it was being applied to nine
+   labels here at 0.6–0.8px. Arabic is never tracked; the Latin machine values
+   inside an Arabic page keep their own tracking, because they are not joined. */
+[dir="rtl"] *:not(.machine):not(.machine *) { letter-spacing: normal !important; }
+/* uppercase has no meaning in a unicameral script; it only costs the shaper work */
+[dir="rtl"] *:not(.machine) { text-transform: none !important; }
+
+/* Arabic carries its detail INSIDE the line rather than above and below it, so
+   at the same pixel size it reads smaller than Latin. The two smallest steps of
+   the scale are raised in the Arabic build, and the line opened, which is the
+   ratio the type designers of Tajawal and Noto Sans Arabic both recommend. */
+[dir="rtl"] {
+  --fs-eyebrow: 11.5px;
+  --fs-hint: 13px;
+}
+[dir="rtl"] body { line-height: 1.65; }
+
 /* ── typographic rhythm ────────────────────────────────────────────────
    The scale was already the brand's; what was missing was the RELATION between
    its steps. Line-height is set once, by role, so a paragraph of Arabic and a
