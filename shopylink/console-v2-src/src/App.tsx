@@ -66,6 +66,10 @@ export default function App() {
   const [toast, setToast] = useState<string | null>(null);
   const [done, setDone] = useState<Record<string, boolean>>({});
   const [news, setNews] = useState(0);
+  /* where the person is: his day, or one service — the whole experience stays
+     inside the console, in one language, and the ONLY bridge between the two
+     experiences is the language toggle */
+  const [view, setView] = useState<{ t: 'home' } | { t: 'svc'; file: string }>({ t: 'home' });
   const ar = lang === 'ar';
 
   useEffect(() => {
@@ -99,12 +103,15 @@ export default function App() {
     });
   }, [ar]);
 
-  const openModule = useCallback((file: string, label?: string) => {
-    if (HAS_MODULES) { window.open(file, '_blank', 'noopener'); return; }
-    setToast(ar
-      ? 'الوحدة «' + (label || file) + '» تُفتح حين يوضع الكونسول بجانب ملفات الحزمة'
-      : 'The module "' + (label || file) + '" opens when the console sits beside the package files');
-  }, [ar]);
+  const openService = useCallback((file: string) => {
+    setView({ t: 'svc', file });
+    setDrawer(null); setListDrawer(null);
+  }, []);
+  /* the owning module file — reachable from the task drawer only, and only
+     where the package files actually exist beside the console */
+  const openModuleFile = useCallback((file: string) => {
+    if (HAS_MODULES) window.open(file, '_blank', 'noopener');
+  }, []);
 
   const tasks: Task[] = useMemo(() => {
     const base = preview === 'empty' ? [] : preview === 'dense' ? denseTasks() : dayTasks;
@@ -148,12 +155,22 @@ export default function App() {
         <div style={{
           height: 56, display: 'flex', alignItems: 'center',
           justifyContent: rail ? 'center' : 'flex-start',
-          padding: rail ? 0 : '0 var(--s4)',
+          padding: rail ? 0 : '0 var(--s3)',
           borderBottom: '1px solid rgba(244,251,255,.08)',
         }}>
           {rail
             ? <img src={MARK_LIGHT} alt="ShopyLink" style={{ height: 18, width: 'auto', display: 'block' }} />
-            : <img src={ar ? LOCKUP_AR : LOCKUP_EN} alt="ShopyLink" style={{ height: 26, width: 'auto', display: 'block' }} />}
+            : (
+              /* the wordmark art sits on a pure-white plate, so it lives in a
+                 pure-white chip — the plate merges into it, and the Arabic and
+                 English builds get the exact same treatment */
+              <span style={{
+                display: 'inline-flex', alignItems: 'center', background: 'var(--paper)',
+                borderRadius: 'var(--radius-sm)', padding: '5px 12px', boxShadow: 'var(--sh-1)',
+              }}>
+                <img src={ar ? LOCKUP_AR : LOCKUP_EN} alt="ShopyLink" style={{ height: 24, width: 'auto', display: 'block' }} />
+              </span>
+            )}
         </div>
 
         <nav style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: 'var(--s3) var(--s2)' }}>
@@ -164,7 +181,7 @@ export default function App() {
               </div>
               {pinnedItems.map(it => (
                 <SideItem key={'p' + it.file} label={ar ? it.ar : it.en}
-                  onOpen={() => openModule(it.file, ar ? it.ar : it.en)}
+                  onOpen={() => openService(it.file)}
                   pinned onTogglePin={() => togglePin(it.file)} ar={ar} />
               ))}
               <div style={{ height: 1, background: 'rgba(244,251,255,.1)', margin: 'var(--s3) var(--s2) 0' }} />
@@ -201,7 +218,7 @@ export default function App() {
                     <div style={{ overflow: 'hidden' }}>
                       {c.items.map(it => (
                         <SideItem key={it.file} label={ar ? it.ar : it.en} indent
-                          onOpen={() => openModule(it.file, ar ? it.ar : it.en)}
+                          onOpen={() => openService(it.file)}
                           pinned={pinned.indexOf(it.file) > -1}
                           onTogglePin={() => togglePin(it.file)} ar={ar} />
                       ))}
@@ -280,6 +297,11 @@ export default function App() {
         </header>
 
         <main style={{ flex: 1, overflowY: 'auto', padding: 'var(--s6)' }}>
+          {view.t === 'svc' ? (
+            <ServiceView file={view.file} ar={ar} t={t}
+              onBack={() => setView({ t: 'home' })}
+              onOpenFile={HAS_MODULES ? openModuleFile : undefined} />
+          ) : (
           <div style={{ maxWidth: 1160, marginInline: 'auto' }}>
 
             {/* page header — the five-second answer */}
@@ -460,6 +482,7 @@ export default function App() {
               })}
             </div>
           </div>
+          )}
         </main>
       </div>
 
@@ -472,7 +495,7 @@ export default function App() {
       }}>
         {drawer && <TaskDrawer task={drawer.task} tab={drawer.tab} ar={ar} t={t}
           onClose={() => setDrawer(null)} onAct={act}
-          onOpenModule={() => openModule(drawer.task.open)} />}
+          onOpenModule={HAS_MODULES ? () => openModuleFile(drawer.task.open) : undefined} />}
       </aside>
 
       {/* ══ LIST DRAWER — the list behind a figure ═══════════════════ */}
@@ -500,7 +523,7 @@ export default function App() {
         )}
       </aside>
 
-      {finder && <Finder ar={ar} t={t} onClose={() => setFinder(false)} onOpen={openModule} />}
+      {finder && <Finder ar={ar} t={t} onClose={() => setFinder(false)} onOpen={openService} />}
 
       {/* state preview — a review affordance, labelled as one */}
       <div style={{
@@ -676,7 +699,7 @@ function NewsBoard({ ar, t, index, onIndex }: {
 /* ── the task drawer: what it is, its trail, its thread, and the act ─── */
 function TaskDrawer({ task, tab, ar, t, onClose, onAct, onOpenModule }: {
   task: Task; tab: 'info' | 'chat'; ar: boolean; t: (a: string, e: string) => string;
-  onClose: () => void; onAct: (x: Task) => void; onOpenModule: () => void;
+  onClose: () => void; onAct: (x: Task) => void; onOpenModule?: () => void;
 }) {
   const late = lateLabel(task.lateMs, ar);
   const d = dayDetails[task.ref];
@@ -771,10 +794,10 @@ function TaskDrawer({ task, tab, ar, t, onClose, onAct, onOpenModule }: {
           onMouseLeave={e => { (e.currentTarget as HTMLElement).style.filter = ''; }}>
           {ar ? task.verbAr : task.verbEn}
         </button>
-        <button onClick={onOpenModule} title={t('افتح في الوحدة المالكة', 'Open in the owning module')} style={{
+        {onOpenModule && <button onClick={onOpenModule} title={t('افتح في الوحدة المالكة', 'Open in the owning module')} style={{
           height: 'var(--ctl-h)', padding: '0 var(--s4)', border: '1.5px solid var(--n3)',
           borderRadius: 'var(--radius-sm)', fontSize: 'var(--fs-hint)', fontWeight: 700, color: 'var(--n7)',
-        }}>{t('الوحدة', 'Module')}</button>
+        }}>{t('الوحدة', 'Module')}</button>}
       </div>
     </div>
   );
@@ -821,7 +844,7 @@ function SideItem({ label, indent, pinned, onOpen, onTogglePin, ar }: {
 /* ── ⌘K ──────────────────────────────────────────────────────────────── */
 function Finder({ ar, t, onClose, onOpen }: {
   ar: boolean; t: (a: string, e: string) => string; onClose: () => void;
-  onOpen: (f: string, label?: string) => void;
+  onOpen: (f: string) => void;
 }) {
   const [q, setQ] = useState('');
   const input = useRef<HTMLInputElement>(null);
@@ -849,7 +872,7 @@ function Finder({ ar, t, onClose, onOpen }: {
           {refHit && (
             <>
               <GroupLabel>{t('شحنة', 'Shipment')}</GroupLabel>
-              <button onClick={() => { onOpen('ShopyLink_D1_Control.html', t('لوحة التحكم', 'the control board')); onClose(); }} style={rowStyle}>
+              <button onClick={() => { onOpen('ShopyLink_D1_Control.html'); onClose(); }} style={rowStyle}>
                 <span className="machine" style={{ fontWeight: 700 }}>{q.toUpperCase()}</span>
                 <span style={{ color: 'var(--n6)', fontSize: 'var(--fs-hint)' }}>{t('افتحها في لوحة التحكم', 'Open it on the control board')}</span>
               </button>
@@ -857,7 +880,7 @@ function Finder({ ar, t, onClose, onOpen }: {
           )}
           <GroupLabel>{t('خدمات', 'Services')}</GroupLabel>
           {services.slice(0, 9).map(i => (
-            <button key={i.file} onClick={() => { onOpen(i.file, ar ? i.ar : i.en); onClose(); }} style={rowStyle}>
+            <button key={i.file} onClick={() => { onOpen(i.file); onClose(); }} style={rowStyle}>
               <span style={{ fontWeight: 600 }}>{ar ? i.ar : i.en}</span>
             </button>
           ))}
@@ -878,4 +901,81 @@ const rowStyle: React.CSSProperties = {
 };
 function GroupLabel({ children }: { children: React.ReactNode }) {
   return <div style={{ fontSize: 'var(--fs-eyebrow)', color: 'var(--n5)', fontWeight: 800, letterSpacing: '.1em', textTransform: 'uppercase', padding: 'var(--s2) var(--s3) var(--s1)' }}>{children}</div>;
+}
+
+/* ── one service, inside the console — the experience never changes language
+      or leaves the page; the module file itself is a package affair ──────── */
+function ServiceView({ file, ar, t, onBack, onOpenFile }: {
+  file: string; ar: boolean; t: (a: string, e: string) => string;
+  onBack: () => void; onOpenFile?: (f: string) => void;
+}) {
+  const cat = CATEGORIES.filter(c => c.items.some(i => i.file === file))[0];
+  const item = cat?.items.filter(i => i.file === file)[0];
+  const Icon = cat ? (CAT_ICONS[cat.id] || Inbox) : Inbox;
+  if (!item || !cat) return null;
+  return (
+    <div style={{ maxWidth: 860, marginInline: 'auto' }}>
+      <nav aria-label={t('مسار', 'Breadcrumb')} style={{
+        display: 'flex', alignItems: 'center', gap: 'var(--s2)',
+        fontSize: 'var(--fs-hint)', color: 'var(--n6)', marginBottom: 'var(--s4)',
+      }}>
+        <button onClick={onBack} style={{ color: 'var(--sky-deep)', fontWeight: 700 }}>
+          {t('يومي', 'My day')}
+        </button>
+        {ar ? <ChevronLeft size={13} /> : <ChevronRight size={13} />}
+        <span>{ar ? cat.ar : cat.en}</span>
+        {ar ? <ChevronLeft size={13} /> : <ChevronRight size={13} />}
+        <b style={{ color: 'var(--ink)' }}>{ar ? item.ar : item.en}</b>
+      </nav>
+
+      <section style={{
+        background: 'var(--paper)', border: '1px solid var(--n3)',
+        borderRadius: 'var(--radius)', boxShadow: 'var(--sh-1)', overflow: 'hidden',
+      }}>
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 'var(--s4)',
+          padding: 'var(--s5) var(--s6)', borderBottom: '1px solid var(--n2)',
+        }}>
+          <span aria-hidden style={{
+            width: 44, height: 44, borderRadius: 'var(--radius)', background: 'var(--sky-tint)',
+            color: 'var(--sky-deep)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}><Icon size={20} /></span>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 'var(--fs-eyebrow)', color: 'var(--n5)', fontWeight: 800, letterSpacing: '.08em', textTransform: 'uppercase' }}>
+              {ar ? cat.ar : cat.en}
+            </div>
+            <h2 style={{ font: '800 21px/1.3 inherit', fontFamily: 'inherit', margin: 0 }}>{ar ? item.ar : item.en}</h2>
+          </div>
+        </div>
+        <div style={{ padding: 'var(--s5) var(--s6)' }}>
+          <p style={{ margin: 0, fontSize: 'var(--fs-lead)', lineHeight: 1.7, color: 'var(--n7)' }}>
+            {ar ? (item.descAr || '') : (item.descEn || '')}
+          </p>
+          <div style={{
+            marginTop: 'var(--s5)', border: '1.5px dashed var(--n3)', borderRadius: 'var(--radius)',
+            padding: 'var(--s6)', textAlign: 'center', color: 'var(--n6)', background: 'var(--cream)',
+          }}>
+            <div style={{ fontSize: 'var(--fs-body)', fontWeight: 700, color: 'var(--ink)' }}>
+              {t('بيانات هذه الخدمة تظهر هنا حين تُنشر قناتها', "This service's data appears here when its channel is published")}
+            </div>
+            <div style={{ fontSize: 'var(--fs-hint)', marginTop: 'var(--s1)' }}>
+              {t('في هذا النموذج، جرّب شاشة اليوم: المهام والأخبار والأرقام كلها حيّة.', 'In this prototype, try the day screen: tasks, news and figures are all live.')}
+            </div>
+            <div style={{ display: 'flex', gap: 'var(--s2)', justifyContent: 'center', marginTop: 'var(--s4)' }}>
+              <button onClick={onBack} style={{
+                height: 34, padding: '0 var(--s4)', background: 'var(--sky)', color: 'var(--ink)',
+                borderRadius: 'var(--radius-sm)', fontSize: 'var(--fs-hint)', fontWeight: 800,
+              }}>{t('عودة إلى يومي', 'Back to my day')}</button>
+              {onOpenFile && (
+                <button onClick={() => onOpenFile(file)} style={{
+                  height: 34, padding: '0 var(--s4)', border: '1.5px solid var(--n3)',
+                  borderRadius: 'var(--radius-sm)', fontSize: 'var(--fs-hint)', fontWeight: 700, color: 'var(--n7)',
+                }}>{t('افتح ملف الوحدة', 'Open the module file')}</button>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
 }
