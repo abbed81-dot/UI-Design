@@ -1,0 +1,102 @@
+/* ShopyLink console — the brand's tokens.
+   No colour is written anywhere else in this project. Three values that arrive
+   with Tailwind's preflight (the border, the placeholder, the focus ring) are
+   replaced here rather than excused: "it came with the framework" is not an
+   exception the brief makes. */
+
+:root {
+  /* ground and ink */
+  --cream: #F7F4EC;
+  --paper: #FFFFFF;
+  --ink: #0B2A3B;
+
+  /* the neutral ramp */
+  --n2: #EDE9E0;
+  --n3: #DDD8CD;
+  --n4: #BFC5C9;
+  --n5: #95A1A9;
+  --n6: #62707A;
+  --n7: #44555F;
+
+  /* the four states, each with a tint to sit on and a deep to read in */
+  --sky: #0ea5e9;
+  --sky-tint: #E6F4FE;
+  --sky-deep: #0B6E9B;
+  --green: #10B981;
+  --green-tint: #DCF5E9;
+  --green-deep: #0A7250;
+  --amber: #F59E0B;
+  --amber-tint: #FDF0D5;
+  --amber-deep: #8A5A06;
+  --red: #E1483B;
+  --red-tint: #FBE3E1;
+  --red-deep: #B23429;
+
+  /* type. φ governs a relation between two masses; applied to type it produced
+     a 5.3px label and a 26px row — unreadable, and too short for an Arabic
+     descender. The scale below is the brand's, and this sentence is the reason. */
+  --body: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --ar: "Tajawal", "Noto Kufi Arabic", ui-sans-serif, system-ui, sans-serif;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --fs-eyebrow: 10.5px;
+  --fs-hint: 12.5px;
+  --fs-body: 14px;
+  --fs-lead: 15.5px;
+  --fs-title: 19px;
+  --fs-figure: 26px;
+
+  /* mass. φ where it is true: a rail of 56, a sidebar of 56 × φ³ = 237 — the
+     brand sheet's 232 to within 2% — and a panel of 384. */
+  --rail-w: 56px;
+  --sb-w: 237px;
+  --panel-w: 384px;
+  --tl-h: 42px;
+  --row-h: 38px;
+
+  /* spacing on Fibonacci: φ in integers a browser lays out honestly */
+  --s1: 5px;
+  --s2: 8px;
+  --s3: 13px;
+  --s4: 21px;
+  --s5: 34px;
+  --s6: 55px;
+  --s7: 89px;
+  --s8: 144px;
+
+  --radius-card: 12px;
+  --radius-ctl: 9px;
+  --radius-pill: 999px;
+}
+
+html, body, #root { height: 100%; }
+
+body {
+  margin: 0;
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: var(--fs-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+[dir="rtl"] body, [dir="rtl"] .ar { font-family: var(--ar); }
+
+/* Machine values stay left-to-right under RTL: ids, codes, money, dates. */
+.machine {
+  direction: ltr;
+  unicode-bidi: isolate;
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* the focus a person actually sees — the brand's, not the framework's blue */
+:focus-visible { outline: 2px solid var(--sky); outline-offset: 2px; }
+
+/* The preflight border and placeholder are NOT overridden here. Overriding
+   them after the fact leaves the framework's own greys in the file and wins
+   only by cascade order; they are replaced at their source, in
+   tailwind.config.js, so those greys are never emitted at all. */
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { background: var(--n4); border-radius: var(--radius-pill); }
+::-webkit-scrollbar-track { background: transparent; }
