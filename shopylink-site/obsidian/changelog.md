@@ -116,3 +116,22 @@ measured on a production build before and after. Counted quantities only.
 
 Not measured: throttled-CPU frame timings, Lighthouse, and the feel on real
 hardware. See ADR-0015.
+
+## ShopyLink — privacy policy
+
+- **Added** `/privacy-policy` (static), the bilingual content in
+  `src/content/privacy.ts`, and `LegalDocument` — an editorial layout with a
+  numbered outline someone can cite and a sticky table of contents. Added to the
+  sitemap. The consent banner's link no longer 404s.
+- The page carries **no 3D scene**, deliberately: the globe is the landing
+  page's argument, and behind a policy people are reading for a reason it is
+  noise.
+- **DRAFT, NOT LEGAL ADVICE.** The structure follows GDPR Arts. 13–14 because it
+  is the widest template in common use and maps onto the UAE PDPL, Türkiye's
+  KVKK and China's PIPL — all of which this service touches by operating in
+  those markets. It needs review by a lawyer in ShopyLink's jurisdiction.
+- Facts only ShopyLink can supply are left as `[bracketed fields]` and are
+  **rendered highlighted on the page**, so an unfilled field cannot ship by
+  accident. There are 14 of them: legal entity, registration number, registered
+  address, privacy contact, DPO, four retention periods, response window,
+  supervisory authority, and minimum age.
