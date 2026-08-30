@@ -7,59 +7,106 @@
 /* ---------------------------------------------------------------------------
    TIER 1 — PRIMITIVES  (`--raw-*`)
    Raw literal values. The only tier allowed to contain a hex/px/ms literal.
-   Never referenced in markup, never bound into @theme. Rename freely.
-   Grammar: --raw-<category>-<name>[-<shade>]
-   See obsidian/frontend/design-system.md → "Token naming convention".
+   Values are the ShopyLink Brand Guide, Issue 02 · 2026 — do not invent shades.
    --------------------------------------------------------------------------- */
 :root {
-  --raw-color-white: #ffffff;
-  --raw-color-neutral-100: #ededed;
-  --raw-color-neutral-900: #171717;
-  --raw-color-neutral-950: #0a0a0a;
+  --raw-color-ink: #0b2a3b;
+  --raw-color-sky-500: #0ea5e9;
+  --raw-color-sky-400: #38bdf8;
+  --raw-color-sky-200: #bae6fd;
+  --raw-color-sky-100: #e0f2fe;
+  --raw-color-clean: #f4fbff;
+  --raw-color-cream: #f7f4ec;
+  --raw-color-sand: #e8dcc3;
+  --raw-color-deep: #0a4a6b;
+  --raw-color-paper: #ffffff;
+
+  /* the ink de-emphasis ladder — used deliberately, never decoratively */
+  --raw-color-ink-55: rgb(11 42 59 / 0.55);
+  --raw-color-ink-40: rgb(11 42 59 / 0.4);
+  --raw-color-ink-14: rgb(11 42 59 / 0.14);
+  --raw-color-paper-80: rgb(255 255 255 / 0.8);
+  --raw-color-paper-92: rgb(255 255 255 / 0.92);
 
   --raw-duration-fast: 150ms;
   --raw-duration-normal: 250ms;
+  --raw-duration-slow: 700ms;
+
+  --raw-radius-sm: 0.5rem;
+  --raw-radius-md: 1.5rem;
+  --raw-radius-pill: 62.5rem;
+
+  --raw-tracking-display: -0.04em;
+  --raw-tracking-label: 0.22em;
 }
 
 /* ---------------------------------------------------------------------------
    TIER 2 — SEMANTIC  (role names, no namespace prefix)
    Purpose, not appearance. Always `var(--raw-*)` — never a literal.
-   This is the themeable layer: dark mode overrides happen HERE, which is why
-   these are separate from the @theme bindings below (see the note there).
-   Grammar: --<role>[-<variant>][-<state>]
    --------------------------------------------------------------------------- */
 :root {
-  --background: var(--raw-color-white);
-  --foreground: var(--raw-color-neutral-900);
+  --background: var(--raw-color-cream);
+  --background-alt: var(--raw-color-sky-100);
+  --surface: var(--raw-color-paper-80);
+  --surface-raised: var(--raw-color-paper-92);
+  --foreground: var(--raw-color-ink);
+  --foreground-muted: var(--raw-color-ink-55);
+  --foreground-subtle: var(--raw-color-ink-40);
+  --accent: var(--raw-color-sky-500);
+  --accent-foreground: var(--raw-color-paper);
+  --accent-quiet: var(--raw-color-sky-200);
+  --counter-accent: var(--raw-color-sand);
+  --line: var(--raw-color-ink-14);
+  --glow: var(--raw-color-sky-400);
 
   --duration-fast: var(--raw-duration-fast);
   --duration-normal: var(--raw-duration-normal);
+  --duration-slow: var(--raw-duration-slow);
+
+  /* The Latin display face; Arabic swaps it below so both scripts read as one
+     voice — Tajawal 900 is weight-matched to Bricolage 800 per the Brand Guide. */
+  --font-display: var(--font-bricolage);
+  --font-body: var(--font-manrope);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: var(--raw-color-neutral-950);
-    --foreground: var(--raw-color-neutral-100);
-  }
+/* Dantora cannot be flipped to dark — the frosted panels and the light-blended
+   scene both assume a light ground. So the palette does not invert; it holds. */
+
+[dir="rtl"] {
+  --font-display: var(--font-tajawal);
+  --font-body: var(--font-tajawal);
 }
 
 /* ---------------------------------------------------------------------------
    THEME BINDINGS — map semantic tokens into Tailwind namespaces.
-   Every entry is exactly `--<tw-namespace>-<role>: var(--<role>)`.
-   `inline` is required: it inlines the var() into each utility, so the
-   dark-mode overrides on the Tier 2 tokens above cascade. Binding a literal
-   here instead would freeze the value and break theming.
-
-   Only these namespaces generate utilities (verified against tailwindcss
-   v4.3.3): --color-* --spacing-* --radius-* --leading-* --tracking-* --text-*
-   --font-* --ease-* --breakpoint-* --container-* --shadow-* --blur-* --animate-*
-   NOTE: there is NO --duration-* namespace in v4 — `duration-fast` compiles to
-   nothing. Durations stay Tier 2 only and are used as duration-[var(--duration-fast)].
+   NOTE: there is NO --duration-* namespace in v4 — durations stay Tier 2 only
+   and are used as duration-[var(--duration-fast)].
    --------------------------------------------------------------------------- */
 @theme inline {
   --color-background: var(--background);
+  --color-background-alt: var(--background-alt);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-onest);
+  --color-foreground-muted: var(--foreground-muted);
+  --color-foreground-subtle: var(--foreground-subtle);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent-quiet: var(--accent-quiet);
+  --color-counter-accent: var(--counter-accent);
+  --color-line: var(--line);
+  --color-glow: var(--glow);
+
+  --font-display: var(--font-display);
+  --font-sans: var(--font-body);
+  --font-mono: var(--font-jetbrains);
+
+  --radius-sm: var(--raw-radius-sm);
+  --radius-md: var(--raw-radius-md);
+  --radius-pill: var(--raw-radius-pill);
+
+  --tracking-display: var(--raw-tracking-display);
+  --tracking-label: var(--raw-tracking-label);
 
   /* Leading floor for clipped TextEngine reveals — see
      obsidian/frontend/text-engine.md → "Alignment & line-height". */
@@ -71,52 +118,10 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  width: 100vw;
+  -webkit-font-smoothing: antialiased;
 }
 
-@layer base {
-  /* Adaptive scaling grid — scales the root font-size with the viewport so a
-     rem-based layout stays proportional. Each breakpoint divides FONT_BASE
-     (16px) by the design base width its range was laid out at:
-       font-size: 16 * 100 / baseWidth  (vw)
-     Above 1920px the AdaptiveGrid component takes over (scale-up).
-     Keep in sync with src/components/common/grid/grid.config.ts. */
-  html {
-    font-size: 16px;
-  }
-
-  @media (max-width: 1920px) {
-    html {
-      font-size: 0.833333vw; /* 16 * 100 / 1920 */
-    }
-  }
-
-  @media (max-width: 1440px) {
-    html {
-      font-size: 1.111111vw; /* 16 * 100 / 1440 */
-    }
-  }
-
-  @media (max-width: 1024px) {
-    html {
-      font-size: 1.5625vw; /* 16 * 100 / 1024 */
-    }
-  }
-
-  @media (max-width: 640px) {
-    html {
-      font-size: 4.444444vw; /* 16 * 100 / 360 */
-    }
-  }
-}
-
-@layer utilities {
-}
-
-@layer components {
+::selection {
+  background: var(--glow);
+  color: var(--foreground);
 }

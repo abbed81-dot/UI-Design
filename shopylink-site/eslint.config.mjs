@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // the three build copied in by `yarn scene:vendor` — vendored, not ours
+    "scenes/vendor/**",
   ]),
   {
     rules: {

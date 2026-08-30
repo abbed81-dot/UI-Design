@@ -42,3 +42,6 @@ next-env.d.ts
 
 # vendored three build for the standalone scene preview (yarn scene:vendor)
 scenes/vendor/
+
+# local QA captures
+qa-*.png

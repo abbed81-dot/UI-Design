@@ -37,6 +37,8 @@ SRC() { grep -rEn --include='*.tsx' --include='*.ts' "$1" "${SCOPE[@]}" 2>/dev/n
 # App source only — excludes the vendored animation engine (#do-not-modify).
 APP() { SRC "$1" | grep -v 'components/animation/springs/' | grep -v 'hooks/animation/'; }
 CSS() { grep -rEn --include='*.css' "$1" "${SCOPE[@]}" 2>/dev/null; }
+# PCRE variant — needed where a check must look BEHIND a match (grep -E cannot).
+SRCP() { grep -rPn --include='*.tsx' --include='*.ts' "$1" "${SCOPE[@]}" 2>/dev/null; }
 
 echo "── Motion (hard rules #1–#3) ─────────────────────────────────"
 
@@ -58,7 +60,7 @@ report FAIL "leading-none combined with overflow" \
 
 report FAIL "duration-fast / duration-normal used as a utility" \
   "Tailwind v4 has no --duration-* namespace — the class compiles to nothing. Use duration-[var(--duration-fast)]." \
-  "$(SRC '\bduration-(fast|normal)\b')"
+  "$(SRCP '(?<!-)\bduration-(fast|normal)\b')"
 
 report WARN "CSS transition without token-backed timing (ADR-0014)" \
   "The narrow CSS-transition exception requires duration-[var(--duration-*)] and a token ease." \

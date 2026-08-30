@@ -83,6 +83,17 @@
       "why": "Its headline is ONE WORD pinned to the left edge and one to the right with the scene in the empty centre — which is the ShopyLink wordmark exactly: shopy ⛓ link, the chain in the seam. The globe becomes the link. In RTL it mirrors to شوبي (right) · لينك (left), which is what the Brand Guide already specifies.",
       "asset": "shopylink-globe (authored, scenes/shopylink-globe.html)",
       "rule": "This composition only works if the centre stays empty — so lookAtOffsetX is 0 and every DOM element is edge-pinned."
+    },
+    {
+      "section": "city-runway",
+      "composition": "custom, edge-pinned",
+      "why": "One panel of scroll = one leg of the camera, so keyframe i lands exactly when panel i fills the viewport. With 5 stations the progress is spread over 4 legs. Copy is pinned to the base because the diorama rises just above the optical centre.",
+      "asset": "the same single scene — no second canvas"
+    },
+    {
+      "section": "steps",
+      "composition": "card-grid",
+      "why": "Below the fold is plain viewport-entry, once, not gated on the loader — don't gate what nobody can see."
     }
   ],
   "decisions": [
@@ -97,5 +108,18 @@
     "cityPitch lifts a city ABOVE the camera axis: parked on the axis it is viewed straight down its own normal and the towers collapse to flat flakes.",
     "No bloom — on a cream ground it washes to white. Cheaper and more honest.",
     "prefers-reduced-motion stops the spin, pings and parcels itself; a canvas loop is not covered by an animation library's global flag."
+  ],
+  "siteLog": [
+    "Curtain: asset-backed counter parking at a 92 ceiling until the scene reports one DRAWN frame, MIN_VISIBLE 1300ms, hard cap 5000ms. The gate flips at the START of the exit, so the content animates in through the departing plate.",
+    "BUG FOUND IN QA: the curtain took ~8s to clear and covered the masthead the whole time. Stiffened the exit spring and added a hard removal deadline, since onRest can be starved when the frame budget is.",
+    "BUG FOUND IN QA: TextEngine mode=\"once\" does not replay when the copy changes under it, so words that exist only in the new language stayed hidden after a locale switch. Fixed by keying each engine on the locale.",
+    "The scene's palette is pulled from the CSS design tokens at startup, so colour has one source of truth and re-skinning the site re-skins the globe.",
+    "verify.sh's duration-fast check was a false positive — its pattern matched inside the very form its message prescribes. Fixed the pattern, not the code."
+  ],
+  "openItems": [
+    "The starter's cookie banner is English-only and shows on the Arabic page — it needs localising.",
+    "Its privacy-policy link 404s; that page does not exist yet.",
+    "Locale is a client switch, not /ar and /en routes. Real routes would be better for SEO and hreflang.",
+    "homeLat/homeLon default to Riyadh — confirm the market you actually deliver into."
   ]
 }

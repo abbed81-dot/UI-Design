@@ -1,0 +1,142 @@
+/**
+ * Every string on the page, in both scripts.
+ *
+ * Copy follows the Brand Guide's voice section: clear over clever, short
+ * sentences, we say what we do — receive, consolidate, deliver — and skip the
+ * hype. The English lines here are the Guide's own "Lines we'd write".
+ */
+
+export type Locale = "ar" | "en";
+
+export const LOCALES: readonly Locale[] = ["ar", "en"] as const;
+
+export const DIRECTION: Record<Locale, "rtl" | "ltr"> = {
+  ar: "rtl",
+  en: "ltr",
+};
+
+export type CityKey = "dubai" | "guangzhou" | "istanbul" | "newyork";
+
+export type City = {
+  key: CityKey;
+  /** index in the scene's station order — station 0 is the world view */
+  station: number;
+  lat: number;
+  lon: number;
+  name: Record<Locale, string>;
+  country: Record<Locale, string>;
+  /** what you actually shop there */
+  markets: Record<Locale, readonly string[]>;
+  note: Record<Locale, string>;
+};
+
+export const CITIES: readonly City[] = [
+  {
+    key: "dubai",
+    station: 1,
+    lat: 25.2,
+    lon: 55.27,
+    name: { ar: "دبي", en: "Dubai" },
+    country: { ar: "الإمارات", en: "UAE" },
+    markets: {
+      ar: ["دبي مول", "ديرة", "دراغون مارت", "السوق الكبير"],
+      en: ["Dubai Mall", "Deira", "Dragon Mart", "Gold Souk"],
+    },
+    note: {
+      ar: "عنوانك في الخليج. نستلم اليوم، ونشحن في نفس الأسبوع.",
+      en: "Your address in the Gulf. We receive today and ship the same week.",
+    },
+  },
+  {
+    key: "guangzhou",
+    station: 2,
+    lat: 23.13,
+    lon: 113.26,
+    name: { ar: "قوانغجو", en: "Guangzhou" },
+    country: { ar: "الصين", en: "China" },
+    markets: {
+      ar: ["بايون", "شاهه", "معرض كانتون", "شي سان هانغ"],
+      en: ["Baiyun", "Shahe", "Canton Fair", "Shi San Hang"],
+    },
+    note: {
+      ar: "اشترِ من عشرة موردين، ويصلك طرد واحد.",
+      en: "Buy from ten suppliers. One parcel arrives.",
+    },
+  },
+  {
+    key: "istanbul",
+    station: 3,
+    lat: 41.01,
+    lon: 28.98,
+    name: { ar: "إسطنبول", en: "Istanbul" },
+    country: { ar: "تركيا", en: "Türkiye" },
+    markets: {
+      ar: ["السوق المسقوف", "لاليلي", "عثمان بيه", "مرتر"],
+      en: ["Grand Bazaar", "Laleli", "Osmanbey", "Merter"],
+    },
+    note: {
+      ar: "الأقمشة والملابس والجلديات — مجمّعة قبل أن تغادر.",
+      en: "Textiles, clothing, leather — consolidated before it leaves.",
+    },
+  },
+  {
+    key: "newyork",
+    station: 4,
+    lat: 40.71,
+    lon: -74.01,
+    name: { ar: "نيويورك", en: "New York" },
+    country: { ar: "أمريكا", en: "USA" },
+    markets: {
+      ar: ["الجادة الخامسة", "سوهو", "بروكلين", "المتاجر الإلكترونية"],
+      en: ["Fifth Ave", "SoHo", "Brooklyn", "US online stores"],
+    },
+    note: {
+      ar: "متاجر لا تشحن خارج أمريكا — تشحن إلينا.",
+      en: "Stores that will not ship abroad will ship to us.",
+    },
+  },
+] as const;
+
+export const COPY = {
+  /** the wordmark, split — the scene sits in the seam between the two halves */
+  markLeft: { ar: "شوبي", en: "shopy" },
+  markRight: { ar: "لينك", en: "link" },
+
+  tagline: { ar: "العالم إلى البيت", en: "world · to · door" },
+
+  promise: {
+    ar: "عنوان لك في كل عواصم التسوّق — ونوصّل طردك إلى البيت.",
+    en: "An address in every shopping capital — and the parcel brought home.",
+  },
+
+  lead: {
+    ar: "تتسوّق من كل العالم، ونحن نستلم ونجمّع ونوصّل إلى بابك — من الإمارات والصين وأمريكا وتركيا.",
+    en: "You shop the world. We receive, consolidate, and deliver to your door — from the UAE, China, the USA and Türkiye.",
+  },
+
+  ctaPrimary: { ar: "افتح عنوانك", en: "Open your address" },
+  ctaSecondary: { ar: "تابع طردًا", en: "Track a parcel" },
+
+  scroll: { ar: "مرّر", en: "Scroll" },
+  marketsLabel: { ar: "الأسواق", en: "Markets" },
+  stepsLabel: { ar: "كيف تعمل", en: "How it works" },
+
+  steps: {
+    ar: [
+      { n: "٠١", t: "نستلم", d: "يصل الطرد إلى عنوانك في السوق." },
+      { n: "٠٢", t: "نجمّع", d: "نضم طرودك في صندوق واحد ونزن ونصوّر." },
+      { n: "٠٣", t: "نوصّل", d: "يخرج الشحن إلى بابك، وتتابعه من السلة حتى الباب." },
+    ],
+    en: [
+      { n: "01", t: "Receive", d: "Your parcel arrives at your address in the market." },
+      { n: "02", t: "Consolidate", d: "We combine your parcels into one box, weigh it and photograph it." },
+      { n: "03", t: "Deliver", d: "It ships to your door, and you track it from cart to doorstep." },
+    ],
+  },
+
+  switchTo: { ar: "English", en: "العربية" },
+  loading: { ar: "جارٍ التحميل", en: "Loading" },
+
+  footerContact: { ar: "hello@shopylink.co", en: "hello@shopylink.co" },
+  site: { ar: "shopylink.co", en: "shopylink.co" },
+} as const;

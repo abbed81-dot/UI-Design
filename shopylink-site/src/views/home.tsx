@@ -1,10 +1,30 @@
+import { Curtain } from "@/components/site/curtain";
+import { CityRunway } from "@/components/site/city-runway";
+import { GlobeCanvas } from "@/components/site/globe-canvas";
+import { Hero } from "@/components/site/hero";
+import { Steps } from "@/components/site/steps";
+
 /**
- * Home view — a Server Component, intentionally empty.
+ * ShopyLink landing page — a Server Component that composes client leaves.
  *
- * This is the starting point for new work: if the project is empty and no other
- * instructions are provided, begin developing here (route `/`). Build sections
- * as client leaves so this view stays a Server Component (hard rule #6).
+ * Built with the real GetLayers flow: committed Style `dantora-style`
+ * (re-dressed to the Brand Guide palette in globals.css), hero composition
+ * `noema-hero`, and ONE authored scene — the library carries no city scene.
+ *
+ * The scene is a single fixed canvas behind everything. There is exactly one
+ * of them on the page, per the combination rules: one scene above the fold,
+ * at most two anywhere.
  */
 export const HomeView = () => {
-  return <main className="min-h-lvh" />;
+  return (
+    <>
+      <GlobeCanvas />
+      <Curtain />
+      <main className="relative">
+        <Hero />
+        <CityRunway />
+        <Steps />
+      </main>
+    </>
+  );
 };
