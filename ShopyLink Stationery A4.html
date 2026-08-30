@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>ShopyLink — Stationery</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FFFFFF; --bg2:#F6F8FA; --bg3:#EEF2F6;
+    --ink:#0B1B26; --ink2:#0A2230; --sub:#5A6B77; --sub2:#8A98A2;
+    --pri:#0EA5E9; --acc:#38BDF8; --pale:#EAF6FE; --line:#E5EAEF; --line2:#EEF1F4;
+    --en:'Bricolage Grotesque',system-ui,sans-serif;
+    --ar:'Tajawal',system-ui,sans-serif;
+    --body:'Manrope',system-ui,sans-serif;
+    --mono:'JetBrains Mono',ui-monospace,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:var(--body);color:var(--ink);background:#5b656d;-webkit-font-smoothing:antialiased;}
+  ::selection{background:var(--acc);color:#fff;}
+
+  .page{width:210mm;height:297mm;position:relative;overflow:hidden;display:flex;flex-direction:column;
+    padding:19mm 19mm 14mm;background:var(--bg);}
+  .page.gray{background:var(--bg2);}
+  @media screen{ .page{margin:9mm auto;box-shadow:0 8px 44px rgba(0,0,0,.30);} }
+  @page{size:A4;margin:0;}
+  @media print{
+    html,body{background:#fff;margin:0;padding:0;width:210mm;}
+    .page{width:210mm;height:296mm;margin:0;box-shadow:none;overflow:hidden;page-break-after:always;break-after:page;}
+    .page:last-child{page-break-after:avoid;break-after:auto;}
+    .stage{perspective:none !important;flex-direction:column;gap:10mm;}
+    .bc{position:relative !important;transform:none !important;
+      box-shadow:0 0 0 1px var(--line) !important;}
+    *{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;}
+  }
+
+  /* chrome */
+  .ph{display:flex;justify-content:space-between;align-items:center;}
+  .pill{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border:1px solid var(--line);border-radius:999px;
+    background:var(--bg);font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--sub);}
+  .pill .d{width:5px;height:5px;border-radius:50%;background:var(--pri);}
+  .ph .r{font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--sub2);}
+  .foot{margin-top:auto;display:flex;justify-content:space-between;align-items:center;
+    font-family:var(--mono);font-size:8.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--sub2);
+    border-top:1px solid var(--line);padding-top:11px;}
+
+  .eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--pri);}
+  .ttl{font-family:var(--en);font-weight:700;font-size:38px;letter-spacing:-.035em;line-height:1.02;}
+  .ttl-ar{font-family:var(--ar);font-weight:700;font-size:22px;color:var(--sub2);direction:rtl;}
+  .lede{font-size:13.5px;line-height:1.6;color:var(--sub);max-width:50ch;font-weight:450;}
+  .cap{font-family:var(--mono);font-size:9px;letter-spacing:.03em;color:var(--sub);line-height:1.7;}
+  .cap b{color:var(--ink);font-weight:600;}
+
+  .wm{display:inline-flex;align-items:center;line-height:1;font-family:var(--en);font-weight:800;letter-spacing:-.045em;white-space:nowrap;}
+  .wm .ink{color:var(--ink);} .wm .blue{color:var(--pri);} .wm .clean{color:#fff;} .wm .acc{color:var(--acc);}
+  .wm-chain{height:.64em;width:auto;margin:0 -.05em;flex:none;}
+  .chain{display:inline-block;vertical-align:middle;}
+
+  /* feature chips (SV-style) */
+  .chips{display:flex;gap:8px;flex-wrap:wrap;}
+  .chip{font-family:var(--mono);font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--sub);
+    padding:6px 11px;border:1px solid var(--line);border-radius:7px;background:var(--bg);}
+
+  /* spec strip */
+  .specrow{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--bg);}
+  .specrow .c{padding:14px 16px;}
+  .specrow .c+.c{border-left:1px solid var(--line2);}
+  .specrow .k{font-family:var(--mono);font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:var(--sub2);}
+  .specrow .v{font-family:var(--en);font-weight:600;font-size:12.5px;margin-top:6px;letter-spacing:-.01em;}
+
+  /* ── business card mockup ── */
+  .stage{position:relative;flex:1;display:flex;align-items:center;justify-content:center;perspective:1800px;}
+  .bc{position:absolute;width:92mm;height:55.2mm;border-radius:3.6mm;overflow:hidden;}
+  .bc.front{background:#fff;padding:9mm 9.5mm 8mm;display:flex;flex-direction:column;justify-content:space-between;
+    transform:translate(21mm,15mm) rotate(5deg);z-index:3;
+    box-shadow:0 34px 60px -26px rgba(11,40,60,.34),0 10px 22px -14px rgba(11,40,60,.22),inset 0 0 0 1px var(--line);}
+  .bc.back{background:linear-gradient(160deg,#0E2B3C,#0A2230);
+    transform:translate(-23mm,-17mm) rotate(-6deg);z-index:2;
+    box-shadow:0 38px 66px -26px rgba(11,40,60,.42),0 10px 22px -14px rgba(11,40,60,.28);
+    display:flex;align-items:center;justify-content:center;}
+  .bc-tape{position:absolute;left:0;right:0;bottom:0;height:4.6mm;background:var(--pri);}
+  .bc .nm{font-family:var(--en);font-weight:700;font-size:16px;letter-spacing:-.02em;}
+  .bc .ro{font-size:9.5px;letter-spacing:.02em;color:var(--sub);margin-top:3px;}
+  .bc .ro-ar{font-family:var(--ar);direction:rtl;font-size:10px;color:var(--sub);}
+  .bc .det{font-family:var(--mono);font-size:7.8px;line-height:2;color:var(--ink);letter-spacing:.01em;}
+  .bc .det .lbl{color:var(--pri);}
+  .bc-back-in{text-align:center;display:flex;flex-direction:column;align-items:center;gap:9px;}
+
+  /* ── letterhead / window stages ── */
+  .sheet-stage{flex:1;display:flex;align-items:center;justify-content:center;}
+  .sheet{width:136mm;background:#fff;border-radius:3mm;overflow:hidden;position:relative;border:1px solid var(--line);
+    box-shadow:0 40px 76px -34px rgba(11,40,60,.32),0 12px 26px -16px rgba(11,40,60,.18);}
+  .sheet .hd{display:flex;justify-content:space-between;align-items:flex-start;padding:13mm 13mm 7mm;}
+  .sheet .hd .addr{font-family:var(--mono);font-size:8px;line-height:1.95;color:var(--sub);text-align:right;letter-spacing:.02em;}
+  .sheet .rule{height:2px;margin:0 13mm;background:linear-gradient(90deg,var(--pri),transparent 78%);}
+  .sheet .bd{padding:8mm 13mm 4mm;display:flex;flex-direction:column;gap:7px;position:relative;}
+  .sheet .bd .meta{font-family:var(--mono);font-size:8.5px;color:var(--sub2);letter-spacing:.04em;}
+  .sheet .bd h4{font-family:var(--en);font-weight:700;font-size:15px;letter-spacing:-.02em;}
+  .sheet .bd p{font-size:9.5px;line-height:1.78;color:var(--sub);max-width:62ch;}
+  .sheet .wmk{position:absolute;right:-6mm;bottom:-2mm;width:60mm;opacity:.05;}
+  .sheet .ft{display:flex;justify-content:space-between;align-items:center;padding:6mm 13mm;margin-top:5mm;
+    background:var(--bg2);font-family:var(--mono);font-size:7.6px;letter-spacing:.12em;color:var(--sub2);text-transform:uppercase;}
+
+  .mail{width:150mm;border-radius:4mm;overflow:hidden;background:#fff;border:1px solid var(--line);
+    box-shadow:0 40px 76px -34px rgba(11,40,60,.34),0 12px 26px -16px rgba(11,40,60,.2);}
+  .mail .bar{height:11mm;background:var(--bg2);display:flex;align-items:center;gap:6px;padding:0 5mm;border-bottom:1px solid var(--line);}
+  .mail .dot{width:3.2mm;height:3.2mm;border-radius:50%;}
+  .mail .subj{margin-left:8px;font-family:var(--mono);font-size:8.5px;color:var(--sub2);letter-spacing:.04em;}
+  .mail .msg{padding:8mm 9mm;font-size:10px;line-height:1.72;color:var(--sub);}
+  .mail .msg .from{font-family:var(--mono);font-size:8px;color:var(--sub2);letter-spacing:.06em;margin-bottom:6mm;display:flex;justify-content:space-between;}
+  .sig{margin-top:7mm;padding-top:6mm;border-top:1px solid var(--line);display:flex;gap:5mm;align-items:center;}
+  .sig .av{width:15mm;height:15mm;border-radius:3.6mm;flex:none;display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(155deg,#38BDF8,#0EA5E9 58%,#0A4A6B);box-shadow:0 6px 14px -7px rgba(14,165,233,.6);}
+  .sig .nm{font-family:var(--en);font-weight:700;font-size:13px;letter-spacing:-.02em;color:var(--ink);}
+  .sig .ro{font-size:9px;color:var(--sub);margin-bottom:5px;}
+  .sig .li{font-family:var(--mono);font-size:8px;color:var(--ink);line-height:1.85;letter-spacing:.01em;}
+  .sig .li a{color:var(--pri);text-decoration:none;}
+  .sig .strip{display:flex;align-items:center;gap:7px;margin-top:5px;font-family:var(--mono);font-size:7px;letter-spacing:.16em;text-transform:uppercase;color:var(--sub2);}
+
+  .hl{display:flex;flex-direction:column;gap:14px;}
+  .hl .row{display:flex;gap:12px;align-items:flex-start;}
+  .hl .ic{flex:none;width:26px;height:26px;border-radius:8px;background:var(--pale);display:flex;align-items:center;justify-content:center;color:var(--pri);}
+  .hl .row h5{font-family:var(--en);font-weight:600;font-size:13px;letter-spacing:-.01em;}
+  .hl .row p{font-size:11px;color:var(--sub);line-height:1.5;margin-top:2px;}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <clipPath id="wv-top"><rect x="46" y="6" width="32" height="34"/></clipPath>
+  <clipPath id="wv-bot"><rect x="46" y="40" width="32" height="34"/></clipPath>
+  <mask id="wv-mA"><rect width="124" height="80" fill="#fff"/><g clip-path="url(#wv-top)"><rect x="50" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#000" stroke-width="9"/></g></mask>
+  <mask id="wv-mB"><rect width="124" height="80" fill="#fff"/><g clip-path="url(#wv-bot)"><rect x="6" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#000" stroke-width="9"/></g></mask>
+  <symbol id="chain-duo" viewBox="0 0 124 80"><rect x="6" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#0B2A3B" stroke-width="9" mask="url(#wv-mA)"/><rect x="50" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#0EA5E9" stroke-width="9" mask="url(#wv-mB)"/></symbol>
+  <symbol id="chain-dark" viewBox="0 0 124 80"><rect x="6" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#F4FBFF" stroke-width="9" mask="url(#wv-mA)"/><rect x="50" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#38BDF8" stroke-width="9" mask="url(#wv-mB)"/></symbol>
+  <symbol id="chain-ink" viewBox="0 0 124 80"><rect x="6" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#0B2A3B" stroke-width="9" mask="url(#wv-mA)"/><rect x="50" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#0B2A3B" stroke-width="9" mask="url(#wv-mB)"/></symbol>
+  <symbol id="chain-white" viewBox="0 0 124 80"><rect x="6" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#FFFFFF" stroke-width="9" mask="url(#wv-mA)"/><rect x="50" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#FFFFFF" stroke-width="9" mask="url(#wv-mB)"/></symbol>
+</svg>
+
+<!-- ══════════ 1 · COVER ══════════ -->
+<section class="page">
+  <div class="ph"><span class="pill"><span class="d"></span>ShopyLink · Stationery</span><span class="r">2026</span></div>
+
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:26px;">
+    <div class="wm" style="font-size:30px;"><span class="ink">shopy</span><svg class="wm-chain" viewBox="0 0 124 80"><use href="#chain-duo"/></svg><span class="blue">link</span></div>
+    <div class="eyebrow">Brand · stationery suite</div>
+    <h1 style="font-family:var(--en);font-weight:700;font-size:62px;letter-spacing:-.04em;line-height:1.0;max-width:15ch;">The identity, in your hand.</h1>
+    <p class="lede" style="font-size:15px;max-width:50ch;">A modern, minimal correspondence system — business card, letterhead and email signature — built on one grid, one accent, one mark.</p>
+    <div class="chips" style="margin-top:6px;">
+      <span class="chip">Business card</span><span class="chip">Letterhead</span><span class="chip">Email signature</span><span class="chip">Print-ready A4</span>
+    </div>
+  </div>
+
+  <div class="foot"><span>Abdulrahman Alnounou · Founder</span><span>shopylink.me · world to door</span></div>
+</section>
+
+<!-- ══════════ 2 · BUSINESS CARD ══════════ -->
+<section class="page gray">
+  <div class="ph"><span class="pill"><span class="d"></span>01 · Business card</span><span class="r">بطاقة العمل</span></div>
+
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-top:12mm;">
+    <div><div class="eyebrow">01 — Business card</div><div class="ttl" style="margin-top:8px;">Double-sided, 92×55</div></div>
+    <p class="lede" style="max-width:32ch;text-align:right;margin-bottom:2px;">Light face for the details, ink reverse for the mark — bound by a single sky edge.</p>
+  </div>
+
+  <div class="stage">
+    <div class="bc back">
+      <div class="bc-back-in">
+        <span class="wm" style="font-size:24px;"><span class="clean">shopy</span><svg class="wm-chain" viewBox="0 0 124 80"><use href="#chain-dark"/></svg><span class="acc">link</span></span>
+        <span style="font-family:var(--mono);font-size:7.5px;letter-spacing:.24em;text-transform:uppercase;color:rgba(255,255,255,.5);">world · to · door</span>
+      </div>
+    </div>
+    <div class="bc front">
+      <span class="wm" style="font-size:18px;"><span class="ink">shopy</span><svg class="wm-chain" viewBox="0 0 124 80"><use href="#chain-duo"/></svg><span class="blue">link</span></span>
+      <div>
+        <div class="nm">Abdulrahman Alnounou</div>
+        <div class="ro">Founder</div>
+        <div class="ro-ar" dir="rtl">المؤسِّس</div>
+      </div>
+      <div class="det">
+        <div><span class="lbl">M&nbsp;&nbsp;</span>00963 944 771887</div>
+        <div><span class="lbl">E&nbsp;&nbsp;&nbsp;</span>abd@shopylink.me</div>
+        <div><span class="lbl">A&nbsp;&nbsp;</span>Baramka · Free Zone · Damascus, Syria</div>
+      </div>
+      <div class="bc-tape"></div>
+    </div>
+  </div>
+
+  <div class="specrow" style="margin-top:8mm;">
+    <div class="c"><div class="k">Format</div><div class="v">92 × 55 mm</div></div>
+    <div class="c"><div class="k">Stock</div><div class="v">350 gsm uncoated</div></div>
+    <div class="c"><div class="k">Print</div><div class="v">4 / 4 · sky edge</div></div>
+    <div class="c"><div class="k">Finish</div><div class="v">Soft-touch matte</div></div>
+  </div>
+
+  <div class="foot"><span>Abdulrahman Alnounou · Founder</span><span>shopylink.me · 01</span></div>
+</section>
+
+<!-- ══════════ 3 · LETTERHEAD ══════════ -->
+<section class="page">
+  <div class="ph"><span class="pill"><span class="d"></span>02 · Letterhead</span><span class="r">الورق الرسمي</span></div>
+
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-top:12mm;">
+    <div><div class="eyebrow">02 — Letterhead</div><div class="ttl" style="margin-top:8px;">A4 correspondence</div></div>
+    <p class="lede" style="max-width:32ch;text-align:right;margin-bottom:2px;">Mark and address paired across a tapering sky rule, chain as a faint watermark.</p>
+  </div>
+
+  <div class="sheet-stage">
+    <div class="sheet">
+      <div class="hd">
+        <span class="wm" style="font-size:21px;"><span class="ink">shopy</span><svg class="wm-chain" viewBox="0 0 124 80"><use href="#chain-duo"/></svg><span class="blue">link</span></span>
+        <div class="addr">ShopyLink<br>Baramka · Free Zone<br>Damascus, Syria<br>abd@shopylink.me · shopylink.me</div>
+      </div>
+      <div class="rule"></div>
+      <div class="bd">
+        <svg class="chain wmk" viewBox="0 0 124 80"><use href="#chain-duo"/></svg>
+        <div class="meta">16 June 2026 · ١٦ يونيو ٢٠٢٦</div>
+        <h4>Re: Your consolidated shipment</h4>
+        <p>Dear customer,</p>
+        <p>This is placeholder body copy for the ShopyLink letterhead. Correspondence is set in Manrope at a comfortable rhythm; headings in Bricolage Grotesque, references and dates in JetBrains Mono. The chain watermark stays faint so it never competes with the words.</p>
+        <p class="ar" style="font-family:var(--ar);direction:rtl;text-align:right;font-size:10px;line-height:1.95;">نصّ نموذجي للورق الرسمي من شوبي لينك، بخط تجوّل للعربية، مع إبقاء علامة السلسلة باهتة في الخلفية.</p>
+        <p style="margin-top:6px;">Warm regards,<br><b style="font-family:var(--en);font-weight:700;color:var(--ink);">Abdulrahman Alnounou</b><br><span style="font-family:var(--mono);font-size:8px;color:var(--sub2);">Founder · ShopyLink</span></p>
+      </div>
+      <div class="ft"><span>world · to · door — العالم إلى البيت</span><span>Damascus · Syria</span></div>
+    </div>
+  </div>
+
+  <div class="foot"><span>Abdulrahman Alnounou · Founder</span><span>shopylink.me · 02</span></div>
+</section>
+
+<!-- ══════════ 4 · EMAIL SIGNATURE ══════════ -->
+<section class="page gray">
+  <div class="ph"><span class="pill"><span class="d"></span>03 · Email signature</span><span class="r">توقيع البريد</span></div>
+
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-top:12mm;">
+    <div><div class="eyebrow">03 — Email signature</div><div class="ttl" style="margin-top:8px;">Inbox-ready block</div></div>
+    <p class="lede" style="max-width:32ch;text-align:right;margin-bottom:2px;">Gradient chip, name, role, mono contact. Table-built, inlined, under ~520 px.</p>
+  </div>
+
+  <div class="sheet-stage">
+    <div class="mail">
+      <div class="bar">
+        <span class="dot" style="background:#ff5f57;"></span><span class="dot" style="background:#febc2e;"></span><span class="dot" style="background:#28c840;"></span>
+        <span class="subj">New message — Your shipment is on its way</span>
+      </div>
+      <div class="msg">
+        <div class="from"><span>To: customer@example.com</span><span>ShopyLink</span></div>
+        Hello,<br><br>Your parcel has cleared the hub and is on its way to your door. Track it any time from your dashboard — thank you for shopping the world with us.
+        <div class="sig">
+          <div class="av"><svg class="chain" viewBox="0 0 124 80" style="width:58%;"><use href="#chain-white"/></svg></div>
+          <div style="flex:1;">
+            <div class="nm">Abdulrahman Alnounou</div>
+            <div class="ro">Founder · ShopyLink</div>
+            <div class="li">
+              <div>00963 944 771887 · <a href="mailto:abd@shopylink.me">abd@shopylink.me</a></div>
+              <div><a href="https://shopylink.me">shopylink.me</a> · Damascus, Syria</div>
+            </div>
+            <div class="strip">
+              <span class="wm" style="font-size:12px;"><span class="ink">shopy</span><svg class="wm-chain" viewBox="0 0 124 80"><use href="#chain-duo"/></svg><span class="blue">link</span></span>
+              <span style="color:var(--line);">·</span><span>world to door</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:7mm;display:flex;gap:22px;align-items:flex-start;">
+    <div class="hl" style="flex:1;">
+      <div class="row"><span class="ic"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><div><h5>Build it in a table</h5><p>Inline every style for Outlook; set explicit pixel widths.</p></div></div>
+      <div class="row"><span class="ic"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><div><h5>Sky 500 links only</h5><p>Never underline the name; host the chip as app-icon-256.png.</p></div></div>
+    </div>
+    <div class="cap" style="flex:1;border-left:1px solid var(--line);padding-left:20px;"><b>Plain-text fallback</b><br><br>Abdulrahman Alnounou — Founder · ShopyLink<br>00963 944 771887<br>abd@shopylink.me · shopylink.me</div>
+  </div>
+
+  <div class="foot"><span>Abdulrahman Alnounou · Founder</span><span>shopylink.me · 03</span></div>
+</section>
+
+</body>
+</html>

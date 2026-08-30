@@ -1,0 +1,466 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>ShopyLink — Packaging Kit (A4) · دليل التغليف</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0B2A3B; --pri:#0EA5E9; --acc:#38BDF8; --soft:#BAE6FD; --pale:#E0F2FE;
+    --clean:#F4FBFF; --cream:#F7F4EC; --paper:#FFFFFF; --deep:#0A4A6B;
+    --sand:#E8DCC3; --kraft:#D8C49E; --kraft2:#C9B187;
+    --rule:rgba(11,42,59,.14); --rule2:rgba(11,42,59,.07);
+    --mute:rgba(11,42,59,.55); --mute2:rgba(11,42,59,.40);
+    --en:'Bricolage Grotesque',system-ui,sans-serif;
+    --ar:'Tajawal',system-ui,sans-serif;
+    --body:'Manrope',system-ui,sans-serif;
+    --mono:'JetBrains Mono',ui-monospace,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:var(--body);color:var(--ink);background:#6b7780;-webkit-font-smoothing:antialiased;}
+  ::selection{background:var(--acc);color:var(--ink);}
+
+  /* ── A4 page ─────────────────────────────────── */
+  .page{
+    width:210mm;height:297mm;background:var(--paper);position:relative;overflow:hidden;
+    padding:18mm 17mm 14mm;display:flex;flex-direction:column;
+  }
+  .page.dark{background:var(--ink);color:var(--clean);}
+  @media screen{ .page{margin:9mm auto;box-shadow:0 6px 36px rgba(0,0,0,.30);} }
+  @page{size:A4;margin:0;}
+  @media print{
+    html,body{background:#fff;margin:0;padding:0;width:210mm;}
+    .page{width:210mm;height:296mm;margin:0;box-shadow:none;overflow:hidden;
+      page-break-after:always;break-after:page;}
+    .page:last-child{page-break-after:avoid;break-after:auto;}
+    .tape .run{animation:none !important;}
+    *{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;}
+  }
+
+  /* ── header / footer ─────────────────────────── */
+  .phead{display:flex;justify-content:space-between;align-items:baseline;
+    font-family:var(--mono);font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--mute);}
+  .dark .phead{color:rgba(244,251,255,.5);}
+  .pfoot{margin-top:auto;display:flex;justify-content:space-between;align-items:center;
+    font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--mute2);
+    border-top:1px solid var(--rule);padding-top:9px;}
+  .dark .pfoot{color:rgba(244,251,255,.45);border-top-color:rgba(244,251,255,.16);}
+
+  .body{flex:1;display:flex;flex-direction:column;min-height:0;}
+  .shead{margin:8mm 0 6mm;}
+  .snum{font-family:var(--mono);font-size:12px;color:var(--pri);letter-spacing:.04em;}
+  .stitle{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-top:7px;}
+  h2{font-family:var(--en);font-weight:800;letter-spacing:-.03em;font-size:31px;line-height:1.04;white-space:nowrap;flex:0 0 auto;}
+  .h2-ar{font-family:var(--ar);font-weight:800;font-size:23px;color:var(--mute);direction:rtl;flex:0 0 auto;}
+  .lead{font-size:12.5px;line-height:1.55;color:var(--mute);max-width:64ch;margin-top:10px;}
+  h3{font-family:var(--en);font-weight:700;font-size:15px;letter-spacing:-.01em;}
+  .mono{font-family:var(--mono);}
+  .ar{font-family:var(--ar);direction:rtl;}
+
+  /* ── wordmark ────────────────────────────────── */
+  .wm{display:inline-flex;align-items:center;line-height:1;font-family:var(--en);font-weight:800;letter-spacing:-.04em;white-space:nowrap;}
+  .wm .ink{color:var(--ink);} .wm .blue{color:var(--pri);}
+  .wm .clean{color:var(--clean);} .wm .acc{color:var(--acc);}
+  .wm-chain{height:.64em;width:auto;margin:0 -.05em;flex:none;}
+  .wm.ar-wm{font-family:var(--ar);font-weight:900;letter-spacing:0;direction:rtl;}
+  .chain{display:inline-block;vertical-align:middle;}
+
+  /* ── tiles / caption ─────────────────────────── */
+  .tile{border:1px solid var(--rule);border-radius:9px;display:flex;align-items:center;justify-content:center;background:var(--cream);overflow:hidden;}
+  .tile.paper{background:var(--paper);}
+  .tile.dark{background:var(--ink);border-color:transparent;}
+  .cap{font-family:var(--mono);font-size:9.5px;color:var(--mute);margin-top:8px;letter-spacing:.01em;line-height:1.5;}
+  .cap b{color:var(--ink);font-weight:500;}
+  .g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+
+  /* ── isometric carton ────────────────────────── */
+  .iso-stage{display:flex;align-items:flex-end;justify-content:center;gap:34px;flex-wrap:wrap;perspective:1400px;}
+  .iso{position:relative;width:var(--w);height:var(--h);transform-style:preserve-3d;transform:rotateX(-24deg) rotateY(-34deg);}
+  .iso .f{position:absolute;display:flex;align-items:center;justify-content:center;background:var(--carton,#D8C49E);box-shadow:inset 0 0 0 1px rgba(0,0,0,.06);}
+  .iso .front{width:var(--w);height:var(--h);transform:translateZ(calc(var(--d)/2));}
+  .iso .top{width:var(--w);height:var(--d);transform:rotateX(90deg) translateZ(calc(var(--h)/2));top:calc(50% - var(--d)/2);}
+  .iso .right{width:var(--d);height:var(--h);transform:rotateY(90deg) translateZ(calc(var(--w)/2));left:calc(50% - var(--d)/2);}
+  .iso .right,.iso .left{filter:brightness(.9);} .iso .top{filter:brightness(1.06);}
+  .carton-kraft{--carton:#D8C49E;} .carton-cream{--carton:#F2EAD8;} .carton-ink{--carton:#0B2A3B;}
+  .carton-tapeline{position:absolute;left:0;top:46%;width:100%;height:9%;background:var(--pri);opacity:.92;}
+  .box-size{font-family:var(--mono);font-size:10px;color:var(--mute);text-align:center;margin-top:14px;line-height:1.6;}
+  .box-size b{color:var(--ink);font-weight:500;font-size:11px;}
+
+  /* ── flat printed panel ──────────────────────── */
+  .panel{border-radius:6px;background:var(--carton,#D8C49E);box-shadow:inset 0 0 0 1px rgba(0,0,0,.07);
+         padding:20px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden;}
+  .panel .seam{position:absolute;inset:9px;border:1.5px dashed rgba(11,42,59,.18);border-radius:4px;pointer-events:none;}
+
+  /* ── packing tape ────────────────────────────── */
+  .tape{position:relative;height:48px;display:flex;align-items:center;overflow:hidden;color:#fff;background:var(--pri);
+    -webkit-mask:radial-gradient(circle 6px at 6px 50%,#0000 98%,#000) left/12px 12px repeat-x,
+          radial-gradient(circle 6px at 6px 50%,#0000 98%,#000) right/12px 12px repeat-x,
+          linear-gradient(#000 0 0) center/100% calc(100% - 11px) no-repeat;
+    mask:linear-gradient(#000 0 0) center/100% calc(100% - 11px) no-repeat;}
+  .tape .run{display:flex;align-items:center;gap:22px;white-space:nowrap;font-family:var(--en);font-weight:800;
+    letter-spacing:-.01em;font-size:14px;animation:tapeScroll 22s linear infinite;padding-left:22px;}
+  .tape.ink{background:var(--ink);} .tape.sand{background:var(--sand);color:var(--ink);}
+  .tape-chain{height:21px;width:auto;flex:none;}
+  @keyframes tapeScroll{to{transform:translateX(-50%);}}
+  @media (prefers-reduced-motion:reduce){.tape .run{animation:none;}}
+
+  /* ── mailer bag ──────────────────────────────── */
+  .bag{position:relative;border-radius:6px 6px 12px 12px;background:linear-gradient(160deg,#13384c,#0B2A3B);
+       color:var(--clean);padding:38px 20px 22px;min-height:218px;display:flex;flex-direction:column;
+       justify-content:space-between;box-shadow:inset 0 1px 0 rgba(255,255,255,.06);}
+  .bag .seal{position:absolute;top:0;left:0;right:0;height:24px;background:repeating-linear-gradient(90deg,var(--acc) 0 10px,#0B2A3B 10px 20px);opacity:.9;}
+  .bag .perf{position:absolute;top:28px;left:12px;right:12px;border-top:2px dashed rgba(255,255,255,.35);}
+  .bag .strip{position:absolute;top:31px;right:18px;font-family:var(--mono);font-size:8px;letter-spacing:.18em;color:rgba(255,255,255,.5);}
+
+  /* ── waybill ─────────────────────────────────── */
+  .waybill{background:#fff;border:1px solid var(--rule);border-radius:6px;overflow:hidden;font-family:var(--mono);color:var(--ink);}
+  .waybill .wb-h{display:flex;align-items:center;justify-content:space-between;padding:11px 13px;background:var(--ink);color:var(--clean);}
+  .waybill .wb-b{padding:13px;display:grid;gap:11px;}
+  .waybill .row{display:flex;gap:12px;}
+  .waybill .fld{flex:1;border:1px solid var(--rule);border-radius:4px;padding:7px 9px;}
+  .waybill .k{font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:var(--mute);}
+  .waybill .v{font-size:11.5px;margin-top:3px;font-family:var(--body);font-weight:600;}
+  .barcode{height:42px;background:repeating-linear-gradient(90deg,var(--ink) 0 2px,#fff 2px 3px,var(--ink) 3px 4px,#fff 4px 7px,var(--ink) 7px 8px,#fff 8px 11px);border-radius:2px;}
+  .qr{width:58px;height:58px;background:conic-gradient(from 0deg,var(--ink) 25%,#fff 0 50%,var(--ink) 0 75%,#fff 0) 0 0/15px 15px,var(--ink);border-radius:4px;box-shadow:inset 0 0 0 4px #fff,inset 0 0 0 5px var(--ink);}
+
+  /* ── handling stamps ─────────────────────────── */
+  .stamps{display:flex;flex-wrap:wrap;gap:14px;}
+  .stamp{width:110px;height:110px;border:2.5px solid var(--pri);border-radius:50%;display:flex;
+         flex-direction:column;align-items:center;justify-content:center;gap:7px;text-align:center;color:var(--pri);}
+  .stamp.sq{border-radius:10px;}
+  .stamp .t{font-family:var(--mono);font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;line-height:1.3;}
+  .stamp .ta{font-family:var(--ar);direction:rtl;font-size:11px;font-weight:700;line-height:1;}
+
+  /* ── stickers ────────────────────────────────── */
+  .sticker-sheet{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+  .sk{aspect-ratio:1/1;border-radius:13px;display:flex;align-items:center;justify-content:center;position:relative;
+      background:var(--paper);box-shadow:0 0 0 2px var(--paper),0 0 0 4px var(--rule);overflow:hidden;}
+  .sk.b{background:var(--pri);color:#fff;} .sk.i{background:var(--ink);color:var(--clean);}
+  .sk.p{background:var(--pale);} .sk.s{background:var(--sand);}
+  .sk .lbl{font-family:var(--en);font-weight:800;font-size:13px;line-height:1.05;text-align:center;letter-spacing:-.02em;}
+  .sk .lbla{font-family:var(--ar);font-weight:900;font-size:17px;direction:rtl;}
+
+  /* ── spec table ──────────────────────────────── */
+  .spec-tbl{width:100%;border-collapse:collapse;font-size:11.5px;}
+  .spec-tbl th{font-family:var(--mono);font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);
+    text-align:left;padding:0 12px 8px;border-bottom:1px solid var(--rule);font-weight:500;}
+  .spec-tbl td{padding:11px 12px;border-bottom:1px solid var(--rule2);vertical-align:middle;}
+  .spec-tbl tr:last-child td{border-bottom:none;}
+  .spec-tbl .sz{font-family:var(--en);font-weight:800;font-size:14px;}
+  .spec-tbl .dim{font-family:var(--mono);font-size:11px;}
+  .swz{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-2px;margin-right:7px;border:1px solid rgba(0,0,0,.1);}
+
+  /* ── checklist ───────────────────────────────── */
+  .steps{display:flex;flex-direction:column;gap:0;counter-reset:step;}
+  .step{display:flex;gap:16px;padding:14px 0;border-bottom:1px solid var(--rule2);align-items:flex-start;}
+  .step:last-child{border-bottom:none;}
+  .step .n{flex:none;width:30px;height:30px;border-radius:50%;background:var(--ink);color:var(--clean);
+    font-family:var(--en);font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;}
+  .step .tx h4{font-family:var(--en);font-weight:700;font-size:14px;margin-bottom:3px;}
+  .step .tx p{font-size:11.5px;line-height:1.45;color:var(--mute);}
+  .step .tx .arx{font-family:var(--ar);direction:rtl;font-size:11.5px;color:var(--mute);margin-top:2px;}
+
+  /* ── do/dont ─────────────────────────────────── */
+  .rc{border:1px solid var(--rule);border-radius:9px;overflow:hidden;}
+  .rc .demo{padding:18px;min-height:74px;display:flex;align-items:center;justify-content:center;background:var(--cream);}
+  .rc.dont .demo{background:#f5eceb;}
+  .rc .lab{display:flex;align-items:center;gap:9px;padding:9px 12px;border-top:1px solid var(--rule);background:var(--paper);}
+  .badge{font-family:var(--mono);font-size:8.5px;letter-spacing:.1em;padding:3px 7px;border-radius:4px;text-transform:uppercase;color:#fff;}
+  .rc.do .badge{background:var(--pri);} .rc.dont .badge{background:#b4453a;}
+  .rc .txt{font-size:10.5px;color:var(--ink);line-height:1.35;}
+  .note{background:var(--pale);border:1px solid var(--soft);border-radius:9px;padding:12px 14px;font-size:11px;line-height:1.5;}
+  .note b{font-weight:700;}
+</style>
+</head>
+<body>
+
+<!-- chain symbols -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <clipPath id="wv-top"><rect x="46" y="6" width="32" height="34"/></clipPath>
+  <clipPath id="wv-bot"><rect x="46" y="40" width="32" height="34"/></clipPath>
+  <mask id="wv-mA"><rect width="124" height="80" fill="#fff"/><g clip-path="url(#wv-top)"><rect x="50" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#000" stroke-width="9"/></g></mask>
+  <mask id="wv-mB"><rect width="124" height="80" fill="#fff"/><g clip-path="url(#wv-bot)"><rect x="6" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#000" stroke-width="9"/></g></mask>
+  <symbol id="chain-duo" viewBox="0 0 124 80"><rect x="6" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#0B2A3B" stroke-width="9" mask="url(#wv-mA)"/><rect x="50" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#0EA5E9" stroke-width="9" mask="url(#wv-mB)"/></symbol>
+  <symbol id="chain-dark" viewBox="0 0 124 80"><rect x="6" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#F4FBFF" stroke-width="9" mask="url(#wv-mA)"/><rect x="50" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#38BDF8" stroke-width="9" mask="url(#wv-mB)"/></symbol>
+  <symbol id="chain-ink" viewBox="0 0 124 80"><rect x="6" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#0B2A3B" stroke-width="9" mask="url(#wv-mA)"/><rect x="50" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#0B2A3B" stroke-width="9" mask="url(#wv-mB)"/></symbol>
+  <symbol id="chain-white" viewBox="0 0 124 80"><rect x="6" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#FFFFFF" stroke-width="9" mask="url(#wv-mA)"/><rect x="50" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#FFFFFF" stroke-width="9" mask="url(#wv-mB)"/></symbol>
+</svg>
+
+<!-- ══════════ PAGE 1 · COVER ══════════ -->
+<section class="page dark">
+  <div class="phead"><span>ShopyLink · Packaging Kit</span><span style="text-align:right;">للعاملين في التغليف · 2026</span></div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:34px;">
+    <svg class="chain" viewBox="0 0 124 80" style="width:82px;"><use href="#chain-dark"/></svg>
+    <div>
+      <div class="mono" style="font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:var(--acc);margin-bottom:16px;">Packaging Kit</div>
+      <div class="wm" style="font-size:58px;"><span class="clean">shopy</span><svg class="wm-chain" viewBox="0 0 124 80"><use href="#chain-dark"/></svg><span class="acc">link</span></div>
+      <h1 style="font-family:var(--en);font-weight:800;font-size:38px;letter-spacing:-.03em;line-height:1.05;margin-top:22px;max-width:18ch;">How we pack — so every box says ShopyLink.</h1>
+      <div class="ar" style="font-family:var(--ar);font-weight:800;font-size:24px;color:rgba(244,251,255,.7);margin-top:16px;direction:rtl;">دليل التغليف — كل صندوق يحمل هويّتنا</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:14px;">
+      <span style="width:40px;height:2px;background:var(--acc);"></span>
+      <span class="mono" style="font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:rgba(244,251,255,.7);">cartons · tape · mailers · labels · marks · العالم إلى البيت</span>
+    </div>
+  </div>
+  <div class="pfoot"><span>Packaging Kit · for warehouse &amp; packing staff</span><span>Issue 01 · 2026</span></div>
+</section>
+
+<!-- ══════════ PAGE 2 · CARTONS ══════════ -->
+<section class="page">
+  <div class="phead"><span>ShopyLink · Packaging Kit</span><span>01 · Cartons</span></div>
+  <div class="body">
+    <div class="shead">
+      <div class="snum">01</div>
+      <div class="stitle"><h2>Cartons</h2><span class="h2-ar">الصناديق</span></div>
+      <p class="lead">Five stock sizes. <b>Kraft brown</b> is the default; <b>cream</b> and <b>ink</b> for premium and gifting. Always: one sky tape line across the seam, mark centred on the front, size code top-right.</p>
+    </div>
+
+    <div class="tile paper" style="padding:26px 20px;">
+      <div class="iso-stage">
+        <div style="text-align:center;">
+          <div class="iso carton-kraft" style="--w:74px;--h:64px;--d:60px;">
+            <div class="f front"><div class="carton-tapeline"></div><span class="wm" style="font-size:8px;position:relative;z-index:2;"><span class="ink">shopy</span><svg class="wm-chain" viewBox="0 0 124 80"><use href="#chain-duo"/></svg><span class="blue">link</span></span></div>
+            <div class="f top"></div><div class="f right"><svg class="chain" viewBox="0 0 124 80" style="width:38%;opacity:.8;"><use href="#chain-ink"/></svg></div>
+          </div>
+          <div class="box-size"><b>S</b><br>20×15×10</div>
+        </div>
+        <div style="text-align:center;">
+          <div class="iso carton-kraft" style="--w:96px;--h:80px;--d:76px;">
+            <div class="f front"><div class="carton-tapeline"></div><span class="wm" style="font-size:10px;position:relative;z-index:2;"><span class="ink">shopy</span><svg class="wm-chain" viewBox="0 0 124 80"><use href="#chain-duo"/></svg><span class="blue">link</span></span></div>
+            <div class="f top"></div><div class="f right"><svg class="chain" viewBox="0 0 124 80" style="width:38%;opacity:.8;"><use href="#chain-ink"/></svg></div>
+          </div>
+          <div class="box-size"><b>M</b><br>35×25×15</div>
+        </div>
+        <div style="text-align:center;">
+          <div class="iso carton-cream" style="--w:120px;--h:98px;--d:90px;">
+            <div class="f front"><div class="carton-tapeline"></div><span class="wm" style="font-size:12px;position:relative;z-index:2;"><span class="ink">shopy</span><svg class="wm-chain" viewBox="0 0 124 80"><use href="#chain-duo"/></svg><span class="blue">link</span></span></div>
+            <div class="f top"></div><div class="f right"><svg class="chain" viewBox="0 0 124 80" style="width:38%;opacity:.8;"><use href="#chain-ink"/></svg></div>
+          </div>
+          <div class="box-size"><b>L</b><br>50×35×25</div>
+        </div>
+      </div>
+    </div>
+    <div class="cap" style="text-align:center;">Drawn to relative scale · kraft S &amp; M · cream L</div>
+
+    <table class="spec-tbl" style="margin-top:22px;">
+      <thead><tr><th>Size</th><th>Dimensions L×W×H (cm)</th><th>Board</th><th>Stock colour</th><th>Use for</th></tr></thead>
+      <tbody>
+        <tr><td class="sz">S</td><td class="dim">20 × 15 × 10</td><td>3-ply single wall</td><td><span class="swz" style="background:var(--kraft)"></span>Kraft</td><td>1–2 small items</td></tr>
+        <tr><td class="sz">M</td><td class="dim">35 × 25 × 15</td><td>3-ply single wall</td><td><span class="swz" style="background:var(--kraft)"></span>Kraft</td><td>Standard consolidated</td></tr>
+        <tr><td class="sz">L</td><td class="dim">50 × 35 × 25</td><td>5-ply double wall</td><td><span class="swz" style="background:#F2EAD8"></span>Cream</td><td>Bulky / premium</td></tr>
+        <tr><td class="sz">XL</td><td class="dim">60 × 45 × 35</td><td>5-ply double wall</td><td><span class="swz" style="background:var(--ink)"></span>Ink</td><td>Flagship / gifting</td></tr>
+        <tr><td class="sz">Flat</td><td class="dim">40 × 30 × 6</td><td>3-ply single wall</td><td><span class="swz" style="background:var(--kraft)"></span>Kraft</td><td>Documents / apparel</td></tr>
+      </tbody>
+    </table>
+
+    <div class="note" style="margin-top:auto;"><b>Choose the smallest box the order fits.</b> Less void fill, lower cost, fewer damages. Never ship a half-empty carton — step down a size or add fill to the top third only.</div>
+  </div>
+  <div class="pfoot"><span>shopylink.co</span><span>02</span></div>
+</section>
+
+<!-- ══════════ PAGE 3 · TAPE + PANELS ══════════ -->
+<section class="page">
+  <div class="phead"><span>ShopyLink · Packaging Kit</span><span>02 · Tape &amp; printed faces</span></div>
+  <div class="body">
+    <div class="shead">
+      <div class="snum">02</div>
+      <div class="stitle"><h2>Tape &amp; printed faces</h2><span class="h2-ar">الشريط والأوجه المطبوعة</span></div>
+      <p class="lead">48&nbsp;mm tape in three finishes. The repeat carries the name and tagline in both scripts, so any wrap angle still reads as ShopyLink. One strip straight across the centre seam — don't criss-cross over the mark.</p>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div class="tape"><div class="run"><svg class="chain tape-chain" viewBox="0 0 124 80"><use href="#chain-white"/></svg><span>shopylink</span><svg class="chain tape-chain" viewBox="0 0 124 80"><use href="#chain-white"/></svg><span>العالم إلى البيت</span><svg class="chain tape-chain" viewBox="0 0 124 80"><use href="#chain-white"/></svg><span>world to door</span><svg class="chain tape-chain" viewBox="0 0 124 80"><use href="#chain-white"/></svg><span>shopylink</span><svg class="chain tape-chain" viewBox="0 0 124 80"><use href="#chain-white"/></svg><span>العالم إلى البيت</span><svg class="chain tape-chain" viewBox="0 0 124 80"><use href="#chain-white"/></svg><span>world to door</span></div></div>
+      <div class="tape ink"><div class="run"><svg class="chain tape-chain" viewBox="0 0 124 80"><use href="#chain-dark"/></svg><span>shopylink</span><svg class="chain tape-chain" viewBox="0 0 124 80"><use href="#chain-dark"/></svg><span>العالم إلى البيت</span><svg class="chain tape-chain" viewBox="0 0 124 80"><use href="#chain-dark"/></svg><span>world to door</span><svg class="chain tape-chain" viewBox="0 0 124 80"><use href="#chain-dark"/></svg><span>shopylink</span><svg class="chain tape-chain" viewBox="0 0 124 80"><use href="#chain-dark"/></svg><span>العالم إلى البيت</span><svg class="chain tape-chain" viewBox="0 0 124 80"><use href="#chain-dark"/></svg><span>world to door</span></div></div>
+      <div class="tape sand"><div class="run"><svg class="chain tape-chain" viewBox="0 0 124 80"><use href="#chain-ink"/></svg><span>shopylink</span><svg class="chain tape-chain" viewBox="0 0 124 80"><use href="#chain-ink"/></svg><span>العالم إلى البيت</span><svg class="chain tape-chain" viewBox="0 0 124 80"><use href="#chain-ink"/></svg><span>world to door</span><svg class="chain tape-chain" viewBox="0 0 124 80"><use href="#chain-ink"/></svg><span>shopylink</span><svg class="chain tape-chain" viewBox="0 0 124 80"><use href="#chain-ink"/></svg><span>العالم إلى البيت</span><svg class="chain tape-chain" viewBox="0 0 124 80"><use href="#chain-ink"/></svg><span>world to door</span></div></div>
+    </div>
+    <div class="cap"><b>Sky</b> (default) · <b>Ink</b> · <b>Sand kraft</b>. Min text height 6 mm so it stays legible on a moving belt.</div>
+
+    <h3 style="margin-top:26px;">Printed box faces</h3>
+    <div class="g2" style="margin-top:12px;align-items:stretch;">
+      <div>
+        <div class="panel carton-kraft" style="--carton:#D8C49E;aspect-ratio:4/3;color:var(--ink);">
+          <div class="seam"></div>
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;position:relative;z-index:2;">
+            <span class="wm" style="font-size:19px;"><span class="ink">shopy</span><svg class="wm-chain" viewBox="0 0 124 80"><use href="#chain-duo"/></svg><span class="blue">link</span></span>
+            <span class="mono" style="font-size:9px;border:1px solid rgba(11,42,59,.3);padding:3px 7px;border-radius:4px;">SIZE&nbsp;L</span>
+          </div>
+          <div style="position:relative;z-index:2;display:flex;justify-content:space-between;align-items:flex-end;">
+            <div class="ar" style="font-family:var(--ar);font-weight:800;font-size:14px;">العالم إلى البيت</div>
+            <div class="mono" style="font-size:8.5px;color:var(--mute);text-align:right;">world to door<br>shopylink.co</div>
+          </div>
+        </div>
+        <div class="cap"><b>1-colour ink on kraft.</b> Cheapest, ships everywhere — the standard.</div>
+      </div>
+      <div>
+        <div class="panel" style="--carton:#0B2A3B;aspect-ratio:4/3;color:var(--clean);">
+          <div class="seam" style="border-color:rgba(255,255,255,.2);"></div>
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;position:relative;z-index:2;">
+            <span class="wm" style="font-size:19px;"><span class="clean">shopy</span><svg class="wm-chain" viewBox="0 0 124 80"><use href="#chain-dark"/></svg><span class="acc">link</span></span>
+            <span class="mono" style="font-size:9px;border:1px solid rgba(255,255,255,.3);padding:3px 7px;border-radius:4px;">SIZE&nbsp;XL</span>
+          </div>
+          <div style="position:relative;z-index:2;display:flex;justify-content:space-between;align-items:flex-end;">
+            <div class="ar" style="font-family:var(--ar);font-weight:800;font-size:14px;color:var(--acc);">العالم إلى البيت</div>
+            <div class="mono" style="font-size:8.5px;color:rgba(244,251,255,.6);text-align:right;">XL · 60×45×35<br>handle with care</div>
+          </div>
+        </div>
+        <div class="cap"><b>Premium ink carton.</b> For flagship / gifting shipments only.</div>
+      </div>
+    </div>
+
+    <div class="note" style="margin-top:auto;"><b>Mark goes top-left, size code top-right, tagline bottom.</b> Keep the dashed clearspace zone clear — no shipping labels or stamps inside it.</div>
+  </div>
+  <div class="pfoot"><span>shopylink.co</span><span>03</span></div>
+</section>
+
+<!-- ══════════ PAGE 4 · MAILERS + LABEL ══════════ -->
+<section class="page">
+  <div class="phead"><span>ShopyLink · Packaging Kit</span><span>03 · Mailers &amp; labels</span></div>
+  <div class="body">
+    <div class="shead">
+      <div class="snum">03</div>
+      <div class="stitle"><h2>Mailers &amp; labels</h2><span class="h2-ar">الأكياس والملصقات</span></div>
+      <p class="lead">Poly mailers for soft, non-fragile goods. Every parcel — box or bag — carries one waybill label on the largest flat face, never over a seam or the fold.</p>
+    </div>
+
+    <div class="g3" style="align-items:start;">
+      <div>
+        <div class="bag">
+          <div class="seal"></div>
+          <div class="perf"></div>
+          <span class="strip">peel · اسحب هنا</span>
+          <div style="position:relative;z-index:2;display:flex;flex-direction:column;gap:4px;">
+            <span class="wm" style="font-size:20px;"><span class="clean">shopy</span><svg class="wm-chain" viewBox="0 0 124 80"><use href="#chain-dark"/></svg><span class="acc">link</span></span>
+            <span class="ar" style="font-family:var(--ar);font-weight:700;font-size:12px;color:rgba(244,251,255,.7);">العالم إلى البيت</span>
+          </div>
+          <div style="position:relative;z-index:2;display:flex;align-items:center;gap:10px;">
+            <span style="width:32px;height:32px;border-radius:50%;border:2px solid var(--acc);display:flex;align-items:center;justify-content:center;"><svg class="chain" viewBox="0 0 124 80" style="width:60%;"><use href="#chain-white"/></svg></span>
+            <span class="mono" style="font-size:8px;color:rgba(244,251,255,.55);line-height:1.5;">tamper-evident seal<br>ختم مانع للعبث</span>
+          </div>
+        </div>
+        <div class="cap"><b>Poly mailer.</b> Self-seal strip + tamper band. Two sizes: 25×35 &amp; 35×45 cm.</div>
+      </div>
+      <div style="grid-column:span 2;">
+        <div class="waybill">
+          <div class="wb-h"><span class="wm" style="font-size:14px;"><span class="clean">shopy</span><svg class="wm-chain" viewBox="0 0 124 80"><use href="#chain-dark"/></svg><span class="acc">link</span></span><span style="font-size:9px;letter-spacing:.14em;">AIR WAYBILL · بوليصة شحن</span></div>
+          <div class="wb-b">
+            <div class="row">
+              <div class="fld"><div class="k">From · من</div><div class="v">ShopyLink Hub — Dubai</div></div>
+              <div class="fld"><div class="k">To · إلى</div><div class="v">Layla A. — Riyadh</div></div>
+            </div>
+            <div class="row" style="align-items:center;">
+              <div style="flex:1;"><div class="barcode"></div><div style="font-size:9.5px;letter-spacing:.3em;margin-top:5px;text-align:center;">SL 8421 0095 7733</div></div>
+              <div class="qr"></div>
+            </div>
+            <div class="row">
+              <div class="fld"><div class="k">Service</div><div class="v" style="font-family:var(--mono);font-size:10.5px;">EXPRESS · CONSOL.</div></div>
+              <div class="fld"><div class="k">Weight</div><div class="v" style="font-family:var(--mono);font-size:10.5px;">4.20 kg</div></div>
+              <div class="fld"><div class="k">Pieces</div><div class="v" style="font-family:var(--mono);font-size:10.5px;">3 / 3</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="cap"><b>Air waybill / address label · 100 × 150 mm thermal.</b> Bilingual fields, barcode + QR, ink-only print. One per parcel on the largest flat face.</div>
+      </div>
+    </div>
+
+    <div class="g2" style="margin-top:24px;gap:14px;">
+      <div class="note"><b>Seal it once.</b> Pull the self-seal strip fully, press along the whole edge. The tamper band must tear if reopened — don't reuse a mailer.</div>
+      <div class="note ar" style="font-family:var(--ar);direction:rtl;text-align:right;"><b>الملصق على أكبر وجه مستوٍ.</b> ملصق واحد لكل طرد، بعيدًا عن الطيّة والحواف، مع بقاء الباركود والـ QR مسطّحين وواضحين.</div>
+    </div>
+
+    <div class="note" style="margin-top:auto;background:var(--cream);border-color:var(--rule);"><b>Multi-piece shipments:</b> label every piece (1/3, 2/3, 3/3) with the same waybill number so the set stays together through consolidation.</div>
+  </div>
+  <div class="pfoot"><span>shopylink.co</span><span>04</span></div>
+</section>
+
+<!-- ══════════ PAGE 5 · HANDLING + STICKERS ══════════ -->
+<section class="page">
+  <div class="phead"><span>ShopyLink · Packaging Kit</span><span>04 · Marks &amp; stickers</span></div>
+  <div class="body">
+    <div class="shead">
+      <div class="snum">04</div>
+      <div class="stitle"><h2>Marks &amp; stickers</h2><span class="h2-ar">العلامات والملصقات</span></div>
+      <p class="lead">Handling marks: sky outline, mono caption, Arabic beneath — one ink, reads on kraft. Apply only the marks the contents need; don't sticker every box "Fragile".</p>
+    </div>
+
+    <div class="stamps">
+      <div class="stamp">
+        <span class="ic"><svg width="32" height="32" viewBox="0 0 34 34"><path d="M17 4 L17 24 M17 4 L11 10 M17 4 L23 10" fill="none" stroke="#0EA5E9" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><line x1="7" y1="28" x2="27" y2="28" stroke="#0EA5E9" stroke-width="2.4" stroke-linecap="round"/></svg></span>
+        <span class="t">This way up</span><span class="ta">هذا الجانب لأعلى</span>
+      </div>
+      <div class="stamp">
+        <span class="ic"><svg width="32" height="32" viewBox="0 0 34 34"><path d="M9 7 L9 27 L25 27" fill="none" stroke="#0EA5E9" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 14 L17 18 L26 8" fill="none" stroke="#0EA5E9" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="11" cy="11" r="2.4" fill="#0EA5E9"/></svg></span>
+        <span class="t">Fragile</span><span class="ta">قابل للكسر</span>
+      </div>
+      <div class="stamp sq">
+        <span class="ic"><svg width="32" height="32" viewBox="0 0 34 34"><path d="M17 5 C9 14 7 19 7 23 a10 10 0 0 0 20 0 c0-4-2-9-10-18 Z" fill="none" stroke="#0EA5E9" stroke-width="2.2" stroke-linejoin="round"/><line x1="6" y1="6" x2="28" y2="28" stroke="#0EA5E9" stroke-width="2.2" stroke-linecap="round"/></svg></span>
+        <span class="t">Keep dry</span><span class="ta">يُحفظ جافًّا</span>
+      </div>
+      <div class="stamp sq">
+        <span class="ic"><svg width="32" height="32" viewBox="0 0 34 34"><rect x="7" y="9" width="20" height="16" rx="2.5" fill="none" stroke="#0EA5E9" stroke-width="2.2"/><path d="M7 14 C12 20 22 20 27 14" fill="none" stroke="#0EA5E9" stroke-width="2.2" stroke-linecap="round"/></svg></span>
+        <span class="t">Handle with care</span><span class="ta">يُرجى الحذر</span>
+      </div>
+    </div>
+    <div class="cap">Stamp or sticker · 1-colour sky · min Ø 40 mm on the carton.</div>
+
+    <h3 style="margin-top:26px;">Sticker sheet</h3>
+    <p class="lead" style="margin-top:4px;">The playful side — die-cut rounded squares for sealing, unboxing and delight. Mix marks, micro-copy and Arabic exclamations. Print on kraft or white.</p>
+    <div class="sticker-sheet" style="margin-top:14px;">
+      <div class="sk b"><svg class="chain" viewBox="0 0 124 80" style="width:58%;"><use href="#chain-white"/></svg></div>
+      <div class="sk"><span class="lbl">world<br>→ home</span></div>
+      <div class="sk i"><span class="lbla" style="color:var(--acc);">وصل!</span></div>
+      <div class="sk p"><span class="lbl" style="color:var(--ink);">unboxing<br>time</span></div>
+      <div class="sk s"><span class="lbl" style="color:var(--ink);">handle<br>with ♥</span></div>
+      <div class="sk i"><span class="lbl" style="color:var(--clean);">cart →<br>door</span></div>
+      <div class="sk b"><span class="lbla" style="color:#fff;">طردك وصل</span></div>
+      <div class="sk"><svg class="chain" viewBox="0 0 124 80" style="width:58%;"><use href="#chain-duo"/></svg></div>
+    </div>
+    <div class="cap">Use one seal sticker per parcel max — they're a delight, not a billboard.</div>
+
+    <div class="note" style="margin-top:auto;"><b>Placement order on the box:</b> printed mark (pre-printed) → tape across seam → waybill label → handling marks if needed → one seal sticker. Never cover the barcode or QR.</div>
+  </div>
+  <div class="pfoot"><span>shopylink.co</span><span>05</span></div>
+</section>
+
+<!-- ══════════ PAGE 6 · CHECKLIST + DO/DONT ══════════ -->
+<section class="page">
+  <div class="phead"><span>ShopyLink · Packaging Kit</span><span>05 · Packing checklist</span></div>
+  <div class="body">
+    <div class="shead">
+      <div class="snum">05</div>
+      <div class="stitle"><h2>Packing checklist</h2><span class="h2-ar">خطوات التغليف</span></div>
+    </div>
+
+    <div class="steps">
+      <div class="step"><div class="n">1</div><div class="tx"><h4>Pick the right box</h4><p>Smallest carton the order fits; double-wall (L/XL) for heavy or fragile.</p><div class="arx">اختر أصغر صندوق يتّسع للطلب.</div></div></div>
+      <div class="step"><div class="n">2</div><div class="tx"><h4>Protect &amp; fill</h4><p>Wrap fragile items, cushion the corners, fill voids so nothing shifts when shaken.</p><div class="arx">غلّف القطع القابلة للكسر واملأ الفراغات.</div></div></div>
+      <div class="step"><div class="n">3</div><div class="tx"><h4>Tape the seam</h4><p>One sky strip straight across the centre seam — H-tape top and bottom for heavy boxes.</p><div class="arx">شريط واحد على وسط الصندوق.</div></div></div>
+      <div class="step"><div class="n">4</div><div class="tx"><h4>Apply the waybill</h4><p>One label on the largest flat face, flat and clear — never over a seam, fold or the mark.</p><div class="arx">ملصق الشحن على أكبر وجه مستوٍ.</div></div></div>
+      <div class="step"><div class="n">5</div><div class="tx"><h4>Add handling marks</h4><p>Only what the contents need: This way up, Fragile, Keep dry, Handle with care.</p><div class="arx">أضف علامات المناولة حسب الحاجة.</div></div></div>
+      <div class="step"><div class="n">6</div><div class="tx"><h4>Final check &amp; seal</h4><p>Barcode &amp; QR clear and scannable, weight matches, one seal sticker, send.</p><div class="arx">تأكد من وضوح الباركود قبل الإرسال.</div></div></div>
+    </div>
+
+    <h3 style="margin-top:20px;">Do &amp; Don't</h3>
+    <div class="g3" style="margin-top:12px;">
+      <div class="rc do">
+        <div class="demo"><span class="wm" style="font-size:22px;"><span class="ink">shopy</span><svg class="wm-chain" viewBox="0 0 124 80"><use href="#chain-duo"/></svg><span class="blue">link</span></span></div>
+        <div class="lab"><span class="badge">Do</span><span class="txt">One tape strip across the seam, mark centred and upright.</span></div>
+      </div>
+      <div class="rc dont">
+        <div class="demo"><span class="wm" style="font-size:22px;transform:rotate(-8deg);"><span class="ink">shopy</span><svg class="wm-chain" viewBox="0 0 124 80"><use href="#chain-duo"/></svg><span class="blue">link</span></span></div>
+        <div class="lab"><span class="badge">Don't</span><span class="txt">Don't criss-cross tape over the mark or label.</span></div>
+      </div>
+      <div class="rc dont">
+        <div class="demo" style="gap:6px;"><span class="wm" style="font-size:15px;opacity:.5;"><span class="ink">shopy</span><svg class="wm-chain" viewBox="0 0 124 80"><use href="#chain-duo"/></svg><span class="blue">link</span></span><span style="font-family:var(--mono);font-size:9px;color:#b4453a;">▢ void</span></div>
+        <div class="lab"><span class="badge">Don't</span><span class="txt">Don't ship a half-empty box — step down a size.</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="pfoot"><span>shopylink.co · packing@shopylink.co</span><span>06</span></div>
+</section>
+
+</body>
+</html>

@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>ShopyLink — Brand &amp; Asset Hub</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0B2A3B; --pri:#0EA5E9; --acc:#38BDF8; --soft:#BAE6FD; --pale:#E0F2FE;
+    --clean:#F4FBFF; --cream:#F7F4EC; --paper:#FFFFFF; --deep:#0A4A6B; --sand:#E8DCC3;
+    --rule:rgba(11,42,59,.14); --rule2:rgba(11,42,59,.07);
+    --mute:rgba(11,42,59,.55); --mute2:rgba(11,42,59,.40);
+    --en:'Bricolage Grotesque',system-ui,sans-serif;
+    --ar:'Tajawal',system-ui,sans-serif;
+    --body:'Manrope',system-ui,sans-serif;
+    --mono:'JetBrains Mono',ui-monospace,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:var(--body);color:var(--ink);background:var(--cream);-webkit-font-smoothing:antialiased;}
+  ::selection{background:var(--acc);color:var(--ink);}
+  a{color:inherit;}
+
+  .wrap{max-width:1180px;margin:0 auto;padding:0 32px;}
+
+  /* ── hero ────────────────────────────────────── */
+  .hero{background:var(--ink);color:var(--clean);padding:54px 0 48px;}
+  .hero .wrap{display:flex;justify-content:space-between;align-items:flex-end;gap:30px;flex-wrap:wrap;}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:var(--acc);}
+  .hero h1{font-family:var(--en);font-weight:800;font-size:46px;letter-spacing:-.03em;line-height:1.02;margin-top:16px;}
+  .hero p{font-size:14px;color:rgba(244,251,255,.7);margin-top:14px;max-width:46ch;line-height:1.6;}
+  .hero .mk{display:flex;flex-direction:column;align-items:flex-end;gap:14px;}
+  .wm{display:inline-flex;align-items:center;line-height:1;font-family:var(--en);font-weight:800;letter-spacing:-.04em;white-space:nowrap;}
+  .wm .ink{color:var(--ink);} .wm .blue{color:var(--pri);} .wm .clean{color:var(--clean);} .wm .acc{color:var(--acc);}
+  .wm-chain{height:.64em;width:auto;margin:0 -.05em;flex:none;}
+  .chain{display:inline-block;vertical-align:middle;}
+
+  /* ── nav ─────────────────────────────────────── */
+  nav{position:sticky;top:0;z-index:50;background:rgba(247,244,236,.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--rule);}
+  nav .wrap{display:flex;gap:6px;flex-wrap:wrap;padding-top:11px;padding-bottom:11px;}
+  nav a{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--mute);
+    text-decoration:none;padding:7px 13px;border-radius:999px;transition:.15s;}
+  nav a:hover{background:var(--paper);color:var(--ink);}
+
+  /* ── section ─────────────────────────────────── */
+  section{padding:48px 0 8px;}
+  .st{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:6px;}
+  .st h2{font-family:var(--en);font-weight:800;font-size:27px;letter-spacing:-.02em;}
+  .st .ar{font-family:var(--ar);font-weight:800;font-size:20px;color:var(--mute);direction:rtl;}
+  .sdesc{font-size:13px;color:var(--mute);max-width:70ch;line-height:1.6;margin-bottom:26px;}
+
+  .grid{display:grid;gap:20px;}
+  .g-logo{grid-template-columns:repeat(2,1fr);}
+  .g-mark{grid-template-columns:repeat(4,1fr);}
+  .g-pack{grid-template-columns:repeat(4,1fr);}
+  @media(max-width:880px){.g-logo{grid-template-columns:1fr;}.g-mark,.g-pack{grid-template-columns:repeat(2,1fr);}}
+
+  .card{background:var(--paper);border:1px solid var(--rule);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;}
+  .preview{flex:1;min-height:150px;display:flex;align-items:center;justify-content:center;padding:30px;background:var(--cream);}
+  .preview.dark{background:var(--ink);} .preview.check{
+    background:
+      linear-gradient(45deg,#eef1ee 25%,transparent 25%),
+      linear-gradient(-45deg,#eef1ee 25%,transparent 25%),
+      linear-gradient(45deg,transparent 75%,#eef1ee 75%),
+      linear-gradient(-45deg,transparent 75%,#eef1ee 75%),var(--paper);
+    background-size:18px 18px;background-position:0 0,0 9px,9px -9px,-9px 0;}
+  .meta{display:flex;align-items:center;gap:10px;padding:13px 15px;border-top:1px solid var(--rule);flex-wrap:wrap;}
+  .meta .nm{font-family:var(--en);font-weight:700;font-size:14px;flex:1 1 auto;min-width:120px;}
+  .meta .nm small{display:block;font-family:var(--mono);font-weight:400;font-size:10px;color:var(--mute);margin-top:2px;letter-spacing:.02em;}
+  .btns{display:flex;gap:7px;}
+  .btn{font-family:var(--mono);font-size:10.5px;font-weight:500;letter-spacing:.04em;text-transform:uppercase;
+    padding:7px 11px;border-radius:6px;border:1px solid var(--rule);background:var(--paper);color:var(--ink);
+    cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:5px;transition:.15s;white-space:nowrap;}
+  .btn:hover{background:var(--ink);color:var(--clean);border-color:var(--ink);}
+  .btn.pri{background:var(--pri);color:#fff;border-color:var(--pri);}
+  .btn.pri:hover{background:var(--ink);border-color:var(--ink);}
+
+  /* ── fonts ───────────────────────────────────── */
+  .font-row{background:var(--paper);border:1px solid var(--rule);border-radius:14px;padding:22px 24px;
+    display:grid;grid-template-columns:210px 1fr auto;gap:24px;align-items:center;margin-bottom:14px;}
+  @media(max-width:780px){.font-row{grid-template-columns:1fr;gap:12px;}}
+  .font-row .info .fn{font-family:var(--en);font-weight:800;font-size:18px;letter-spacing:-.02em;}
+  .font-row .info .fm{font-family:var(--mono);font-size:10.5px;color:var(--mute);line-height:1.7;margin-top:5px;}
+  .font-row .samp{font-size:34px;line-height:1.1;color:var(--ink);}
+
+  /* ── colours ─────────────────────────────────── */
+  .g-col{grid-template-columns:repeat(4,1fr);}
+  @media(max-width:880px){.g-col{grid-template-columns:repeat(2,1fr);}}
+  .sw{border:1px solid var(--rule);border-radius:12px;overflow:hidden;background:var(--paper);cursor:pointer;}
+  .sw .chip{height:74px;} .sw .b{padding:11px 13px;}
+  .sw .nm{font-family:var(--en);font-weight:700;font-size:14px;}
+  .sw .hx{font-family:var(--mono);font-size:11px;color:var(--mute);margin-top:2px;}
+  .sw .rl{font-size:9px;color:var(--mute);margin-top:6px;text-transform:uppercase;letter-spacing:.08em;}
+
+  /* ── docs ────────────────────────────────────── */
+  .g-doc{grid-template-columns:repeat(3,1fr);}
+  @media(max-width:880px){.g-doc{grid-template-columns:1fr;}}
+  .doc{background:var(--paper);border:1px solid var(--rule);border-radius:14px;padding:22px;display:flex;flex-direction:column;gap:14px;}
+  .doc .ic{width:46px;height:46px;border-radius:11px;background:var(--pale);display:flex;align-items:center;justify-content:center;color:var(--pri);}
+  .doc h3{font-family:var(--en);font-weight:800;font-size:18px;letter-spacing:-.02em;}
+  .doc p{font-size:12px;color:var(--mute);line-height:1.55;flex:1;}
+  .doc .lk{display:flex;gap:8px;flex-wrap:wrap;}
+
+  footer{margin-top:56px;background:var(--ink);color:rgba(244,251,255,.6);padding:34px 0;}
+  footer .wrap{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;font-family:var(--mono);font-size:11px;letter-spacing:.1em;}
+
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--clean);
+    padding:12px 22px;border-radius:8px;font-family:var(--mono);font-size:12px;opacity:0;pointer-events:none;transition:.3s;z-index:1000;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  .banner{background:var(--pri);color:#fff;}
+  .banner .wrap{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap;padding:18px 32px;}
+  .banner .t{font-family:var(--en);font-weight:800;font-size:17px;letter-spacing:-.01em;}
+  .banner .s{font-size:12px;opacity:.85;margin-top:2px;}
+
+  /* off-screen render rigs */
+  #rigs{position:fixed;left:-99999px;top:0;}
+  .rig{display:inline-flex;align-items:center;justify-content:center;font-family:var(--en);font-weight:800;letter-spacing:-.04em;line-height:1;}
+</style>
+</head>
+<body>
+
+<!-- chain helper symbols (inline, full — html2canvas-safe) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="c-duo" viewBox="0 0 124 80"><clipPath id="cb1"><rect x="50" y="44" width="24" height="22"/></clipPath><rect x="6" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#0B2A3B" stroke-width="9"/><rect x="50" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#0EA5E9" stroke-width="9"/><g clip-path="url(#cb1)"><rect x="6" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#0B2A3B" stroke-width="9"/></g></symbol>
+  <symbol id="c-dark" viewBox="0 0 124 80"><clipPath id="cb2"><rect x="50" y="44" width="24" height="22"/></clipPath><rect x="6" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#F4FBFF" stroke-width="9"/><rect x="50" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#38BDF8" stroke-width="9"/><g clip-path="url(#cb2)"><rect x="6" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#F4FBFF" stroke-width="9"/></g></symbol>
+  <symbol id="c-ink" viewBox="0 0 124 80"><clipPath id="cb3"><rect x="50" y="44" width="24" height="22"/></clipPath><rect x="6" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#0B2A3B" stroke-width="9"/><rect x="50" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#0B2A3B" stroke-width="9"/><g clip-path="url(#cb3)"><rect x="6" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#0B2A3B" stroke-width="9"/></g></symbol>
+  <symbol id="c-white" viewBox="0 0 124 80"><clipPath id="cb4"><rect x="50" y="44" width="24" height="22"/></clipPath><rect x="6" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#fff" stroke-width="9"/><rect x="50" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#fff" stroke-width="9"/><g clip-path="url(#cb4)"><rect x="6" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#fff" stroke-width="9"/></g></symbol>
+</svg>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="wrap">
+    <div>
+      <div class="eyebrow">ShopyLink · Brand &amp; Asset Hub</div>
+      <h1>Every asset,<br>one place.</h1>
+      <p>Logos, marks, packaging, fonts and colours — download each as scalable <b>SVG</b> or ready-to-use <b>PNG</b>. Plus the print-ready brand, packaging and stationery documents.</p>
+    </div>
+    <div class="mk">
+      <span class="wm" style="font-size:40px;"><span class="clean">shopy</span><svg class="wm-chain" viewBox="0 0 124 80"><use href="#c-dark"/></svg><span class="acc">link</span></span>
+      <span class="eyebrow" style="color:rgba(244,251,255,.55);">world · to · door</span>
+    </div>
+  </div>
+</header>
+
+<!-- DOWNLOAD ALL BANNER -->
+<div class="banner">
+  <div class="wrap">
+    <div>
+      <div class="t">Need the whole kit?</div>
+      <div class="s">Ask for the full asset folder as a single download — SVGs, PNGs and every document zipped.</div>
+    </div>
+    <span class="btn" style="background:#fff;color:var(--pri);border-color:#fff;">Request “ShopyLink Brand” .zip</span>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav><div class="wrap">
+  <a href="#logos">Logos</a>
+  <a href="#marks">Marks &amp; icons</a>
+  <a href="#packaging">Packaging</a>
+  <a href="#fonts">Fonts</a>
+  <a href="#colours">Colours</a>
+  <a href="#docs">Documents</a>
+</div></nav>
+
+<main class="wrap">
+
+  <!-- LOGOS -->
+  <section id="logos">
+    <div class="st"><h2>Logos</h2><span class="ar">الشعارات</span></div>
+    <p class="sdesc">The horizontal wordmark with the interlocking chain. Use the light lockup on cream/paper, the dark lockup on ink and photography. PNGs are exported live at high resolution with the Bricolage font baked in.</p>
+    <div class="grid g-logo" id="logo-grid"></div>
+  </section>
+
+  <!-- MARKS -->
+  <section id="marks">
+    <div class="st"><h2>Marks &amp; icons</h2><span class="ar">الرمز والأيقونات</span></div>
+    <p class="sdesc">The chain mark on its own, single-colour variants, the gradient app icon, and favicons — for avatars, app stores, and tight spaces.</p>
+    <div class="grid g-mark" id="mark-grid"></div>
+  </section>
+
+  <!-- PACKAGING -->
+  <section id="packaging">
+    <div class="st"><h2>Packaging</h2><span class="ar">التغليف</span></div>
+    <p class="sdesc">Handling marks, packing-tape artwork and the tagline badge — the reusable pieces that go on boxes, mailers and labels. Full set and specs live in the Packaging Kit document below.</p>
+    <div class="grid g-pack" id="pack-grid"></div>
+  </section>
+
+  <!-- FONTS -->
+  <section id="fonts">
+    <div class="st"><h2>Fonts</h2><span class="ar">الخطوط</span></div>
+    <p class="sdesc">Four free Google Fonts. Install once from Google Fonts — free for commercial use.</p>
+    <div id="font-list"></div>
+  </section>
+
+  <!-- COLOURS -->
+  <section id="colours">
+    <div class="st"><h2>Colours</h2><span class="ar">الألوان</span></div>
+    <p class="sdesc">Tap any swatch to copy its hex.</p>
+    <div class="grid g-col" id="col-grid"></div>
+  </section>
+
+  <!-- DOCS -->
+  <section id="docs">
+    <div class="st"><h2>Documents</h2><span class="ar">المستندات</span></div>
+    <p class="sdesc">Print-ready A4. Open, then Print → Save as PDF (A4 · Margins: None · Background graphics: on).</p>
+    <div class="grid g-doc" id="doc-grid"></div>
+  </section>
+
+</main>
+
+<footer><div class="wrap">
+  <span>ShopyLink · world to door · العالم إلى البيت</span>
+  <span>Asset Hub · 2026</span>
+</div></footer>
+
+<div id="rigs"></div>
+<div class="toast" id="toast"></div>
+
+<script src="https://unpkg.com/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script>
+const BRAND = 'ShopyLink Brand';
+function chain(sym){return '<svg class="wm-chain" viewBox="0 0 124 80"><use href="#'+sym+'"/></svg>';}
+function wm(shopy,link,sym,fs){return '<span class="wm" style="font-size:'+fs+'px"><span style="color:'+shopy+'">shopy</span>'+chain(sym)+'<span style="color:'+link+'">link</span></span>';}
+
+/* ---- LOGOS ---- */
+const logos = [
+  {id:'primary', nm:'Primary lockup', sub:'ink + sky · light bg', bg:'cream',
+    prev:wm('#0B2A3B','#0EA5E9','c-duo',40), svg:BRAND+'/svg/01 Primary lockup.svg', rig:'light'},
+  {id:'dark', nm:'Primary · dark', sub:'clean + sky 400 · dark bg', bg:'dark',
+    prev:wm('#F4FBFF','#38BDF8','c-dark',40), svg:BRAND+'/svg/02 Primary lockup dark.svg', rig:'dark'},
+  {id:'tagline', nm:'Lockup + tagline', sub:'world · to · door', bg:'cream',
+    prev:'<div style="display:flex;flex-direction:column;align-items:center;gap:12px">'+wm('#0B2A3B','#0EA5E9','c-duo',34)+'<div style="display:flex;align-items:center;gap:12px"><span style="width:34px;height:2px;background:#0EA5E9"></span><span style="font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:#0B2A3B">world · to · door</span><span style="width:34px;height:2px;background:#0EA5E9"></span></div></div>',
+    svg:BRAND+'/svg/05 Lockup with tagline.svg', rig:'tagline'},
+  {id:'mono-ink', nm:'Mono · ink', sub:'one colour · ink', bg:'cream',
+    prev:wm('#0B2A3B','#0B2A3B','c-ink',40), svg:BRAND+'/svg/06 Mark mono ink.svg', png:BRAND+'/png/mark-mono-ink-1024.png', rig:'monoink'},
+];
+
+/* ---- MARKS ---- */
+const marks = [
+  {id:'mark', nm:'Chain mark', sub:'2-colour symbol', bg:'cream',
+    prev:'<svg class="chain" viewBox="0 0 124 80" style="width:78px"><use href="#c-duo"/></svg>',
+    svg:BRAND+'/svg/03 Mark only.svg', png:BRAND+'/png/mark-1024.png'},
+  {id:'mark-white', nm:'Mark · white', sub:'one colour · white', bg:'dark',
+    prev:'<svg class="chain" viewBox="0 0 124 80" style="width:78px"><use href="#c-white"/></svg>',
+    svg:BRAND+'/svg/07 Mark mono white.svg', png:BRAND+'/png/mark-mono-white-1024.png'},
+  {id:'appicon', nm:'App icon', sub:'gradient · iOS / Android', bg:'check',
+    prev:appIconSVG(96), svg:BRAND+'/svg/04 App icon.svg', png:BRAND+'/png/app-icon-1024.png'},
+  {id:'favicon', nm:'Favicon', sub:'32 / 64 px', bg:'check',
+    prev:'<img src="'+BRAND+'/png/favicon-64.png" width="56" height="56" style="image-rendering:auto">',
+    png:BRAND+'/png/favicon-64.png', png2:BRAND+'/png/favicon-32.png'},
+];
+
+/* ---- PACKAGING ---- */
+const PK = BRAND+'/packaging-svg/';
+const pack = [
+  {id:'h1', nm:'This way up', sub:'handling mark', bg:'paper', svg:PK+'handling-this-way-up.svg'},
+  {id:'h2', nm:'Fragile', sub:'handling mark', bg:'paper', svg:PK+'handling-fragile.svg'},
+  {id:'h3', nm:'Keep dry', sub:'handling mark', bg:'paper', svg:PK+'handling-keep-dry.svg'},
+  {id:'h4', nm:'Handle with care', sub:'handling mark', bg:'paper', svg:PK+'handling-handle-with-care.svg'},
+  {id:'tape', nm:'Packing tape', sub:'sky · bilingual repeat', bg:'paper', svg:PK+'tape-tile-sky.svg', wide:true},
+  {id:'badge', nm:'Tagline badge', sub:'world → door', bg:'paper', svg:PK+'badge-world-to-door.svg', wide:true},
+];
+
+function appIconSVG(w){
+  return '<svg viewBox="0 0 1024 1024" style="width:'+w+'px;border-radius:22%;box-shadow:0 8px 20px -8px rgba(11,42,59,.5)">'
+  +'<defs><linearGradient id="aig" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#38BDF8"/><stop offset="60%" stop-color="#0EA5E9"/><stop offset="100%" stop-color="#0A4A6B"/></linearGradient>'
+  +'<mask id="aml"><rect width="124" height="80" fill="#fff"/><rect x="54" y="12" width="17" height="19" fill="#000"/></mask>'
+  +'<mask id="amr"><rect width="124" height="80" fill="#fff"/><rect x="54" y="49" width="17" height="19" fill="#000"/></mask></defs>'
+  +'<rect width="1024" height="1024" rx="225" fill="url(#aig)"/>'
+  +'<g transform="translate(512,512) scale(5.4) translate(-62,-40)">'
+  +'<rect x="6" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#fff" stroke-width="9" mask="url(#aml)"/>'
+  +'<rect x="50" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#fff" stroke-width="9" mask="url(#amr)"/></g></svg>';
+}
+
+/* ---- card builder ---- */
+function cardHTML(a, kind){
+  let btns='';
+  if(a.svg) btns+='<a class="btn" href="'+encodeURI(a.svg)+'" download>SVG</a>';
+  if(a.png) btns+='<a class="btn'+(a.svg?'':' pri')+'" href="'+encodeURI(a.png)+'" download>PNG</a>';
+  if(a.png2) btns+='<a class="btn" href="'+encodeURI(a.png2)+'" download>32px</a>';
+  if(!a.png && a.rig!==undefined) btns+='<button class="btn pri" onclick="exportRig(\''+a.rig+'\',\''+a.id+'\')">PNG</button>';
+  if(!a.png && a.svg && kind==='pack') btns+='<button class="btn pri" onclick="exportSvg(\''+encodeURI(a.svg)+'\',\''+a.id+'\','+(a.wide?1400:600)+')">PNG</button>';
+  return '<div class="card"><div class="preview '+(a.bg||'cream')+'" style="'+(a.wide?'padding:24px':'')+'">'+a.prev0+'</div>'
+    +'<div class="meta"><div class="nm">'+a.nm+'<small>'+a.sub+'</small></div><div class="btns">'+btns+'</div></div></div>';
+}
+
+function mountGrid(id, arr, kind){
+  const el=document.getElementById(id);
+  el.innerHTML = arr.map(a=>{ a.prev0 = a.prev || ('<img src="'+encodeURI(a.svg)+'" style="max-width:100%;max-height:'+(a.wide?70:150)+'px">'); return cardHTML(a,kind); }).join('');
+}
+mountGrid('logo-grid', logos, 'logo');
+mountGrid('mark-grid', marks, 'mark');
+mountGrid('pack-grid', pack, 'pack');
+
+/* ---- render rigs for wordmark PNG export ---- */
+function buildRigs(){
+  const F=380;
+  const rigs={
+    light:{bg:'#F7F4EC', html:wm('#0B2A3B','#0EA5E9','c-duo',F), pad:'120px 150px'},
+    dark:{bg:'#0B2A3B', html:wm('#F4FBFF','#38BDF8','c-dark',F), pad:'120px 150px'},
+    monoink:{bg:'transparent', html:wm('#0B2A3B','#0B2A3B','c-ink',F), pad:'80px 120px'},
+    tagline:{bg:'#F7F4EC', html:'<div style="display:flex;flex-direction:column;align-items:center;gap:'+(F*0.16)+'px">'+wm('#0B2A3B','#0EA5E9','c-duo',F)+'<div style="display:flex;align-items:center;gap:40px"><span style="width:200px;height:4px;background:#0EA5E9"></span><span style="font-family:var(--mono);font-weight:500;font-size:'+(F*0.15)+'px;letter-spacing:.2em;text-transform:uppercase;color:#0B2A3B">world · to · door</span><span style="width:200px;height:4px;background:#0EA5E9"></span></div></div>', pad:'110px 150px'},
+  };
+  const host=document.getElementById('rigs');
+  host.innerHTML=Object.entries(rigs).map(([k,r])=>'<div class="rig" id="rig-'+k+'" style="background:'+r.bg+';padding:'+r.pad+'">'+r.html+'</div>').join('');
+}
+buildRigs();
+
+async function exportRig(rig,name){
+  toast('Generating PNG…');
+  await document.fonts.ready;
+  const el=document.getElementById('rig-'+rig);
+  const transparent = (rig==='monoink');
+  const canvas=await html2canvas(el,{backgroundColor: transparent?null:getComputedStyle(el).backgroundColor, scale:2, logging:false});
+  downloadCanvas(canvas,'shopylink-'+name);
+}
+async function exportSvg(url,name,w){
+  toast('Generating PNG…');
+  await document.fonts.ready;
+  const txt=await (await fetch(url)).text();
+  const blob=new Blob([txt],{type:'image/svg+xml'}); const burl=URL.createObjectURL(blob);
+  const img=new Image(); img.crossOrigin='anonymous';
+  await new Promise((res,rej)=>{img.onload=res;img.onerror=rej;img.src=burl;});
+  const ratio=img.height/img.width; const W=w, H=Math.round(w*ratio);
+  const c=document.createElement('canvas'); c.width=W; c.height=H;
+  c.getContext('2d').drawImage(img,0,0,W,H);
+  URL.revokeObjectURL(burl);
+  downloadCanvas(c,'shopylink-'+name);
+}
+function downloadCanvas(canvas,fn){
+  canvas.toBlob(b=>{ const u=URL.createObjectURL(b); const a=document.createElement('a'); a.href=u; a.download=fn+'.png'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(u),4000); toast('Downloaded '+fn+'.png'); },'image/png');
+}
+
+/* ---- fonts ---- */
+const fonts=[
+  {fn:'Bricolage Grotesque', use:'Latin wordmark · headings', wt:'500 / 700 / 800', samp:'shopylink Aa', ff:"'Bricolage Grotesque'", fw:800, url:'https://fonts.google.com/specimen/Bricolage+Grotesque'},
+  {fn:'Tajawal', use:'Arabic wordmark · headings · body', wt:'400–900', samp:'شوبي لينك', ff:"'Tajawal'", fw:900, dir:'rtl', url:'https://fonts.google.com/specimen/Tajawal'},
+  {fn:'JetBrains Mono', use:'Tagline · labels · codes', wt:'400 / 500', samp:'world · to · door', ff:"'JetBrains Mono'", fw:500, sz:20, up:1, url:'https://fonts.google.com/specimen/JetBrains+Mono'},
+  {fn:'Manrope', use:'Latin body · UI', wt:'400 / 500 / 700', samp:'Your world, brought home.', ff:"'Manrope'", fw:500, sz:22, url:'https://fonts.google.com/specimen/Manrope'},
+];
+document.getElementById('font-list').innerHTML=fonts.map(f=>
+  '<div class="font-row"><div class="info"><div class="fn">'+f.fn+'</div><div class="fm"><b style="color:var(--ink)">Use</b> · '+f.use+'<br><b style="color:var(--ink)">Weights</b> · '+f.wt+'</div></div>'
+  +'<div class="samp" style="font-family:'+f.ff+';font-weight:'+f.fw+';'+(f.dir?'direction:rtl;text-align:right;':'')+(f.sz?'font-size:'+f.sz+'px;':'')+(f.up?'text-transform:uppercase;letter-spacing:.18em;':'')+'">'+f.samp+'</div>'
+  +'<a class="btn pri" href="'+f.url+'" target="_blank" rel="noopener">Google Fonts ↗</a></div>').join('');
+
+/* ---- colours ---- */
+const cols=[
+  ['Sky 500','#0EA5E9','Primary brand'],['Ink','#0B2A3B','Type · structure'],
+  ['Sky 400','#38BDF8','Accent on dark'],['Deep','#0A4A6B','Icon gradient'],
+  ['Sky 200','#BAE6FD','Tints · fills'],['Sky 100','#E0F2FE','Backgrounds'],
+  ['Cream','#F7F4EC','Default surface'],['Sand','#E8DCC3','Play · kraft'],
+];
+document.getElementById('col-grid').innerHTML=cols.map(c=>
+  '<div class="sw" onclick="copyHex(\''+c[1]+'\')"><div class="chip" style="background:'+c[1]+'"></div><div class="b"><div class="nm">'+c[0]+'</div><div class="hx">'+c[1]+'</div><div class="rl">'+c[2]+'</div></div></div>').join('');
+function copyHex(h){navigator.clipboard&&navigator.clipboard.writeText(h);toast('Copied '+h);}
+
+/* ---- docs ---- */
+const docIcon='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>';
+const docs=[
+  {nm:'Brand Guide', sub:'Logo, bilingual, colour, type, voice, do &amp; don’t — 10 pages.', view:'ShopyLink Brand Guide A4.html', print:'ShopyLink Brand Guide A4-print.html'},
+  {nm:'Packaging Kit', sub:'Cartons, tape, mailers, labels, marks, packing checklist — 6 pages.', view:'ShopyLink Packaging Kit A4.html', print:'ShopyLink Packaging Kit A4-print.html'},
+  {nm:'Stationery', sub:'Business card, letterhead and email signature — 4 pages.', view:'ShopyLink Stationery A4.html', print:'ShopyLink Stationery A4-print.html'},
+];
+document.getElementById('doc-grid').innerHTML=docs.map(d=>
+  '<div class="doc"><div class="ic">'+docIcon+'</div><h3>'+d.nm+'</h3><p>'+d.sub+'</p><div class="lk"><a class="btn" href="'+encodeURI(d.view)+'" target="_blank" rel="noopener">View</a><a class="btn pri" href="'+encodeURI(d.print)+'" target="_blank" rel="noopener">Print / PDF</a></div></div>').join('');
+
+/* ---- toast ---- */
+let tT; function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(tT);tT=setTimeout(()=>t.classList.remove('show'),2200);}
+</script>
+</body>
+</html>

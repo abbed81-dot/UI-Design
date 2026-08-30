@@ -1,0 +1,725 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>ShopyLink — Brand Sheet</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Manrope:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0B2A3B;
+    --pri: #0EA5E9;
+    --acc: #38BDF8;
+    --soft: #BAE6FD;
+    --pale: #E0F2FE;
+    --cream: #F7F4EC;
+    --paper: #FFFFFF;
+    --rule: rgba(11, 42, 59, 0.12);
+    --mute: rgba(11, 42, 59, 0.55);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--cream); color: var(--ink); }
+  body {
+    font-family: 'Manrope', system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    padding: 0;
+  }
+  .page {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 64px 56px;
+    background: var(--paper);
+    min-height: 100vh;
+  }
+
+  /* ── Typography ─────────────────────────────────── */
+  h1, h2, h3 { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; letter-spacing: -0.03em; }
+  h1 { font-size: 52px; line-height: 1; }
+  h2 { font-size: 28px; line-height: 1.1; margin-top: 64px; padding-top: 32px; border-top: 1px solid var(--rule); }
+  h3 { font-size: 17px; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 12px; }
+  .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+  .eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--mute); }
+  p { color: var(--ink); max-width: 62ch; }
+  p + p { margin-top: 8px; }
+  .lead { font-size: 17px; line-height: 1.5; color: var(--mute); margin-top: 8px; }
+
+  /* ── Header ─────────────────────────────────────── */
+  header { display: flex; justify-content: space-between; align-items: flex-end; gap: 48px; padding-bottom: 32px; border-bottom: 1px solid var(--rule); }
+  header .left .eyebrow { margin-bottom: 16px; }
+  header .meta { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--mute); text-align: right; line-height: 1.7; white-space: pre-line; }
+
+  /* ── Logo display tiles ─────────────────────────── */
+  .tile {
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    padding: 48px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: var(--cream);
+  }
+  .tile.dark { background: var(--ink); border-color: transparent; }
+  .tile.white { background: var(--paper); }
+  .tile.pri  { background: var(--pri); border-color: transparent; }
+  .tile.pale { background: var(--pale); border-color: transparent; }
+  .tile svg, .tile img { max-width: 100%; height: auto; }
+  /* Inline SVGs (post-cleaning) have no width/height — make them fill their wrapper. */
+  .tile > div > svg, .rule-card .demo > div > svg { width: 100%; height: auto; display: block; }
+  /* App icon needs to be a perfect square */
+  .tile > div[style*="aspect-ratio:1/1"] > svg { aspect-ratio: 1 / 1; }
+  .tile-caption { padding: 12px 4px 0; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--mute); }
+
+  /* ── Grids ──────────────────────────────────────── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 24px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 24px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-top: 24px; }
+
+  /* ── Color swatches ─────────────────────────────── */
+  .swatch { border-radius: 6px; overflow: hidden; border: 1px solid var(--rule); }
+  .swatch .chip { aspect-ratio: 4 / 3; }
+  .swatch .body { padding: 14px 16px; background: var(--paper); }
+  .swatch .name { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 16px; letter-spacing: -0.01em; }
+  .swatch .hex { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--mute); margin-top: 2px; }
+  .swatch .role { font-size: 11px; color: var(--mute); margin-top: 6px; text-transform: uppercase; letter-spacing: 0.08em; }
+
+  /* ── Type specimen ──────────────────────────────── */
+  .type-spec { padding: 24px 0; border-bottom: 1px solid var(--rule); display: grid; grid-template-columns: 240px 1fr; gap: 24px; align-items: baseline; }
+  .type-spec:last-child { border-bottom: none; }
+  .type-spec .meta { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--mute); line-height: 1.6; }
+  .type-spec .meta b { color: var(--ink); font-weight: 500; }
+  .type-spec .sample { line-height: 1; color: var(--ink); }
+
+  /* ── Usage rules (do / don't) ───────────────────── */
+  .rules { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 24px; }
+  .rule-card { border: 1px solid var(--rule); border-radius: 6px; padding: 0; overflow: hidden; }
+  .rule-card.do .badge { background: var(--pri); color: var(--paper); }
+  .rule-card.dont .badge { background: var(--ink); color: var(--paper); }
+  .rule-card .demo { padding: 36px 24px; min-height: 120px; display: flex; align-items: center; justify-content: center; }
+  .rule-card.do .demo  { background: var(--cream); }
+  .rule-card.dont .demo { background: #f4ecec; }
+  .rule-card .label { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-top: 1px solid var(--rule); background: var(--paper); }
+  .rule-card .badge { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.12em; padding: 4px 8px; border-radius: 3px; text-transform: uppercase; font-weight: 500; }
+  .rule-card .text { font-size: 12px; color: var(--ink); }
+
+  /* ── Tagline lockup demo ────────────────────────── */
+  .applications { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 24px; }
+
+  /* ── Clearspace diagram ─────────────────────────── */
+  .clearspace { display: flex; align-items: center; justify-content: center; padding: 40px; background: var(--cream); border: 1px solid var(--rule); border-radius: 6px; }
+  .clearspace svg { width: 100%; max-width: 720px; height: auto; }
+
+  /* ── Print ──────────────────────────────────────── */
+  @media print {
+    /* A4 landscape gives multi-column grids (do/don't, swatches) enough
+       horizontal room to fit on a single page each. */
+    @page { size: A4 landscape; margin: 10mm 14mm; }
+    /* Force-print all colour fills (swatches, dark tiles, ink badges, sky pills).
+       Without this, Chrome silently strips backgrounds. */
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    html, body { background: white !important; }
+    .page { box-shadow: none; padding: 0; max-width: none; min-height: 0; }
+
+    /* Each <section> is its own page — start fresh, finish before the next.
+       break-inside: avoid forces all content to live on that one page. */
+    section { break-before: page; page-break-before: always;
+              break-after: page; page-break-after: always;
+              break-inside: avoid; page-break-inside: avoid;
+              margin: 0 !important; padding: 0 !important; }
+    section:first-of-type { break-before: avoid; page-break-before: avoid; }
+    header { break-after: avoid; page-break-after: avoid; padding-bottom: 12px !important; margin-bottom: 16px !important; }
+
+    /* Section heading styling: smaller, no top border, no forced gap. */
+    h2 { font-size: 22px !important; margin: 0 !important; padding: 0 !important;
+         border-top: none !important; break-after: avoid; page-break-after: avoid; }
+    h2:first-of-type { break-before: avoid; page-break-before: avoid; }
+    h3 { font-size: 14px !important; margin-bottom: 6px !important;
+         break-after: avoid; page-break-after: avoid; }
+    h1 { font-size: 32px !important; }
+
+    /* Compact body copy: tighter leading, smaller intro paragraphs. */
+    p.lead { font-size: 12px !important; margin-bottom: 12px !important; max-width: none !important; }
+    p { font-size: 12px !important; }
+
+    /* Reduce all tile/swatch padding so multi-up grids fit one page. */
+    .tile { padding: 18px 16px !important; }
+    .grid-2, .grid-3, .grid-4 { gap: 12px !important; margin-top: 10px !important; }
+    .tile-caption { padding: 6px 4px 0 !important; font-size: 9.5px !important; }
+
+    /* Swatch chips smaller in print so 8 fit comfortably on one page. */
+    .swatch .chip { aspect-ratio: 16 / 9 !important; }
+    .swatch .body { padding: 8px 10px !important; }
+    .swatch .name { font-size: 13px !important; }
+    .swatch .hex, .swatch .role { font-size: 10px !important; }
+
+    /* Do/don't: 3 columns × 2 rows fits landscape A4 perfectly. */
+    .rules { grid-template-columns: repeat(3, 1fr) !important; gap: 12px !important; margin-top: 10px !important; }
+    .rule-card .demo { padding: 18px 12px !important; min-height: 80px !important; }
+    .rule-card .label { padding: 8px 12px !important; }
+    .rule-card .text { font-size: 10px !important; }
+    .rule-card .badge { font-size: 9px !important; padding: 3px 6px !important; }
+
+    /* Typography specimens — keep all three on one page. */
+    .type-spec { padding: 10px 0 !important; grid-template-columns: 180px 1fr !important; gap: 16px !important; }
+    .type-spec .meta { font-size: 9.5px !important; }
+    .type-spec .sample { font-size: 44px !important; }
+
+    /* File inventory tables — tighter rows so both tables fit one page. */
+    table { font-size: 10px !important; }
+    table th, table td { padding: 4px 0 !important; }
+
+    /* Clearspace diagram stays compact. */
+    .clearspace { padding: 16px !important; }
+    .clearspace svg { max-width: 480px !important; }
+
+    /* Inline SVG logos still need width:100% to render. */
+    .tile > div > svg, .rule-card .demo > div > svg { width: 100%; height: auto; }
+    /* All logo tiles can be a bit shorter in print. */
+    .tile { min-height: 0 !important; }
+
+    /* Protect against orphans/widows. */
+    p, li { orphans: 3; widows: 3; }
+
+    /* Hide on-screen footer in print — it's not needed per-page and adds noise. */
+    footer { display: none !important; }
+
+    /* The promise page (no h2 number) gets a comfortable single-page layout. */
+    section:first-of-type { padding-top: 8px !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <header>
+    <div class="left">
+      <div class="eyebrow">ShopyLink · Brand sheet · v1</div>
+      <h1>Identity guide</h1>
+    </div>
+    <div class="meta">Issued · May 2026
+Format · Sky-blue, two-ring chain
+Final selection · 01 Chain Wordmark</div>
+  </header>
+
+  <!-- ───────────── Brand promise ───────────── -->
+  <section>
+    <h2>The promise</h2>
+    <p class="lead" style="max-width: 32ch; font-size: 32px; line-height: 1.15; font-family: 'Bricolage Grotesque'; font-weight: 800; color: var(--ink); letter-spacing: -0.025em; margin-top: 24px;">
+      We give you an address in <span style="color: var(--pri)">every shopping capital</span> &mdash; and bring the parcel home.
+    </p>
+    <p class="lead" style="margin-top: 28px;">
+      Your address in the UAE, China, the USA and Turkey. You shop &mdash; we receive, consolidate, and deliver to your door, wherever you are.
+    </p>
+    <div style="display: inline-flex; align-items: center; gap: 24px; margin-top: 32px; padding: 14px 28px; background: var(--ink); border-radius: 999px;">
+      <span style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 22px; letter-spacing: -0.02em; color: var(--paper);">world</span>
+      <svg width="40" height="14" viewBox="0 0 60 14" aria-hidden>
+        <path d="M 4 7 L 50 7" stroke="var(--acc)" stroke-width="2" stroke-linecap="round" stroke-dasharray="1 4"/>
+        <path d="M 48 3 L 56 7 L 48 11" fill="none" stroke="var(--acc)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 22px; letter-spacing: -0.02em; color: var(--acc);">door</span>
+    </div>
+  </section>
+
+  <!-- ───────────── Primary lockup ───────────── -->
+  <section>
+    <h2>01 &middot; Primary lockup</h2>
+    <p class="lead">The horizontal wordmark with an interlocking two-ring chain replacing the seam between <i>shopy</i> and <i>link</i>. Use this version 90% of the time.</p>
+    <div class="grid-2">
+      <div>
+        <div class="tile" style="aspect-ratio: 2400 / 560;">
+          <div style="width:100%;height:auto;display:flex;align-items:center;justify-content:center"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 320" role="img" aria-label="ShopyLink wordmark">
+  <defs>
+    <clipPath id="wvT"><rect x="46" y="6" width="32" height="34"></rect></clipPath><clipPath id="wvB"><rect x="46" y="40" width="32" height="34"></rect></clipPath><mask id="wvMA"><rect width="124" height="80" fill="#fff"></rect><g clip-path="url(#wvT)"><rect x="50" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#000" stroke-width="9"></rect></g></mask><mask id="wvMB"><rect width="124" height="80" fill="#fff"></rect><g clip-path="url(#wvB)"><rect x="6" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#000" stroke-width="9"></rect></g></mask>
+  </defs>
+
+  <text x="640" y="225" text-anchor="end" fill="#0B2A3B" style="font-family:&#39;Bricolage Grotesque&#39;,&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;font-weight:800;font-size:220px;letter-spacing:-9px;">shopy</text>
+
+  <g transform="translate(620 75) scale(1.75)">
+    <rect x="6" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#0B2A3B" stroke-width="9" mask="url(#wvMA)"></rect>
+    <rect x="50" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#0EA5E9" stroke-width="9" mask="url(#wvMB)"></rect>
+    
+  </g>
+
+  <text x="840" y="225" text-anchor="start" fill="#0EA5E9" style="font-family:&#39;Bricolage Grotesque&#39;,&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;font-weight:800;font-size:220px;letter-spacing:-9px;">link</text>
+</svg></div>
+        </div>
+        <div class="tile-caption">Primary on cream &middot; default surface</div>
+      </div>
+      <div>
+        <div class="tile dark" style="aspect-ratio: 2400 / 560;">
+          <div style="width:100%;height:auto;display:flex;align-items:center;justify-content:center"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 320" role="img" aria-label="ShopyLink wordmark — for dark backgrounds">
+  <defs>
+    <clipPath id="wvT"><rect x="46" y="6" width="32" height="34"></rect></clipPath><clipPath id="wvB"><rect x="46" y="40" width="32" height="34"></rect></clipPath><mask id="wvMA"><rect width="124" height="80" fill="#fff"></rect><g clip-path="url(#wvT)"><rect x="50" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#000" stroke-width="9"></rect></g></mask><mask id="wvMB"><rect width="124" height="80" fill="#fff"></rect><g clip-path="url(#wvB)"><rect x="6" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#000" stroke-width="9"></rect></g></mask>
+  </defs>
+
+  <text x="640" y="225" text-anchor="end" fill="#F4FBFF" style="font-family:&#39;Bricolage Grotesque&#39;,&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;font-weight:800;font-size:220px;letter-spacing:-9px;">shopy</text>
+
+  <g transform="translate(620 75) scale(1.75)">
+    <rect x="6" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#F4FBFF" stroke-width="9" mask="url(#wvMA)"></rect>
+    <rect x="50" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#38BDF8" stroke-width="9" mask="url(#wvMB)"></rect>
+    
+  </g>
+
+  <text x="840" y="225" text-anchor="start" fill="#38BDF8" style="font-family:&#39;Bricolage Grotesque&#39;,&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;font-weight:800;font-size:220px;letter-spacing:-9px;">link</text>
+</svg></div>
+        </div>
+        <div class="tile-caption">Primary on dark ink &middot; nights, headers, video</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────────── Tagline lockup ───────────── -->
+  <section>
+    <h2>02 &middot; Lockup with tagline</h2>
+    <p class="lead">For first impressions: about page, business cards, packaging seal. The tagline "world &middot; to &middot; door" sits in JetBrains Mono with a wide track between two short rules.</p>
+    <div style="margin-top: 24px;">
+      <div class="tile" style="padding: 56px 32px;">
+        <div style="max-width:760px;width:100%;display:flex;align-items:center;justify-content:center"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 440" role="img" aria-label="ShopyLink wordmark with tagline">
+  <defs>
+    <clipPath id="wvT"><rect x="46" y="6" width="32" height="34"></rect></clipPath><clipPath id="wvB"><rect x="46" y="40" width="32" height="34"></rect></clipPath><mask id="wvMA"><rect width="124" height="80" fill="#fff"></rect><g clip-path="url(#wvT)"><rect x="50" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#000" stroke-width="9"></rect></g></mask><mask id="wvMB"><rect width="124" height="80" fill="#fff"></rect><g clip-path="url(#wvB)"><rect x="6" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#000" stroke-width="9"></rect></g></mask>
+  </defs>
+
+  <text x="640" y="225" text-anchor="end" fill="#0B2A3B" style="font-family:&#39;Bricolage Grotesque&#39;,&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;font-weight:800;font-size:220px;letter-spacing:-9px;">shopy</text>
+
+  <g transform="translate(620 75) scale(1.75)">
+    <rect x="6" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#0B2A3B" stroke-width="9" mask="url(#wvMA)"></rect>
+    <rect x="50" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#0EA5E9" stroke-width="9" mask="url(#wvMB)"></rect>
+    
+  </g>
+
+  <text x="840" y="225" text-anchor="start" fill="#0EA5E9" style="font-family:&#39;Bricolage Grotesque&#39;,&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;font-weight:800;font-size:220px;letter-spacing:-9px;">link</text>
+
+  <line x1="380" y1="320" x2="500" y2="320" stroke="#0EA5E9" stroke-width="3"></line>
+  <text x="700" y="340" text-anchor="middle" fill="#0B2A3B" style="font-family:&#39;JetBrains Mono&#39;,ui-monospace,monospace;font-weight:500;font-size:38px;letter-spacing:12px;text-transform:uppercase;">world  ·  to  ·  door</text>
+  <line x1="900" y1="320" x2="1020" y2="320" stroke="#0EA5E9" stroke-width="3"></line>
+</svg></div>
+      </div>
+      <div class="tile-caption">Stacked lockup with tagline &middot; ShopyLink Brand/svg/05 Lockup with tagline.svg</div>
+    </div>
+  </section>
+
+  <!-- ───────────── Mark + App icon ───────────── -->
+  <section>
+    <h2>03 &middot; Symbol &amp; app icon</h2>
+    <p class="lead">When space is tight or the wordmark won't read &mdash; favicons, social avatars, app icons &mdash; use the chain mark alone, or the gradient app icon.</p>
+    <div class="grid-4">
+      <div>
+        <div class="tile" style="aspect-ratio: 1 / 1;">
+          <div style="width:70%;display:flex;align-items:center;justify-content:center"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 124 80" role="img" aria-label="ShopyLink mark — interlocking chain">
+  <defs>
+    <clipPath id="wvT"><rect x="46" y="6" width="32" height="34"></rect></clipPath><clipPath id="wvB"><rect x="46" y="40" width="32" height="34"></rect></clipPath><mask id="wvMA"><rect width="124" height="80" fill="#fff"></rect><g clip-path="url(#wvT)"><rect x="50" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#000" stroke-width="9"></rect></g></mask><mask id="wvMB"><rect width="124" height="80" fill="#fff"></rect><g clip-path="url(#wvB)"><rect x="6" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#000" stroke-width="9"></rect></g></mask>
+  </defs>
+  
+  <rect x="6" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#0B2A3B" stroke-width="9" mask="url(#wvMA)"></rect>
+  
+  <rect x="50" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#0EA5E9" stroke-width="9" mask="url(#wvMB)"></rect>
+  
+  
+</svg></div>
+        </div>
+        <div class="tile-caption">Mark &middot; 2-colour</div>
+      </div>
+      <div>
+        <div class="tile dark" style="aspect-ratio: 1 / 1;">
+          <div style="width:70%;display:flex;align-items:center;justify-content:center"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 124 80" role="img" aria-label="ShopyLink mark — mono white">
+  <defs>
+    <clipPath id="wvT"><rect x="46" y="6" width="32" height="34"></rect></clipPath><clipPath id="wvB"><rect x="46" y="40" width="32" height="34"></rect></clipPath><mask id="wvMA"><rect width="124" height="80" fill="#fff"></rect><g clip-path="url(#wvT)"><rect x="50" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#000" stroke-width="9"></rect></g></mask><mask id="wvMB"><rect width="124" height="80" fill="#fff"></rect><g clip-path="url(#wvB)"><rect x="6" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#000" stroke-width="9"></rect></g></mask>
+  </defs>
+  <rect x="6" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#FFFFFF" stroke-width="9" mask="url(#wvMA)"></rect>
+  <rect x="50" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#FFFFFF" stroke-width="9" mask="url(#wvMB)"></rect>
+  
+</svg></div>
+        </div>
+        <div class="tile-caption">Mono white &middot; on ink</div>
+      </div>
+      <div>
+        <div class="tile" style="aspect-ratio: 1 / 1; padding: 0; background: transparent; border: none;">
+          <div style="width:100%;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-label="ShopyLink app icon">
+  <defs>
+    <linearGradient id="sl-grad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#38BDF8"></stop>
+      <stop offset="60%" stop-color="#0EA5E9"></stop>
+      <stop offset="100%" stop-color="#0A4A6B"></stop>
+    </linearGradient>
+    <clipPath id="wvT"><rect x="46" y="6" width="32" height="34"></rect></clipPath><clipPath id="wvB"><rect x="46" y="40" width="32" height="34"></rect></clipPath><mask id="wvMA"><rect width="124" height="80" fill="#fff"></rect><g clip-path="url(#wvT)"><rect x="50" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#000" stroke-width="9"></rect></g></mask><mask id="wvMB"><rect width="124" height="80" fill="#fff"></rect><g clip-path="url(#wvB)"><rect x="6" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#000" stroke-width="9"></rect></g></mask>
+  </defs>
+
+  
+  <rect x="0" y="0" width="1024" height="1024" rx="230" ry="230" fill="url(#sl-grad)"></rect>
+
+  
+  <rect x="0" y="0" width="1024" height="1024" rx="230" ry="230" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="2"></rect>
+
+  
+  <g transform="translate(196 372) scale(5.16)">
+    <rect x="6" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#FFFFFF" stroke-width="11"></rect>
+    <rect x="50" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#0A2A3B" stroke-width="11" opacity="0.85"></rect>
+    
+  </g>
+</svg></div>
+        </div>
+        <div class="tile-caption">App icon &middot; iOS squircle</div>
+      </div>
+      <div>
+        <div class="tile pale" style="aspect-ratio: 1 / 1;">
+          <div style="width:70%;display:flex;align-items:center;justify-content:center"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 124 80" role="img" aria-label="ShopyLink mark — mono ink">
+  <defs>
+    <clipPath id="wvT"><rect x="46" y="6" width="32" height="34"></rect></clipPath><clipPath id="wvB"><rect x="46" y="40" width="32" height="34"></rect></clipPath><mask id="wvMA"><rect width="124" height="80" fill="#fff"></rect><g clip-path="url(#wvT)"><rect x="50" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#000" stroke-width="9"></rect></g></mask><mask id="wvMB"><rect width="124" height="80" fill="#fff"></rect><g clip-path="url(#wvB)"><rect x="6" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#000" stroke-width="9"></rect></g></mask>
+  </defs>
+  <rect x="6" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#0B2A3B" stroke-width="9" mask="url(#wvMA)"></rect>
+  <rect x="50" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#0B2A3B" stroke-width="9" mask="url(#wvMB)"></rect>
+  
+</svg></div>
+        </div>
+        <div class="tile-caption">Mono ink &middot; on pale</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────────── Clearspace ───────────── -->
+  <section>
+    <h2>04 &middot; Clearspace &amp; minimums</h2>
+    <p class="lead">Hold a margin equal to the height of the chain's ring around the entire lockup. Don't crowd it &mdash; the chain needs to read as two distinct, interlocked shapes.</p>
+    <div class="clearspace">
+      <svg viewBox="0 0 720 280" aria-hidden>
+        <!-- Clearspace box -->
+        <rect x="40" y="60" width="640" height="160" fill="none" stroke="var(--acc)" stroke-width="1.5" stroke-dasharray="6 6"/>
+        <!-- "x" measurement marks -->
+        <line x1="120" y1="20" x2="120" y2="60" stroke="var(--mute)" stroke-width="1"/>
+        <line x1="120" y1="40" x2="200" y2="40" stroke="var(--mute)" stroke-width="1"/>
+        <text x="160" y="34" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="var(--mute)">x</text>
+        <!-- Wordmark -->
+        <g transform="translate(155 100)">
+          <text x="0" y="58" font-family="Bricolage Grotesque" font-weight="800" font-size="76" letter-spacing="-3" fill="var(--ink)">shopy</text>
+          <g transform="translate(215 5) scale(0.62)">
+            <defs><clipPath id="wvT"><rect x="46" y="6" width="32" height="34"></rect></clipPath><clipPath id="wvB"><rect x="46" y="40" width="32" height="34"></rect></clipPath><mask id="wvMA"><rect width="124" height="80" fill="#fff"></rect><g clip-path="url(#wvT)"><rect x="50" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#000" stroke-width="9"></rect></g></mask><mask id="wvMB"><rect width="124" height="80" fill="#fff"></rect><g clip-path="url(#wvB)"><rect x="6" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#000" stroke-width="9"></rect></g></mask></defs>
+            <rect x="6" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="var(--ink)" stroke-width="9" mask="url(#wvMA)"/>
+            <rect x="50" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="var(--pri)" stroke-width="9" mask="url(#wvMB)"/>
+            
+          </g>
+          <text x="290" y="58" font-family="Bricolage Grotesque" font-weight="800" font-size="76" letter-spacing="-3" fill="var(--pri)">link</text>
+        </g>
+        <!-- Ring height indicator -->
+        <line x1="380" y1="245" x2="380" y2="280" stroke="var(--mute)" stroke-width="1"/>
+        <text x="380" y="272" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="var(--mute)">x = ring height</text>
+      </svg>
+    </div>
+    <div class="grid-2" style="margin-top: 16px;">
+      <div>
+        <h3>Minimum size</h3>
+        <p>Digital: never smaller than <b>120 px</b> wide for the lockup, or <b>32 px</b> for the mark.</p>
+      </div>
+      <div>
+        <h3>Print</h3>
+        <p>Never smaller than <b>30 mm</b> wide for the lockup, or <b>10 mm</b> for the mark.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────────── Colour ───────────── -->
+  <section>
+    <h2>05 &middot; Colour system</h2>
+    <p class="lead">Four blues plus one near-black. Sky 500 is the primary brand colour; Ink anchors type, structure and high-contrast surfaces.</p>
+    <div class="grid-4">
+      <div class="swatch">
+        <div class="chip" style="background: var(--pri);"></div>
+        <div class="body">
+          <div class="name">Sky 500</div>
+          <div class="hex">#0EA5E9</div>
+          <div class="role">Primary brand</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="chip" style="background: var(--ink);"></div>
+        <div class="body">
+          <div class="name">Ink</div>
+          <div class="hex">#0B2A3B</div>
+          <div class="role">Type, structure</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="chip" style="background: var(--acc);"></div>
+        <div class="body">
+          <div class="name">Sky 400</div>
+          <div class="hex">#38BDF8</div>
+          <div class="role">Accent on dark</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="chip" style="background: var(--soft);"></div>
+        <div class="body">
+          <div class="name">Sky 200</div>
+          <div class="hex">#BAE6FD</div>
+          <div class="role">Tints, fills</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="chip" style="background: var(--pale);"></div>
+        <div class="body">
+          <div class="name">Sky 100</div>
+          <div class="hex">#E0F2FE</div>
+          <div class="role">Backgrounds</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="chip" style="background: var(--cream);"></div>
+        <div class="body">
+          <div class="name">Cream</div>
+          <div class="hex">#F7F4EC</div>
+          <div class="role">Default surface</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="chip" style="background: var(--paper); border: 1px solid var(--rule);"></div>
+        <div class="body">
+          <div class="name">Paper</div>
+          <div class="hex">#FFFFFF</div>
+          <div class="role">Cards, print</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="chip" style="background: #F4FBFF;"></div>
+        <div class="body">
+          <div class="name">Clean</div>
+          <div class="hex">#F4FBFF</div>
+          <div class="role">Type on dark</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────────── Typography ───────────── -->
+  <section>
+    <h2>06 &middot; Typography</h2>
+    <p class="lead">Two faces, both Google Fonts &mdash; free for any use, anywhere.</p>
+
+    <div class="type-spec">
+      <div class="meta">
+        <div style="font-family: 'Bricolage Grotesque'; font-weight: 800; font-size: 22px; color: var(--ink); letter-spacing: -0.02em;">Bricolage Grotesque</div>
+        <div style="margin-top: 10px;"><b>Use for</b> &middot; Wordmark, headings, display</div>
+        <div><b>Weights</b> &middot; 500, 700, 800</div>
+        <div><b>Track</b> &middot; -4% at display sizes</div>
+        <div><b>Source</b> &middot; fonts.google.com</div>
+      </div>
+      <div class="sample" style="font-family: 'Bricolage Grotesque'; font-weight: 800; font-size: 76px; letter-spacing: -3px;">
+        shopylink
+      </div>
+    </div>
+
+    <div class="type-spec">
+      <div class="meta">
+        <div style="font-family: 'JetBrains Mono'; font-weight: 500; font-size: 16px; color: var(--ink); letter-spacing: 0;">JetBrains Mono</div>
+        <div style="margin-top: 10px;"><b>Use for</b> &middot; Tagline, tracking codes, labels</div>
+        <div><b>Weights</b> &middot; 400, 500</div>
+        <div><b>Track</b> &middot; +22% in uppercase</div>
+        <div><b>Source</b> &middot; fonts.google.com</div>
+      </div>
+      <div class="sample" style="font-family: 'JetBrains Mono'; font-weight: 500; font-size: 22px; letter-spacing: 4.8px; text-transform: uppercase; color: var(--ink);">
+        world &middot; to &middot; door
+      </div>
+    </div>
+
+    <div class="type-spec">
+      <div class="meta">
+        <div style="font-family: 'Manrope'; font-weight: 700; font-size: 16px; color: var(--ink); letter-spacing: -0.005em;">Manrope</div>
+        <div style="margin-top: 10px;"><b>Use for</b> &middot; Body, UI, paragraphs</div>
+        <div><b>Weights</b> &middot; 400, 500, 700</div>
+        <div><b>Source</b> &middot; fonts.google.com</div>
+      </div>
+      <div class="sample" style="font-family: 'Manrope'; font-weight: 500; font-size: 17px; line-height: 1.5; letter-spacing: 0; color: var(--ink); text-transform: none;">
+        Your concierge in the world's four shopping capitals. Buy anywhere &mdash; we'll receive, consolidate, and deliver to your door.
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────────── Usage do/don't ───────────── -->
+  <section>
+    <h2>07 &middot; Do &amp; Don't</h2>
+    <p class="lead">A few rules that protect the mark's integrity. Anything else is fair game.</p>
+
+    <div class="rules">
+      <div class="rule-card do">
+        <div class="demo">
+          <div style="max-width:280px;width:100%"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 320" role="img" aria-label="ShopyLink wordmark">
+  <defs>
+    <clipPath id="wvT"><rect x="46" y="6" width="32" height="34"></rect></clipPath><clipPath id="wvB"><rect x="46" y="40" width="32" height="34"></rect></clipPath><mask id="wvMA"><rect width="124" height="80" fill="#fff"></rect><g clip-path="url(#wvT)"><rect x="50" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#000" stroke-width="9"></rect></g></mask><mask id="wvMB"><rect width="124" height="80" fill="#fff"></rect><g clip-path="url(#wvB)"><rect x="6" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#000" stroke-width="9"></rect></g></mask>
+  </defs>
+
+  <text x="640" y="225" text-anchor="end" fill="#0B2A3B" style="font-family:&#39;Bricolage Grotesque&#39;,&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;font-weight:800;font-size:220px;letter-spacing:-9px;">shopy</text>
+
+  <g transform="translate(620 75) scale(1.75)">
+    <rect x="6" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#0B2A3B" stroke-width="9" mask="url(#wvMA)"></rect>
+    <rect x="50" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#0EA5E9" stroke-width="9" mask="url(#wvMB)"></rect>
+    
+  </g>
+
+  <text x="840" y="225" text-anchor="start" fill="#0EA5E9" style="font-family:&#39;Bricolage Grotesque&#39;,&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;font-weight:800;font-size:220px;letter-spacing:-9px;">link</text>
+</svg></div>
+        </div>
+        <div class="label">
+          <span class="badge">Do</span>
+          <span class="text">Use the lockup as supplied. Two-tone ink + sky blue, on cream or paper.</span>
+        </div>
+      </div>
+      <div class="rule-card dont">
+        <div class="demo">
+          <div style="display: flex; align-items: center; font-family: 'Bricolage Grotesque'; font-weight: 800; font-size: 40px; letter-spacing: -1.6px;">
+            <span style="color: #ff5a3c;">shopy</span>
+            <svg width="50" height="32" viewBox="0 0 124 80" style="margin: 0 -2px;"><rect x="6" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#7a44ff" stroke-width="9" mask="url(#wvMA)"/><rect x="50" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#16d97f" stroke-width="9" mask="url(#wvMB)"/></svg>
+            <span style="color: #7a44ff;">link</span>
+          </div>
+        </div>
+        <div class="label">
+          <span class="badge">Don't</span>
+          <span class="text">Don't recolour. The sky blue is the brand.</span>
+        </div>
+      </div>
+      <div class="rule-card do">
+        <div class="demo">
+          <div style="max-width:280px;width:100%"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 320" role="img" aria-label="ShopyLink wordmark">
+  <defs>
+    <clipPath id="wvT"><rect x="46" y="6" width="32" height="34"></rect></clipPath><clipPath id="wvB"><rect x="46" y="40" width="32" height="34"></rect></clipPath><mask id="wvMA"><rect width="124" height="80" fill="#fff"></rect><g clip-path="url(#wvT)"><rect x="50" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#000" stroke-width="9"></rect></g></mask><mask id="wvMB"><rect width="124" height="80" fill="#fff"></rect><g clip-path="url(#wvB)"><rect x="6" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#000" stroke-width="9"></rect></g></mask>
+  </defs>
+
+  <text x="640" y="225" text-anchor="end" fill="#0B2A3B" style="font-family:&#39;Bricolage Grotesque&#39;,&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;font-weight:800;font-size:220px;letter-spacing:-9px;">shopy</text>
+
+  <g transform="translate(620 75) scale(1.75)">
+    <rect x="6" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#0B2A3B" stroke-width="9" mask="url(#wvMA)"></rect>
+    <rect x="50" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#0EA5E9" stroke-width="9" mask="url(#wvMB)"></rect>
+    
+  </g>
+
+  <text x="840" y="225" text-anchor="start" fill="#0EA5E9" style="font-family:&#39;Bricolage Grotesque&#39;,&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;font-weight:800;font-size:220px;letter-spacing:-9px;">link</text>
+</svg></div>
+        </div>
+        <div class="label">
+          <span class="badge">Do</span>
+          <span class="text">Keep the chain rings interlocked &mdash; left over at the bottom, blue over at the top.</span>
+        </div>
+      </div>
+      <div class="rule-card dont">
+        <div class="demo">
+          <div style="display: flex; align-items: center; font-family: 'Bricolage Grotesque'; font-weight: 800; font-size: 40px; letter-spacing: -1.6px; transform: skewX(-8deg);">
+            <span style="color: var(--ink);">shopy</span>
+            <svg width="50" height="32" viewBox="0 0 124 80" style="margin: 0 -2px;"><rect x="6" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="var(--ink)" stroke-width="9" mask="url(#wvMA)"/><rect x="50" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="var(--pri)" stroke-width="9" mask="url(#wvMB)"/></svg>
+            <span style="color: var(--pri);">link</span>
+          </div>
+        </div>
+        <div class="label">
+          <span class="badge">Don't</span>
+          <span class="text">Don't skew, rotate, or distort the lockup.</span>
+        </div>
+      </div>
+      <div class="rule-card do">
+        <div class="demo dark" style="background: var(--ink); padding: 36px 24px;">
+          <div style="max-width:280px;width:100%"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 320" role="img" aria-label="ShopyLink wordmark — for dark backgrounds">
+  <defs>
+    <clipPath id="wvT"><rect x="46" y="6" width="32" height="34"></rect></clipPath><clipPath id="wvB"><rect x="46" y="40" width="32" height="34"></rect></clipPath><mask id="wvMA"><rect width="124" height="80" fill="#fff"></rect><g clip-path="url(#wvT)"><rect x="50" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#000" stroke-width="9"></rect></g></mask><mask id="wvMB"><rect width="124" height="80" fill="#fff"></rect><g clip-path="url(#wvB)"><rect x="6" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#000" stroke-width="9"></rect></g></mask>
+  </defs>
+
+  <text x="640" y="225" text-anchor="end" fill="#F4FBFF" style="font-family:&#39;Bricolage Grotesque&#39;,&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;font-weight:800;font-size:220px;letter-spacing:-9px;">shopy</text>
+
+  <g transform="translate(620 75) scale(1.75)">
+    <rect x="6" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#F4FBFF" stroke-width="9" mask="url(#wvMA)"></rect>
+    <rect x="50" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#38BDF8" stroke-width="9" mask="url(#wvMB)"></rect>
+    
+  </g>
+
+  <text x="840" y="225" text-anchor="start" fill="#38BDF8" style="font-family:&#39;Bricolage Grotesque&#39;,&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;font-weight:800;font-size:220px;letter-spacing:-9px;">link</text>
+</svg></div>
+        </div>
+        <div class="label">
+          <span class="badge">Do</span>
+          <span class="text">On dark surfaces, use the Clean/Sky 400 variant for legibility.</span>
+        </div>
+      </div>
+      <div class="rule-card dont">
+        <div class="demo" style="background: var(--pri); padding: 36px 24px;">
+          <div style="max-width:280px;width:100%;opacity:0.6"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 320" role="img" aria-label="ShopyLink wordmark">
+  <defs>
+    <clipPath id="wvT"><rect x="46" y="6" width="32" height="34"></rect></clipPath><clipPath id="wvB"><rect x="46" y="40" width="32" height="34"></rect></clipPath><mask id="wvMA"><rect width="124" height="80" fill="#fff"></rect><g clip-path="url(#wvT)"><rect x="50" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#000" stroke-width="9"></rect></g></mask><mask id="wvMB"><rect width="124" height="80" fill="#fff"></rect><g clip-path="url(#wvB)"><rect x="6" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#000" stroke-width="9"></rect></g></mask>
+  </defs>
+
+  <text x="640" y="225" text-anchor="end" fill="#0B2A3B" style="font-family:&#39;Bricolage Grotesque&#39;,&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;font-weight:800;font-size:220px;letter-spacing:-9px;">shopy</text>
+
+  <g transform="translate(620 75) scale(1.75)">
+    <rect x="6" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#0B2A3B" stroke-width="9" mask="url(#wvMA)"></rect>
+    <rect x="50" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#0EA5E9" stroke-width="9" mask="url(#wvMB)"></rect>
+    
+  </g>
+
+  <text x="840" y="225" text-anchor="start" fill="#0EA5E9" style="font-family:&#39;Bricolage Grotesque&#39;,&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;font-weight:800;font-size:220px;letter-spacing:-9px;">link</text>
+</svg></div>
+        </div>
+        <div class="label">
+          <span class="badge">Don't</span>
+          <span class="text">Don't place the dark wordmark on sky blue &mdash; not enough contrast.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────────── File inventory ───────────── -->
+  <section>
+    <h2>08 &middot; File inventory</h2>
+    <p class="lead">All assets live in the <span class="mono">ShopyLink Brand/</span> folder.</p>
+
+    <div style="margin-top: 28px;">
+      <h3>SVG &middot; scalable vector originals</h3>
+      <table style="width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 13px;">
+        <thead>
+          <tr style="text-align: left; border-bottom: 1px solid var(--rule);">
+            <th style="padding: 8px 0; font-weight: 700; width: 50%;">File</th>
+            <th style="padding: 8px 0; font-weight: 700;">When to use</th>
+          </tr>
+        </thead>
+        <tbody class="mono" style="font-size: 12px;">
+          <tr style="border-bottom: 1px solid var(--rule);"><td style="padding: 8px 0;">svg/01 Primary lockup.svg</td><td>Default everywhere &middot; web, print, video</td></tr>
+          <tr style="border-bottom: 1px solid var(--rule);"><td style="padding: 8px 0;">svg/02 Primary lockup dark.svg</td><td>On ink or dark photography</td></tr>
+          <tr style="border-bottom: 1px solid var(--rule);"><td style="padding: 8px 0;">svg/03 Mark only.svg</td><td>Avatar, favicon, watermark</td></tr>
+          <tr style="border-bottom: 1px solid var(--rule);"><td style="padding: 8px 0;">svg/04 App icon.svg</td><td>iOS / Android / PWA icon</td></tr>
+          <tr style="border-bottom: 1px solid var(--rule);"><td style="padding: 8px 0;">svg/05 Lockup with tagline.svg</td><td>About page, business card, packaging</td></tr>
+          <tr style="border-bottom: 1px solid var(--rule);"><td style="padding: 8px 0;">svg/06 Mark mono ink.svg</td><td>Single-colour print, stamps</td></tr>
+          <tr style="border-bottom: 1px solid var(--rule);"><td style="padding: 8px 0;">svg/07 Mark mono white.svg</td><td>Reverse on solid colour</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="margin-top: 32px;">
+      <h3>PNG &middot; ready-to-use rasters</h3>
+      <table style="width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 13px;">
+        <thead>
+          <tr style="text-align: left; border-bottom: 1px solid var(--rule);">
+            <th style="padding: 8px 0; font-weight: 700; width: 50%;">File</th>
+            <th style="padding: 8px 0; font-weight: 700;">Size</th>
+          </tr>
+        </thead>
+        <tbody class="mono" style="font-size: 12px;">
+                                                            <tr style="border-bottom: 1px solid var(--rule);"><td style="padding: 8px 0;">png/mark-2048.png</td><td>2048 &middot; print master, mark only</td></tr>
+          <tr style="border-bottom: 1px solid var(--rule);"><td style="padding: 8px 0;">png/mark-1024.png &middot; mark-512.png</td><td>Web &middot; avatar &middot; social</td></tr>
+          <tr style="border-bottom: 1px solid var(--rule);"><td style="padding: 8px 0;">png/mark-mono-ink-1024.png &middot; mark-mono-white-1024.png</td><td>Mono variants</td></tr>
+          <tr style="border-bottom: 1px solid var(--rule);"><td style="padding: 8px 0;">png/app-icon-1024.png &middot; -512.png &middot; -256.png</td><td>App stores &middot; PWA</td></tr>
+          <tr style="border-bottom: 1px solid var(--rule);"><td style="padding: 8px 0;">png/favicon-64.png &middot; favicon-32.png</td><td>Browser tab</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer style="margin-top: 96px; padding-top: 32px; border-top: 1px solid var(--rule); display: flex; justify-content: space-between; align-items: baseline;">
+    <div class="eyebrow">ShopyLink &middot; world to door</div>
+    <div class="mono" style="font-size: 11px; color: var(--mute);">Brand sheet &middot; v1 &middot; May 2026</div>
+  </footer>
+
+</div>
+
+</body>
+<script>
+(async () => {
+  await document.fonts.ready;
+  await new Promise(r => setTimeout(r, 600));
+  window.print();
+})();
+</script>
+</html>

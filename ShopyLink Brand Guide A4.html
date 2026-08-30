@@ -1,0 +1,508 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>ShopyLink — Brand Guide (A4) · دليل الهوية</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0B2A3B; --pri:#0EA5E9; --acc:#38BDF8; --soft:#BAE6FD; --pale:#E0F2FE;
+    --clean:#F4FBFF; --cream:#F7F4EC; --paper:#FFFFFF; --deep:#0A4A6B; --sand:#E8DCC3;
+    --rule:rgba(11,42,59,.14); --rule2:rgba(11,42,59,.07);
+    --mute:rgba(11,42,59,.55); --mute2:rgba(11,42,59,.40);
+    --en:'Bricolage Grotesque',system-ui,sans-serif;
+    --ar:'Tajawal',system-ui,sans-serif;
+    --body:'Manrope',system-ui,sans-serif;
+    --mono:'JetBrains Mono',ui-monospace,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:var(--body);color:var(--ink);background:#6b7780;-webkit-font-smoothing:antialiased;}
+  ::selection{background:var(--acc);color:var(--ink);}
+
+  /* ── A4 page ─────────────────────────────────── */
+  .page{
+    width:210mm;height:297mm;background:var(--paper);position:relative;overflow:hidden;
+    padding:19mm 18mm 15mm;display:flex;flex-direction:column;
+  }
+  .page.dark{background:var(--ink);color:var(--clean);}
+
+  @media screen{
+    .page{margin:9mm auto;box-shadow:0 6px 36px rgba(0,0,0,.30);}
+  }
+  @page{size:A4;margin:0;}
+  @media print{
+    html,body{background:#fff;margin:0;padding:0;width:210mm;}
+    .page{width:210mm;height:296mm;margin:0;box-shadow:none;overflow:hidden;
+      page-break-after:always;break-after:page;}
+    .page:last-child{page-break-after:avoid;break-after:auto;}
+    *{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;}
+  }
+
+  /* ── running header / footer ─────────────────── */
+  .phead{display:flex;justify-content:space-between;align-items:baseline;
+    font-family:var(--mono);font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--mute);}
+  .dark .phead{color:rgba(244,251,255,.5);}
+  .pfoot{margin-top:auto;display:flex;justify-content:space-between;align-items:center;
+    font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--mute2);
+    border-top:1px solid var(--rule);padding-top:9px;}
+  .dark .pfoot{color:rgba(244,251,255,.45);border-top-color:rgba(244,251,255,.16);}
+
+  /* ── section heading ─────────────────────────── */
+  .body{flex:1;display:flex;flex-direction:column;}
+  .shead{margin:9mm 0 7mm;}
+  .snum{font-family:var(--mono);font-size:12px;color:var(--pri);letter-spacing:.04em;}
+  .stitle{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-top:8px;}
+  h2{font-family:var(--en);font-weight:800;letter-spacing:-.03em;font-size:33px;line-height:1.04;white-space:nowrap;flex:0 0 auto;}
+  .h2-ar{flex:0 0 auto;}
+  .h2-ar{font-family:var(--ar);font-weight:800;font-size:25px;color:var(--mute);direction:rtl;}
+  .lead{font-size:13.5px;line-height:1.55;color:var(--mute);max-width:62ch;margin-top:12px;}
+  h3{font-family:var(--en);font-weight:700;font-size:14px;letter-spacing:-.01em;}
+  .mono{font-family:var(--mono);}
+  .ar{font-family:var(--ar);direction:rtl;}
+
+  /* ── wordmark ────────────────────────────────── */
+  .wm{display:inline-flex;align-items:center;line-height:1;font-family:var(--en);font-weight:800;letter-spacing:-.04em;white-space:nowrap;}
+  .wm .ink{color:var(--ink);} .wm .blue{color:var(--pri);}
+  .wm .clean{color:var(--clean);} .wm .acc{color:var(--acc);}
+  .wm-chain{height:.64em;width:auto;margin:0 -.05em;flex:none;}
+  .wm.ar-wm{font-family:var(--ar);font-weight:900;letter-spacing:0;direction:rtl;}
+  .chain{display:inline-block;vertical-align:middle;}
+
+  /* ── tiles / frames ──────────────────────────── */
+  .tile{border:1px solid var(--rule);border-radius:9px;display:flex;align-items:center;justify-content:center;background:var(--cream);overflow:hidden;}
+  .tile.paper{background:var(--paper);}
+  .tile.dark{background:var(--ink);border-color:transparent;}
+  .cap{font-family:var(--mono);font-size:10px;color:var(--mute);margin-top:9px;letter-spacing:.01em;}
+  .cap b{color:var(--ink);font-weight:500;}
+
+  .g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+  .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;}
+
+  /* ── swatches ────────────────────────────────── */
+  .sw{border-radius:8px;overflow:hidden;border:1px solid var(--rule);background:var(--paper);}
+  .sw .chip{height:60px;}
+  .sw .b{padding:9px 11px;}
+  .sw .nm{font-family:var(--en);font-weight:700;font-size:13px;}
+  .sw .hx{font-family:var(--mono);font-size:10px;color:var(--mute);margin-top:1px;}
+  .sw .rl{font-size:9px;color:var(--mute);margin-top:5px;text-transform:uppercase;letter-spacing:.08em;}
+
+  /* ── type specimen ───────────────────────────── */
+  .spec{padding:15px 0;border-bottom:1px solid var(--rule);display:grid;grid-template-columns:185px 1fr;gap:20px;align-items:baseline;}
+  .spec:last-child{border-bottom:none;}
+  .spec .meta{font-family:var(--mono);font-size:10px;color:var(--mute);line-height:1.7;}
+  .spec .meta b{color:var(--ink);font-weight:500;}
+  .spec .nmf{font-family:var(--en);font-weight:800;font-size:16px;color:var(--ink);letter-spacing:-.02em;margin-bottom:7px;}
+
+  /* ── do / dont ───────────────────────────────── */
+  .rc{border:1px solid var(--rule);border-radius:9px;overflow:hidden;}
+  .rc .demo{padding:26px 18px;min-height:96px;display:flex;align-items:center;justify-content:center;background:var(--cream);}
+  .rc.dont .demo{background:#f5eceb;}
+  .rc .lab{display:flex;align-items:center;gap:10px;padding:10px 13px;border-top:1px solid var(--rule);background:var(--paper);}
+  .badge{font-family:var(--mono);font-size:9px;letter-spacing:.1em;padding:3px 8px;border-radius:4px;text-transform:uppercase;color:#fff;}
+  .rc.do .badge{background:var(--pri);} .rc.dont .badge{background:#b4453a;}
+  .rc .txt{font-size:11px;color:var(--ink);line-height:1.4;}
+
+  /* ── note ────────────────────────────────────── */
+  .note{background:var(--pale);border:1px solid var(--soft);border-radius:9px;padding:13px 15px;font-size:11.5px;line-height:1.5;}
+  .note b{font-weight:700;}
+
+  /* ── market chips ────────────────────────────── */
+  .markets{display:flex;flex-wrap:wrap;gap:8px;}
+  .mk{display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:999px;border:1px solid var(--rule);font-family:var(--mono);font-size:11px;background:var(--paper);}
+  .mk .d{width:6px;height:6px;border-radius:50%;background:var(--pri);}
+
+  /* ── pill / tagline ──────────────────────────── */
+  .pill{display:inline-flex;align-items:center;gap:9px;padding:8px 16px;border-radius:999px;background:var(--ink);color:var(--clean);font-family:var(--en);font-weight:800;letter-spacing:-.02em;font-size:16px;}
+  .pill .acc{color:var(--acc);}
+  .arrow{width:30px;height:11px;}
+</style>
+</head>
+<body>
+
+<!-- chain symbols -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <clipPath id="wv-top"><rect x="46" y="6" width="32" height="34"/></clipPath>
+  <clipPath id="wv-bot"><rect x="46" y="40" width="32" height="34"/></clipPath>
+  <mask id="wv-mA"><rect width="124" height="80" fill="#fff"/><g clip-path="url(#wv-top)"><rect x="50" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#000" stroke-width="9"/></g></mask>
+  <mask id="wv-mB"><rect width="124" height="80" fill="#fff"/><g clip-path="url(#wv-bot)"><rect x="6" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#000" stroke-width="9"/></g></mask>
+  <symbol id="chain-duo" viewBox="0 0 124 80"><rect x="6" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#0B2A3B" stroke-width="9" mask="url(#wv-mA)"/><rect x="50" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#0EA5E9" stroke-width="9" mask="url(#wv-mB)"/></symbol>
+  <symbol id="chain-dark" viewBox="0 0 124 80"><rect x="6" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#F4FBFF" stroke-width="9" mask="url(#wv-mA)"/><rect x="50" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#38BDF8" stroke-width="9" mask="url(#wv-mB)"/></symbol>
+  <symbol id="chain-ink" viewBox="0 0 124 80"><rect x="6" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#0B2A3B" stroke-width="9" mask="url(#wv-mA)"/><rect x="50" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#0B2A3B" stroke-width="9" mask="url(#wv-mB)"/></symbol>
+  <symbol id="chain-white" viewBox="0 0 124 80"><rect x="6" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#FFFFFF" stroke-width="9" mask="url(#wv-mA)"/><rect x="50" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#FFFFFF" stroke-width="9" mask="url(#wv-mB)"/></symbol>
+</svg>
+
+<!-- ══════════ PAGE 1 · COVER ══════════ -->
+<section class="page dark">
+  <div class="phead">
+    <span>ShopyLink · Brand Guide</span>
+    <span style="text-align:right;">دليل الهوية · 2026</span>
+  </div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:40px;">
+    <svg class="chain" viewBox="0 0 124 80" style="width:88px;"><use href="#chain-dark"/></svg>
+    <div>
+      <div class="wm" style="font-size:72px;"><span class="clean">shopy</span><svg class="wm-chain" viewBox="0 0 124 80"><use href="#chain-dark"/></svg><span class="acc">link</span></div>
+      <div class="wm ar-wm" dir="rtl" style="font-size:64px;margin-top:26px;display:flex;justify-content:flex-start;"><span class="clean">شوبي</span><svg class="wm-chain" viewBox="0 0 124 80"><use href="#chain-dark"/></svg><span class="acc">لينك</span></div>
+    </div>
+    <div style="margin-top:6px;">
+      <div style="display:flex;align-items:center;gap:14px;">
+        <span style="width:42px;height:2px;background:var(--acc);"></span>
+        <span class="mono" style="font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:rgba(244,251,255,.75);">world · to · door</span>
+      </div>
+      <div class="ar" style="font-family:var(--ar);font-weight:700;font-size:19px;color:rgba(244,251,255,.7);margin-top:14px;direction:rtl;">العالم إلى البيت</div>
+    </div>
+  </div>
+  <div class="pfoot">
+    <span>Brand Guide</span>
+    <span>Issue 02 · 2026</span>
+  </div>
+</section>
+
+<!-- ══════════ PAGE 2 · THE PROMISE ══════════ -->
+<section class="page">
+  <div class="phead"><span>ShopyLink · Brand Guide</span><span>01 · The promise</span></div>
+  <div class="body">
+    <div class="shead">
+      <div class="snum">01</div>
+      <div class="stitle"><h2>The promise</h2><span class="h2-ar">الوعد</span></div>
+    </div>
+    <p style="font-family:var(--en);font-weight:800;font-size:27px;line-height:1.18;letter-spacing:-.025em;max-width:20ch;">An address in <span style="color:var(--pri)">every shopping capital</span> — and the parcel brought home.</p>
+    <p class="ar" style="font-family:var(--ar);font-weight:800;font-size:23px;line-height:1.45;max-width:22ch;text-align:right;margin-left:auto;margin-top:18px;">عنوان لك في <span style="color:var(--pri)">كل عواصم التسوّق</span> — ونوصّل طردك إلى البيت.</p>
+
+    <div class="g2" style="margin-top:30px;align-items:start;gap:26px;">
+      <p class="lead" style="margin:0;">You shop the world. We receive, consolidate, and deliver to your door — from the UAE, China, the USA and Turkey.</p>
+      <p class="ar lead" style="margin:0;font-family:var(--ar);text-align:right;line-height:1.85;">تتسوّق من كل العالم، ونحن نستلم ونجمّع ونوصّل إلى بابك — من الإمارات والصين وأمريكا وتركيا.</p>
+    </div>
+
+    <div style="margin-top:auto;padding-top:26px;">
+      <div class="mono" style="font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--mute);margin-bottom:11px;">Markets · الأسواق</div>
+      <div class="markets">
+        <span class="mk"><span class="d"></span>UAE · الإمارات</span>
+        <span class="mk"><span class="d"></span>China · الصين</span>
+        <span class="mk"><span class="d"></span>USA · أمريكا</span>
+        <span class="mk"><span class="d"></span>Türkiye · تركيا</span>
+        <span class="mk" style="border-style:dashed;">→ your door · بابك</span>
+      </div>
+    </div>
+  </div>
+  <div class="pfoot"><span>shopylink.co</span><span>02</span></div>
+</section>
+
+<!-- ══════════ PAGE 3 · THE LOGO ══════════ -->
+<section class="page">
+  <div class="phead"><span>ShopyLink · Brand Guide</span><span>02 · The logo</span></div>
+  <div class="body">
+    <div class="shead">
+      <div class="snum">02</div>
+      <div class="stitle"><h2>The logo</h2><span class="h2-ar">الشعار</span></div>
+      <p class="lead">A horizontal wordmark with an interlocking two-ring chain in the seam between <i>shopy</i> and <i>link</i>. This is the primary mark — use it 90% of the time.</p>
+    </div>
+
+    <div class="tile paper" style="height:150px;">
+      <span class="wm" style="font-size:62px;"><span class="ink">shopy</span><svg class="wm-chain" viewBox="0 0 124 80"><use href="#chain-duo"/></svg><span class="blue">link</span></span>
+    </div>
+    <div class="cap"><b>Primary · light.</b> Ink + Sky on cream or paper.</div>
+
+    <div class="g3" style="margin-top:20px;">
+      <div>
+        <div class="tile dark" style="height:110px;"><span class="wm" style="font-size:34px;"><span class="clean">shopy</span><svg class="wm-chain" viewBox="0 0 124 80"><use href="#chain-dark"/></svg><span class="acc">link</span></span></div>
+        <div class="cap"><b>On dark.</b> Clean + Sky 400.</div>
+      </div>
+      <div>
+        <div class="tile paper" style="height:110px;position:relative;">
+          <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-family:var(--mono);font-size:10px;color:var(--pri);">x</span>
+          <span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-family:var(--mono);font-size:10px;color:var(--pri);">x</span>
+          <div style="outline:1px solid var(--rule);padding:7px 15px;"><span class="wm" style="font-size:30px;"><span class="ink">shopy</span><svg class="wm-chain" viewBox="0 0 124 80"><use href="#chain-duo"/></svg><span class="blue">link</span></span></div>
+        </div>
+        <div class="cap"><b>Clearspace.</b> = the cap-height of the mark (x).</div>
+      </div>
+      <div>
+        <div class="tile paper" style="height:110px;"><svg class="chain" viewBox="0 0 124 80" style="width:54%;"><use href="#chain-duo"/></svg></div>
+        <div class="cap"><b>Min size.</b> 24 px / 8 mm wide on print.</div>
+      </div>
+    </div>
+
+    <div class="note" style="margin-top:22px;"><b>One mark, two finishes.</b> The light lockup for cream and paper; the dark lockup for ink and photography. Never rebuild or recolour the chain — it is fixed.</div>
+  </div>
+  <div class="pfoot"><span>shopylink.co</span><span>03</span></div>
+</section>
+
+<!-- ══════════ PAGE 4 · BILINGUAL ══════════ -->
+<section class="page">
+  <div class="phead"><span>ShopyLink · Brand Guide</span><span>03 · Bilingual system</span></div>
+  <div class="body">
+    <div class="shead">
+      <div class="snum">03</div>
+      <div class="stitle"><h2>Bilingual system</h2><span class="h2-ar">النظام ثنائي اللغة</span></div>
+      <p class="lead">The Arabic wordmark <b dir="rtl" style="font-family:var(--ar)">شوبي لينك</b> is set in Tajawal Black to match Bricolage's weight. The chain mark is shared, unchanged, between both scripts.</p>
+    </div>
+
+    <div class="g2" style="gap:14px;">
+      <div>
+        <div class="tile paper" style="height:120px;"><span class="wm" style="font-size:40px;"><span class="ink">shopy</span><svg class="wm-chain" viewBox="0 0 124 80"><use href="#chain-duo"/></svg><span class="blue">link</span></span></div>
+        <div class="cap"><b>Latin.</b> Bricolage 800 · reads shopy → link</div>
+      </div>
+      <div>
+        <div class="tile paper" style="height:120px;"><span class="wm ar-wm" dir="rtl" style="font-size:42px;"><span class="ink">شوبي</span><svg class="wm-chain" viewBox="0 0 124 80"><use href="#chain-duo"/></svg><span class="blue">لينك</span></span></div>
+        <div class="cap"><b>Arabic.</b> Tajawal 900 · reads شوبي ← لينك</div>
+      </div>
+    </div>
+
+    <div class="tile paper" style="height:150px;flex-direction:column;gap:14px;margin-top:14px;">
+      <span class="wm" style="font-size:40px;"><span class="ink">shopy</span><svg class="wm-chain" viewBox="0 0 124 80"><use href="#chain-duo"/></svg><span class="blue">link</span></span>
+      <span class="wm ar-wm" dir="rtl" style="font-size:32px;"><span class="ink">شوبي</span><svg class="wm-chain" viewBox="0 0 124 80"><use href="#chain-duo"/></svg><span class="blue">لينك</span></span>
+    </div>
+    <div class="cap"><b>Stacked lockup.</b> Latin on top, Arabic below, centred — shared chain.</div>
+
+    <div class="g3" style="margin-top:22px;">
+      <div class="note"><b>Reading order.</b> Arabic flows right→left: شوبي sits right, لينك left. The chain stays in the middle.</div>
+      <div class="note"><b>Direction.</b> In Arabic layouts set <span class="mono" style="font-size:10px;">dir="rtl"</span>; arrows and the tagline flip to point ← .</div>
+      <div class="note"><b>Never mix scripts.</b> Keep each script whole — don't interleave Latin and Arabic in one lockup line.</div>
+    </div>
+  </div>
+  <div class="pfoot"><span>shopylink.co</span><span>04</span></div>
+</section>
+
+<!-- ══════════ PAGE 5 · SYMBOL & APP ICON ══════════ -->
+<section class="page">
+  <div class="phead"><span>ShopyLink · Brand Guide</span><span>04 · Symbol &amp; icon</span></div>
+  <div class="body">
+    <div class="shead">
+      <div class="snum">04</div>
+      <div class="stitle"><h2>Symbol &amp; app icon</h2><span class="h2-ar">الرمز والأيقونة</span></div>
+      <p class="lead">When the wordmark won't read — avatars, favicons, app stores — use the chain mark alone or the gradient app icon.</p>
+    </div>
+
+    <div class="g4">
+      <div>
+        <div class="tile paper" style="aspect-ratio:1/1;"><svg class="chain" viewBox="0 0 124 80" style="width:62%;"><use href="#chain-duo"/></svg></div>
+        <div class="cap">Mark · 2-colour</div>
+      </div>
+      <div>
+        <div class="tile dark" style="aspect-ratio:1/1;"><svg class="chain" viewBox="0 0 124 80" style="width:62%;"><use href="#chain-dark"/></svg></div>
+        <div class="cap">Mark · on dark</div>
+      </div>
+      <div>
+        <div class="tile" style="aspect-ratio:1/1;padding:0;border:none;background:transparent;">
+          <svg viewBox="0 0 1024 1024" style="width:100%;height:100%;border-radius:22%;">
+            <defs>
+              <linearGradient id="ai-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#38BDF8"/><stop offset="60%" stop-color="#0EA5E9"/><stop offset="100%" stop-color="#0A4A6B"/></linearGradient>
+              <clipPath id="ai-bot"><rect x="50" y="44" width="24" height="22"/></clipPath>
+            </defs>
+            <rect width="1024" height="1024" rx="225" fill="url(#ai-g)"/>
+            <g transform="translate(512,512) scale(5.6) translate(-62,-40)">
+              <rect x="6" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#fff" stroke-width="9"/>
+              <rect x="50" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#38BDF8" stroke-width="9"/>
+              <g clip-path="url(#ai-bot)"><rect x="6" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#fff" stroke-width="9"/></g>
+            </g>
+          </svg>
+        </div>
+        <div class="cap">App icon · gradient</div>
+      </div>
+      <div>
+        <div class="tile pale" style="aspect-ratio:1/1;background:var(--pale);border-color:transparent;"><svg class="chain" viewBox="0 0 124 80" style="width:58%;"><use href="#chain-duo"/></svg></div>
+        <div class="cap">Avatar · tint</div>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:16px;padding:16px 20px;background:var(--paper);border:1px solid var(--rule);border-radius:10px;margin-top:22px;">
+      <svg class="chain" viewBox="0 0 124 80" style="width:44px;"><use href="#chain-duo"/></svg>
+      <svg class="chain" viewBox="0 0 124 80" style="width:30px;"><use href="#chain-duo"/></svg>
+      <svg class="chain" viewBox="0 0 124 80" style="width:19px;"><use href="#chain-duo"/></svg>
+      <span class="cap" style="margin:0;">Favicon · 48 / 32 / 20 px — keep the seam crisp</span>
+    </div>
+
+    <div class="note" style="margin-top:22px;"><b>Pick the simplest that reads.</b> Full lockup first; chain mark when space is tight; gradient icon only for app stores and home screens.</div>
+  </div>
+  <div class="pfoot"><span>shopylink.co</span><span>05</span></div>
+</section>
+
+<!-- ══════════ PAGE 6 · COLOUR ══════════ -->
+<section class="page">
+  <div class="phead"><span>ShopyLink · Brand Guide</span><span>05 · Colour</span></div>
+  <div class="body">
+    <div class="shead">
+      <div class="snum">05</div>
+      <div class="stitle"><h2>Colour</h2><span class="h2-ar">الألوان</span></div>
+      <p class="lead">Four blues, one near-black, two paper tones — and one warm sand reserved for the playful side.</p>
+    </div>
+
+    <div class="g4">
+      <div class="sw"><div class="chip" style="background:var(--pri)"></div><div class="b"><div class="nm">Sky 500</div><div class="hx">#0EA5E9</div><div class="rl">Primary brand</div></div></div>
+      <div class="sw"><div class="chip" style="background:var(--ink)"></div><div class="b"><div class="nm">Ink</div><div class="hx">#0B2A3B</div><div class="rl">Type · structure</div></div></div>
+      <div class="sw"><div class="chip" style="background:var(--acc)"></div><div class="b"><div class="nm">Sky 400</div><div class="hx">#38BDF8</div><div class="rl">Accent on dark</div></div></div>
+      <div class="sw"><div class="chip" style="background:var(--deep)"></div><div class="b"><div class="nm">Deep</div><div class="hx">#0A4A6B</div><div class="rl">Icon gradient</div></div></div>
+      <div class="sw"><div class="chip" style="background:var(--soft)"></div><div class="b"><div class="nm">Sky 200</div><div class="hx">#BAE6FD</div><div class="rl">Tints · fills</div></div></div>
+      <div class="sw"><div class="chip" style="background:var(--pale)"></div><div class="b"><div class="nm">Sky 100</div><div class="hx">#E0F2FE</div><div class="rl">Backgrounds</div></div></div>
+      <div class="sw"><div class="chip" style="background:var(--cream)"></div><div class="b"><div class="nm">Cream</div><div class="hx">#F7F4EC</div><div class="rl">Default surface</div></div></div>
+      <div class="sw"><div class="chip" style="background:var(--sand)"></div><div class="b"><div class="nm">Sand</div><div class="hx">#E8DCC3</div><div class="rl">Play · kraft</div></div></div>
+    </div>
+
+    <div style="margin-top:26px;">
+      <h3>Usage balance</h3>
+      <div style="display:flex;height:42px;border-radius:8px;overflow:hidden;margin-top:11px;border:1px solid var(--rule);">
+        <div style="flex:55;background:var(--cream)"></div><div style="flex:22;background:var(--ink)"></div><div style="flex:15;background:var(--pri)"></div><div style="flex:5;background:var(--acc)"></div><div style="flex:3;background:var(--sand)"></div>
+      </div>
+      <div class="cap">≈ 55% cream · 22% ink · 15% sky · 5% accent · 3% sand</div>
+    </div>
+
+    <div class="note" style="margin-top:auto;"><b>Contrast.</b> Ink on cream and Clean (#F4FBFF) on ink both pass AA. Never set Ink type on Sky 500 — too low contrast.</div>
+  </div>
+  <div class="pfoot"><span>shopylink.co</span><span>06</span></div>
+</section>
+
+<!-- ══════════ PAGE 7 · TYPOGRAPHY ══════════ -->
+<section class="page">
+  <div class="phead"><span>ShopyLink · Brand Guide</span><span>06 · Typography</span></div>
+  <div class="body">
+    <div class="shead">
+      <div class="snum">06</div>
+      <div class="stitle"><h2>Typography</h2><span class="h2-ar">الخطوط</span></div>
+      <p class="lead">Four families, all free Google Fonts. Bricolage leads in Latin, Tajawal in Arabic — matched in weight so the two scripts feel like one voice.</p>
+    </div>
+
+    <div class="spec">
+      <div class="meta">
+        <div class="nmf">Bricolage Grotesque</div>
+        <div><b>Use</b> · Latin wordmark, headings</div>
+        <div><b>Weights</b> · 500 / 700 / 800</div>
+        <div><b>Track</b> · −4% at display</div>
+      </div>
+      <div style="font-family:var(--en);font-weight:800;font-size:52px;letter-spacing:-2px;line-height:1;">shopylink Aa</div>
+    </div>
+
+    <div class="spec">
+      <div class="meta">
+        <div class="nmf" style="font-family:var(--ar);font-weight:900;">Tajawal · تجوّل</div>
+        <div><b>Use</b> · Arabic wordmark, headings, body</div>
+        <div><b>Weights</b> · 400 / 500 / 700 / 800 / 900</div>
+        <div><b>Match</b> · 900 = Bricolage 800</div>
+      </div>
+      <div class="ar" style="font-family:var(--ar);font-weight:900;font-size:50px;direction:rtl;line-height:1;">شوبي لينك ٱبج</div>
+    </div>
+
+    <div class="spec">
+      <div class="meta">
+        <div class="nmf" style="font-family:var(--mono);font-weight:500;font-size:14px;">JetBrains Mono</div>
+        <div><b>Use</b> · Tagline, tracking codes, labels</div>
+        <div><b>Weights</b> · 400 / 500</div>
+        <div><b>Track</b> · +24% uppercase</div>
+      </div>
+      <div class="mono" style="font-weight:500;font-size:18px;letter-spacing:4px;text-transform:uppercase;">world · to · door</div>
+    </div>
+
+    <div class="spec">
+      <div class="meta">
+        <div class="nmf" style="font-family:var(--body);font-weight:700;font-size:14px;">Manrope</div>
+        <div><b>Use</b> · Latin body, UI, paragraphs</div>
+        <div><b>Weights</b> · 400 / 500 / 700</div>
+      </div>
+      <div style="font-family:var(--body);font-weight:500;font-size:16px;line-height:1.5;max-width:44ch;">Your concierge in the world's shopping capitals. Buy anywhere — we'll receive, consolidate and deliver to your door.</div>
+    </div>
+  </div>
+  <div class="pfoot"><span>shopylink.co</span><span>07</span></div>
+</section>
+
+<!-- ══════════ PAGE 8 · VOICE & TONE ══════════ -->
+<section class="page">
+  <div class="phead"><span>ShopyLink · Brand Guide</span><span>07 · Voice &amp; tone</span></div>
+  <div class="body">
+    <div class="shead">
+      <div class="snum">07</div>
+      <div class="stitle"><h2>Voice &amp; tone</h2><span class="h2-ar">الصوت والنبرة</span></div>
+      <p class="lead">Warm, plain-spoken, quietly confident. We are the friend abroad who handles the boring part so the parcel just arrives.</p>
+    </div>
+
+    <div class="g3" style="gap:18px;">
+      <div>
+        <h3>We sound</h3>
+        <p style="margin-top:8px;font-size:12.5px;line-height:1.55;color:var(--ink);">Clear over clever. Short sentences. We say what we do — receive, consolidate, deliver — and skip the hype.</p>
+      </div>
+      <div>
+        <h3>We don't sound</h3>
+        <p style="margin-top:8px;font-size:12.5px;line-height:1.55;color:var(--ink);">Corporate, jargon-heavy, or breathless. No "revolutionary logistics synergy." Just: your stuff, brought home.</p>
+      </div>
+      <div>
+        <h3 style="font-family:var(--ar);direction:rtl;text-align:right;">نبرتنا بالعربية</h3>
+        <p class="ar" style="margin-top:8px;font-size:12.5px;font-family:var(--ar);text-align:right;line-height:1.85;">واضحة وقريبة من الناس، بلهجة بسيطة ومطمئنة. نقول ما نفعله بالضبط: نستلم، نجمّع، ونوصّل إلى بابك.</p>
+      </div>
+    </div>
+
+    <div style="margin-top:30px;">
+      <h3>Lines we'd write</h3>
+      <div class="g2" style="margin-top:12px;gap:14px;">
+        <div class="note"><b>EN.</b> "You shop the world. We bring it home." · "One address in every market." · "Track it from cart to doorstep."</div>
+        <div class="note ar" style="font-family:var(--ar);direction:rtl;text-align:right;"><b>AR.</b> «تسوّق من كل العالم، ونحن نوصّله لبيتك.» · «عنوان واحد في كل سوق.» · «تابع طردك من السلة حتى الباب.»</div>
+      </div>
+    </div>
+
+    <div style="margin-top:auto;display:flex;justify-content:center;gap:20px;padding-top:26px;">
+      <span class="pill"><span class="clean">world</span><svg class="arrow" viewBox="0 0 60 14"><path d="M4 7 L50 7" stroke="#38BDF8" stroke-width="2" stroke-linecap="round" stroke-dasharray="1 4"/><path d="M48 3 L56 7 L48 11" fill="none" stroke="#38BDF8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="acc">door</span></span>
+      <span class="pill ar" dir="rtl" style="font-family:var(--ar);font-weight:800;"><span class="clean">العالم</span><svg class="arrow" style="transform:scaleX(-1);" viewBox="0 0 60 14"><path d="M4 7 L50 7" stroke="#38BDF8" stroke-width="2" stroke-linecap="round" stroke-dasharray="1 4"/><path d="M48 3 L56 7 L48 11" fill="none" stroke="#38BDF8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="acc">البيت</span></span>
+    </div>
+  </div>
+  <div class="pfoot"><span>shopylink.co</span><span>08</span></div>
+</section>
+
+<!-- ══════════ PAGE 9 · DO & DON'T ══════════ -->
+<section class="page">
+  <div class="phead"><span>ShopyLink · Brand Guide</span><span>08 · Do &amp; Don't</span></div>
+  <div class="body">
+    <div class="shead">
+      <div class="snum">08</div>
+      <div class="stitle"><h2>Do &amp; Don't</h2><span class="h2-ar">الصواب والخطأ</span></div>
+      <p class="lead">A few rules protect the mark. Everything else is fair game.</p>
+    </div>
+
+    <div class="g2" style="gap:14px;">
+      <div class="rc do">
+        <div class="demo"><span class="wm" style="font-size:30px;"><span class="ink">shopy</span><svg class="wm-chain" viewBox="0 0 124 80"><use href="#chain-duo"/></svg><span class="blue">link</span></span></div>
+        <div class="lab"><span class="badge">Do</span><span class="txt">Use the lockup as supplied — ink + sky, on cream or paper.</span></div>
+      </div>
+      <div class="rc dont">
+        <div class="demo"><span class="wm" style="font-size:30px;"><span style="color:#ff5a3c">shopy</span><svg class="wm-chain" viewBox="0 0 124 80"><rect x="6" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#7a44ff" stroke-width="9"/><rect x="50" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#16d97f" stroke-width="9"/></svg><span style="color:#7a44ff">link</span></span></div>
+        <div class="lab"><span class="badge">Don't</span><span class="txt">Don't recolour. The sky blue is the brand.</span></div>
+      </div>
+      <div class="rc do">
+        <div class="demo" style="background:var(--ink);"><span class="wm" style="font-size:30px;"><span class="clean">shopy</span><svg class="wm-chain" viewBox="0 0 124 80"><use href="#chain-dark"/></svg><span class="acc">link</span></span></div>
+        <div class="lab"><span class="badge">Do</span><span class="txt">On dark, switch to Clean + Sky 400 for legibility.</span></div>
+      </div>
+      <div class="rc dont">
+        <div class="demo"><span class="wm" style="font-size:30px;transform:skewX(-9deg);"><span class="ink">shopy</span><svg class="wm-chain" viewBox="0 0 124 80"><use href="#chain-duo"/></svg><span class="blue">link</span></span></div>
+        <div class="lab"><span class="badge">Don't</span><span class="txt">Don't skew, rotate, stretch or distort.</span></div>
+      </div>
+      <div class="rc do">
+        <div class="demo"><span class="wm ar-wm" dir="rtl" style="font-size:28px;"><span class="ink">شوبي</span><svg class="wm-chain" viewBox="0 0 124 80"><use href="#chain-duo"/></svg><span class="blue">لينك</span></span></div>
+        <div class="lab"><span class="badge">Do</span><span class="txt">Set Arabic in Tajawal, same two-tone, chain unchanged.</span></div>
+      </div>
+      <div class="rc dont">
+        <div class="demo"><span style="font-family:var(--body);font-weight:400;font-size:28px;direction:rtl;color:var(--ink);">شوبي لينك</span></div>
+        <div class="lab"><span class="badge">Don't</span><span class="txt">Don't set the Arabic name in a default or thin font.</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="pfoot"><span>shopylink.co</span><span>09</span></div>
+</section>
+
+<!-- ══════════ PAGE 10 · BACK COVER ══════════ -->
+<section class="page dark">
+  <div class="phead"><span>ShopyLink · Brand Guide</span><span style="text-align:right;">دليل الهوية · 2026</span></div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:24px;">
+    <span class="wm" style="font-size:48px;"><span class="clean">shopy</span><svg class="wm-chain" viewBox="0 0 124 80"><use href="#chain-dark"/></svg><span class="acc">link</span></span>
+    <div style="display:flex;align-items:center;gap:14px;">
+      <span style="width:42px;height:2px;background:var(--acc);"></span>
+      <span class="mono" style="font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:rgba(244,251,255,.7);">world · to · door · العالم إلى البيت</span>
+    </div>
+    <p style="max-width:46ch;font-size:13px;line-height:1.7;color:rgba(244,251,255,.7);">The complete identity system for ShopyLink — bilingual, built for app, web, print and shipping. Source files live in <span class="mono" style="font-size:11px;color:var(--acc);">ShopyLink Brand/</span>. Use SVG to scale, PNG to drop in.</p>
+  </div>
+  <div class="pfoot">
+    <span>shopylink.co · hello@shopylink.co</span>
+    <span>Issue 02 · 2026</span>
+  </div>
+</section>
+
+</body>
+</html>
