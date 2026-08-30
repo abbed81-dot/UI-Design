@@ -11,6 +11,9 @@ export type SavedState = {
   pinned?: string[];        /* module files, max 5 */
   whoId?: string;
   rail?: boolean;
+  /* what the owner registered while trying the prototype — the demo must let
+     him WORK, and work that vanishes on reload is not work */
+  intakes?: { ref: string; client: string; from: string; to: string; mode: 'air' | 'land' | 'sea'; weight: number; cartons: number; at: number }[];
 };
 
 const KEY = 'SL_CONSOLE_V2_STATE';

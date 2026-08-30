@@ -12,7 +12,7 @@ import { LOCKUP_EN } from '@/lib/lockup_en';
 import { MARK_LIGHT } from '@/lib/mark';
 import {
   dayTasks, dayFigures, dayMe, dayThreads, denseTasks, dayNews, dayTrail, dayDetails,
-  dayStaff, weekIntake, weekMeasured, weekLate, GROUP_META, type Task, type NewsItem,
+  dayStaff, weekIntake, weekMeasured, weekLate, GROUP_META, intakeToTask, nextRef, openTrips, type Task, type NewsItem, type Intake,
 } from '@/lib/day';
 import { readState, writeState, type SavedState } from '@/lib/store';
 
@@ -69,7 +69,8 @@ export default function App() {
   /* where the person is: his day, or one service — the whole experience stays
      inside the console, in one language, and the ONLY bridge between the two
      experiences is the language toggle */
-  const [view, setView] = useState<{ t: 'home' } | { t: 'svc'; file: string }>({ t: 'home' });
+  const [view, setView] = useState<{ t: 'home' } | { t: 'svc'; file: string; focus?: Task }>({ t: 'home' });
+  const [intakes, setIntakes] = useState<Intake[]>(saved.intakes ?? []);
   const ar = lang === 'ar';
 
   useEffect(() => {
@@ -77,7 +78,7 @@ export default function App() {
     document.documentElement.setAttribute('lang', lang);
   }, [ar, lang]);
 
-  useEffect(() => { writeState({ lang, pinned, rail, whoId: dayMe.id }); }, [lang, pinned, rail]);
+  useEffect(() => { writeState({ lang, pinned, rail, whoId: dayMe.id, intakes }); }, [lang, pinned, rail, intakes]);
 
   useEffect(() => {
     if (!toast) return; const t = setTimeout(() => setToast(null), 5000); return () => clearTimeout(t);
@@ -103,6 +104,13 @@ export default function App() {
     });
   }, [ar]);
 
+  const registerIntake = useCallback((f: Omit<Intake, 'ref' | 'at'>) => {
+    const ref = nextRef(intakes.map(i => i.ref).concat(dayTasks.map(x => x.ref)));
+    setIntakes(list => [{ ...f, ref, at: Date.now() }, ...list]);
+    setToast({ text: t('سُجّل الاستلام — ', 'Intake recorded — ') + ref + t(' وينتظر القياس في طابورك', ' and awaits measuring on your queue') });
+    return ref;
+  }, [intakes, t]);
+
   const openService = useCallback((file: string) => {
     setView({ t: 'svc', file });
     setDrawer(null); setListDrawer(null);
@@ -114,9 +122,10 @@ export default function App() {
   }, []);
 
   const tasks: Task[] = useMemo(() => {
-    const base = preview === 'empty' ? [] : preview === 'dense' ? denseTasks() : dayTasks;
+    const mine = intakes.map(intakeToTask);
+    const base = preview === 'empty' ? [] : preview === 'dense' ? denseTasks() : [...mine, ...dayTasks];
     return base.filter(x => !done[x.id]);
-  }, [preview, done]);
+  }, [preview, done, intakes]);
 
   /* the queue, grouped: the home shows the shape of the day; a group opens
      onto its complete list — five hundred rows stay one row here */
@@ -128,17 +137,25 @@ export default function App() {
       .map(k => ({ kind: k, items: g[k].sort((a, b) => b.lateMs - a.lateMs) }));
   }, [tasks]);
 
-  /* the brief's words: a DIRECT action button. The verb on a row acts now —
-     records, clears the row, says so — and the toast carries an undo, because
-     a direct act needs a direct way back. Details live behind the row title. */
-  const act = useCallback((task: Task) => {
+  /* the verb on a row is a DOOR, not a switch: no list finishes work in one
+     press. It carries the person to the owning service page with the task in
+     hand, and the act is performed THERE — a load is loaded from the trip page
+     and only then leaves the queue. */
+  const goAct = useCallback((task: Task) => {
+    setDrawer(null); setListDrawer(null);
+    setView({ t: 'svc', file: task.open, focus: task });
+  }, []);
+
+  /* completing the flow on the service page is the only thing that clears the
+     row — and the toast carries an undo, because a real act needs a real way back */
+  const completeTask = useCallback((task: Task, text: string) => {
     setDone(d => ({ ...d, [task.id]: true }));
-    setDrawer(null);
+    setView(v => (v.t === 'svc' ? { t: 'svc', file: v.file } : v));
     setToast({
-      text: t('سُجّل — ', 'Recorded — ') + task.ref + t(' خرج من قائمتك', ' left your list'),
+      text,
       undo: () => { setDone(d => ({ ...d, [task.id]: false })); setToast(null); },
     });
-  }, [t]);
+  }, []);
 
   const allItems = useMemo(() => CATEGORIES.flatMap(c => c.items), []);
   const pinnedItems = useMemo(() => pinned.map(f => allItems.filter(i => i.file === f)[0]).filter(Boolean), [pinned, allItems]);
@@ -306,6 +323,13 @@ export default function App() {
         <main style={{ flex: 1, overflowY: 'auto', padding: 'var(--s6)' }}>
           {view.t === 'svc' ? (
             <ServiceView file={view.file} ar={ar} t={t}
+              tasks={tasks.filter(x => x.open === view.file)}
+              focus={view.focus && !done[view.focus.id] ? view.focus : undefined}
+              onComplete={completeTask}
+              onAct={goAct}
+              onOpen={task => setDrawer({ task, tab: 'info' })}
+              onChat={task => setDrawer({ task, tab: 'chat' })}
+              onRegister={view.file === 'ShopyLink_Action_01_ReceiveParcel.html' ? registerIntake : undefined}
               onBack={() => setView({ t: 'home' })}
               onOpenFile={HAS_MODULES ? openModuleFile : undefined} />
           ) : (
@@ -425,7 +449,7 @@ export default function App() {
                       {open && (
                         <TaskList tasks={g.items} ar={ar} t={t} limit={3}
                           onMore={() => setListDrawer({ title: ar ? meta.ar : meta.en, tasks: g.items })}
-                          onAct={act}
+                          onAct={goAct}
                           onOpen={task => setDrawer({ task, tab: 'info' })}
                           onChat={task => setDrawer({ task, tab: 'chat' })} />
                       )}
@@ -502,7 +526,11 @@ export default function App() {
         boxShadow: drawer ? 'var(--sh-2)' : 'none', zIndex: 26,
       }}>
         {drawer && <TaskDrawer task={drawer.task} tab={drawer.tab} ar={ar} t={t}
-          onClose={() => setDrawer(null)} onAct={act}
+          detailsOf={ref => {
+            const i = intakes.filter(x => x.ref === ref)[0];
+            return i ? { client: i.client, route: i.from + ' ← ' + i.to, weight: i.weight.toFixed(1) + ' kg', cartons: i.cartons } : dayDetails[ref];
+          }}
+          onClose={() => setDrawer(null)} onAct={goAct}
           onOpenModule={HAS_MODULES ? () => openModuleFile(drawer.task.open) : undefined}
           onMention={names => setToast(
             (ar ? 'وُسم ' : 'Mentioned ') + names.map(n => '@' + n).join(ar ? ' و' : ', ') +
@@ -526,7 +554,7 @@ export default function App() {
               {listDrawer.tasks.length === 0
                 ? <div style={{ padding: 'var(--s6)', color: 'var(--n6)', fontSize: 'var(--fs-hint)', textAlign: 'center' }}>{t('لا شيء هنا — وهذا هو المقصود.', 'Nothing here — which is the point.')}</div>
                 : <TaskList tasks={listDrawer.tasks} ar={ar} t={t}
-                    onAct={task => { act(task); setListDrawer(ld => ld && { ...ld, tasks: ld.tasks.filter(x => x.id !== task.id) }); }}
+                    onAct={goAct}
                     onOpen={task => { setListDrawer(null); setDrawer({ task, tab: 'info' }); }}
                     onChat={task => { setListDrawer(null); setDrawer({ task, tab: 'chat' }); }} />}
             </div>
@@ -744,13 +772,14 @@ function NewsBoard({ ar, t, index, onIndex }: {
 }
 
 /* ── the task drawer: what it is, its trail, its thread, and the act ─── */
-function TaskDrawer({ task, tab, ar, t, onClose, onAct, onOpenModule, onMention }: {
+function TaskDrawer({ task, tab, ar, t, onClose, onAct, onOpenModule, onMention, detailsOf }: {
   task: Task; tab: 'info' | 'chat'; ar: boolean; t: (a: string, e: string) => string;
   onClose: () => void; onAct: (x: Task) => void; onOpenModule?: () => void;
   onMention?: (names: string[]) => void;
+  detailsOf?: (ref: string) => { client: string; route: string; weight: string; cartons: number } | undefined;
 }) {
   const late = lateLabel(task.lateMs, ar);
-  const d = dayDetails[task.ref];
+  const d = detailsOf ? detailsOf(task.ref) : dayDetails[task.ref];
   const trail = dayTrail[task.ref] || [];
   const thread = dayThreads[task.ref] || [];
   const [draft, setDraft] = useState('');
@@ -1025,10 +1054,16 @@ function GroupLabel({ children }: { children: React.ReactNode }) {
   return <div style={{ fontSize: 'var(--fs-eyebrow)', color: 'var(--n5)', fontWeight: 800, letterSpacing: '.1em', textTransform: 'uppercase', padding: 'var(--s2) var(--s3) var(--s1)' }}>{children}</div>;
 }
 
-/* ── one service, inside the console — the experience never changes language
-      or leaves the page; the module file itself is a package affair ──────── */
-function ServiceView({ file, ar, t, onBack, onOpenFile }: {
+/* ── one service, inside the console — and WORKABLE: it shows the service's
+      own live work (act, open, thread — the same rows as the home), and the
+      intake service carries the registering form itself. The experience never
+      changes language or leaves the page. ─────────────────────────────────── */
+function ServiceView({ file, ar, t, tasks, focus, onComplete, onAct, onOpen, onChat, onRegister, onBack, onOpenFile }: {
   file: string; ar: boolean; t: (a: string, e: string) => string;
+  tasks: Task[]; focus?: Task;
+  onComplete: (x: Task, text: string) => void;
+  onAct: (x: Task) => void; onOpen: (x: Task) => void; onChat: (x: Task) => void;
+  onRegister?: (f: { client: string; from: string; to: string; mode: 'air' | 'land' | 'sea'; weight: number; cartons: number }) => string;
   onBack: () => void; onOpenFile?: (f: string) => void;
 }) {
   const cat = CATEGORIES.filter(c => c.items.some(i => i.file === file))[0];
@@ -1041,9 +1076,7 @@ function ServiceView({ file, ar, t, onBack, onOpenFile }: {
         display: 'flex', alignItems: 'center', gap: 'var(--s2)',
         fontSize: 'var(--fs-hint)', color: 'var(--n6)', marginBottom: 'var(--s4)',
       }}>
-        <button onClick={onBack} style={{ color: 'var(--sky-deep)', fontWeight: 700 }}>
-          {t('يومي', 'My day')}
-        </button>
+        <button onClick={onBack} style={{ color: 'var(--sky-deep)', fontWeight: 700 }}>{t('يومي', 'My day')}</button>
         {ar ? <ChevronLeft size={13} /> : <ChevronRight size={13} />}
         <span>{ar ? cat.ar : cat.en}</span>
         {ar ? <ChevronLeft size={13} /> : <ChevronRight size={13} />}
@@ -1053,11 +1086,9 @@ function ServiceView({ file, ar, t, onBack, onOpenFile }: {
       <section style={{
         background: 'var(--paper)', border: '1px solid var(--n3)',
         borderRadius: 'var(--radius)', boxShadow: 'var(--sh-1)', overflow: 'hidden',
+        marginBottom: 'var(--s5)',
       }}>
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: 'var(--s4)',
-          padding: 'var(--s5) var(--s6)', borderBottom: '1px solid var(--n2)',
-        }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--s4)', padding: 'var(--s5) var(--s6)' }}>
           <span aria-hidden style={{
             width: 44, height: 44, borderRadius: 'var(--radius)', background: 'var(--sky-tint)',
             color: 'var(--sky-deep)', display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -1066,38 +1097,295 @@ function ServiceView({ file, ar, t, onBack, onOpenFile }: {
             <div style={{ fontSize: 'var(--fs-eyebrow)', color: 'var(--n5)', fontWeight: 800, letterSpacing: '.08em', textTransform: 'uppercase' }}>
               {ar ? cat.ar : cat.en}
             </div>
-            <h2 style={{ font: '800 21px/1.3 inherit', fontFamily: 'inherit', margin: 0 }}>{ar ? item.ar : item.en}</h2>
+            <h2 style={{ fontSize: 21, fontWeight: 800, lineHeight: 1.3, margin: 0 }}>{ar ? item.ar : item.en}</h2>
+            <p style={{ margin: 'var(--s1) 0 0', fontSize: 'var(--fs-hint)', color: 'var(--n6)' }}>
+              {ar ? (item.descAr || '') : (item.descEn || '')}
+            </p>
           </div>
-        </div>
-        <div style={{ padding: 'var(--s5) var(--s6)' }}>
-          <p style={{ margin: 0, fontSize: 'var(--fs-lead)', lineHeight: 1.7, color: 'var(--n7)' }}>
-            {ar ? (item.descAr || '') : (item.descEn || '')}
-          </p>
-          <div style={{
-            marginTop: 'var(--s5)', border: '1.5px dashed var(--n3)', borderRadius: 'var(--radius)',
-            padding: 'var(--s6)', textAlign: 'center', color: 'var(--n6)', background: 'var(--cream)',
-          }}>
-            <div style={{ fontSize: 'var(--fs-body)', fontWeight: 700, color: 'var(--ink)' }}>
-              {t('بيانات هذه الخدمة تظهر هنا حين تُنشر قناتها', "This service's data appears here when its channel is published")}
-            </div>
-            <div style={{ fontSize: 'var(--fs-hint)', marginTop: 'var(--s1)' }}>
-              {t('في هذا النموذج، جرّب شاشة اليوم: المهام والأخبار والأرقام كلها حيّة.', 'In this prototype, try the day screen: tasks, news and figures are all live.')}
-            </div>
-            <div style={{ display: 'flex', gap: 'var(--s2)', justifyContent: 'center', marginTop: 'var(--s4)' }}>
-              <button onClick={onBack} style={{
-                height: 34, padding: '0 var(--s4)', background: 'var(--sky)', color: 'var(--ink)',
-                borderRadius: 'var(--radius-sm)', fontSize: 'var(--fs-hint)', fontWeight: 800,
-              }}>{t('عودة إلى يومي', 'Back to my day')}</button>
-              {onOpenFile && (
-                <button onClick={() => onOpenFile(file)} style={{
-                  height: 34, padding: '0 var(--s4)', border: '1.5px solid var(--n3)',
-                  borderRadius: 'var(--radius-sm)', fontSize: 'var(--fs-hint)', fontWeight: 700, color: 'var(--n7)',
-                }}>{t('افتح ملف الوحدة', 'Open the module file')}</button>
-              )}
-            </div>
-          </div>
+          {onOpenFile && (
+            <button onClick={() => onOpenFile(file)} style={{
+              height: 32, padding: '0 var(--s3)', border: '1.5px solid var(--n3)',
+              borderRadius: 'var(--radius-sm)', fontSize: 'var(--fs-eyebrow)', fontWeight: 700, color: 'var(--n7)',
+            }}>{t('ملف الوحدة', 'Module file')}</button>
+          )}
         </div>
       </section>
+
+      {focus && <ActFlow task={focus} ar={ar} t={t} onComplete={onComplete} />}
+
+      {onRegister && <IntakeForm ar={ar} t={t} onRegister={onRegister} />}
+
+      <Panel
+        icon={<Timer size={14} />}
+        eyebrow={ar ? item.ar : item.en}
+        title={t('عمل هذه الخدمة اليوم', "This service's work today")}
+        meta={<span className="machine" style={{ fontSize: 'var(--fs-lead)', fontWeight: 700, color: 'var(--n6)' }}>{tasks.length}</span>}
+      >
+        {tasks.length === 0
+          ? (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--s2)', padding: 'var(--s7) var(--s6)', color: 'var(--n6)' }}>
+              <CircleCheckBig size={26} strokeWidth={1.5} style={{ color: 'var(--green)' }} />
+              <div style={{ fontSize: 'var(--fs-body)', fontWeight: 700, color: 'var(--ink)' }}>
+                {t('لا عمل معلّقاً لهذه الخدمة الآن.', 'No pending work for this service right now.')}
+              </div>
+              <div style={{ fontSize: 'var(--fs-hint)' }}>
+                {t('ما يخصّها يظهر هنا وعلى طابور يومك معاً.', 'What belongs to it appears here and on your day queue alike.')}
+              </div>
+            </div>
+          )
+          : <TaskList tasks={tasks} ar={ar} t={t} onAct={onAct} onOpen={onOpen} onChat={onChat} />}
+      </Panel>
     </div>
+  );
+}
+
+/* ── registering an intake: the act itself, workable in the prototype ──── */
+function IntakeForm({ ar, t, onRegister }: {
+  ar: boolean; t: (a: string, e: string) => string;
+  onRegister: (f: { client: string; from: string; to: string; mode: 'air' | 'land' | 'sea'; weight: number; cartons: number }) => string;
+}) {
+  const [f, setF] = useState({ client: '', from: 'Dubai', to: 'Damascus', mode: 'air' as 'air' | 'land' | 'sea', weight: '', cartons: '1' });
+  const [err, setErr] = useState<string | null>(null);
+  const [last, setLast] = useState<string | null>(null);
+  const field = (k: keyof typeof f) => (e: { target: { value: string } }) => { setF(v => ({ ...v, [k]: e.target.value })); setErr(null); };
+  const submit = () => {
+    /* refusal says WHICH field displeased it — a greyed button explains nothing */
+    if (!f.client.trim()) { setErr(t('اسم العميل مطلوب — الطرد يُسجَّل على صاحبه.', "The client's name is required — a parcel is recorded to its owner.")); return; }
+    const wt = parseFloat(f.weight);
+    if (!(wt > 0)) { setErr(t('الوزن مطلوب ويكون أكبر من صفر.', 'A weight above zero is required.')); return; }
+    const ct = parseInt(f.cartons, 10);
+    if (!(ct > 0)) { setErr(t('عدد الطرود يكون واحداً فأكثر.', 'Cartons must be one or more.')); return; }
+    const ref = onRegister({ client: f.client.trim(), from: f.from, to: f.to, mode: f.mode, weight: wt, cartons: ct });
+    setLast(ref);
+    setF(v => ({ ...v, client: '', weight: '', cartons: '1' }));
+  };
+  const box: React.CSSProperties = {
+    height: 'var(--ctl-h)', padding: '0 var(--s3)', border: '1.5px solid var(--n3)',
+    borderRadius: 'var(--radius-sm)', fontSize: 'var(--fs-body)', fontFamily: 'inherit',
+    background: 'var(--paper)', width: '100%',
+  };
+  const lbl: React.CSSProperties = { fontSize: 'var(--fs-eyebrow)', color: 'var(--n6)', fontWeight: 800, letterSpacing: '.06em', textTransform: 'uppercase', display: 'block', marginBottom: 'var(--s1)' };
+  return (
+    <section style={{
+      background: 'var(--paper)', border: '1px solid var(--n3)', borderRadius: 'var(--radius)',
+      boxShadow: 'var(--sh-1)', overflow: 'hidden', marginBottom: 'var(--s5)',
+    }}>
+      <header style={{ display: 'flex', alignItems: 'center', gap: 'var(--s3)', padding: 'var(--s3) var(--s4)', borderBottom: '1px solid var(--n2)' }}>
+        <span aria-hidden style={{ width: 26, height: 26, borderRadius: 'var(--radius-sm)', background: 'var(--green-tint)', color: 'var(--green-deep)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Boxes size={14} />
+        </span>
+        <div style={{ flex: 1, lineHeight: 1.2 }}>
+          <div style={{ fontSize: 'var(--fs-eyebrow)', color: 'var(--n5)', fontWeight: 800, letterSpacing: '.08em', textTransform: 'uppercase' }}>{t('الفعل', 'The act')}</div>
+          <div style={{ fontSize: 'var(--fs-lead)', fontWeight: 800 }}>{t('سجّل استلام طرد', 'Record a parcel intake')}</div>
+        </div>
+        {last && <span className="machine" style={{ fontSize: 'var(--fs-eyebrow)', color: 'var(--green-deep)', background: 'var(--green-tint)', padding: '3px 9px', borderRadius: 'var(--radius-pill)', fontWeight: 800 }}>{last}</span>}
+      </header>
+      <div style={{ padding: 'var(--s4) var(--s5)' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 'var(--s3)' }}>
+          <div style={{ gridColumn: '1 / -1' }}>
+            <label style={lbl}>{t('العميل', 'Client')}</label>
+            <input value={f.client} onChange={field('client')} onKeyDown={e => { if (e.key === 'Enter') submit(); }}
+              placeholder={t('اسم صاحب الطرد', "The parcel owner's name")} style={box} />
+          </div>
+          <div>
+            <label style={lbl}>{t('من', 'From')}</label>
+            <select value={f.from} onChange={field('from')} style={box}>
+              {['Dubai', 'Istanbul', 'Yiwu', 'Charlotte'].map(x => <option key={x} value={x}>{x}</option>)}
+            </select>
+          </div>
+          <div>
+            <label style={lbl}>{t('إلى', 'To')}</label>
+            <select value={f.to} onChange={field('to')} style={box}>
+              {['Damascus', 'Aleppo', 'Homs', 'Latakia'].map(x => <option key={x} value={x}>{x}</option>)}
+            </select>
+          </div>
+          <div>
+            <label style={lbl}>{t('الوسيلة', 'Mode')}</label>
+            <select value={f.mode} onChange={field('mode')} style={box}>
+              <option value="air">{t('جوي', 'Air')}</option>
+              <option value="land">{t('بري', 'Land')}</option>
+              <option value="sea">{t('بحري', 'Sea')}</option>
+            </select>
+          </div>
+          <div>
+            <label style={lbl}>{t('الوزن kg', 'Weight kg')}</label>
+            <input value={f.weight} onChange={field('weight')} inputMode="decimal" placeholder="0.0" className="machine" style={box} />
+          </div>
+          <div>
+            <label style={lbl}>{t('الطرود', 'Cartons')}</label>
+            <input value={f.cartons} onChange={field('cartons')} inputMode="numeric" className="machine" style={box} />
+          </div>
+        </div>
+        {err && (
+          <div role="alert" style={{
+            marginTop: 'var(--s3)', fontSize: 'var(--fs-hint)', fontWeight: 700,
+            color: 'var(--red-deep)', background: 'var(--red-tint)',
+            padding: 'var(--s2) var(--s3)', borderRadius: 'var(--radius-sm)',
+          }}>{err}</div>
+        )}
+        <div style={{ marginTop: 'var(--s4)' }}>
+          <button onClick={submit} style={{
+            height: 'var(--ctl-h)', padding: '0 var(--s6)', background: 'var(--sky)', color: 'var(--ink)',
+            borderRadius: 'var(--radius-sm)', fontSize: 'var(--fs-body)', fontWeight: 800,
+            transition: 'filter var(--t-state) var(--ease)',
+          }}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.filter = 'brightness(1.06)'; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.filter = ''; }}>
+            {t('سجّل الاستلام', 'Record the intake')}
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ── the act, performed where it belongs ────────────────────────────────
+   The verb on a queue row brings the person HERE, to the owning service,
+   with the task in hand. The flow below is the act itself — pick the trip,
+   record the measure, decide the failed delivery — and only completing it
+   clears the row from the queue. */
+function ActFlow({ task, ar, t, onComplete }: {
+  task: Task; ar: boolean; t: (a: string, e: string) => string;
+  onComplete: (x: Task, text: string) => void;
+}) {
+  const [tripPick, setTripPick] = useState(openTrips[0].ref);
+  const [wt, setWt] = useState('');
+  const [reason, setReason] = useState('');
+  const [err, setErr] = useState<string | null>(null);
+  const box: React.CSSProperties = {
+    height: 'var(--ctl-h)', padding: '0 var(--s3)', border: '1.5px solid var(--n3)',
+    borderRadius: 'var(--radius-sm)', fontSize: 'var(--fs-body)', fontFamily: 'inherit', background: 'var(--paper)',
+  };
+  const primary: React.CSSProperties = {
+    height: 'var(--ctl-h)', padding: '0 var(--s5)', background: 'var(--sky)', color: 'var(--ink)',
+    borderRadius: 'var(--radius-sm)', fontSize: 'var(--fs-body)', fontWeight: 800,
+  };
+  const done = (txtAr: string, txtEn: string) =>
+    onComplete(task, (ar ? txtAr : txtEn) + ' — ' + task.ref + (ar ? ' خرج من طابورك' : ' left your queue'));
+  return (
+    <section aria-label={t('تنفيذ', 'Act')} style={{
+      background: 'var(--paper)', border: '1.5px solid var(--sky)', borderRadius: 'var(--radius)',
+      boxShadow: 'var(--sh-2)', overflow: 'hidden', marginBottom: 'var(--s5)',
+    }}>
+      <header style={{
+        display: 'flex', alignItems: 'center', gap: 'var(--s3)',
+        padding: 'var(--s3) var(--s4)', background: 'var(--sky-tint)', borderBottom: '1px solid var(--n2)',
+      }}>
+        <span aria-hidden style={{
+          width: 26, height: 26, borderRadius: 'var(--radius-sm)', background: 'var(--sky)',
+          color: 'var(--ink)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}><Timer size={14} /></span>
+        <div style={{ flex: 1, lineHeight: 1.25 }}>
+          <div style={{ fontSize: 'var(--fs-eyebrow)', color: 'var(--sky-deep)', fontWeight: 800, letterSpacing: '.08em', textTransform: 'uppercase' }}>
+            {t('المهمة بين يديك', 'The task in hand')}
+          </div>
+          <div style={{ fontSize: 'var(--fs-lead)', fontWeight: 800 }}>{ar ? task.ar : task.en}</div>
+        </div>
+        <span className="machine" style={{ fontSize: 'var(--fs-hint)', color: 'var(--n6)' }}>{task.ref}</span>
+      </header>
+
+      <div style={{ padding: 'var(--s4) var(--s5)' }}>
+        {task.kind === 'document' && task.open === 'ShopyLink_Action_03_CreateTrip.html' && (
+          <>
+            <div style={{ fontSize: 'var(--fs-hint)', color: 'var(--n6)', marginBottom: 'var(--s3)' }}>
+              {t('أضف الحمولة إلى رحلة ما تزال تُحمَّل، أو أنشئ رحلة جديدة لها.', 'Add the load to a trip still boarding, or create a new trip for it.')}
+            </div>
+            <div role="radiogroup" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--s2)', marginBottom: 'var(--s4)' }}>
+              {openTrips.map(tr => (
+                <label key={tr.ref} style={{
+                  display: 'flex', alignItems: 'center', gap: 'var(--s3)', padding: 'var(--s3) var(--s4)',
+                  border: '1.5px solid ' + (tripPick === tr.ref ? 'var(--sky)' : 'var(--n3)'),
+                  borderRadius: 'var(--radius-sm)', cursor: 'pointer',
+                  background: tripPick === tr.ref ? 'var(--sky-tint)' : 'var(--paper)',
+                  transition: 'border-color var(--t-state) var(--ease), background var(--t-state) var(--ease)',
+                }}>
+                  <input type="radio" name="trip" checked={tripPick === tr.ref} onChange={() => setTripPick(tr.ref)} style={{ accentColor: 'var(--sky)' }} />
+                  <span className="machine" style={{ fontWeight: 700 }}>{tr.ref}</span>
+                  <span style={{ flex: 1, fontSize: 'var(--fs-hint)', color: 'var(--n7)' }}>{tr.to} · {ar ? tr.departsAr : tr.departsEn}</span>
+                </label>
+              ))}
+            </div>
+            <div style={{ display: 'flex', gap: 'var(--s3)', flexWrap: 'wrap' }}>
+              <button style={primary} onClick={() => done('حُمِّلت على ' + tripPick, 'Loaded onto ' + tripPick)}>
+                {t('أضفها إلى هذه الرحلة', 'Add it to this trip')}
+              </button>
+              <button style={{ ...primary, background: 'var(--paper)', border: '1.5px solid var(--n3)', color: 'var(--n7)', fontWeight: 700 }}
+                onClick={() => {
+                  const ref = 'TRP-' + String(new Date().getMonth() + 1).padStart(2, '0') + String(new Date().getDate()).padStart(2, '0') + '-0' + (openTrips.length + 1);
+                  done('أُنشئت الرحلة ' + ref + ' وحُمِّلت عليها', 'Trip ' + ref + ' created and loaded');
+                }}>
+                {t('أنشئ رحلة جديدة وأضفها', 'Create a new trip and add it')}
+              </button>
+            </div>
+          </>
+        )}
+
+        {task.kind === 'measure' && (
+          <>
+            <div style={{ fontSize: 'var(--fs-hint)', color: 'var(--n6)', marginBottom: 'var(--s3)' }}>
+              {t('سجّل الوزن المقيس — القياس هو ما يُفوتَر عليه.', 'Record the measured weight — the measure is what gets invoiced.')}
+            </div>
+            <div style={{ display: 'flex', gap: 'var(--s3)', alignItems: 'flex-end', flexWrap: 'wrap' }}>
+              <div>
+                <label style={{ fontSize: 'var(--fs-eyebrow)', color: 'var(--n6)', fontWeight: 800, display: 'block', marginBottom: 'var(--s1)' }}>{t('الوزن kg', 'Weight kg')}</label>
+                <input value={wt} onChange={e => { setWt(e.target.value); setErr(null); }} inputMode="decimal" placeholder="0.0" className="machine" style={{ ...box, width: 140 }} />
+              </div>
+              <button style={primary} onClick={() => {
+                const v = parseFloat(wt);
+                if (!(v > 0)) { setErr(t('الوزن مطلوب ويكون أكبر من صفر.', 'A weight above zero is required.')); return; }
+                done('سُجّل القياس ' + v.toFixed(1) + ' kg', 'Measured at ' + v.toFixed(1) + ' kg');
+              }}>{t('سجّل القياس', 'Record the measure')}</button>
+            </div>
+          </>
+        )}
+
+        {task.kind === 'deliver' && (
+          <>
+            <div style={{ fontSize: 'var(--fs-hint)', color: 'var(--n6)', marginBottom: 'var(--s3)' }}>
+              {t('محاولتان أخفقتا — القرار لك.', 'Two attempts failed — the decision is yours.')}
+            </div>
+            <div style={{ display: 'flex', gap: 'var(--s3)', flexWrap: 'wrap', alignItems: 'flex-end' }}>
+              <button style={primary} onClick={() => done('جُدولت محاولة ثالثة', 'A third attempt is scheduled')}>
+                {t('جدولة محاولة ثالثة', 'Schedule a third attempt')}
+              </button>
+              <div style={{ display: 'flex', gap: 'var(--s2)', alignItems: 'flex-end' }}>
+                <div>
+                  <label style={{ fontSize: 'var(--fs-eyebrow)', color: 'var(--n6)', fontWeight: 800, display: 'block', marginBottom: 'var(--s1)' }}>{t('سبب الإرجاع', 'Return reason')}</label>
+                  <input value={reason} onChange={e => { setReason(e.target.value); setErr(null); }}
+                    placeholder={t('إلزامي عند الإرجاع', 'Required to return')} style={{ ...box, width: 220 }} />
+                </div>
+                <button style={{ ...primary, background: 'var(--red-tint)', color: 'var(--red-deep)' }} onClick={() => {
+                  if (!reason.trim()) { setErr(t('الإرجاع يحتاج سبباً مكتوباً.', 'A return needs a written reason.')); return; }
+                  done('أُرجعت إلى المرسل: ' + reason.trim(), 'Returned to sender: ' + reason.trim());
+                }}>{t('إرجاع إلى المرسل', 'Return to sender')}</button>
+              </div>
+            </div>
+          </>
+        )}
+
+        {task.kind === 'approve' && (
+          <button style={primary} onClick={() => done('وُقّع الطلب', 'Signed')}>{t('وقّع', 'Sign')}</button>
+        )}
+
+        {task.kind === 'document' && task.open !== 'ShopyLink_Action_03_CreateTrip.html' && (
+          <>
+            <div style={{ fontSize: 'var(--fs-hint)', color: 'var(--n6)', marginBottom: 'var(--s3)' }}>
+              {t('نفّذ الخطوة هنا ثم سجّل إتمامها — التسجيل هو ما يُخرجها من الطابور.', 'Do the step here, then record it done — the record is what clears the queue.')}
+            </div>
+            <button style={primary} onClick={() => done('سُجّل الإتمام', 'Recorded done')}>
+              {t('سجّل الإتمام', 'Record it done')}
+            </button>
+          </>
+        )}
+
+        {err && (
+          <div role="alert" style={{
+            marginTop: 'var(--s3)', fontSize: 'var(--fs-hint)', fontWeight: 700,
+            color: 'var(--red-deep)', background: 'var(--red-tint)',
+            padding: 'var(--s2) var(--s3)', borderRadius: 'var(--radius-sm)',
+          }}>{err}</div>
+        )}
+      </div>
+    </section>
   );
 }

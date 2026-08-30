@@ -18,12 +18,12 @@ export type Task = {
 };
 
 export const dayTasks: Task[] = [
-  { id: 'T1', ar: 'تسليم أخفق مرّتين — يقرَّر مصيره', en: 'A delivery that failed twice — decide it', ref: 'CON-240703-02', lateMs: 26 * H, verbAr: 'قرِّر', verbEn: 'Decide', open: 'ShopyLink_Action_08_Delivery.html', kind: 'deliver' },
-  { id: 'T2', ar: 'طرد مستلَم ينتظر القياس', en: 'A parcel received, waiting to be measured', ref: 'CON-240712-01', lateMs: 9 * H, verbAr: 'قِس', verbEn: 'Measure', open: 'ShopyLink_Action_01_ReceiveParcel.html', kind: 'measure' },
-  { id: 'T3', ar: 'حمولة مجمَّعة تنتظر رحلة', en: 'A consolidated load waiting for a trip', ref: 'CON-240711-04', lateMs: 6 * H, verbAr: 'جمِّع', verbEn: 'Consolidate', open: 'ShopyLink_Action_02_Consolidation.html', kind: 'document' },
-  { id: 'T4', ar: 'طرد وصل مركزك اليوم', en: 'A parcel that reached your centre today', ref: 'CON-240712-03', lateMs: 3 * H, verbAr: 'قِس', verbEn: 'Measure', open: 'ShopyLink_Action_01_ReceiveParcel.html', kind: 'measure' },
-  { id: 'T5', ar: 'طرد ثانٍ ينتظر القياس', en: 'A second parcel waiting to be measured', ref: 'CON-240712-05', lateMs: 1 * H, verbAr: 'قِس', verbEn: 'Measure', open: 'ShopyLink_Action_01_ReceiveParcel.html', kind: 'measure' },
-  { id: 'T6', ar: 'شحنة تصل خلال ساعتين — جهّز الرصيف', en: 'A shipment arriving within two hours — clear the dock', ref: 'TRP-2608-014', lateMs: -2 * H, verbAr: 'جهّز', verbEn: 'Prepare', open: 'ShopyLink_Action_06_ArrivalReceive.html', kind: 'document' },
+  { id: 'T1', ar: 'تسليم أخفق مرّتين — يقرَّر مصيره', en: 'A delivery that failed twice — decide it', ref: 'CON-240703-02', lateMs: 26 * H, verbAr: 'إلى القرار', verbEn: 'To the decision', open: 'ShopyLink_Action_08_Delivery.html', kind: 'deliver' },
+  { id: 'T2', ar: 'طرد مستلَم ينتظر القياس', en: 'A parcel received, waiting to be measured', ref: 'CON-240712-01', lateMs: 9 * H, verbAr: 'إلى القياس', verbEn: 'To measuring', open: 'ShopyLink_Action_01_ReceiveParcel.html', kind: 'measure' },
+  { id: 'T3', ar: 'حمولة مجمَّعة تنتظر رحلة', en: 'A consolidated load waiting for a trip', ref: 'CON-240711-04', lateMs: 6 * H, verbAr: 'إلى رحلة', verbEn: 'To a trip', open: 'ShopyLink_Action_03_CreateTrip.html', kind: 'document' },
+  { id: 'T4', ar: 'طرد وصل مركزك اليوم', en: 'A parcel that reached your centre today', ref: 'CON-240712-03', lateMs: 3 * H, verbAr: 'إلى القياس', verbEn: 'To measuring', open: 'ShopyLink_Action_01_ReceiveParcel.html', kind: 'measure' },
+  { id: 'T5', ar: 'طرد ثانٍ ينتظر القياس', en: 'A second parcel waiting to be measured', ref: 'CON-240712-05', lateMs: 1 * H, verbAr: 'إلى القياس', verbEn: 'To measuring', open: 'ShopyLink_Action_01_ReceiveParcel.html', kind: 'measure' },
+  { id: 'T6', ar: 'شحنة تصل خلال ساعتين — جهّز الرصيف', en: 'A shipment arriving within two hours — clear the dock', ref: 'TRP-2608-014', lateMs: -2 * H, verbAr: 'إلى التجهيز', verbEn: 'To preparing', open: 'ShopyLink_Action_06_ArrivalReceive.html', kind: 'document' },
 ];
 
 export const dayNotice = {
@@ -64,7 +64,7 @@ export function denseTasks(): Task[] {
       ar: 'تسليم أخفق مرّتين — يقرَّر مصيره', en: 'A delivery that failed twice — decide it',
       ref: 'CON-9' + String(100000 + i).slice(1) + '-01',
       lateMs: (500 - i) * 0.5 * H,
-      verbAr: 'قرِّر', verbEn: 'Decide',
+      verbAr: 'إلى القرار', verbEn: 'To the decision',
       open: 'ShopyLink_Action_08_Delivery.html', kind: 'deliver',
     });
   }
@@ -146,4 +146,39 @@ export const dayStaff: { ar: string; en: string; role: string }[] = [
   { ar: 'عمر المصري',  en: 'Omar Al-Masri', role: 'admin' },
   { ar: 'رنا يوسف',    en: 'Rana Yousef',   role: 'acct' },
   { ar: 'لينا حموي',   en: 'Lina Hamwi',    role: 'customs' },
+];
+
+/* ── an intake REGISTERED IN THIS PROTOTYPE ───────────────────────────
+   The console is a window, so in the package this act belongs to B1 — but the
+   prototype must let the owner WORK it: the form records here, the record
+   becomes a measuring task on the day's queue, and it survives the session
+   through the artifact state. */
+export type Intake = {
+  ref: string; client: string; from: string; to: string;
+  mode: 'air' | 'land' | 'sea'; weight: number; cartons: number; at: number;
+};
+
+export function intakeToTask(i: Intake): Task {
+  return {
+    id: 'IN-' + i.ref,
+    ar: 'طرد مستلَم ينتظر القياس', en: 'A parcel received, waiting to be measured',
+    ref: i.ref, lateMs: Date.now() - i.at - 8 * H,
+    verbAr: 'إلى القياس', verbEn: 'To measuring',
+    open: 'ShopyLink_Action_01_ReceiveParcel.html', kind: 'measure',
+  };
+}
+
+export function nextRef(existing: string[]): string {
+  const d = new Date();
+  const stamp = String(d.getFullYear()).slice(2) + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0');
+  let n = 1;
+  const mk = () => 'CON-' + stamp + '-' + String(n).padStart(2, '0');
+  while (existing.indexOf(mk()) > -1) n++;
+  return mk();
+}
+
+/* trips still boarding — what the add-to-trip flow offers */
+export const openTrips = [
+  { ref: 'TRP-2608-021', to: 'Damascus', mode: 'land', departsAr: 'تنطلق غداً 06:00', departsEn: 'departs tomorrow 06:00' },
+  { ref: 'TRP-2608-022', to: 'Aleppo',   mode: 'land', departsAr: 'تنطلق الخميس',      departsEn: 'departs Thursday' },
 ];
