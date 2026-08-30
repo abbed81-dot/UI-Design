@@ -63,7 +63,7 @@ export default function App() {
   const [listDrawer, setListDrawer] = useState<{ title: string; tasks: Task[] } | null>(null);
   const [finder, setFinder] = useState(false);
   const [preview, setPreview] = useState<Preview>('normal');
-  const [toast, setToast] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ text: string; undo?: () => void } | null>(null);
   const [done, setDone] = useState<Record<string, boolean>>({});
   const [news, setNews] = useState(0);
   /* where the person is: his day, or one service — the whole experience stays
@@ -80,7 +80,7 @@ export default function App() {
   useEffect(() => { writeState({ lang, pinned, rail, whoId: dayMe.id }); }, [lang, pinned, rail]);
 
   useEffect(() => {
-    if (!toast) return; const t = setTimeout(() => setToast(null), 4000); return () => clearTimeout(t);
+    if (!toast) return; const t = setTimeout(() => setToast(null), 5000); return () => clearTimeout(t);
   }, [toast]);
 
   useEffect(() => {
@@ -98,7 +98,7 @@ export default function App() {
     setPinned(prev => {
       if (prev.indexOf(file) > -1) return prev.filter(f => f !== file);
       const next = [...prev, file];
-      if (next.length > 5) { next.shift(); setToast(ar ? 'خمسة حدّ التثبيت — استُبدل الأقدم' : 'Five is the pin limit — the oldest was replaced'); }
+      if (next.length > 5) { next.shift(); setToast({ text: ar ? 'خمسة حدّ التثبيت — استُبدل الأقدم' : 'Five is the pin limit — the oldest was replaced' }); }
       return next;
     });
   }, [ar]);
@@ -128,10 +128,16 @@ export default function App() {
       .map(k => ({ kind: k, items: g[k].sort((a, b) => b.lateMs - a.lateMs) }));
   }, [tasks]);
 
+  /* the brief's words: a DIRECT action button. The verb on a row acts now —
+     records, clears the row, says so — and the toast carries an undo, because
+     a direct act needs a direct way back. Details live behind the row title. */
   const act = useCallback((task: Task) => {
     setDone(d => ({ ...d, [task.id]: true }));
     setDrawer(null);
-    setToast(t('سُجّل — ', 'Recorded — ') + task.ref + t(' خرج من قائمتك', ' left your list'));
+    setToast({
+      text: t('سُجّل — ', 'Recorded — ') + task.ref + t(' خرج من قائمتك', ' left your list'),
+      undo: () => { setDone(d => ({ ...d, [task.id]: false })); setToast(null); },
+    });
   }, [t]);
 
   const allItems = useMemo(() => CATEGORIES.flatMap(c => c.items), []);
@@ -262,16 +268,17 @@ export default function App() {
           borderBottom: '1px solid var(--n3)', boxShadow: 'var(--sh-1)', zIndex: 2,
         }}>
           <button onClick={() => setFinder(true)} style={{
-            display: 'flex', alignItems: 'center', gap: 'var(--s2)', height: 32, minWidth: 260,
+            display: 'flex', alignItems: 'center', gap: 'var(--s2)', height: 32,
+            width: 'clamp(150px, 26vw, 260px)', minWidth: 0,
             padding: '0 var(--s3)', border: '1.5px solid var(--n3)', borderRadius: 'var(--radius-sm)',
             color: 'var(--n6)', fontSize: 'var(--fs-hint)', background: 'var(--cream)',
           }}>
-            <Search size={14} />
-            <span style={{ flex: 1, textAlign: 'start' }}>{t('خدمة أو شحنة برقمها…', 'A service, or a shipment by its number…')}</span>
+            <Search size={14} style={{ flex: '0 0 auto' }} />
+            <span className="sl-nowrap" style={{ flex: 1, textAlign: 'start', overflow: 'hidden', textOverflow: 'ellipsis' }}>{t('خدمة أو شحنة برقمها…', 'A service, or a shipment by its number…')}</span>
             <kbd className="machine" style={{ fontSize: 10, color: 'var(--n5)' }}>⌘K</kbd>
           </button>
           <div style={{ flex: 1 }} />
-          <span style={{
+          <span className="sl-demo-badge sl-nowrap" style={{
             background: 'var(--amber-tint)', color: 'var(--amber-deep)', padding: '4px 10px',
             borderRadius: 'var(--radius-pill)', fontSize: 'var(--fs-eyebrow)', fontWeight: 800, letterSpacing: '.06em',
           }}>
@@ -289,9 +296,9 @@ export default function App() {
               color: 'var(--sky-deep)', display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontWeight: 800, fontSize: 'var(--fs-hint)',
             }}>{dayMe.name.slice(0, 1)}</span>
-            <div style={{ textAlign: ar ? 'left' : 'right', lineHeight: 1.25 }}>
-              <div style={{ fontSize: 'var(--fs-hint)', fontWeight: 800 }}>{dayMe.name}</div>
-              <div className="machine" style={{ fontSize: 'var(--fs-eyebrow)', color: 'var(--n6)' }}>{dayMe.role} · L{dayMe.level}</div>
+            <div style={{ textAlign: ar ? 'left' : 'right', lineHeight: 1.3, flex: '0 0 auto' }}>
+              <div className="sl-nowrap" style={{ fontSize: 'var(--fs-hint)', fontWeight: 800 }}>{dayMe.name}</div>
+              <div className="machine sl-nowrap" style={{ fontSize: 'var(--fs-eyebrow)', color: 'var(--n6)' }}>{dayMe.role} · L{dayMe.level}</div>
             </div>
           </div>
         </header>
@@ -329,7 +336,7 @@ export default function App() {
             </div>
 
             {/* main grid: the queue + the news board */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) 360px', gap: 'var(--s5)', alignItems: 'start' }}>
+            <div className="sl-main-grid">
 
               {/* ① needs action — grouped */}
               <Panel
@@ -418,6 +425,7 @@ export default function App() {
                       {open && (
                         <TaskList tasks={g.items} ar={ar} t={t} limit={3}
                           onMore={() => setListDrawer({ title: ar ? meta.ar : meta.en, tasks: g.items })}
+                          onAct={act}
                           onOpen={task => setDrawer({ task, tab: 'info' })}
                           onChat={task => setDrawer({ task, tab: 'chat' })} />
                       )}
@@ -488,11 +496,10 @@ export default function App() {
       </div>
 
       {/* ══ TASK DRAWER — details · trail · thread · the act ═════════ */}
-      <aside aria-hidden={!drawer} style={{
-        width: drawer ? 'var(--panel-w)' : 0, flex: '0 0 auto', background: 'var(--paper)',
+      <aside aria-hidden={!drawer} className="sl-drawer" style={{
+        width: drawer ? 'min(var(--panel-w), 92vw)' : 0,
         borderInlineStart: drawer ? '1px solid var(--n3)' : 'none',
-        transition: 'width var(--t-panel) var(--ease)', overflow: 'hidden',
-        boxShadow: drawer ? 'var(--sh-2)' : 'none',
+        boxShadow: drawer ? 'var(--sh-2)' : 'none', zIndex: 26,
       }}>
         {drawer && <TaskDrawer task={drawer.task} tab={drawer.tab} ar={ar} t={t}
           onClose={() => setDrawer(null)} onAct={act}
@@ -503,10 +510,9 @@ export default function App() {
       </aside>
 
       {/* ══ LIST DRAWER — the list behind a figure ═══════════════════ */}
-      <aside aria-hidden={!listDrawer} style={{
-        width: listDrawer ? 'var(--panel-w)' : 0, flex: '0 0 auto', background: 'var(--paper)',
+      <aside aria-hidden={!listDrawer} className="sl-drawer" style={{
+        width: listDrawer ? 'min(var(--panel-w), 92vw)' : 0,
         borderInlineStart: listDrawer ? '1px solid var(--n3)' : 'none',
-        transition: 'width var(--t-panel) var(--ease)', overflow: 'hidden',
         boxShadow: listDrawer ? 'var(--sh-2)' : 'none',
       }}>
         {listDrawer && (
@@ -520,6 +526,7 @@ export default function App() {
               {listDrawer.tasks.length === 0
                 ? <div style={{ padding: 'var(--s6)', color: 'var(--n6)', fontSize: 'var(--fs-hint)', textAlign: 'center' }}>{t('لا شيء هنا — وهذا هو المقصود.', 'Nothing here — which is the point.')}</div>
                 : <TaskList tasks={listDrawer.tasks} ar={ar} t={t}
+                    onAct={task => { act(task); setListDrawer(ld => ld && { ...ld, tasks: ld.tasks.filter(x => x.id !== task.id) }); }}
                     onOpen={task => { setListDrawer(null); setDrawer({ task, tab: 'info' }); }}
                     onChat={task => { setListDrawer(null); setDrawer({ task, tab: 'chat' }); }} />}
             </div>
@@ -550,10 +557,19 @@ export default function App() {
       {toast && (
         <div role="status" style={{
           position: 'fixed', insetInlineStart: '50%', bottom: 'var(--s7)', transform: 'translateX(-50%)',
+          display: 'flex', alignItems: 'center', gap: 'var(--s3)',
           background: 'var(--ink)', color: 'var(--paper)', borderRadius: 'var(--radius-sm)',
           padding: 'var(--s2) var(--s4)', fontSize: 'var(--fs-hint)', fontWeight: 700,
           boxShadow: 'var(--sh-2)', zIndex: 40, maxWidth: '80vw',
-        }}>{toast}</div>
+        }}>
+          <span>{toast.text}</span>
+          {toast.undo && (
+            <button onClick={toast.undo} style={{
+              color: 'var(--acc)', fontWeight: 800, fontSize: 'var(--fs-hint)',
+              textDecoration: 'underline', textUnderlineOffset: 3,
+            }}>{t('تراجع', 'Undo')}</button>
+          )}
+        </div>
       )}
     </div>
   );
@@ -591,9 +607,9 @@ function Panel({ icon, eyebrow, title, meta, children }: {
       "more" button — the home shows the shape of the day, the drawer holds the
       day itself. In the drawer it reveals progressively, 120 at a time, so the
       500-row state scrolls clean without a wall of nodes. ─────────────────── */
-function TaskList({ tasks, ar, t, onOpen, onChat, limit, onMore }: {
+function TaskList({ tasks, ar, t, onOpen, onChat, onAct, limit, onMore }: {
   tasks: Task[]; ar: boolean; t: (a: string, e: string) => string;
-  onOpen: (x: Task) => void; onChat: (x: Task) => void;
+  onOpen: (x: Task) => void; onChat: (x: Task) => void; onAct: (x: Task) => void;
   limit?: number; onMore?: () => void;
 }) {
   const [cap, setCap] = useState(120);
@@ -620,7 +636,9 @@ function TaskList({ tasks, ar, t, onOpen, onChat, limit, onMore }: {
             <button onClick={() => onChat(task)} title={t('المحادثة', 'Thread')} aria-label={t('المحادثة', 'Thread')} style={{ color: 'var(--n5)', display: 'flex' }}>
               <MessageSquare size={14} />
             </button>
-            <button onClick={() => onOpen(task)} style={{
+            <button onClick={() => onAct(task)}
+              title={t('نفّذ الآن', 'Act now')}
+              style={{
               height: 24, padding: '0 var(--s3)', background: 'var(--sky)', color: 'var(--ink)',
               borderRadius: 'var(--radius-sm)', fontSize: 'var(--fs-eyebrow)', fontWeight: 800,
             }}>{ar ? task.verbAr : task.verbEn}</button>
