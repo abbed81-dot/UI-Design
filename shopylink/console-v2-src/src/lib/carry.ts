@@ -55,9 +55,28 @@ function unblockFonts(html: string): string {
   );
 }
 
+/* ── one Arabic face on one screen ──────────────────────────────────────
+   The owner chose Noto Sans Arabic for the console. A module still asking for
+   Tajawal would put two Arabic faces on the same screen — the console's chrome
+   in one, the form inside it in another — which reads as a mistake even to
+   someone who cannot name it. The carried COPY is retuned: the module's font
+   request gains the family, and every place it names Tajawal now names Noto
+   first and keeps Tajawal behind it. The package file on disk is untouched;
+   deleting this one function puts every module back on Tajawal. */
+const AR_FACE = 'Noto Sans Arabic';
+
+function oneArabicFace(html: string): string {
+  return html
+    .replace(/family=Tajawal(:[^&"']*)?/g,
+      (m) => m + '&family=Noto+Sans+Arabic:wght@400;500;600;700;800')
+    .replace(/'Tajawal'/g, `'${AR_FACE}','Tajawal'`)
+    .replace(/"Tajawal"/g, `"${AR_FACE}","Tajawal"`);
+}
+
 function merge(html: string): string {
   if (html.indexOf('sl-console-merge') > -1) return html;
   html = unblockFonts(html);
+  html = oneArabicFace(html);
   /* planted at the end of the head so it wins on order without !important
      doing the arguing — and if a module has no head, at the top of the body */
   const head = html.search(/<\/head\s*>/i);
