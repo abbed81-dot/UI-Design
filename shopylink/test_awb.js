@@ -10,38 +10,42 @@ console.log('§141 the brand is the asset (A1)');
 const w=load('en');
 const img=w.document.querySelector('.awb img');
 ok(!!img,'the sticker carries the wordmark as an image');
-/* This line compared the embedding against /mnt/project/wordmarkmonowhite.png
-   — a path on the machine this was authored on. The package does not ship that
-   file, so the contract threw here and reported nothing about the sticker it
-   exists to check. Two things came out of looking:
+/* This line used to compare the embedding against /mnt/project/wordmarkmonowhite.png
+   — a path on the machine this was authored on, so the contract threw here and
+   reported nothing about the sticker it exists to check. Looking at it turned
+   up two real faults, both now closed:
 
-   · The package embeds an image whose source file it does not carry. The bytes
-     are written to assets/wordmark_mono_white.jpg so the package holds what it
-     prints; comparing the embedding against a file extracted FROM it would
-     prove nothing, so that is not what is asserted below.
-   · The data URI declares image/png and the bytes are a JPEG (ffd8ffe0, JFIF,
-     1400x308). Browsers sniff it and draw it anyway. It matters for a PRINTED
-     sticker: a JPEG has no alpha, so a mono WHITE wordmark meant for a dark
-     ground carries a baked background, and lossy compression rings the
-     letterforms. Re-encoding it to PNG here would not restore what was already
-     lost — the original is what is needed, and it is not in the package.
+   · The package embedded an image whose source file it did not ship. The mark
+     is in assets/wordmarkmonowhite.png now, with assets/wordmarkmonowhite@2x.png
+     beside it, so the package carries what it prints.
+   · The data URI declared image/png and the bytes were a JPEG — 1400x308, JFIF.
+     On a PRINTED sticker that is not cosmetic: a JPEG has no alpha, so a mono
+     WHITE wordmark meant for a dark ground carried a baked background and lossy
+     ringing on the letterforms. The original is embedded now: a real PNG, pure
+     white on a true alpha channel, stored greyscale+alpha because every visible
+     pixel is white and the colour channels held nothing the alpha did not —
+     lossless, and 17KB instead of 37KB.
 
-   What is asserted is what can be: it is a real raster image of the right
-   shape, and it is not drawn. */
+   The comparison below is the anti-drift check the original line was reaching
+   for: the embedding must stay the file the package ships, so re-embedding
+   something else is caught here rather than at a print run. */
 const b64=img.src.split(',')[1]||'';
 const bytes=Buffer.from(b64,'base64');
-ok(bytes.length>2000,'…as real image bytes, not an icon font or a traced path ('+bytes.length+' bytes)');
-ok(/^ffd8ff|^89504e47/.test(bytes.slice(0,4).toString('hex')),'…a JPEG or a PNG, which is a file somebody produced rather than shapes arranged to look like the mark');
+ok(b64===fs.readFileSync('assets/wordmarkmonowhite.png').toString('base64'),
+   '…byte for byte assets/wordmarkmonowhite.png, not drawn from shapes and not a re-encoding of it');
+ok(bytes.slice(0,4).toString('hex')==='89504e47',
+   '…and it IS a PNG, as the data URI says: a JPEG here would print a white mark on a baked ground');
+/* IHDR: 8 bytes of signature, then length(4) + "IHDR"(4) + width(4) +
+   height(4), so bit depth is byte 24 and colour type is byte 25. Reading 24
+   for the colour type is off by one and answers 8 — the bit depth — which is
+   never 4 or 6, so the check failed on a file that was correct. */
+ok(bytes.slice(12,16).toString()==='IHDR'&&(bytes[25]===4||bytes[25]===6),
+   '…with a real alpha channel (PNG colour type '+bytes[25]+'), because the ground it prints on is dark');
 /* Not "no vector on the sticker" — the scannable code is an SVG and belongs
    there. The rule is about the WORDMARK: it is an <img>, and nothing vector
    stands in its place. */
 ok(img.tagName==='IMG','…and the mark itself is an image element, not a drawing');
 ok(w.document.querySelectorAll('.awb svg').length>0,'…while the SVG on the sticker is the scannable code, which is what a vector is FOR here');
-/* KNOWN, and stated rather than hidden: the declared type is not the real one.
-   Flip this to ok(...) once the original PNG is put back. */
-console.log('  ! the data URI says image/png and the bytes are '+
-  (/^ffd8ff/.test(bytes.slice(0,4).toString('hex'))?'a JPEG':'a PNG')+
-  ' — no alpha on a white mark for a dark ground; the source PNG is not in the package');
 ok(!/>shopy</.test(w.document.querySelector('.awb').innerHTML),'no typed "shopy" remains');
 
 console.log('§142 both readers, one sticker');
