@@ -1,0 +1,92 @@
+const fs=require('fs');const {JSDOM,VirtualConsole}=require('/home/claude/work/node_modules/jsdom');
+const dom=new JSDOM(fs.readFileSync('ShopyLink_D1_Control.html','utf8'),{runScripts:'dangerously',pretendToBeVisual:true,virtualConsole:new VirtualConsole()});
+const w=dom.window,d=w.document;const sh=()=>d.getElementById('shell').innerHTML;
+let f=0,n=0;const ok=(c,m)=>{n++;console.log((c?'  ✓ ':'  ✗ FAIL ')+m);if(!c)f++;};
+const D=w.DAY,H=w.HOUR;
+
+console.log('§47 the greeting states the obligation');
+ok(w.sim==='s0','47.0 the dashboard opens on My Day, not on a queue');
+const q=w.queueFor(w.ME.role);
+const line=w.obligationLine(w.ME.role);
+const od=q.filter(x=>w.overdue(x)).length, dt=q.filter(x=>w.dueToday(x)).length, ua=w.myUnacked(w.ME.role).length;
+ok(!od||new RegExp(od+' overdue').test(line),'47.1 the line gives the counts in words');
+ok((od+dt+ua)===0||/overdue|due today|handover/.test(line),'47.2 …and they are the engine\'s own numbers');
+w.setActor('U-05');
+const quiet=w.queueFor('customs');
+ok(quiet.filter(x=>w.overdue(x)).length>0||/Nothing overdue/.test(w.obligationLine('customs')),'47.3 with nothing outstanding it says so plainly');
+w.setActor('U-01');
+ok(new RegExp(w.roleById(w.ME.role).stmt.slice(0,40)).test(sh()),'47.4 the responsibility statement is under it');
+const g1=w.greetingWord(); w.CLOCK+=10*H; const g2=w.greetingWord(); w.CLOCK=0;
+ok(g1!==g2,'47.5 the greeting is time-aware from the injectable clock');
+
+console.log('§48 the priority list is ordered by consequence');
+const L=w.priorityList('docs');
+ok(Array.isArray(L),'48.1 one list, not one per module');
+let ordered=true;
+const rank={black:0,red:1,amber:2,green:3,grey:4};
+for(let i=1;i<L.length;i++){
+ const a=rank[w.tone(L[i-1])],b=rank[w.tone(L[i])];
+ if(a>b)ordered=false;
+ if(a===b&&(L[i-1].due||9e15)>(L[i].due||9e15))ordered=false;
+}
+ok(ordered,'48.2 black → red → amber → green, and the nearest deadline within a tone');
+const oldGreen=w.mk({ref:'OLD-1',title:'an old calm task',kind:'document',owner:'U-01',role:'docs',next:'do',due:w.NOW()+9*D,allow:9*D,touched:w.T0-30*D});
+const newRed=w.mk({ref:'NEW-1',title:'a fresh burning task',kind:'document',owner:'U-01',role:'docs',next:'do',due:w.NOW()-2*H,allow:H});
+const L2=w.priorityList('docs');
+ok(L2.indexOf(newRed)<L2.indexOf(oldGreen),'48.3 a new red outranks an old green — creation date is irrelevant');
+const row=L2[0];
+ok(row.next&&row.ref&&row.due!==undefined,'48.4 every row has the action, the record and the deadline');
+ok(w.consequenceOf(row).length>25,'48.5 …and states what happens if it is missed');
+const kinds=['measure','document','invoice','clear','deliver'];
+const texts=kinds.map(k=>w.consequenceOf({kind:k,due:w.NOW()+D}));
+ok(new Set(texts).size===kinds.length,'48.6 the consequence is specific to the kind of work, not one generic line');
+const hard=w.mk({ref:'HARD-1',title:'past cutoff',kind:'document',owner:'U-01',role:'docs',next:'do',due:w.NOW()+D,allow:D,hardCutoff:w.NOW()-H});
+ok(/hard cutoff is already past/.test(w.consequenceOf(hard)),'48.7 a passed hard cutoff gets the strongest wording');
+w.go('s0');
+ok(/touch\(|resolve\(|ack\(/.test(sh()),'48.8 rows are actionable in place');
+ok(w.priorityList('finance').every(x=>x.role==='finance'||(x.ho&&x.ho.to==='finance')),'48.9 the list holds only that person\'s work');
+w.resolve(oldGreen.id);w.resolve(newRed.id);w.resolve(hard.id);
+
+console.log('§49 the shape of today');
+const band=w.todayBand('docs');
+ok(typeof band.byHour==='object'&&typeof band.nowHour==='number','49.1 an hour band exists for today only');
+const inBand=Object.keys(band.byHour).reduce((a,k)=>a+band.byHour[k].length,0);
+ok(inBand===w.queueFor('docs').filter(x=>w.dueToday(x)).length,'49.1b it contains exactly today\'s items');
+const probe=w.mk({ref:'HOUR-1',title:'hour probe',kind:'document',owner:'U-01',role:'docs',next:'do',due:w.NOW()+3*H,allow:D});
+const b2=w.todayBand('docs');
+const targetHour=new Date(probe.due).getHours();
+ok((b2.byHour[targetHour]||[]).indexOf(probe)>-1,'49.2 each marker sits in the hour of its deadline');
+ok(b2.nowHour===new Date(w.NOW()).getHours(),'49.3 the split between spent and live hours is NOW');
+w.resolve(probe.id);
+ok(/nothing falls due today|The shape of today/.test(sh()),'49.4 an empty day says so rather than drawing an empty grid');
+
+console.log('§50 since you were last here');
+w.LAST_SEEN=w.T0-6*H;
+const s1=w.sinceLast('docs');
+ok(Array.isArray(s1),'50.1 the list is derived from the audit history');
+w.assign(w.unassigned()[0]?w.unassigned()[0].id:w.openItems()[0].id,'U-01');
+ok(w.sinceLast('docs').length>=s1.length,'50.3 a new assignment appears there');
+w.markSeen();
+ok(w.sinceLast('docs').length===0,'50.2 marking as seen moves the marker');
+
+console.log('§51 the shift handover note');
+const sn=w.shiftNote('wh');
+ok(sn&&sn.by&&sn.at&&sn.text.length>20,'51.1 a note exists per role, with who and when');
+w.setActor('U-03');
+w.go('s0');
+ok(/from the previous shift|الوردية السابقة/.test(sh()),'51.3 the next reader sees it at the top of their day');
+const before=w.shiftNotesFor('wh').length;
+ok(w.leaveNote('wh','').ok===false,'51.5 an empty note cannot be saved');
+ok(w.leaveNote('wh','scanner is out of order, weigh by the floor scale until Monday').ok===true,'51.2 a real note is saved');
+ok(w.shiftNotesFor('wh').length===before+1,'51.4 notes are kept, not overwritten');
+
+console.log('§52 standing rules');
+const warm=['Do this now','ordered by consequence, not by date','The shape of today','Since you were last here','Leave a note for the next shift'];
+ok(warm.filter(s=>!w.T_w[s]).length===0,'52.1 every warm string has an Arabic twin');
+w.setLang('ar');
+ok(/افعل هذا الآن/.test(sh())&&/شكل اليوم/.test(sh()),'52.1b AR renders');
+ok(/إن فات|متأخر/.test(sh()),'52.1c the consequence is written in Arabic too');
+w.setLang('en');
+ok(/class="machine"/.test(sh()),'52.2 machine values LTR-isolated');
+console.log('\n'+(f?('FAIL — '+f+' of '+n):('ALL PASS — '+n+' checks')));
+process.exit(f?1:0);

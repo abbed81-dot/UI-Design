@@ -1,0 +1,2096 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ShopyLink — Individual App (states-first)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&family=Tajawal:wght@400;500;700;800&family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0B2A3B; --pri:#0EA5E9; --sky:#0EA5E9; --acc:#38BDF8; --pale:#E0F2FE; --cream:#F7F4EC; --paper:#FFFFFF;
+  --mute:rgba(11,42,59,.55); --rule:rgba(11,42,59,.12); --warm:#FBBF24; --green:#10B981; --danger:#E1483B;
+  --disp:'Bricolage Grotesque',sans-serif; --body:'Manrope',sans-serif; --mono:'JetBrains Mono',monospace; --ar:'Tajawal','Cairo',sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:#E9EFF3;color:var(--ink);font-family:var(--body);
+  min-height:100vh}
+.wrap{max-width:1180px;margin:0 auto;padding:22px 20px 60px}
+.top{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:6px}
+.brand{font-family:var(--disp);font-weight:800;font-size:20px;letter-spacing:-0.02em}
+.brand .dot{color:var(--pri)}
+.tag{font-size:12px;color:var(--mute)}
+.controls{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.seg{display:inline-flex;background:#fff;border:1px solid var(--rule);border-radius:99px;padding:3px}
+.seg button{border:0;background:transparent;font-family:var(--body);font-size:13px;font-weight:600;color:var(--mute);padding:6px 13px;border-radius:99px;cursor:pointer}
+.seg button.on{background:var(--ink);color:#fff}
+.hint{font-size:12px;color:var(--mute);margin:10px 0 22px;max-width:760px;line-height:1.5}
+.stage{display:flex;justify-content:center}
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(244px,1fr));gap:30px 22px;align-items:start}
+.gcell{display:flex;flex-direction:column;align-items:center;gap:10px}
+.gcell .scaler{width:242px;height:486px;overflow:hidden;border-radius:34px}
+.gcell .scaler .phone{transform:scale(.6204);transform-origin:top left}
+.glabel{font-size:12px;font-weight:600;text-align:center}
+.glabel small{display:block;color:var(--mute);font-weight:500;font-size:11px;margin-top:1px}
+
+/* phone */
+.phone{width:390px;height:783px;background:var(--cream);position:relative;display:flex;flex-direction:column;overflow:hidden}
+.framewrap{border-radius:42px;padding:11px;background:#0B2A3B;box-shadow:0 18px 44px -24px rgba(11,42,59,.4)}
+.framewrap .phone{border-radius:32px}
+.sb{height:46px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 24px 6px;font-size:13px;font-weight:600;color:var(--ink);flex-shrink:0}
+.scr{flex:1;display:flex;flex-direction:column;padding:8px 22px 0;overflow-y:auto}
+.scr::-webkit-scrollbar{width:0}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--pri);margin-bottom:10px}
+h1.disp{font-family:var(--disp);font-weight:700;font-size:28px;line-height:1.08;letter-spacing:-0.02em;margin:0 0 8px}
+.sub{font-size:13.5px;color:var(--mute);line-height:1.5;margin:0 0 18px}
+.backchip{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--mute);background:transparent;border:0;cursor:pointer;padding:4px 0;margin-bottom:6px}
+.foot{padding:12px 22px 22px;flex-shrink:0;background:linear-gradient(to top,var(--cream) 72%,transparent)}
+.btn{width:100%;border:0;border-radius:14px;background:var(--ink);color:#fff;font-family:var(--body);font-weight:700;font-size:15px;padding:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;transition:.15s}
+.btn:disabled{opacity:.4}
+.btn.ghost{background:#fff;color:var(--ink);border:1.5px solid var(--rule)}
+.seclabel{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-weight:500;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);margin:20px 0 12px}
+.seclabel::after{content:"";flex:1;height:1px;background:var(--rule)}
+
+/* intro / onboarding */
+.intro{flex:1;display:flex;flex-direction:column;padding:0 26px}
+.intro .art{flex:1;display:flex;align-items:center;justify-content:center;min-height:300px}
+.intro .glyph{width:184px;height:184px;border-radius:46px;display:flex;align-items:center;justify-content:center;color:var(--pri);
+  background:var(--pale);border:1px solid rgba(14,165,233,.14)}
+.intro .glyph svg{filter:none}
+.intro h2{font-family:var(--disp);font-weight:800;font-size:25px;line-height:1.12;letter-spacing:-.02em;margin:0 0 10px}
+.intro p{font-size:14px;color:var(--mute);line-height:1.55;margin:0 0 8px}
+.dots{display:flex;gap:7px;justify-content:center;margin:18px 0 14px}
+.dots i{width:7px;height:7px;border-radius:50%;background:var(--rule);transition:.2s}
+.dots i.on{width:22px;border-radius:99px;background:var(--pri)}
+.introfoot{padding:6px 26px 24px}
+.skiplink{position:absolute;top:54px;inset-inline-end:22px;font-size:13px;font-weight:600;color:var(--mute);background:transparent;border:0;cursor:pointer;z-index:3}
+
+/* home */
+.hello{font-size:13px;color:var(--mute);font-weight:600}
+.hgreet{font-family:var(--disp);font-weight:800;font-size:26px;letter-spacing:-.02em;margin:2px 0 16px}
+.actionrow{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:6px}
+.action{border-radius:18px;padding:16px;cursor:pointer;color:#fff;min-height:120px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}
+.action.addr{background:var(--pri);box-shadow:0 6px 16px -12px rgba(14,165,233,.5)}
+.action.card{background:#F7A40B;color:#3a2c00;box-shadow:0 6px 16px -12px rgba(245,158,11,.45)}
+.action .ic{width:40px;height:40px;border-radius:13px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.2)}
+.action.card .ic{background:rgba(255,255,255,.45)}
+.action .t{font-family:var(--disp);font-weight:800;font-size:16px;line-height:1.15}
+.action .s{font-size:11.5px;opacity:.85;margin-top:3px;font-weight:600}
+.card2{background:#fff;border:1px solid var(--rule);border-radius:16px;padding:14px;margin-bottom:12px}
+.card2 .ch{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.card2 .ch .fl{font-size:20px}
+.card2 .ch .nm{font-family:var(--disp);font-weight:800;font-size:14.5px;flex:1}
+.card2 .ch .chev{color:var(--mute);font-size:18px}
+.addr-mini{font-size:12px;color:var(--mute);line-height:1.5}
+.schip{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;border-radius:99px;padding:4px 10px}
+.schip .dotc{width:6px;height:6px;border-radius:50%;background:currentColor}
+.schip.ok{background:rgba(16,185,129,.12);color:#0a7d54}
+.schip.warn{background:rgba(251,191,36,.16);color:#92660A}
+.schip.bad{background:rgba(225,72,59,.1);color:var(--danger)}
+.schip.neu{background:var(--pale);color:var(--pri)}
+.shipmini{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--rule)}
+.shipmini .ico{width:38px;height:38px;border-radius:11px;background:var(--pale);color:var(--pri);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.shipmini .mid{flex:1}
+.shipmini .mid .t{font-weight:700;font-size:13.5px}
+.shipmini .mid .s{font-size:11.5px;color:var(--mute);margin-top:1px}
+.emptyhome{text-align:center;color:var(--mute);font-size:13px;padding:18px 10px}
+
+/* bottom tab bar */
+.tabbar{display:flex;background:#fff;border-top:1px solid var(--rule);flex-shrink:0;padding:7px 6px calc(7px + env(safe-area-inset-bottom))}
+.tabbar .tab{flex:1;border:0;background:transparent;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 2px;cursor:pointer;color:var(--mute);font-family:var(--body)}
+.tabbar .tab .ti{height:23px;display:flex;align-items:center}
+.tabbar .tab .tl{font-size:10.5px;font-weight:700}
+.tabbar .tab.on{color:var(--pri)}
+.notifdot{position:absolute;top:5px;inset-inline-end:14px;min-width:16px;height:16px;border-radius:99px;background:var(--danger);color:#fff;font-size:9.5px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 4px}
+
+/* generic page header with notif bell */
+.pagehead{display:flex;align-items:center;gap:10px;margin-bottom:8px;position:relative}
+.bell{margin-inline-start:auto;width:38px;height:38px;border-radius:12px;border:1px solid var(--rule);background:#fff;color:var(--ink);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative}
+
+/* shipments */
+.seg2{display:flex;background:#fff;border:1px solid var(--rule);border-radius:99px;padding:3px;margin-bottom:14px}
+.seg2 button{flex:1;border:0;background:transparent;font-family:var(--body);font-size:13px;font-weight:600;color:var(--mute);padding:9px;border-radius:99px;cursor:pointer;transition:.15s}
+.seg2 button.on{background:var(--ink);color:#fff}
+.arrbanner{background:#FEF6E0;border:1px solid rgba(146,102,10,.16);border-radius:16px;padding:14px;margin-bottom:14px}
+.arrbanner .at{font-family:var(--disp);font-weight:800;font-size:14.5px;color:#7a5600;display:flex;align-items:center;gap:7px}
+.arrbanner .at svg{color:#92660A}
+.arrbanner .as{font-size:12px;color:#92660A;margin:4px 0 10px;line-height:1.45}
+.arrbanner .btn{background:#92660A;padding:11px;font-size:13.5px}
+.shiprow{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--rule);border-radius:14px;padding:12px;margin-bottom:10px;cursor:pointer}
+.shiprow .ico{width:42px;height:42px;border-radius:12px;background:var(--pale);color:var(--pri);display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative}
+.shiprow .ico .fl{position:absolute;bottom:-3px;inset-inline-end:-3px;font-size:13px}
+.shiprow .mid{flex:1;min-width:0}
+.shiprow .mid .t{font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.shiprow .mid .s{font-size:11.5px;color:var(--mute);margin-top:2px;font-family:var(--mono)}
+.shiprow .rt{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
+.emptybox{text-align:center;color:var(--mute);font-size:13px;padding:40px 18px;line-height:1.55}
+.emptybox .big{margin-bottom:12px;color:var(--mute);opacity:.55;display:flex;justify-content:center}
+/* tracking detail */
+.dhead{background:#fff;border:1px solid var(--rule);border-radius:16px;padding:16px;margin-bottom:16px}
+.dhead .dt{font-family:var(--disp);font-weight:800;font-size:18px}
+.dhead .did{font-family:var(--mono);font-size:11.5px;color:var(--mute);margin-top:2px}
+.route{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:12.5px;font-weight:700}
+.route .pin{flex:1;background:var(--pale);border-radius:9px;padding:8px;text-align:center}
+.route .arr{color:var(--mute)}
+.timeline{position:relative;margin:6px 0 8px;padding-inline-start:6px}
+.tnode{display:flex;gap:14px;position:relative;padding-bottom:20px}
+.tnode:last-child{padding-bottom:4px}
+.tnode .rail{position:relative;display:flex;flex-direction:column;align-items:center}
+.tnode .bullet{width:22px;height:22px;border-radius:50%;border:2px solid var(--rule);background:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;color:#0B2A3B;flex-shrink:0;z-index:1}
+.tnode .line{flex:1;width:2px;background:var(--rule);margin:2px 0}
+.tnode:last-child .line{display:none}
+.tnode.done .bullet{background:var(--green);border-color:var(--green)}
+.tnode.done .line{background:var(--green)}
+.tnode.cur .bullet{background:var(--pri);border-color:var(--pri);box-shadow:0 0 0 4px rgba(14,165,233,.18)}
+.tnode .tx{padding-top:1px}
+.tnode .tx .nm{font-weight:700;font-size:13.5px}
+.tnode.up .tx .nm{color:var(--mute);font-weight:600}
+.tnode .tx .dt2{font-size:11px;color:var(--mute);font-family:var(--mono);margin-top:1px}
+.dlist{background:#fff;border:1px solid var(--rule);border-radius:16px;padding:6px 14px;margin-bottom:14px}
+.drow{display:flex;justify-content:space-between;padding:11px 0;border-top:1px solid var(--rule);font-size:13px}
+.drow:first-child{border-top:0}
+.drow .k{color:var(--mute)} .drow .v{font-weight:700}
+/* notifications */
+.notifrow{display:flex;gap:12px;padding:14px 0;border-bottom:1px solid var(--rule)}
+.notifrow .nic{width:40px;height:40px;border-radius:12px;background:var(--pale);color:var(--pri);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.notifrow .nmid{flex:1}
+.notifrow .nmid .nt{font-size:13.5px;font-weight:600;line-height:1.4}
+.notifrow .nmid .ntime{font-size:11px;color:var(--mute);font-family:var(--mono);margin-top:3px}
+.notifrow .nact{font-size:12px;font-weight:700;color:var(--pri);background:var(--pale);border:0;border-radius:9px;padding:7px 11px;cursor:pointer;align-self:center;white-space:nowrap}
+.unread{width:8px;height:8px;border-radius:50%;background:var(--pri);flex-shrink:0;margin-top:6px}
+.linkrow{display:flex;justify-content:flex-end;margin-bottom:6px}
+.linkrow button{font-size:12px;font-weight:700;color:var(--pri);background:transparent;border:0;cursor:pointer}
+
+.scene{width:248px;height:200px;border-radius:30px;display:flex;align-items:center;justify-content:center;color:var(--pri);
+  background:var(--pale);border:1px solid rgba(14,165,233,.14);overflow:hidden}
+.scene svg{width:100%;height:100%}
+.scene .spin{animation:sc-spin 18s linear infinite;transform-box:fill-box}
+.scene .pin{animation:sc-drop 3.4s ease-in-out infinite;transform-box:fill-box}
+.scene .fly{animation:sc-fly 3s cubic-bezier(.5,0,.5,1) infinite}
+.scene .f2{animation-delay:.9s}
+.scene .bag{animation:sc-bob 3s ease-in-out infinite;transform-box:fill-box}
+.scene .parcel{animation:sc-move 3.2s ease-in-out infinite}
+.scene .road{stroke-dasharray:5 9;animation:sc-dash 1s linear infinite}
+.scene .cover{animation:sc-cover 3.6s ease-in-out infinite;transform-box:fill-box}
+.scene .code .d{opacity:0;animation:sc-digit 3.6s ease-in-out infinite}
+.scene .code .d2{animation-delay:.12s}.scene .code .d3{animation-delay:.24s}.scene .code .d4{animation-delay:.36s}
+.scene .spark{animation:sc-twinkle 2.4s ease-in-out infinite;transform-box:fill-box}.scene .k2{animation-delay:.6s}.scene .k3{animation-delay:1.2s}
+.scene .prog{animation:sc-prog 3.6s ease-in-out infinite}
+.scene .tdot{animation:sc-dot 3.6s ease-in-out infinite}
+.scene .nd{animation:sc-node 3.6s ease-in-out infinite}.scene .nd2{animation-delay:.5s}.scene .nd3{animation-delay:1s}.scene .nd4{animation-delay:1.5s}.scene .nd5{animation-delay:2s}
+@keyframes sc-spin{to{transform:rotate(360deg)}}
+@keyframes sc-drop{0%{transform:translateY(-13px);opacity:0}18%{opacity:1}50%,100%{transform:translateY(0);opacity:1}}
+@keyframes sc-fly{0%,8%{transform:translate(0,0);opacity:0}16%{opacity:1}68%,100%{transform:translate(116px,56px);opacity:0}}
+@keyframes sc-bob{0%,55%,100%{transform:translateY(0)}72%{transform:translateY(-4px)}}
+@keyframes sc-move{0%{transform:translate(48px,118px)}88%,100%{transform:translate(150px,118px)}}
+@keyframes sc-dash{to{stroke-dashoffset:-14}}
+@keyframes sc-cover{0%,22%{transform:translateX(0);opacity:1}58%,100%{transform:translateX(132px);opacity:0}}
+@keyframes sc-digit{0%,42%{opacity:0}60%,100%{opacity:1}}
+@keyframes sc-twinkle{0%,100%{opacity:0;transform:scale(.5)}50%{opacity:1;transform:scale(1)}}
+@keyframes sc-prog{0%,15%{stroke-dashoffset:100}82%,100%{stroke-dashoffset:0}}
+@keyframes sc-dot{0%,15%{transform:translateX(0)}82%,100%{transform:translateX(160px)}}
+@keyframes sc-node{0%,42%{fill:#fff;stroke:var(--rule)}56%,100%{fill:var(--green);stroke:var(--green)}}
+@media (prefers-reduced-motion: reduce){.scene *{animation:none!important}.scene .cover{display:none}.scene .code .d{opacity:1}.scene .w1{opacity:1}.scene .b1{opacity:1}}
+
+.scene .wc{opacity:0;animation:sc-cycle 6s ease-in-out infinite}
+.scene .w2{animation-delay:1.5s}.scene .w3{animation-delay:3s}.scene .w4{animation-delay:4.5s}
+@keyframes sc-cycle{0%{opacity:0}4%{opacity:1}21%{opacity:1}25%{opacity:0}100%{opacity:0}}
+
+.scene .br{opacity:0;animation:sc-cycle3 5.4s ease-in-out infinite}
+.scene .b2{animation-delay:1.8s}.scene .b3{animation-delay:3.6s}
+@keyframes sc-cycle3{0%{opacity:0}6%{opacity:1}28%{opacity:1}33%{opacity:0}100%{opacity:0}}
+
+/* account */
+.profile{display:flex;align-items:center;gap:13px;background:#fff;border:1px solid var(--rule);border-radius:16px;padding:14px;margin-bottom:16px}
+.profile .ava{width:50px;height:50px;border-radius:50%;background:linear-gradient(150deg,var(--pri),var(--ink));color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-weight:800;font-size:20px;flex-shrink:0}
+.profile .pinfo{flex:1}
+.profile .pn{font-family:var(--disp);font-weight:800;font-size:16px}
+.profile .pp{font-size:12.5px;color:var(--mute);font-family:var(--mono);margin-top:2px}
+.menu{background:#fff;border:1px solid var(--rule);border-radius:16px;overflow:hidden;margin-bottom:14px}
+.mrow{width:100%;display:flex;align-items:center;gap:13px;padding:14px;border:0;border-top:1px solid var(--rule);background:#fff;cursor:pointer;font-family:var(--body)}
+.mrow:first-child{border-top:0}
+.mrow .mic{width:34px;height:34px;border-radius:10px;background:var(--pale);color:var(--pri);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.mrow .ml{flex:1;text-align:start;font-size:14px;font-weight:600;color:var(--ink)}
+.mrow .mchev{color:var(--mute);font-size:18px}
+.logout{color:var(--danger);border-color:rgba(225,72,59,.3)}
+.setrow{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--rule);border-radius:14px;padding:12px 14px;margin-bottom:10px}
+.setrow .sk{flex:1;font-size:13.5px;font-weight:600}
+.seg2.mini{margin:0;padding:2px;width:auto}
+.seg2.mini button{padding:6px 11px;font-size:12px}
+.toggle{width:44px;height:26px;border-radius:99px;background:var(--rule);position:relative;cursor:pointer;transition:.18s;flex-shrink:0}
+.toggle .kn{position:absolute;top:3px;inset-inline-start:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.18s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.toggle.on{background:var(--green)}
+.toggle.on .kn{inset-inline-start:21px}
+.acc{background:#fff;border:1px solid var(--rule);border-radius:14px;padding:14px;margin-bottom:10px;cursor:pointer}
+.acc .qrow{display:flex;align-items:center;gap:10px}
+.acc .q{flex:1;font-size:13.5px;font-weight:700}
+.acc .qchev{color:var(--pri);font-size:18px;font-weight:700}
+.acc .a{font-size:12.5px;color:var(--mute);line-height:1.55;margin-top:10px}
+.trow{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--rule);border-radius:14px;padding:13px;margin-bottom:10px;cursor:pointer}
+.trow .tmid{flex:1;min-width:0}
+.trow .tsub{font-weight:700;font-size:13.5px}
+.trow .tlast{font-size:11.5px;color:var(--mute);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.trow .trt{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
+.trow .ttime{font-size:10.5px;color:var(--mute);font-family:var(--mono)}
+.thread{display:flex;flex-direction:column;gap:10px}
+.msg{max-width:80%;padding:11px 13px;border-radius:14px;font-size:13px;line-height:1.45}
+.msg .mt{font-size:10px;color:var(--mute);font-family:var(--mono);margin-top:5px}
+.msg.you{align-self:flex-end;background:var(--pale);border-bottom-right-radius:4px}
+.msg.us{align-self:flex-start;background:#fff;border:1px solid var(--rule);border-bottom-left-radius:4px}
+.phone.rtl .msg.you{align-self:flex-start;border-bottom-right-radius:14px;border-bottom-left-radius:4px}
+.phone.rtl .msg.us{align-self:flex-end}
+.replybar{display:flex;gap:8px;align-items:center}
+.replyin{flex:1;border:1.5px solid var(--rule);border-radius:12px;padding:13px;font-family:var(--body);font-size:13px;background:#fff}
+
+/* invoice + payment */
+.invoice{background:#fff;border:1px solid var(--rule);border-radius:14px;padding:6px 14px;margin-bottom:4px}
+.invoice .ir{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 0;border-top:1px solid var(--rule);font-size:13px}
+.invoice .ir:first-child{border-top:0}
+.invoice .ir span{color:var(--mute);font-weight:600}
+.invoice .ir b{font-weight:700;font-family:var(--mono);color:var(--ink)}
+.invoice .ir.total{border-top:1.5px solid var(--ink)}
+.invoice .ir.total span{color:var(--ink);font-weight:800;font-family:var(--disp)}
+.invoice .ir.total b{font-size:16px;color:var(--pri)}
+.paymethods{display:flex;flex-direction:column;gap:9px}
+.paym{display:flex;align-items:center;gap:12px;background:#fff;border:1.5px solid var(--rule);border-radius:13px;padding:13px 14px;cursor:pointer;font-family:var(--body)}
+.paym .pmi{width:32px;height:32px;border-radius:9px;background:var(--pale);color:var(--pri);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.paym .pml{flex:1;text-align:start;font-size:13.5px;font-weight:600}
+.paym .rad{width:19px;height:19px;border-radius:50%;border:2px solid var(--rule);flex-shrink:0}
+.paym.on{border-color:var(--pri);background:var(--pale)}
+.paym.on .rad{border-color:var(--pri);background:var(--pri);box-shadow:inset 0 0 0 3px #fff}
+
+/* banners — Claude Design system */
+.banner{border-radius:13px;padding:12px 13px;font-size:12.5px;font-weight:600;line-height:1.45;display:flex;gap:9px;margin-bottom:14px}
+.banner.warn{background:rgba(251,191,36,.16);color:#8a5e06;box-shadow:inset 0 0 0 1px rgba(251,191,36,.32)}
+.banner.info{background:var(--pale);color:#0a6aa1}
+.banner.ok2{background:rgba(16,185,129,.14);color:#0a7a55;box-shadow:inset 0 0 0 1px rgba(16,185,129,.28)}
+.schip.paidpill{margin-inline-start:6px}
+.paysels{display:flex;flex-direction:column;gap:9px}
+.paysel{display:flex;align-items:center;gap:12px;background:#fff;border:1.5px solid var(--rule);border-radius:13px;padding:12px 13px;cursor:pointer;font-family:var(--body);text-align:start}
+.paysel .psbox{width:21px;height:21px;border-radius:6px;border:2px solid var(--rule);flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff}
+.paysel.on{border-color:var(--pri);background:var(--pale)}
+.paysel.on .psbox{background:var(--pri);border-color:var(--pri)}
+.paysel .psmid{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.paysel .pstitle{font-size:13.5px;font-weight:700}
+.paysel .pssub{font-size:11.5px;color:var(--mute);font-family:var(--mono)}
+.paysel .psamt{font-family:var(--mono);font-weight:700;font-size:13px;color:var(--ink);flex-shrink:0}
+.btn.dis{opacity:.5;pointer-events:none}
+.card2.tap{cursor:pointer;transition:.15s}
+.card2.tap:hover{border-color:var(--sky);box-shadow:0 0 0 4px var(--pale)}
+.addr-name{font-family:var(--disp);font-weight:800;font-size:15px;color:var(--ink);padding-bottom:9px;margin-bottom:9px;border-bottom:1px dashed var(--rule);display:flex;flex-direction:column;gap:3px}
+.addr-name .anl{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--sky);font-weight:700}
+.ctiles{display:flex;flex-direction:column;gap:10px}
+.ctile{display:flex;align-items:center;gap:12px;background:#fff;border:1.5px solid var(--rule);border-radius:14px;padding:14px;cursor:pointer;font-family:var(--body);transition:.15s}
+.ctile:hover{border-color:var(--sky);box-shadow:0 0 0 4px var(--pale)}
+.ctile .fl{font-size:24px}
+.ctile .cn{flex:1;text-align:start;font-weight:700;font-size:15px;color:var(--ink)}
+.ctile .chev{color:var(--mute);font-size:18px}
+.addr-lines{font-size:13px;line-height:1.65;color:var(--ink)}
+.addr-lines .addr-id{font-family:var(--mono);font-size:11px;color:var(--mute);margin-top:7px}
+.banner svg{flex-shrink:0}
+.btn.ghost:hover{border-color:var(--sky);box-shadow:0 0 0 4px var(--pale);background:#fff}
+
+.phone.rtl{direction:rtl;font-family:var(--ar)}
+.phone.rtl h1.disp,.phone.rtl .seclabel,.phone.rtl .intro h2,.phone.rtl .hgreet,.phone.rtl .action .t,.phone.rtl .card2 .ch .nm{font-family:var(--ar)}
+.phone.rtl .eyebrow{font-family:var(--mono)}
+
+.simrow{display:flex;gap:7px;flex-wrap:wrap;margin-top:14px;justify-content:center}
+.simrow button{font-size:12px;font-weight:600;border:1px solid var(--rule);background:#fff;color:var(--mute);border-radius:99px;padding:6px 12px;cursor:pointer}
+.simrow button.on{background:var(--pale);color:var(--ink);border-color:var(--pri)}
+.note{font-size:12px;color:var(--mute);text-align:center;margin-top:16px}
+.screenpick{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;margin-bottom:14px}
+.screenpick button{font-size:12px;font-weight:700;border:1px solid var(--rule);background:#fff;color:var(--mute);border-radius:10px;padding:7px 12px;cursor:pointer}
+.screenpick button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+/* ── control geometry ──────────────────────────────────────────────
+   A control styled with padding but no height takes the browser's default,
+   which differs per control type — that is why a select used to sit proud of
+   the input beside it, and why the native arrow was jammed against the edge.
+   The arrow is drawn here, so the room for it is reserved here.            */
+select{
+  height:var(--ctl-h,42px);
+  -webkit-appearance:none;-moz-appearance:none;appearance:none;
+  padding-right:32px;padding-left:12px;
+  background-image:url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 L6 6.5 L11 1.5' fill='none' stroke='%2362707A' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;
+  font-size:var(--fs-body,14px);color:var(--ink,#0B2A3B);line-height:normal;
+}
+select::-ms-expand{display:none}
+[dir="rtl"] select{padding-right:12px;padding-left:32px;background-position:left 12px center}
+input[type="text"],input[type="number"],input[type="tel"],input[type="email"],input[type="date"]{
+  height:var(--ctl-h,42px);font-size:var(--fs-body,14px);line-height:normal;
+}
+textarea{font-size:var(--fs-body,14px);line-height:1.6}
+
+/* ── the screen switcher is NAVIGATION, not debug chrome ───────────
+   It was 10px white at 40% on the dark bar: 3.35:1, below AA and unreadable,
+   which is why its destinations could not be found. Now 11.5px at 72% (7.18:1)
+   with a solid active pill, so it reads as what it is.                      */
+.sl-sim-btn{font-size:11.5px !important;font-weight:700 !important;padding:5px 13px !important;
+  color:rgba(255,255,255,.72) !important;background:rgba(255,255,255,.09) !important;
+  min-height:26px;white-space:nowrap}
+.sl-sim-btn:hover{background:rgba(255,255,255,.18) !important;color:#FFFFFF !important}
+.sl-sim-btn.on{background:#FFFFFF !important;color:#0B2A3B !important}
+.sl-sim-lbl{font-size:10px !important;color:rgba(255,255,255,.60) !important}
+
+/* ── mobile: every screen must be usable and complete on a phone ───
+   Nothing is hidden to make it fit. Rows wrap, tables scroll inside their own
+   box rather than pushing the page sideways, and touch targets keep their size. */
+@media (max-width:767px){
+  /* A control pushed past the edge is a control that does not exist.
+     Inline flex rows wrap, and auto-margin spacers stop shoving the last item
+     off-screen — which is what hid "simulate issue" on a narrow window. */
+  [style*="display:flex"]{flex-wrap:wrap !important}
+  [style*="margin-left:auto"]{margin-left:0 !important}
+  [dir="rtl"] [style*="margin-right:auto"]{margin-right:0 !important}
+  .sl-modal{width:auto !important;max-width:calc(100vw - 20px)}
+
+  /* the sidebar is handled by this module's own 767px rules — not duplicated here */
+  .sl-main,.sl-scroll{padding-left:12px !important;padding-right:12px !important}
+  .sl-sim{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:nowrap}
+  .card{border-radius:11px}
+  select,input[type="text"],input[type="number"],input[type="tel"],input[type="email"]{
+    min-height:44px;font-size:16px}          /* 16px stops iOS zooming on focus */
+  button{min-height:40px}
+}
+@media (max-width:560px){
+  .sl-scroll,.sl-main{padding-left:10px !important;padding-right:10px !important}
+  .figure{font-size:22px !important}
+}
+.tnode .tat{font-family:var(--mono);font-size:10.5px;color:var(--mute);margin-top:2px;direction:ltr}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="brand">Shopy<span class="dot">·</span>Link <span style="font-weight:600;font-size:13px;color:var(--mute)">— individual app</span></div>
+    <div class="controls">
+      <div class="seg" id="lang"><button data-l="en" class="on">EN</button><button data-l="ar">عربي</button></div>
+      <div class="seg" id="mode"><button data-m="walk" class="on">Walkthrough</button><button data-m="gallery">All states</button></div>
+    </div>
+  </div>
+  <div class="tag">world · to · door · Stage 1: intro · home · tab bar</div>
+  <div class="hint" id="hint"></div>
+  <div id="view"></div>
+</div>
+
+<script>
+function slNum(n,dec){
+ // No Intl: the legacy engine may not have it, and toLocaleString drops trailing zeros.
+ var v=Number(n); if(!isFinite(v))v=0;
+ var neg=v<0; v=Math.abs(v);
+ var s2=dec?(Math.round(v*100)/100).toFixed(2):String(Math.round(v));
+ var p=s2.split('.'), whole=p[0], out='', i, c=0;
+ for(i=whole.length-1;i>=0;i--){out=whole.charAt(i)+out;c++;if(c%3===0&&i>0)out=','+out;}
+ return (neg?'-':'')+out+(dec?'.'+p[1]:'');
+}
+
+/* ── ShopyLink icons ────────────────────────────────────────────────
+   One family, one 1.7 stroke, 16px, outline, currentColor. Drawn here because
+   an emoji is rendered by the device, not by us — the same character is a
+   different picture on Android, Windows and iOS, which is how the wrong flag
+   reached a customer. These do not move between machines.                */
+/* ── option sets that grow ──────────────────────────────────────────
+   A row of pressable chips reads well at five and becomes a wall at twenty.
+   slPicker() paints chips while the set is small and switches to a searchable
+   list once it is not — the same control, the same handler, one decision made
+   by the data rather than by the day it was written.                        */
+var SL_CHIP_MAX=7;                 /* above this, chips stop being scannable */
+var SL_PICK_Q={};                  /* the search box per picker, by id */
+function slPickQ(id,v){SL_PICK_Q[id]=v;render();}
+function slPicker(id,items,current,onpick,opts){
+  opts=opts||{};
+  var all=items||[], i, h='';
+  var lbl=function(x){return opts.label?opts.label(x):(x.name||x.label||x.id||String(x));};
+  var val=function(x){return opts.value?opts.value(x):(x.id!==undefined?x.id:String(x));};
+  /* A choice is made from a dropdown, never from the whole set laid out on the page.
+     Five options or five hundred, the control is the same size and the page does not
+     change shape as the business grows. The native select carries its own search on
+     every platform, and our control-geometry rule already gives it a height and an arrow. */
+  h+='<select onchange="if(this.value){'+onpick.replace('{v}',"'+this.value+'")+'}" '
+   +'style="min-width:'+(opts.width||'220px')+';max-width:100%;border:1.5px solid rgba(11,42,59,.15);'
+   +'border-radius:10px;font-family:var(--body);background:#FFFFFF">';
+  if(opts.blank)h+='<option value="">'+opts.blank+'</option>';
+  for(i=0;i<all.length;i++){
+    var v=val(all[i]);
+    h+='<option value="'+String(v).replace(/"/g,'&quot;')+'"'+(v===current?' selected':'')+'>'
+      +String(lbl(all[i])).replace(/<[^>]*>/g,'')+'</option>';
+  }
+  h+='</select>';
+  if(opts.add)h+=' <button onclick="'+opts.add+'" style="cursor:pointer;font-family:var(--body);font-size:var(--fs-hint);font-weight:800;padding:0 14px;height:var(--ctl-h);border-radius:10px;border:1.5px dashed rgba(14,165,233,.55);background:#F4FBFF;color:#0A4A6B">+ '+(opts.addLabel||t('add'))+'</button>';
+  if(opts.count===true)h+=' <span class="hint machine" style="margin-'+(currentLang==='ar'?'right':'left')+':8px">'+all.length+'</span>';
+  return h;
+}
+function slMultiPicker(id,items,isOn,onToggle,opts){
+  opts=opts||{};
+  var all=items||[], q=String(SL_PICK_Q[id]||'').toLowerCase(), i, h='';
+  var lbl=function(x){return opts.label?opts.label(x):(x.name||x.label||String(x));};
+  var val=function(x){return opts.value?opts.value(x):(x.id!==undefined?x.id:String(x));};
+  var chosen=[]; for(i=0;i<all.length;i++){if(isOn(all[i]))chosen.push(all[i]);}
+  var chip=function(x,on){
+    return '<button onclick="'+onToggle.replace('{v}',val(x))+'" style="cursor:pointer;font-family:var(--body);font-size:var(--fs-hint);font-weight:800;'
+     +'padding:7px 13px;border-radius:999px;border:1.5px solid '+(on?'#0A7250':'rgba(11,42,59,.14)')+';'
+     +'background:'+(on?'#DCF5E9':'#FFFFFF')+';color:'+(on?'#0A7250':'#0B2A3B')+'">'+(on?'&#10003; ':'')+lbl(x)+'</button>';
+  };
+  if(all.length<=SL_CHIP_MAX&&!q){
+    h+='<div style="display:flex;gap:6px;flex-wrap:wrap">';
+    for(i=0;i<all.length;i++)h+=chip(all[i],isOn(all[i]));
+    return h+'</div>';
+  }
+  var hits=[]; for(i=0;i<all.length;i++){if(!q||String(lbl(all[i])).toLowerCase().indexOf(q)>-1)hits.push(all[i]);}
+  var shown=hits.slice(0,SL_CHIP_MAX);
+  h+='<div>';
+  if(chosen.length){
+    h+='<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:7px">';
+    for(i=0;i<Math.min(chosen.length,SL_CHIP_MAX);i++)h+=chip(chosen[i],true);
+    if(chosen.length>SL_CHIP_MAX)h+='<span class="hint" style="align-self:center">+'+(chosen.length-SL_CHIP_MAX)+'</span>';
+    h+='</div>';
+  }
+  h+='<input type="text" value="'+String(SL_PICK_Q[id]||'').replace(/"/g,'&quot;')+'" oninput="slPickQ(\''+id+'\',this.value)" '
+   +'placeholder="'+(opts.placeholder||t('search'))+'" style="width:100%;max-width:280px;border:1.5px solid rgba(11,42,59,.15);'
+   +'border-radius:9px;padding:0 11px;font-family:var(--body);font-size:var(--fs-body);background:#FFFFFF">'
+   +'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:7px">';
+  for(i=0;i<shown.length;i++)h+=chip(shown[i],isOn(shown[i]));
+  h+='</div><div class="hint" style="margin-top:5px">'
+   +t('chosen')+' <span class="machine">'+chosen.length+'</span> '+t('of')+' <span class="machine">'+all.length+'</span>'
+   +(hits.length>shown.length?' · '+t('keep typing to narrow it'):'')+'</div></div>';
+  return h;
+}
+
+var SL_ICONS={
+ hub:'<path d="M3 20h18M5 20V9l7-5 7 5v11M9 20v-5h6v5"/>',
+ city:'<path d="M3 21V9l5-3v4l5-3v14"/><path d="M13 21V11l6-3v13"/><path d="M6 12h1M6 15h1M6 18h1M16 12h1M16 15h1M16 18h1"/>',
+ blocked:'<circle cx="12" cy="12" r="8.5"/><path d="M6 6l12 12"/>',
+
+ idcard:'<rect x="2.5" y="5" width="19" height="14" rx="2.4"/><circle cx="8.5" cy="11" r="2.2"/><path d="M5 16.2a3.8 3.8 0 0 1 7 0M14 10h4M14 13.5h4"/>',
+ key:'<circle cx="8" cy="12" r="4"/><path d="M12 12h9M17.5 12v3M20.5 12v2.2"/>',
+ shield:'<path d="M12 3 5 6v6c0 4 3 6.7 7 8 4-1.3 7-4 7-8V6z"/><path d="M9 12l2 2 4-4"/>',
+
+ compass:'<circle cx="12" cy="12" r="9"/><path d="M15.5 8.5 13.5 13.5 8.5 15.5 10.5 10.5z"/>',
+ ruler:'<path d="M3.5 14.5 14.5 3.5l6 6-11 11z"/><path d="M7 11l2 2M10 8l2 2M13 5l2 2"/>',
+ depart:'<path d="M3 20h18"/><path d="M4 14.5 6.5 15 10 11 5.5 5.5l2.5-.5 6 4.5 4.5-1a2 2 0 1 1 .8 3.4L6.5 17z"/>',
+ abacus:'<rect x="3.5" y="3.5" width="17" height="17" rx="2"/><path d="M3.5 9h17M3.5 14.5h17M9 3.5v17M15 3.5v17"/>',
+ folders:'<path d="M3 8h6l2 2h10v9H3z"/><path d="M6 8V5h5l2 2"/>',
+ scroll:'<path d="M6 4h11v14a2.5 2.5 0 0 0 2.5 2.5H8A2.5 2.5 0 0 1 5.5 18V6"/><path d="M9 8h5M9 12h5"/>',
+ tag:'<path d="M11 3H4.5v6.5L14 19l6.5-6.5z"/><circle cx="8" cy="7" r="1.4"/>',
+ people:'<circle cx="9" cy="8" r="3.2"/><path d="M2.5 19a6.5 6.5 0 0 1 13 0"/><path d="M16 5.5a3.2 3.2 0 0 1 0 6M17.5 19a6 6 0 0 0-2-4.4"/>',
+ tools:'<path d="M14.5 6.5a3.5 3.5 0 1 0 4 4L21 13l-8 8-2.5-2.5"/><path d="M9 4 4 9l3.5 3.5L12.5 7.5z"/>',
+ bank:'<path d="M3 9.5 12 4l9 5.5"/><path d="M5 9.5V19M9.5 9.5V19M14.5 9.5V19M19 9.5V19M3 19h18"/>',
+ clipboard:'<rect x="5" y="4.5" width="14" height="16" rx="2"/><path d="M9 4.5V3h6v1.5"/><path d="M9 10h6M9 14h6"/>',
+ export:'<path d="M12 3v11M8 7l4-4 4 4"/><path d="M4 15v4h16v-4"/>',
+ gift:'<rect x="3" y="9" width="18" height="11" rx="1.6"/><path d="M3 13h18M12 9v11"/><path d="M12 9C10 5.5 6 6 6 8.2 6 9.4 8 9 12 9zM12 9c2-3.5 6-3 6-.8 0 1.2-2 .8-6 .8z"/>',
+ home:'<path d="M3.5 11 12 4l8.5 7"/><path d="M6 10.5V20h12v-9.5"/><path d="M10 20v-5h4v5"/>',
+ flask:'<path d="M10 3v6L4.5 18.5A2 2 0 0 0 6.3 21.5h11.4a2 2 0 0 0 1.8-3L14 9V3"/><path d="M9 3h6M7.5 15h9"/>',
+ trophy:'<path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4.5v1.5A3 3 0 0 0 7 10.4M17 6h2.5v1.5A3 3 0 0 1 17 10.4"/><path d="M12 14v3M8.5 20h7"/>',
+
+ plane:'<path d="M2.5 13.5 21 5l-4 9 4 9-18.5-8.5" /><path d="M8 11.6 8 6"/>',
+ ship:'<path d="M3 17.5c1.6 1 3.2 1 4.8 0s3.2-1 4.8 0 3.2 1 4.8 0 3.2-1 4.8 0"/><path d="M5 14l1.4-5h11.2L19 14"/><path d="M12 4v5"/>',
+ truck:'<path d="M2 16V6h11v10"/><path d="M13 9h4l4 4v3h-8"/><circle cx="6.5" cy="17.5" r="1.8"/><circle cx="17.5" cy="17.5" r="1.8"/>',
+ box:'<path d="M12 3 3 7.5V17l9 4.5 9-4.5V7.5z"/><path d="M3 7.5 12 12l9-4.5M12 12v9.5"/>',
+ pin:'<path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.6"/>',
+ person:'<circle cx="12" cy="8" r="3.6"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/>',
+ handshake:'<path d="M3 12.5 7 8.5l3 2.5 3-2.5 4 4"/><path d="M10 15.5 12 17.5l2-2 2 2"/><path d="M2 9.5 5.5 6M22 9.5 18.5 6"/>',
+ lock:'<rect x="4.5" y="10.5" width="15" height="9.5" rx="2.2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/>',
+ search:'<circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/>',
+ card:'<rect x="2.5" y="5" width="19" height="14" rx="2.6"/><path d="M2.5 10h19"/>',
+ camera:'<rect x="2.5" y="7" width="19" height="13" rx="2.4"/><circle cx="12" cy="13.5" r="4"/><path d="M8.5 7l1.5-3h4l1.5 3"/>',
+ globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.2 3 14.8 0 18M12 3c-3 3.2-3 14.8 0 18"/>',
+ bolt:'<path d="M13.5 2 5 13.5h6L10.5 22 19 10.5h-6z"/>',
+ scale:'<path d="M12 4v16M6 20h12M12 6 4 10M12 6l8 4"/><path d="M1.5 10.5a2.5 2.5 0 0 0 5 0M17.5 10.5a2.5 2.5 0 0 0 5 0"/>',
+ customs:'<rect x="3" y="9" width="18" height="11" rx="1.8"/><path d="M3 13h18M8 9V5h8v4"/>',
+ factory:'<path d="M3 20V11l5 3V11l5 3V6h8v14z"/><path d="M17 11v3M20 11v3"/>',
+ map:'<path d="M9 4 3 6.5v13L9 17l6 2.5 6-2.5v-13L15 6.5z"/><path d="M9 4v13M15 6.5v13"/>',
+ bell:'<path d="M6 9a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6z"/><path d="M10 19.5a2.2 2.2 0 0 0 4 0"/>',
+ clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5.4l3.4 2"/>',
+ doc:'<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/>',
+ chat:'<path d="M4 5h16v11H9l-5 4z"/>',
+ gear:'<circle cx="12" cy="12" r="3.2"/><path d="M12 3v2.4M12 18.6V21M3 12h2.4M18.6 12H21M5.6 5.6l1.7 1.7M16.7 16.7l1.7 1.7M18.4 5.6l-1.7 1.7M7.3 16.7l-1.7 1.7"/>',
+ palm:'<path d="M12 21V11"/><path d="M12 11c-3-3-6-2.5-8-1 1.5-4 5.5-5 8-2 2.5-3 6.5-2 8 2-2-1.5-5-2-8 1z"/>',
+ flag:'<path d="M6 21V4M6 4h11l-2.2 3.5L17 11H6"/>',
+ printer:'<path d="M7 9V3h10v6"/><rect x="3.5" y="9" width="17" height="7" rx="1.8"/><path d="M7 14h10v7H7z"/>'
+};
+function slIcon(name,size,stroke){
+ var p=SL_ICONS[name];
+ if(!p)return '';
+ var s=size||16;
+ return '<svg viewBox="0 0 24 24" width="'+s+'" height="'+s+'" fill="none" stroke="currentColor" '
+  +'stroke-width="'+(stroke||1.7)+'" stroke-linecap="round" stroke-linejoin="round" '
+  +'style="vertical-align:-0.18em;flex-shrink:0" aria-hidden="true">'+p+'</svg>';
+}
+
+if(!Array.prototype.find){Array.prototype.find=function(fn,th){for(var i=0;i<this.length;i++){if(fn.call(th,this[i],i,this))return this[i];}return undefined;};}
+if(!Array.prototype.findIndex){Array.prototype.findIndex=function(fn,th){for(var i=0;i<this.length;i++){if(fn.call(th,this[i],i,this))return i;}return -1;};}
+
+function _slicedToArray(r, e) { return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest(); }
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(r, a) { if (r) { if ("string" == typeof r) return _arrayLikeToArray(r, a); var t = {}.toString.call(r).slice(8, -1); return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0; } }
+function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length); for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e]; return n; }
+function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t.return && (u = t.return(), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
+function _arrayWithHoles(r) { if (Array.isArray(r)) return r; }
+var fmt = function fmt(n) {
+  return slNum(n,0);
+};
+
+/* ── content ── */
+var T = {
+  en: {
+    tag: 'world · to · door',
+    intro: [{
+      g: 'globe',
+      h: 'A shopping address in 4 countries',
+      p: 'Get your own local address in the UAE, USA, China or Turkey — shop the world like a local.'
+    }, {
+      g: 'bag',
+      h: 'Shop any store you like',
+      p: 'Buy from any website and ship to your ShopyLink address. We receive your parcels for you.'
+    }, {
+      g: 'box',
+      h: 'We deliver to your door in Syria',
+      p: 'We forward everything to your doorstep in Syria — you only pay shipping per parcel.'
+    }, {
+      g: 'gift',
+      h: 'Gift cards in seconds',
+      p: 'Buy store gift cards (Amazon, iTunes, more). The code is revealed to you in seconds.'
+    }, {
+      g: 'truck',
+      h: 'Track every step',
+      p: 'Follow each shipment from the warehouse to your hands, and get notified on arrival.'
+    }],
+    parcel: 'Parcel',
+    fxAt: function fxAt(a,r,d){return "".concat(a," converted at ").concat(r," \u00B7 rate set ").concat(d);},
+    fxNone: 'shown in the currency it was priced in — no approved rate is published',
+    skip: 'Skip',
+    next: 'Next',
+    getStarted: 'Get started',
+    // home
+    hello: 'Welcome back',
+    name: 'Obada',
+    buyAddr: 'Buy an address',
+    buyAddrSub: '',
+    buyCard: 'Buy a gift card',
+    buyCardSub: 'Code in seconds',
+    yourAddrs: 'Your addresses',
+    latestShip: 'Latest shipment',
+    viewAll: 'View all',
+    noAddr: 'No addresses yet — tap “Buy an address” to get your first one.',
+    activeUntil: function activeUntil(d) {
+      return "Active until ".concat(d);
+    },
+    ended: function ended(d) {
+      return "Ended ".concat(d);
+    },
+    shipTitle: 'Nike Air Max · 2 items',
+    shipStatus: 'In transit · Damascus hub',
+    shipEta: 'ETA tomorrow',
+    // tabs
+    t_home: 'Home',
+    t_ship: 'Shipments',
+    t_cards: 'Cards',
+    t_me: 'Account',
+    shipments: 'Shipments',
+    active: 'Active',
+    history: 'History',
+    arrived: 'Parcel arrived',
+    arrivedSub: function arrivedSub(n) {
+      return "".concat(n, " parcel arrived at your ").concat(arrivedWh('en'), " warehouse \u2014 we\u2019re forwarding it to your door automatically.");
+    },
+    noShip: 'No shipments yet. When a store delivers to your ShopyLink address, it appears here.',
+    noHistory: 'No past shipments yet.',
+    track: 'Track',
+    etaL: function etaL(d) {
+      return "ETA ".concat(d);
+    },
+    deliveredL: function deliveredL(d) {
+      return "Delivered ".concat(d);
+    },
+    atWh: 'At warehouse',
+    inTransit: 'In transit',
+    outForDel: 'Out for delivery',
+    parcelDetails: 'Parcel details',
+    itemsL: 'Items',
+    weightL: 'Weight',
+    fromL: 'From',
+    toL: 'To',
+    shipCostL: 'Shipping fee',
+    trackingL: 'Tracking no.',
+    syp: 'SYP',
+    perKg: '/kg',
+    awaitPay: 'Awaiting payment',
+    invoiceL: 'Shipping invoice',
+    totalDue: 'Total due',
+    payGate: 'Your parcel is in Syria — it’s delivered to your door once the shipping fee is paid.',
+    payTitle: 'Pay shipping',
+    paySub: 'Pay the shipping fee to release your parcel for delivery.',
+    shipmentL: 'Shipment',
+    rateL: 'Rate',
+    payMethod: 'Payment method',
+    pm_card: 'Card',
+    pm_transfer: 'Bank transfer',
+    pm_cash: 'Cash point',
+    payNow: function payNow(n) {
+      return "Pay ".concat(n, " SYP");
+    },
+    dueL: function dueL(n) {
+      return "Due: ".concat(n, " SYP");
+    },
+    paidTitle: 'Payment received',
+    paidSub: 'Your parcel is now cleared for delivery to your door.',
+    paidSubT: 'Your parcel is on its way — it’ll be delivered to your door on arrival.',
+    trackShip: 'Track shipment',
+    paidL: 'Paid',
+    payN: function payN(n) {
+      return "Pay shipping (".concat(n, ")");
+    },
+    paySelSub: 'Choose which shipments to pay — one or all.',
+    selectNone: 'Select a shipment',
+    paidMulti: function paidMulti(n) {
+      return "".concat(n, " shipments are cleared for delivery to your door.");
+    },
+    backToShip: 'Back to shipments',
+    paidBanner: 'Shipping paid — your parcel will be delivered to your door.',
+    stages: ['Expected', 'At warehouse', 'Packed & shipped', 'In transit', 'Arrived in Syria', 'Out for delivery', 'Delivered'],
+    notifications: 'Notifications',
+    noNotifs: 'You’re all caught up.',
+    markRead: 'Mark all read',
+    syria: 'Syria (your door)',
+    whAddr: 'Your warehouse address',
+    recipientName: 'Recipient name (use this)',
+    continueL: 'Continue',
+    copyAddr: 'Copy address',
+    renewAddr: 'Renew address',
+    choosePlan: 'Choose a plan',
+    renewSub: function renewSub(c) {
+      return "Renew your ".concat(c, " shopping address.");
+    },
+    activeShip: 'Active · one shipment',
+    getAddr: 'Get a shopping address',
+    pickCountry: 'Choose your country.',
+    ownedB: 'Owned',
+    expiredB: 'Expired',
+    buySub: function buySub(c) {
+      return "Set up your shopping address in ".concat(c, ".");
+    },
+    boughtTitle: 'Address ready',
+    boughtSub: function boughtSub(c) {
+      return "Your ".concat(c, " shopping address is active.");
+    },
+    pl_per_shipment: 'Per shipment',
+    pl_monthly: 'Monthly',
+    pl_annual: 'Annual',
+    pln_per_shipment: 'One trip home, then renew.',
+    pln_monthly: 'Unlimited for 30 days.',
+    pln_annual: 'Unlimited, all year.',
+    renewedTitle: 'Address renewed',
+    renewedSub: function renewedSub(c) {
+      return "Your ".concat(c, " address is active again.");
+    },
+    viewAddress: 'View address',
+    shipPreview: function shipPreview(c, r) {
+      return "Parcels arriving here are forwarded to your door automatically \u2014 shipping is just ".concat(r, " SYP/kg, billed per shipment.");
+    },
+    account: 'Account',
+    verified: 'Verified',
+    myAddresses: 'My addresses',
+    myCards: 'My cards',
+    settings: 'Settings',
+    helpFaq: 'Help & FAQ',
+    supportL: 'Support',
+    language: 'Language',
+    logout: 'Log out',
+    appearance: 'Appearance',
+    theme: 'Theme',
+    light: 'Light',
+    dark: 'Dark',
+    system: 'System',
+    notifs2: 'Notifications',
+    n_ship2: 'Shipment updates',
+    n_codes: 'Card codes',
+    n_promo: 'Offers & news',
+    accountSec: 'Account',
+    editProfile: 'Edit profile',
+    changePhone: 'Change phone',
+    privacy: 'Privacy & data',
+    faqTitle: 'Help & FAQ',
+    faqSub: 'Quick answers to common questions.',
+    supportTitle: 'Support',
+    openT: 'Open',
+    closedT: 'Closed',
+    newTicket: 'New ticket',
+    noTickets: 'No tickets yet. We’re here if you need us.',
+    reply: 'Write a reply…',
+    send: 'Send'
+  },
+  ar: {
+    tag: 'من العالم إلى بابك',
+    intro: [{
+      g: 'globe',
+      h: 'تملك عنوان تسوّق في ٤ دول',
+      p: 'احصل على عنوانك المحلّي في الإمارات أو أمريكا أو الصين أو تركيا — تسوق من العالم وكأنك تعيش هناك.'
+    }, {
+      g: 'bag',
+      h: 'تسوّق من أي متجر تحب',
+      p: 'اشترِ من أي موقع واشحن إلى عنوان ShopyLink. نستلم طرودك نيابةً عنك.'
+    }, {
+      g: 'box',
+      h: 'نوصِّل إلى بابك في سوريا',
+      p: 'نعيد شحن كل شيء إلى عتبة دارك في سوريا — تدفع الشحن فقط لكل طرد.'
+    }, {
+      g: 'gift',
+      h: 'بطاقات دفع خلال ثوانٍ',
+      p: 'اشترِ بطاقات المتاجر (أمازون، شي إن، ترانديول وغيرها). يظهر لك الرمز خلال ثوانٍ. اشترِ من العالم وادفع بالليرة السورية.'
+    }, {
+      g: 'truck',
+      h: 'تتبّع كل خطوة',
+      p: 'تابع كل شحنة من المستودع إلى يديك، ويصلك إشعار عند الوصول.'
+    }],
+    parcel: 'طرد',
+    fxAt: function fxAt(a,r,d){return "".concat(a," حُوِّل بسعر ").concat(r," \u00B7 حُدِّد في ").concat(d);},
+    fxNone: 'معروض بعملة تسعيره — لا سعر صرف معتمد منشور',
+    skip: 'تخطٍّ',
+    next: 'التالي',
+    getStarted: 'لنبدأ',
+    hello: 'أهلًا بعودتك',
+    name: 'عبادة',
+    buyAddr: 'تملّك عنوانًا',
+    buyAddrSub: '',
+    buyCard: 'احصل على بطاقة دفع',
+    buyCardSub: 'الرمز خلال ثوانٍ',
+    yourAddrs: 'عناوينك',
+    latestShip: 'آخر شحنة',
+    viewAll: 'عرض الكل',
+    noAddr: 'لا عناوين بعد — اضغط «اشترِ عنوانًا» للحصول على أوّل عنوان.',
+    activeUntil: function activeUntil(d) {
+      return "\u0641\u0639\u0651\u0627\u0644 \u062D\u062A\u0649 ".concat(d);
+    },
+    ended: function ended(d) {
+      return "\u0627\u0646\u062A\u0647\u0649 ".concat(d);
+    },
+    shipTitle: 'Nike Air Max · قطعتان',
+    shipStatus: 'قيد النقل · مركز دمشق',
+    shipEta: 'الوصول غدًا',
+    t_home: 'الرئيسية',
+    t_ship: 'الشحنات',
+    t_cards: 'البطاقات',
+    t_me: 'حسابي',
+    shipments: 'الشحنات',
+    active: 'النشطة',
+    history: 'السجلّ',
+    arrived: 'وصل طرد',
+    arrivedSub: function arrivedSub(n) {
+      return "".concat(n, " \u0637\u0631\u062F \u0648\u0635\u0644 \u0625\u0644\u0649 \u0645\u0633\u062A\u0648\u062F\u0639 ").concat(arrivedWh('ar'), " \u2014 \u0646\u0639\u064A\u062F \u0634\u062D\u0646\u0647 \u0625\u0644\u0649 \u0628\u0627\u0628\u0643 \u062A\u0644\u0642\u0627\u0626\u064A\u064B\u0651\u0627.");
+    },
+    noShip: 'لا شحنات بعد. حين يسلّم متجرٌ إلى عنوان ShopyLink، يظهر هنا.',
+    noHistory: 'لا شحنات سابقة بعد.',
+    track: 'تتبّع',
+    etaL: function etaL(d) {
+      return "\u0627\u0644\u0648\u0635\u0648\u0644 ".concat(d);
+    },
+    deliveredL: function deliveredL(d) {
+      return "\u0633\u064F\u0644\u0651\u0645 ".concat(d);
+    },
+    atWh: 'في المستودع',
+    inTransit: 'قيد النقل',
+    outForDel: 'خارج للتوصيل',
+    parcelDetails: 'تفاصيل الطرد',
+    itemsL: 'القطع',
+    weightL: 'الوزن',
+    fromL: 'من',
+    toL: 'إلى',
+    shipCostL: 'رسوم الشحن',
+    trackingL: 'رقم التتبّع',
+    syp: 'ل.س',
+    perKg: '/كغ',
+    awaitPay: 'بانتظار الدفع',
+    invoiceL: 'فاتورة الشحن',
+    totalDue: 'الإجمالي المستحقّ',
+    payGate: 'طردك في سوريا — يُسلَّم إلى بابك فور دفع رسم الشحن.',
+    payTitle: 'دفع الشحن',
+    paySub: 'ادفع رسم الشحن ليُفرَج عن طردك للتوصيل.',
+    shipmentL: 'الشحنة',
+    rateL: 'السعر',
+    payMethod: 'طريقة الدفع',
+    pm_card: 'بطاقة',
+    pm_transfer: 'حوالة بنكيّة',
+    pm_cash: 'نقطة دفع نقديّ',
+    payNow: function payNow(n) {
+      return "\u0627\u062F\u0641\u0639 ".concat(n, " \u0644.\u0633");
+    },
+    dueL: function dueL(n) {
+      return "\u0627\u0644\u0645\u0633\u062A\u062D\u0642\u0651: ".concat(n, " \u0644.\u0633");
+    },
+    paidTitle: 'تمّ استلام الدفع',
+    paidSub: 'طردك الآن جاهز للتوصيل إلى بابك.',
+    paidSubT: 'طردك في الطريق — سيُسلَّم إلى بابك فور وصوله.',
+    trackShip: 'تتبّع الشحنة',
+    paidL: 'مدفوع',
+    payN: function payN(n) {
+      return "\u062F\u0641\u0639 \u0627\u0644\u0634\u062D\u0646 (".concat(n, ")");
+    },
+    paySelSub: 'اختر الشحنات التي تريد دفعها — واحدة أو الكلّ.',
+    selectNone: 'اختر شحنة',
+    paidMulti: function paidMulti(n) {
+      return "".concat(n, " \u0634\u062D\u0646\u0627\u062A \u062C\u0627\u0647\u0632\u0629 \u0644\u0644\u062A\u0648\u0635\u064A\u0644 \u0625\u0644\u0649 \u0628\u0627\u0628\u0643.");
+    },
+    backToShip: 'العودة إلى الشحنات',
+    paidBanner: 'تمّ دفع الشحن — سيُسلَّم طردك إلى بابك.',
+    stages: ['متوقّع', 'في المستودع', 'جُهّز وشُحن', 'قيد النقل', 'وصل إلى سوريا', 'خارج للتوصيل', 'سُلّم'],
+    notifications: 'الإشعارات',
+    noNotifs: 'لا جديد لديك.',
+    markRead: 'تعليم الكل كمقروء',
+    syria: 'سوريا (بابك)',
+    whAddr: 'عنوان مستودعك',
+    recipientName: 'اسم المستلِم (استخدمه)',
+    continueL: 'متابعة',
+    copyAddr: 'انسخ العنوان',
+    renewAddr: 'جدّد العنوان',
+    choosePlan: 'اختر خطّة',
+    renewSub: function renewSub(c) {
+      return "\u062C\u062F\u0651\u062F \u0639\u0646\u0648\u0627\u0646 \u0627\u0644\u062A\u0633\u0648\u0651\u0642 \u0641\u064A ".concat(c, ".");
+    },
+    activeShip: 'فعّال · شحنة واحدة',
+    getAddr: 'تملّك عنوان تسوّق',
+    pickCountry: 'اختر دولتك.',
+    ownedB: 'مملوك',
+    expiredB: 'منتهٍ',
+    buySub: function buySub(c) {
+      return "\u0623\u0646\u0634\u0626 \u0639\u0646\u0648\u0627\u0646 \u062A\u0633\u0648\u0651\u0642\u0643 \u0641\u064A ".concat(c, ".");
+    },
+    boughtTitle: 'العنوان جاهز',
+    boughtSub: function boughtSub(c) {
+      return "\u0639\u0646\u0648\u0627\u0646 \u0627\u0644\u062A\u0633\u0648\u0651\u0642 \u0641\u064A ".concat(c, " \u0641\u0639\u0651\u0627\u0644 \u0627\u0644\u0622\u0646.");
+    },
+    pl_per_shipment: 'لكل شحنة',
+    pl_monthly: 'شهري',
+    pl_annual: 'سنوي',
+    pln_per_shipment: 'رحلة واحدة إلى البيت، ثم تُجدّد.',
+    pln_monthly: 'غير محدود لمدة ٣٠ يومًا.',
+    pln_annual: 'غير محدود طوال السنة.',
+    renewedTitle: 'تمّ تجديد العنوان',
+    renewedSub: function renewedSub(c) {
+      return "\u0639\u0627\u062F \u0639\u0646\u0648\u0627\u0646 ".concat(c, " \u0641\u0639\u0651\u0627\u0644\u064B\u0627.");
+    },
+    viewAddress: 'عرض العنوان',
+    shipPreview: function shipPreview(c, r) {
+      return "\u0627\u0644\u0637\u0631\u0648\u062F \u0627\u0644\u062A\u064A \u062A\u0635\u0644 \u0647\u0646\u0627 \u062A\u064F\u0639\u0627\u062F \u062A\u0644\u0642\u0627\u0626\u064A\u064B\u0651\u0627 \u0625\u0644\u0649 \u0628\u0627\u0628\u0643 \u2014 \u0627\u0644\u0634\u062D\u0646 ".concat(r, " \u0644.\u0633/\u0643\u063A \u0641\u0642\u0637\u060C \u064A\u064F\u062D\u062A\u0633\u0628 \u0644\u0643\u0644 \u0634\u062D\u0646\u0629.");
+    },
+    account: 'حسابي',
+    verified: 'موثّق',
+    myAddresses: 'عناويني',
+    myCards: 'بطاقاتي',
+    settings: 'الإعدادات',
+    helpFaq: 'المساعدة والأسئلة',
+    supportL: 'الدعم',
+    language: 'اللغة',
+    logout: 'تسجيل الخروج',
+    appearance: 'المظهر',
+    theme: 'الثيم',
+    light: 'فاتح',
+    dark: 'داكن',
+    system: 'النظام',
+    notifs2: 'الإشعارات',
+    n_ship2: 'تحديثات الشحن',
+    n_codes: 'رموز البطاقات',
+    n_promo: 'العروض والأخبار',
+    accountSec: 'الحساب',
+    editProfile: 'تعديل الملف',
+    changePhone: 'تغيير الهاتف',
+    privacy: 'الخصوصيّة والبيانات',
+    faqTitle: 'المساعدة والأسئلة',
+    faqSub: 'إجابات سريعة للأسئلة الشائعة.',
+    supportTitle: 'الدعم',
+    openT: 'مفتوحة',
+    closedT: 'مغلقة',
+    newTicket: 'تذكرة جديدة',
+    noTickets: 'لا تذاكر بعد. نحن هنا متى احتجت.',
+    reply: 'اكتب ردًّا…',
+    send: 'إرسال'
+  }
+};
+
+/* mock user state */
+var ADDRS = [{
+  code: 'USA',
+  ar: 'أمريكا',
+  flag: '🇺🇸',
+  status: 'active',
+  until: '16 Jun 2027',
+  lines: ['ShopyLink Fulfillment — Suite SL', '1208 Cross Beam Drive', 'Charlotte, NC 28217', 'United States']
+}, {
+  code: 'Turkey',
+  ar: 'تركيا',
+  flag: '🇹🇷',
+  status: 'expired',
+  ended: '10 Jun 2026',
+  lines: ['ShopyLink Lojistik — Depo SL', 'Merkez Mah. 1428. Sk No:5', 'Bağcılar, İstanbul', 'Türkiye']
+}];
+/* ── who this app belongs to ──────────────────────────────────────────
+   The account was known only by a greeting — 'Obada' in one dictionary and
+   'عبادة' in the other. A greeting is a display string: it changes with the
+   language, so it can never be matched against the owner of a shipment. The
+   account is ONE fact, held once, and the greeting is derived from it.
+   The demo account is an individual who already exists in the client register
+   and in the delivery data, so the chain can be followed end to end. */
+var ACCOUNT={id:'CL-003',name:'Layla Al-Rifai',nameAr:'ليلى الرفاعي'};
+/* …unless somebody actually registered on this device. Registration writes
+   SL_ACCOUNT_V1; until today the identity the whole app is built on could only
+   be changed by editing this line, which is not a system, it is a demo. The row
+   above stays as the fallback so the gallery keeps working with no storage. */
+function syncAccount(){
+ /* read on every pass, not once at load: an account registered while the app is
+    open belongs to the person NOW, and a reader that only looks once cannot be
+    tested either. */
+ try{
+  var r=window.localStorage.getItem('SL_ACCOUNT_V1');
+  if(!r)return false;
+  var o=JSON.parse(r), a=o&&o.account;
+  if(!(a&&a.name))return false;
+  ACCOUNT={id:a.id||'',name:a.name,nameAr:a.nameAr||a.name,phone:a.phone||'',gov:a.gov||''};
+  return true;
+ }catch(e){return false;}
+}
+syncAccount();
+function accountName(lang){return (lang==='ar'?ACCOUNT.nameAr:ACCOUNT.name)||ACCOUNT.name;}
+function firstName(lang){return String(accountName(lang)).split(' ')[0];}
+
+/* ── where each parcel actually is ────────────────────────────────────
+   Read from the log the whole company writes to, in the same order D1 and the
+   business app read it. Nothing is stored here and nothing is computed twice.
+   The rows below are DESIGN FIXTURES for the gallery; a parcel the log knows
+   about is placed by the log, never by the number written into the fixture. */
+var SL_EV_IND='SL_EVENTS_V1';
+var STAGE_EV=['shipment.expected','parcel.received','parcel.consolidated',
+              'trip.loaded','shipment.arrived','run.assigned','shipment.delivered'];
+function indEvents(){
+ try{var r=window.localStorage.getItem(SL_EV_IND);if(!r)return [];
+  var l=JSON.parse(r);return (l&&l.length)?l:[];}catch(e){return [];}
+}
+function indNames(e){
+ /* what a step happened TO. failedShips names cargo it did not deliver, so it
+    is excluded: nobody may be shown "Delivered" for a parcel still on the van. */
+ var out=[],p=e.payload||{},i,lists=[p.ships,p.parcels];
+ for(i=0;i<lists.length;i++)if(lists[i]&&lists[i].length)
+  lists[i].forEach(function(x){if(x)out.push(String(x));});
+ return out;
+}
+function indOwners(){
+ var own={};
+ indEvents().forEach(function(e){if(e.client&&e.ship)own[String(e.ship)]=e.client;});
+ return own;
+}
+/* the furthest stage the log records for this account's parcel, and when it was
+   reached — or null when the log says nothing about it */
+function logStage(id){
+ var own=indOwners(), order={}, best=null;
+ if(own[id]!==ACCOUNT.name)return null;
+ STAGE_EV.forEach(function(ev,i){order[ev]=i;});
+ indEvents().forEach(function(e){
+  if(order[e.type]===undefined)return;
+  var names=indNames(e);
+  if(e.ship&&own[String(e.ship)])names.push(String(e.ship));
+  if(names.indexOf(id)===-1)return;
+  var i=order[e.type];
+  if(best===null||i>best.i)best={i:i,at:e.at};
+ });
+ return best;
+}
+function stageOf(sp){
+ var l=logStage(sp&&sp.id);
+ return l?l.i:(sp?sp.stage:0);
+}
+function stageAt(id,i){
+ /* the moment a step was reached, for the timeline. Absent from the log means
+    absent from the screen — never a plausible date. */
+ var own=indOwners(), order={}, at=null;
+ if(own[id]!==ACCOUNT.name)return '';
+ STAGE_EV.forEach(function(ev,k){order[ev]=k;});
+ indEvents().forEach(function(e){
+  if(order[e.type]!==i)return;
+  var names=indNames(e);
+  if(e.ship&&own[String(e.ship)])names.push(String(e.ship));
+  if(names.indexOf(id)===-1)return;
+  if(at===null)at=e.at;
+ });
+ if(at===null)return '';
+ if(typeof at==='string')return at.slice(0,16);
+ var d=new Date(Number(at)); if(isNaN(d.getTime()))return '';
+ var m=d.getMonth()+1,dd=d.getDate();
+ return d.getFullYear()+'-'+(m<10?'0':'')+m+'-'+(dd<10?'0':'')+dd+' '+d.toTimeString().slice(0,5);
+}
+var SHIPMENTS = [{
+  id: 'SL-9502',
+  title: 'Amazon order',
+  flag: '🇦🇪',
+  origin: 'Dubai',
+  originAr: 'دبي',
+  dest: 'Damascus',
+  method: 'air',
+  items: 1,
+  weight: '0.8 kg',
+  cost: null,
+  stage: 1,
+  status: 'arrived'
+}, {
+  id: 'SL-9489',
+  title: 'SHEIN order',
+  flag: '🇨🇳',
+  origin: 'Guangzhou',
+  originAr: 'قوانغتشو',
+  dest: 'Aleppo',
+  method: 'air',
+  items: 2,
+  weight: '1.6 kg',
+  cost: null,
+  stage: 4,
+  status: 'await',
+  paid: false
+}, {
+  id: 'SL-9471',
+  title: 'Nike Air Max',
+  flag: '🇦🇪',
+  origin: 'Dubai',
+  originAr: 'دبي',
+  dest: 'Damascus',
+  method: 'air',
+  items: 2,
+  weight: '1.4 kg',
+  cost: '180,000',
+  stage: 3,
+  status: 'transit',
+  eta: 'tomorrow',
+  etaAr: 'غدًا',
+  paid: false
+}, {
+  id: 'SL-9420',
+  title: 'Anker charger',
+  flag: '🇨🇳',
+  origin: 'Guangzhou',
+  originAr: 'قوانغتشو',
+  dest: 'Damascus',
+  method: 'air',
+  items: 3,
+  weight: '0.6 kg',
+  cost: '95,000',
+  stage: 5,
+  status: 'out',
+  eta: 'today',
+  etaAr: 'اليوم',
+  paid: true
+}, {
+  id: 'SL-9388',
+  title: 'Zara coat',
+  flag: '🇹🇷',
+  origin: 'Istanbul',
+  originAr: 'إسطنبول',
+  dest: 'Homs',
+  method: 'land',
+  items: 1,
+  weight: '0.9 kg',
+  cost: '120,000',
+  stage: 6,
+  status: 'delivered',
+  del: '05 Jun',
+  delAr: '٥ يونيو'
+}, {
+  id: 'SL-9301',
+  title: 'iHerb vitamins',
+  flag: '🇦🇪',
+  origin: 'Dubai',
+  originAr: 'دبي',
+  dest: 'Latakia',
+  method: 'air',
+  items: 4,
+  weight: '2.1 kg',
+  cost: '210,000',
+  stage: 6,
+  status: 'delivered',
+  del: '21 May',
+  delAr: '٢١ مايو'
+}];
+var NOTIFS = [{
+  ic: 'box',
+  en: 'Your parcel arrived — we’re forwarding it to your door automatically.',
+  ar: 'وصل طردك — نعيد شحنه إلى بابك تلقائيًّا.',
+  te: '2h ago',
+  ta: 'قبل ساعتين',
+  act: 'detail',
+  unread: true
+}, {
+  ic: 'truck',
+  en: 'Your Anker charger is out for delivery.',
+  ar: 'شحنة Anker خارجة للتوصيل.',
+  te: '5h ago',
+  ta: 'قبل ٥ ساعات',
+  act: 'detail',
+  unread: true
+}, {
+  ic: 'gift',
+  en: 'Your Amazon gift card code is ready.',
+  ar: 'رمز بطاقة Amazon جاهز.',
+  te: '1d ago',
+  ta: 'قبل يوم',
+  act: null,
+  unread: false
+}, {
+  ic: 'clock',
+  en: 'Your Turkey address expired — renew to keep it.',
+  ar: 'انتهى عنوان تركيا — جدّد للاحتفاظ به.',
+  te: '3d ago',
+  ta: 'قبل ٣ أيام',
+  act: 'renew',
+  unread: false
+}];
+var FAQ = [{
+  qe: 'How do I get a shopping address?',
+  qa: 'كيف أحصل على عنوان تسوّق؟',
+  ae: 'Buy an address for a country from Home → “Buy an address”. You’ll receive a local warehouse address to use at any store.',
+  aa: 'اشترِ عنوانًا لدولة من الرئيسية ← «تملّك عنوانًا». ستحصل على عنوان مستودع محلّي تستخدمه في أي متجر.'
+}, {
+  qe: 'How is shipping charged?',
+  qa: 'كيف يُحتسب الشحن؟',
+  ae: 'Shipping to Syria is billed per shipment by weight, at the per-kg rate shown for that country. Parcels are forwarded to your door automatically — you never request shipping.',
+  aa: 'يُحتسب الشحن إلى سوريا لكل شحنة بالوزن، بسعر الكيلوغرام المعروض لتلك الدولة. تُعاد الطرود إلى بابك تلقائيًّا — دون أن تطلب الشحن.'
+}, {
+  qe: 'How long does delivery take?',
+  qa: 'كم يستغرق التوصيل؟',
+  ae: 'It depends on origin and shipping mode; you can follow every stage live under Shipments.',
+  aa: 'يعتمد على بلد المصدر وطريقة الشحن؛ يمكنك متابعة كل مرحلة مباشرةً من «الشحنات».'
+}, {
+  qe: 'How do payment cards work?',
+  qa: 'كيف تعمل بطاقات الدفع؟',
+  ae: 'Pick a store and amount, pay in Syrian pounds, and the code is revealed to you in seconds.',
+  aa: 'اختر متجرًا ومبلغًا، ادفع بالليرة السورية، ويظهر لك الرمز خلال ثوانٍ.'
+}, {
+  qe: 'What if my name matches someone else’s?',
+  qa: 'ماذا لو تطابق اسمي مع آخر؟',
+  ae: 'Your name is your unique identity across all warehouses. On a clash we ask you to adjust it slightly before issuing the address.',
+  aa: 'اسمك هويّتك الفريدة في كل المستودعات. عند التطابق نطلب تعديلًا بسيطًا قبل إصدار العنوان.'
+}];
+var TICKETS = [{
+  id: 'TK-2041',
+  status: 'open',
+  se: 'Where is my Nike shipment?',
+  sa: 'أين شحنة Nike؟',
+  le: 'Hi, my parcel has been in transit for a while…',
+  la: 'مرحبًا، شحنتي قيد النقل منذ مدّة…',
+  te: '2h ago',
+  ta: 'قبل ساعتين'
+}, {
+  id: 'TK-2030',
+  status: 'open',
+  se: 'Address name correction',
+  sa: 'تصحيح اسم العنوان',
+  le: 'Can you add a middle name to my address?',
+  la: 'هل يمكن إضافة اسم أوسط لعنواني؟',
+  te: '1d ago',
+  ta: 'قبل يوم'
+}, {
+  id: 'TK-1990',
+  status: 'closed',
+  se: 'Gift card code issue',
+  sa: 'مشكلة رمز بطاقة',
+  le: 'Resolved — code worked after retry. Thank you!',
+  la: 'حُلّت — عمل الرمز بعد المحاولة. شكرًا!',
+  te: '5d ago',
+  ta: 'قبل ٥ أيام'
+}];
+var st = {
+  lang: 'en',
+  mode: 'walk',
+  screen: 'intro',
+  slide: 0,
+  variant: 'default',
+  tab: 'home',
+  theme: 'system',
+  faqOpen: null,
+  tog: {
+    ship: true,
+    codes: true,
+    promo: false
+  },
+  ticketId: null,
+  payM: 'card',
+  addrCode: null,
+  paySel: {},
+  paidCount: 1,
+  renewPlan: 'monthly',
+  buyCode: null,
+  buyPlan: 'monthly'
+};
+function sb() {
+  return "<div class=\"sb\"><span>9:41</span><span>\u25CF\u25CF\u25CF \u25AE</span></div>";
+}
+var ic = {
+  back: '<svg width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M6 1L1 6l5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  backR: '<svg width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M1 1l5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+};
+var IC = {
+  globe: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.6 2.7 2.6 15.3 0 18M12 3c-2.6 2.7-2.6 15.3 0 18"/>',
+  bag: '<path d="M5.5 8h13l-1 11.5H6.5L5.5 8Z"/><path d="M9 8V6.2a3 3 0 0 1 6 0V8"/>',
+  box: '<path d="M3 7.2l9-4 9 4v9.6l-9 4-9-4V7.2Z"/><path d="M3 7.2l9 4 9-4M12 11.2v9.6"/>',
+  gift: '<rect x="4" y="9.6" width="16" height="10.4" rx="1.2"/><path d="M3 9.6h18v3.2H3z"/><path d="M12 9.6v10.4"/><path d="M12 9.6C11 7 9.6 4.2 7.9 4.8 6.2 5.4 7.5 9.6 12 9.6Zm0 0c1-2.6 2.4-5.4 4.1-4.8 1.7.6.4 4.8-4.1 4.8Z"/>',
+  truck: '<path d="M3 6.6h11v9.4H3z"/><path d="M14 9.6h3.6L21 13v3h-7z"/><circle cx="7" cy="18.2" r="1.7"/><circle cx="17.4" cy="18.2" r="1.7"/>',
+  pin: '<path d="M12 21s6.8-6.4 6.8-11.6A6.8 6.8 0 1 0 5.2 9.4C5.2 14.6 12 21 12 21Z"/><circle cx="12" cy="9" r="2.4"/>',
+  bell: '<path d="M6 9.2a6 6 0 1 1 12 0c0 4.6 2 5.8 2 5.8H4s2-1.2 2-5.8Z"/><path d="M10 19a2 2 0 0 0 4 0"/>',
+  home: '<path d="M4 11l8-6.6 8 6.6"/><path d="M6.2 9.8V19h11.6V9.8"/>',
+  user: '<circle cx="12" cy="8" r="3.4"/><path d="M5.5 19.5a6.5 6.5 0 0 1 13 0"/>',
+  clock: '<circle cx="12" cy="12" r="8.4"/><path d="M12 7.2V12l3.2 2"/>',
+  inbox: '<path d="M4 13l2-8.2h12L20 13"/><path d="M4 13v6.2h16V13"/><path d="M4 13h4.5l1.2 2h4.6l1.2-2H20"/>',
+  gear: '<circle cx="12" cy="12" r="3.2"/><path d="M12 3.4v2.2M12 18.4v2.2M5 6.6l1.6 1.5M17.4 15.9l1.6 1.5M5 17.4l1.6-1.5M17.4 8.1l1.6-1.5M3.4 12h2.2M18.4 12h2.2"/>',
+  help: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.4a2.6 2.6 0 0 1 5 .8c0 1.8-2.5 2.2-2.5 3.9"/><path d="M12 17.2h.01"/>',
+  chat: '<path d="M4 6.5h16v10H9.5L5.5 20v-3.5H4Z"/><path d="M8 10.5h8M8 13h5"/>'
+};
+function svg(name, size, sw) {
+  return "<svg width=\"".concat(size, "\" height=\"").concat(size, "\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"").concat(sw || 1.7, "\" stroke-linecap=\"round\" stroke-linejoin=\"round\">").concat(IC[name] || '', "</svg>");
+}
+var SCL = {
+  en: {
+    usa: 'USA',
+    uae: 'UAE',
+    cn: 'China',
+    tr: 'Turkey',
+    store: 'Any store',
+    bag: 'Your bag',
+    wh: 'Warehouse',
+    home: 'Your door · Syria',
+    card: 'Gift card',
+    shipped: 'Shipped',
+    delivered: 'Delivered',
+    moving: 'On the way'
+  },
+  ar: {
+    usa: 'أمريكا',
+    uae: 'الإمارات',
+    cn: 'الصين',
+    tr: 'تركيا',
+    store: 'أي متجر',
+    bag: 'حقيبتك',
+    wh: 'المستودع',
+    home: 'بابك · سوريا',
+    card: 'بطاقة هديّة',
+    shipped: 'شُحن',
+    delivered: 'سُلّم',
+    moving: 'في الطريق'
+  }
+};
+function introScene(i, lang) {
+  var L = SCL[lang] || SCL.en;
+  var ff = lang === 'ar' ? "'Tajawal','Cairo',sans-serif" : "'Manrope',sans-serif";
+  var lab = function lab(x, y, txt, sz, col) {
+    return "<text x=\"".concat(x, "\" y=\"").concat(y, "\" text-anchor=\"middle\" font-family=\"").concat(ff, "\" font-size=\"").concat(sz || 9.5, "\" font-weight=\"700\" fill=\"").concat(col || 'var(--ink)', "\" stroke=\"none\">").concat(txt, "</text>");
+  };
+  if (i === 0) {
+    var pin = function pin(x, y, c, d) {
+      return "<g class=\"pin\" style=\"animation-delay:".concat(d, "s\"><path d=\"M").concat(x, " ").concat(y + 8, "c-4.5-3.5-7-6-7-9a7 7 0 0 1 14 0c0 3-2.5 5.5-7 9Z\" fill=\"").concat(c, "\" stroke=\"none\"/><circle cx=\"").concat(x, "\" cy=\"").concat(y - 1, "\" r=\"2.3\" fill=\"#fff\"/></g>");
+    };
+    return "<svg viewBox=\"0 0 220 184\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\">\n      <g class=\"spin\"><circle cx=\"110\" cy=\"92\" r=\"30\"/><path d=\"M80 92h60\"/><path d=\"M110 62c8 9 8 51 0 60M110 62c-8 9-8 51 0 60\"/></g>\n      ".concat(pin(44, 46, 'var(--pri)', 0)).concat(lab(44, 70, L.usa, 9, 'var(--mute)'), "\n      ").concat(pin(176, 50, 'var(--acc)', .4)).concat(lab(176, 74, L.uae, 9, 'var(--mute)'), "\n      ").concat(pin(44, 140, 'var(--warm)', .8)).concat(lab(44, 164, L.cn, 9, 'var(--mute)'), "\n      ").concat(pin(176, 136, 'var(--green)', 1.2)).concat(lab(176, 160, L.tr, 9, 'var(--mute)'), "</svg>");
+  }
+  if (i === 1) {
+    return "<svg viewBox=\"0 0 220 184\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\">\n      <rect x=\"30\" y=\"30\" width=\"92\" height=\"66\" rx=\"9\"/><path d=\"M30 46h92\"/><circle cx=\"41\" cy=\"38\" r=\"1.6\" fill=\"currentColor\"/><circle cx=\"48\" cy=\"38\" r=\"1.6\" fill=\"currentColor\"/>\n      <rect x=\"44\" y=\"58\" width=\"22\" height=\"22\" rx=\"5\" fill=\"var(--pale)\"/><rect x=\"80\" y=\"58\" width=\"22\" height=\"22\" rx=\"5\" fill=\"var(--pale)\"/>\n      ".concat(lab(76, 112, L.store, 9.5, 'var(--mute)'), "\n      <g class=\"bag\"><path d=\"M150 120h40l-3.5 32h-33L150 120Z\" fill=\"#fff\"/><path d=\"M159 120v-5a11 11 0 0 1 22 0v5\"/></g>\n      ").concat(lab(170, 166, L.bag, 9.5, 'var(--mute)'), "\n      <g class=\"fly f1\"><rect x=\"44\" y=\"58\" width=\"20\" height=\"20\" rx=\"5\" fill=\"var(--pri)\" stroke=\"none\"/></g>\n      <g class=\"fly f2\"><rect x=\"44\" y=\"58\" width=\"20\" height=\"20\" rx=\"5\" fill=\"var(--acc)\" stroke=\"none\"/></g></svg>");
+  }
+  if (i === 2) {
+    return "<svg viewBox=\"0 0 220 184\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\">\n      <path d=\"M28 120h164\" stroke=\"var(--rule)\"/><path class=\"road\" d=\"M28 120h164\"/>\n      <g><path d=\"M24 118V84l24-11 24 11v34\"/><path d=\"M24 118h48\"/><rect x=\"40\" y=\"100\" width=\"16\" height=\"18\"/></g><g class=\"whcycle\" font-family=\"".concat(ff, "\" font-weight=\"700\" fill=\"var(--ink)\" stroke=\"none\" text-anchor=\"middle\" font-size=\"9.5\"><text class=\"wc w1\" x=\"48\" y=\"150\">").concat(L.uae, "</text><text class=\"wc w2\" x=\"48\" y=\"150\">").concat(L.cn, "</text><text class=\"wc w3\" x=\"48\" y=\"150\">").concat(L.tr, "</text><text class=\"wc w4\" x=\"48\" y=\"150\">").concat(L.usa, "</text></g>\n      <g><path d=\"M150 118V90l21-13 21 13v28\"/><path d=\"M150 118h42\"/><rect x=\"165\" y=\"103\" width=\"12\" height=\"15\"/></g>").concat(lab(171, 150, L.home, 9, 'var(--mute)'), "\n      <g class=\"parcel\"><rect x=\"-10\" y=\"-10\" width=\"20\" height=\"20\" rx=\"3.5\" fill=\"var(--warm)\" stroke=\"none\"/><path d=\"M-10 0h20M0 -10v20\" stroke=\"#fff\" stroke-width=\"1.4\"/></g></svg>");
+  }
+  if (i === 3) {
+    return "<svg viewBox=\"0 0 220 184\" fill=\"none\" stroke=\"none\">\n      ".concat(lab(110, 40, L.card, 10, 'var(--mute)'), "\n      <rect x=\"46\" y=\"52\" width=\"128\" height=\"80\" rx=\"14\" fill=\"var(--ink)\"/>\n      <rect x=\"46\" y=\"70\" width=\"128\" height=\"15\" fill=\"rgba(255,255,255,.16)\"/>\n      <g class=\"brandgrp\" text-anchor=\"middle\" font-family=\"'Manrope',sans-serif\" font-weight=\"800\" fill=\"#fff\" font-size=\"13\" stroke=\"none\"><text class=\"br b1\" x=\"110\" y=\"66\">Amazon</text><text class=\"br b2\" x=\"110\" y=\"66\">SHEIN</text><text class=\"br b3\" x=\"110\" y=\"66\">Trendyol</text></g>\n      <text class=\"code\" x=\"110\" y=\"118\" text-anchor=\"middle\" fill=\"#fff\" font-family=\"'JetBrains Mono',monospace\" font-size=\"17\" font-weight=\"700\" letter-spacing=\"6\"><tspan class=\"d d1\">X</tspan><tspan class=\"d d2\">K</tspan><tspan class=\"d d3\">4</tspan><tspan class=\"d d4\">P</tspan></text>\n      <g class=\"spark k1\" transform=\"translate(60,60)\"><path d=\"M0 -7L1.6 -1.6 7 0 1.6 1.6 0 7 -1.6 1.6 -7 0 -1.6 -1.6Z\" fill=\"var(--warm)\"/></g>\n      <g class=\"spark k2\" transform=\"translate(162,66)\"><path d=\"M0 -5L1.2 -1.2 5 0 1.2 1.2 0 5 -1.2 1.2 -5 0 -1.2 -1.2Z\" fill=\"var(--acc)\"/></g>\n      <g class=\"spark k3\" transform=\"translate(150,120)\"><path d=\"M0 -6L1.4 -1.4 6 0 1.4 1.4 0 6 -1.4 1.4 -6 0 -1.4 -1.4Z\" fill=\"var(--warm)\"/></g>\n      <rect class=\"cover\" x=\"46\" y=\"52\" width=\"128\" height=\"80\" rx=\"14\" fill=\"var(--pri)\"/></svg>");
+  }
+  var node = function node(x, c) {
+    return "<circle class=\"nd ".concat(c, "\" cx=\"").concat(x, "\" cy=\"90\" r=\"7\" fill=\"#fff\" stroke=\"var(--rule)\" stroke-width=\"2\"/>");
+  };
+  return "<svg viewBox=\"0 0 220 184\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\">\n    <path d=\"M30 90h160\" stroke=\"var(--rule)\" stroke-width=\"2.4\"/>\n    <path class=\"prog\" d=\"M30 90h160\" stroke=\"var(--green)\" stroke-width=\"2.4\" pathLength=\"100\" stroke-dasharray=\"100\" stroke-dashoffset=\"100\"/>\n    ".concat(node(30, 'nd1')).concat(node(70, 'nd2')).concat(node(110, 'nd3')).concat(node(150, 'nd4')).concat(node(190, 'nd5'), "\n    <g class=\"tdot\"><circle cx=\"30\" cy=\"90\" r=\"5.5\" fill=\"var(--pri)\" stroke=\"#fff\" stroke-width=\"2\"/></g>\n    ").concat(lab(34, 112, L.shipped, 8.5, 'var(--mute)')).concat(lab(186, 112, L.delivered, 8.5, 'var(--green)'), "</svg>");
+}
+function backBtn(lang) {
+  return "<button class=\"backchip\">".concat(lang === 'ar' ? ic.backR : ic.back).concat(T[lang].skip === 'تخطٍّ' ? 'رجوع' : 'Back', "</button>");
+}
+function tabbar(lang, active, notif) {
+  var t = T[lang];
+  var tabs = [['home', 'home', t.t_home], ['ship', 'box', t.t_ship], ['cards', 'gift', t.t_cards], ['me', 'user', t.t_me]];
+  return "<div class=\"tabbar\">" + tabs.map(function (_ref) {
+    var _ref2 = _slicedToArray(_ref, 3),
+      k = _ref2[0],
+      i = _ref2[1],
+      l = _ref2[2];
+    return "<button class=\"tab ".concat(active === k ? 'on' : '', "\" data-tab=\"").concat(k, "\" style=\"position:relative\">").concat(k === 'ship' && notif ? "<span class=\"notifdot\">".concat(notif, "</span>") : '', "<span class=\"ti\">").concat(svg(i, 23, 1.7), "</span><span class=\"tl\">").concat(l, "</span></button>");
+  }).join('') + "</div>";
+}
+var UNAME = 'Obada · SL-4821';
+var PLANS = {
+  per_shipment: 75000,
+  monthly: 250000,
+  annual: 2400000
+};
+var CITY = {
+  USA: {
+    ar: 'أمريكا',
+    flag: '🇺🇸',
+    lines: ['ShopyLink Fulfillment — Suite SL', '1208 Cross Beam Drive', 'Charlotte, NC 28217', 'United States']
+  },
+  UAE: {
+    ar: 'الإمارات',
+    flag: '🇦🇪',
+    lines: ['ShopyLink Logistics — Bay SL', 'Warehouse 7, Al Quoz Ind. 3', 'Dubai', 'United Arab Emirates']
+  },
+  China: {
+    ar: 'الصين',
+    flag: '🇨🇳',
+    lines: ['ShopyLink Warehouse — Unit SL', 'Bldg 3, Bao’an District', 'Shenzhen, Guangdong', 'China']
+  },
+  Turkey: {
+    ar: 'تركيا',
+    flag: '🇹🇷',
+    lines: ['ShopyLink Lojistik — Depo SL', 'Merkez Mah. 1428. Sk No:5', 'Bağcılar, İstanbul', 'Türkiye']
+  }
+};
+function renewUntil(pl) {
+  return pl === 'annual' ? '18 Jun 2027' : pl === 'monthly' ? '18 Jul 2026' : null;
+}
+/* ── no price is invented here any more ───────────────────────────────
+   This module used to keep a rate table of its own — USA 95, China 60, Turkey
+   55 per kg in pounds — while the company's approved tariff asks 6.50 USD per
+   kg from Guangzhou, which is 878 pounds at the approved rate. It was not a
+   duplicate, it was wrong by more than fifteen times, and every parcel priced
+   from it undercharged by that much. It is gone. Every price on this screen now
+   comes from the same published tariff the receiving clerk prices with, and a
+   parcel on a lane the company does not sell shows no price at all. */
+/* ── the origins this app may ship from ───────────────────────────────
+   The line under "Buy an address" listed four countries as a hard-coded string,
+   so it would have gone on promising a warehouse we closed and hiding one we
+   opened. The list is published: C7 holds the hubs, Pricing decides which of
+   them are offered to individuals — an L3 decision — and this app only reads it.
+   With nothing published it says nothing rather than naming a country. */
+function retailOrigins(){
+ try{var r=window.localStorage.getItem('SL_TARIFF_V1');if(!r)return [];
+  var o=JSON.parse(r);
+  return ((o&&o.origins)||[]).filter(function(x){return x.retail;});
+ }catch(e){return [];}
+}
+var COUNTRY_AR={'AE':'الإمارات','CN':'الصين','TR':'تركيا','US':'أمريكا','SY':'سوريا'};
+var COUNTRY_EN={'AE':'UAE','CN':'China','TR':'Turkey','US':'USA','SY':'Syria'};
+function originsLine(lang){
+ var seen={},out=[];
+ retailOrigins().forEach(function(o){
+  var c=o.country||'';
+  var nm=(lang==='ar'?COUNTRY_AR[c]:COUNTRY_EN[c])||o.city||c;
+  if(nm&&!seen[nm]){seen[nm]=1;out.push(nm);}
+ });
+ return out.join(' · ');
+}
+function tariffOf(){
+ try{var r=window.localStorage.getItem('SL_TARIFF_V1');if(!r)return null;
+  var o=JSON.parse(r);return (o&&o.base)?o:null;}catch(e){return null;}
+}
+function laneUnit(from,city,method){
+ var tf=tariffOf(); if(!tf)return null;
+ var cx=null;(tf.cities||[]).forEach(function(c){if(c.city===city)cx=c;});
+ if(!cx)return null;
+ var hub=(tf.hubs||{})[cx.country]||city, hit=null;
+ (tf.lanes||[]).forEach(function(l){
+  if(l.kind!=='ind'||l.method!==method||l.to!==hub)return;
+  if(from&&l.from!==from)return;
+  if(l.basis!=='perkg')return;          /* a parcel is carried by weight */
+  var k=l.from+'→'+city+' · '+l.method+' · '+l.basis;
+  var b=((tf.base||{}).ind||{})[k];
+  if(b)hit={unit:b.unit,cur:b.cur,key:k};
+ });
+ return hit;
+}
+/* ── the list itself comes from the log, not only the position ────────
+   Reading the log for the STAGE but the LIST from a fixture meant a parcel the
+   warehouse received today could never appear: the screen knew where it was and
+   still would not show it. A parcel this account owns is listed because the log
+   says it exists, and the fixtures remain for the gallery. */
+function statusFromStage(i){
+ return i>=6?'delivered':i===5?'out':i===4?'arrived':i>=2?'transit':'await';
+}
+function logShipments(){
+ var own=indOwners(), order={}, seen={}, out=[], byId={};
+ STAGE_EV.forEach(function(ev,i){order[ev]=i;});
+ SHIPMENTS.forEach(function(x){seen[x.id]=1;});
+ indEvents().forEach(function(e){
+  if(order[e.type]===undefined)return;
+  var names=indNames(e);
+  if(e.ship&&own[String(e.ship)])names.push(String(e.ship));
+  names.forEach(function(id){
+   if(own[id]!==ACCOUNT.name||seen[id])return;      /* not ours, or already a fixture */
+   var p=e.payload||{};
+   if(!byId[id]){
+    byId[id]={id:id,title:'',flag:'',origin:p.from||'',
+              items:Number(p.cartons)||0,weight:(p.weight?p.weight+' kg':''),
+              cost:null,stage:0,status:'await',fromLog:true};
+    out.push(byId[id]);
+   }
+   /* the earliest step carries the description; later ones only move it along */
+   if(p.cartons&&!byId[id].items)byId[id].items=Number(p.cartons)||0;
+   if(p.from&&!byId[id].origin)byId[id].origin=p.from;
+  });
+ });
+ out.forEach(function(r){var l=logStage(r.id);r.stage=l?l.i:0;r.status=statusFromStage(r.stage);});
+ return out;
+}
+/* one list, everywhere a list is read */
+function allShipments(){return SHIPMENTS.concat(logShipments());}
+/* ── money the customer can check ─────────────────────────────────────
+   The tariff is written in USD; this app speaks Syrian pounds. There is one
+   approved rate, owned and published by C-Pricing, and it is used here with its
+   date shown — a converted figure without the rate and the day it was set is not
+   a price, it is a rumour. With no rate published the amount is shown in the
+   currency it was actually set in rather than converted at a guess. */
+function slFx(){
+ try{var r=window.localStorage.getItem('SL_TARIFF_V1');if(!r)return null;
+  var o=JSON.parse(r);return (o&&o.fx&&o.fx.rate>0)?o.fx:null;}catch(e){return null;}
+}
+/* what the log says this parcel was priced at, if anything */
+function logPrice(id){
+ var own=indOwners(),hit=null;
+ if(own[id]!==ACCOUNT.name)return null;
+ indEvents().forEach(function(e){
+  if(e.type!=='parcel.received'||String(e.ship)!==id)return;
+  var p=(e.payload||{}).price;
+  if(p&&p.amount>0&&!hit)hit={amount:Number(p.amount),cur:p.cur||'USD'};
+ });
+ return hit;
+}
+function shipMoney(s2){
+ var lp=logPrice(s2&&s2.id), fx=slFx();
+ /* a fixture with no event behind it is priced from the tariff, in the tariff's
+    currency, and then converted by exactly the same road as a real parcel */
+ if(!lp){
+  var c=shipCost(s2);
+  if(!(c>0))return {amount:0,cur:'SYP',converted:false};
+  lp={amount:c,cur:shipCostCur(s2)};
+ }
+ if(lp.cur==='SYP')return {amount:lp.amount,cur:'SYP',converted:false};
+ if(fx&&fx.base===lp.cur&&fx.quote==='SYP')
+  return {amount:Math.round(lp.amount*fx.rate),cur:'SYP',converted:true,
+          rate:fx.rate,at:fx.at,from:lp.amount,fromCur:lp.cur};
+ return {amount:lp.amount,cur:lp.cur,converted:false,unconverted:true};
+}
+function moneyStr(s2,lang){
+ var m=shipMoney(s2);
+ return fmt(m.amount)+' '+(m.cur==='SYP'?T[lang].syp:m.cur);
+}
+function rateNote(s2,lang){
+ var m=shipMoney(s2);
+ /* fmt() rounds to whole pounds, which is right for pounds and wrong for the
+    figure it converted FROM: 7.98 USD must not be cited as "8 USD" */
+ if(m.converted)return T[lang].fxAt(Number(m.from).toFixed(2)+' '+m.fromCur,fmt(m.rate),m.at);
+ if(m.unconverted)return T[lang].fxNone;
+ return '';
+}
+/* the banner used to name a country in the source — "your USA warehouse" — and
+   went on saying it after the company stopped shipping from there. It reads the
+   parcel that actually arrived. */
+function arrivedWh(lang){
+ var hit=null;
+ allShipments().forEach(function(x){if(!hit&&statusOfRow(x)==='arrived')hit=x;});
+ if(!hit)return lang==='ar'?'':'';
+ return (lang==='ar'&&hit.originAr)?hit.originAr:(hit.origin||'');
+}
+function statusOfRow(x){return x.status;}
+function shipCost(s) {
+  /* kept as the one place a fixture is priced, but from the tariff now */
+  var u = laneUnit(s.origin, s.dest, s.method);
+  var w = parseFloat(s.weight) || 0;
+  if (!u || !w) return 0;
+  return Math.round(u.unit * w * 100) / 100;
+}
+function shipCostCur(s) {
+  var u = laneUnit(s.origin, s.dest, s.method);
+  return u ? u.cur : 'USD';
+}
+function shipPayable(s) {
+  /* the stage comes from the log now, and a parcel whose carriage we cannot
+     price is NOT payable: a "Pay now 0" button is worse than no button. */
+  var sg = stageOf(s);
+  return sg >= 3 && sg < 6 && !s.paid && shipMoney(s).amount > 0;
+}
+function shipChip(s, lang) {
+  var t = T[lang];
+  var STG = t.stages;
+  var sg = stageOf(s);            /* the log decides, not the fixture */
+  if (sg >= 6) return "<span class=\"schip ok\"><span class=\"dotc\"></span>".concat(STG[6], "</span>");
+  if (shipPayable(s)) return "<span class=\"schip warn\"><span class=\"dotc\"></span>".concat(t.awaitPay, "</span>");
+  var chip = "<span class=\"schip neu\"><span class=\"dotc\"></span>".concat(STG[sg], "</span>");
+  if (s.paid) chip += "<span class=\"schip ok paidpill\">".concat(t.paidL, "</span>");
+  return chip;
+}
+function _shipChipOld(s, lang) {
+  var t = T[lang];
+  return "<span class=\"schip ok\"><span class=\"dotc\"></span>".concat(t.deliveredL(lang === 'ar' ? s.delAr : s.del), "</span>");
+}
+function shipRow(s, lang) {
+  var t = T[lang];
+  var sub = shipPayable(s) ? t.dueL(moneyStr(s, lang).replace(' '+t.syp,'')) : stageOf(s) >= 6 ? '' : s.eta ? t.etaL(lang === 'ar' ? s.etaAr : s.eta) : '';
+  return "<div class=\"shiprow\" data-ship=\"".concat(s.id, "\"><div class=\"ico\">").concat(svg('box', 20, 1.7), "<span class=\"fl\">").concat(s.flag, "</span></div>\n    <div class=\"mid\"><div class=\"t\">").concat(s.title || t.parcel, "</div><div class=\"s\">").concat(s.id, " \xB7 ").concat(s.items, " ").concat(lang === 'ar' ? 'قطعة' : 'items', "</div></div>\n    <div class=\"rt\">").concat(shipChip(s, lang)).concat(sub ? "<span style=\"font-size:11px;color:var(--mute);font-weight:600\">".concat(sub, "</span>") : '', "</div></div>");
+}
+function menuRow(act, icon, label) {
+  return "<button class=\"mrow\" data-".concat(act === 'noop' ? 'act' : 'screen', "=\"").concat(act, "\"><span class=\"mic\">").concat(icon, "</span><span class=\"ml\">").concat(label, "</span><span class=\"mchev\">\u203A</span></button>");
+}
+function toggleRow(k, label, on) {
+  return "<div class=\"setrow\"><span class=\"sk\">".concat(label, "</span><span class=\"toggle ").concat(on ? 'on' : '', "\" data-toggle=\"").concat(k, "\"><span class=\"kn\"></span></span></div>");
+}
+function ticketRow(tk, lang) {
+  var t = T[lang];
+  var chip = tk.status === 'open' ? "<span class=\"schip warn\"><span class=\"dotc\"></span>".concat(t.openT, "</span>") : "<span class=\"schip ok\"><span class=\"dotc\"></span>".concat(t.closedT, "</span>");
+  return "<div class=\"trow\" data-ticket=\"".concat(tk.id, "\"><div class=\"tmid\"><div class=\"tsub\">").concat(lang === 'ar' ? tk.sa : tk.se, "</div><div class=\"tlast\">").concat(lang === 'ar' ? tk.la : tk.le, "</div></div><div class=\"trt\">").concat(chip, "<span class=\"ttime\">").concat(lang === 'ar' ? tk.ta : tk.te, "</span></div></div>");
+}
+
+/* ── screens ── */
+function screenHTML(screen, variant, lang) {
+  var t = T[lang];
+  var inner = '',
+    foot = '',
+    tab = '',
+    framecls = '';
+  if (screen === 'intro') {
+    var i = st.slide,
+      s = t.intro[i],
+      last = i === t.intro.length - 1;
+    inner = "<button class=\"skiplink\" data-act=\"skip\">".concat(t.skip, "</button>\n      <div class=\"intro\">\n        <div class=\"art\"><div class=\"scene\">").concat(introScene(st.slide, lang), "</div></div>\n        <div class=\"dots\">").concat(t.intro.map(function (_, k) {
+      return "<i class=\"".concat(k === i ? 'on' : '', "\"></i>");
+    }).join(''), "</div>\n        <h2>").concat(s.h, "</h2><p>").concat(s.p, "</p>\n      </div>");
+    foot = "<div class=\"introfoot\"><button class=\"btn\" data-act=\"".concat(last ? 'start' : 'next', "\">").concat(last ? t.getStarted : t.next, "</button></div>");
+  } else if (screen === 'home') {
+    tab = 'home';
+    var addrCards = ADDRS.length ? ADDRS.map(function (a) {
+      var chip = a.status === 'active' ? "<span class=\"schip ok\"><span class=\"dotc\"></span>".concat(t.activeUntil(a.until), "</span>") : "<span class=\"schip bad\"><span class=\"dotc\"></span>".concat(t.ended(a.ended), "</span>");
+      return "<div class=\"card2 tap\" data-go-addrmod=\"1\"><div class=\"ch\"><span class=\"fl\">".concat(a.flag, "</span><span class=\"nm\">").concat(lang === 'ar' ? a.ar : a.code, "</span><span class=\"chev\">").concat(lang === 'ar' ? '‹' : '›', "</span></div>\n        <div style=\"margin-bottom:8px\">").concat(chip, "</div>\n        <div class=\"addr-mini\">ShopyLink \xB7 ").concat(lang === 'ar' ? a.ar : a.code, " warehouse \xB7 #SL-").concat(a.code.slice(0, 2).toUpperCase(), "-4821</div></div>");
+    }).join('') : "<div class=\"card2\"><div class=\"emptyhome\">".concat(t.noAddr, "</div></div>");
+    inner = "<div class=\"pagehead\"><div><div class=\"hello\">".concat(t.hello, "</div><div class=\"hgreet\">").concat(firstName(lang), " \uD83D\uDC4B</div></div>\n        <button class=\"bell\" data-screen=\"notifs\">").concat(svg('bell', 18, 1.7), "<span class=\"notifdot\">2</span></button></div>\n      <div class=\"actionrow\">\n        <div class=\"action addr\" data-go-buyaddr=\"1\"><div class=\"ic\">").concat(svg('pin', 24, 1.8), "</div><div><div class=\"t\">").concat(t.buyAddr, "</div><div class=\"s\">").concat(originsLine(lang), "</div></div></div>\n        <div class=\"action card\" data-go-buycard=\"1\"><div class=\"ic\">").concat(svg('gift', 24, 1.8), "</div><div><div class=\"t\">").concat(t.buyCard, "</div><div class=\"s\">").concat(t.buyCardSub, "</div></div></div>\n      </div>\n      <div class=\"seclabel\">").concat(t.yourAddrs, "</div>\n      ").concat(addrCards, "\n      <div class=\"seclabel\">").concat(t.latestShip, "</div>\n      <div class=\"card2\" style=\"padding:4px 14px\" data-tab=\"ship\">\n        <div class=\"shipmini\" style=\"border-top:0\">\n          <div class=\"ico\">").concat(svg('box', 18, 1.7), "</div>\n          <div class=\"mid\"><div class=\"t\">").concat(t.shipTitle, "</div><div class=\"s\">").concat(t.shipStatus, " \xB7 ").concat(t.shipEta, "</div></div>\n          <span class=\"schip neu\"><span class=\"dotc\"></span>").concat(lang === 'ar' ? 'تتبّع' : 'Track', "</span>\n        </div>\n      </div>\n      <div style=\"height:8px\"></div>");
+    tab = 'home';
+  } else if (screen === 'ship') {
+    tab = 'ship';
+    var onAct = st.variant !== 'history';
+    var isEmpty = st.variant === 'empty';
+    var arrived = allShipments().find(function (x) {
+      return x.status === 'arrived';
+    });
+    var list = isEmpty ? [] : onAct ? allShipments().filter(function (x) {
+      return x.status !== 'delivered';
+    }) : allShipments().filter(function (x) {
+      return x.status === 'delivered';
+    });
+    var banner = onAct && !isEmpty && arrived ? "<div class=\"arrbanner\"><div class=\"at\">".concat(svg('bell', 16, 1.8), " ").concat(t.arrived, "</div><div class=\"as\">").concat(t.arrivedSub(1), "</div><button class=\"btn\" data-ship=\"").concat(arrived.id, "\">").concat(t.track, "</button></div>") : '';
+    var body2 = list.length ? list.map(function (s) {
+      return shipRow(s, lang);
+    }).join('') : "<div class=\"emptybox\"><div class=\"big\">".concat(svg('inbox', 46, 1.4), "</div>").concat(onAct ? t.noShip : t.noHistory, "</div>");
+    var due = isEmpty ? [] : allShipments().filter(shipPayable);
+    if (onAct && due.length) {
+      foot = due.length > 1 ? "<button class=\"btn\" data-go-paysel=\"1\">".concat(t.payN(due.length), "</button>") : "<button class=\"btn\" data-go-pay=\"".concat(due[0].id, "\">").concat(t.payNow(fmt(shipCost(due[0]))), "</button>");
+    }
+    inner = "<div class=\"pagehead\"><h1 class=\"disp\" style=\"margin:0\">".concat(t.shipments, "</h1><button class=\"bell\" data-screen=\"notifs\">").concat(svg('bell', 18, 1.7), "<span class=\"notifdot\">2</span></button></div>\n      ").concat(banner, "\n      <div class=\"seg2\"><button class=\"").concat(onAct ? 'on' : '', "\" data-seg=\"active\">").concat(t.active, "</button><button class=\"").concat(!onAct ? 'on' : '', "\" data-seg=\"history\">").concat(t.history, "</button></div>\n      ").concat(body2, "<div style=\"height:8px\"></div>");
+  } else if (screen === 'ship-detail') {
+    tab = 'ship';
+    var _s = allShipments().find(function (x) {
+      return x.id === st.detailId;
+    }) || SHIPMENTS[1];
+    /* the position comes from the log when the log knows this parcel, and the
+       fixture's own number only when it does not — one order of stages, shared
+       with D1 and the business app, so the three can never tell different
+       stories about the same parcel. */
+    var _sg = stageOf(_s);
+    var tl = t.stages.map(function (nm, k) {
+      var cls = k < _sg ? 'done' : k === _sg ? 'cur' : 'up';
+      var when = stageAt(_s.id, k);
+      return "<div class=\"tnode ".concat(cls, "\"><div class=\"rail\"><div class=\"bullet\">").concat(k < _sg ? '✓' : '', "</div><div class=\"line\"></div></div><div class=\"tx\"><div class=\"nm\">").concat(nm, "</div>").concat(when ? "<div class=\"tat machine\">".concat(when, "</div>") : '', "</div></div>");
+    }).join('');
+    inner = "".concat(backBtn(lang), "\n      <div class=\"dhead\"><div class=\"dt\">").concat(_s.title || t.parcel, "</div><div class=\"did\">").concat(t.trackingL, ": ").concat(_s.id, "</div>\n        <div class=\"route\"><div class=\"pin\">").concat(_s.flag, " ").concat(lang === 'ar' ? _s.originAr : _s.origin, "</div><div class=\"arr\">").concat(lang === 'ar' ? '←' : '→', "</div><div class=\"pin\"><svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 30 20\" width=\"18\" height=\"12\" style=\"border-radius:2px;vertical-align:-2px;display:inline-block;box-shadow:0 1px 2px rgba(0,0,0,.22)\"><rect width=\"30\" height=\"20\" fill=\"#007A3D\"/><rect y=\"6.67\" width=\"30\" height=\"6.66\" fill=\"#FFFFFF\"/><rect y=\"13.33\" width=\"30\" height=\"6.67\" fill=\"#000000\"/><g fill=\"#CE1126\" transform=\"translate(7.5,10)\"><polygon points=\"0,-2.2 0.52,-0.72 2.09,-0.72 0.85,0.17 1.29,1.67 0,0.8 -1.29,1.67 -0.85,0.17 -2.09,-0.72 -0.52,-0.72\"/></g><g fill=\"#CE1126\" transform=\"translate(15,10)\"><polygon points=\"0,-2.2 0.52,-0.72 2.09,-0.72 0.85,0.17 1.29,1.67 0,0.8 -1.29,1.67 -0.85,0.17 -2.09,-0.72 -0.52,-0.72\"/></g><g fill=\"#CE1126\" transform=\"translate(22.5,10)\"><polygon points=\"0,-2.2 0.52,-0.72 2.09,-0.72 0.85,0.17 1.29,1.67 0,0.8 -1.29,1.67 -0.85,0.17 -2.09,-0.72 -0.52,-0.72\"/></g></svg> ").concat(t.syria, "</div></div></div>\n      <div class=\"timeline\">").concat(tl, "</div>\n      <div class=\"seclabel\">").concat(t.parcelDetails, "</div>\n      <div class=\"dlist\">\n        <div class=\"drow\"><span class=\"k\">").concat(t.itemsL, "</span><span class=\"v\">").concat(_s.items, "</span></div>\n        <div class=\"drow\"><span class=\"k\">").concat(t.weightL, "</span><span class=\"v\">").concat(_s.weight, "</span></div>\n        <div class=\"drow\"><span class=\"k\">").concat(t.shipCostL, "</span><span class=\"v\">").concat(moneyStr(_s, lang), "</span></div>").concat(rateNote(_s, lang) ? "<div class=\"drow\"><span class=\"k\"></span><span class=\"v\" style=\"font-size:10.5px;color:var(--mute);direction:ltr\">".concat(rateNote(_s, lang), "</span></div>") : '', "</div>\n      </div>\n      ").concat(shipPayable(_s) ? "<div class=\"seclabel\">".concat(t.invoiceL, "</div>\n        <div class=\"invoice\">\n          <div class=\"ir\"><span>").concat(_s.weight, " \xD7 ").concat(RATES[_s.origin], " ").concat(t.syp).concat(t.perKg, "</span><b>").concat(fmt(shipCost(_s)), " ").concat(t.syp, "</b></div>\n          <div class=\"ir total\"><span>").concat(t.totalDue, "</span><b>").concat(fmt(shipCost(_s)), " ").concat(t.syp, "</b></div>\n        </div>\n        <div class=\"banner warn\" style=\"margin-top:10px\">").concat(svg('clock', 16, 1.8)).concat(t.payGate, "</div>") : _s.paid && _s.stage < 6 ? "<div class=\"banner ok2\" style=\"margin-top:4px\">".concat(svg('check', 16, 2)).concat(t.paidBanner, "</div>") : '', "\n      <div style=\"height:6px\"></div>");
+    foot = shipPayable(_s) ? "<button class=\"btn\" data-go=\"pay\">".concat(t.payNow(fmt(shipCost(_s))), "</button>") : '';
+  } else if (screen === 'notifs') {
+    tab = 'ship';
+    var empty = st.variant === 'empty';
+    inner = "".concat(backBtn(lang), "<div class=\"pagehead\" style=\"margin-bottom:12px\"><h1 class=\"disp\" style=\"margin:0\">").concat(t.notifications, "</h1></div>");
+    if (empty) {
+      inner += "<div class=\"emptybox\"><div class=\"big\">".concat(svg('bell', 46, 1.4), "</div>").concat(t.noNotifs, "</div>");
+    } else {
+      inner += "<div class=\"linkrow\"><button data-act=\"noop\">".concat(t.markRead, "</button></div>") + NOTIFS.map(function (n) {
+        return "<div class=\"notifrow\">".concat(n.unread ? '<span class="unread"></span>' : '<span style="width:8px;flex-shrink:0"></span>', "<div class=\"nic\">").concat(svg(n.ic, 19, 1.7), "</div>\n        <div class=\"nmid\"><div class=\"nt\">").concat(lang === 'ar' ? n.ar : n.en, "</div><div class=\"ntime\">").concat(lang === 'ar' ? n.ta : n.te, "</div></div>\n        ").concat(n.act ? "<button class=\"nact\" data-nact=\"".concat(n.act, "\">").concat(n.act === 'renew' ? lang === 'ar' ? 'جدّد' : 'Renew' : t.track, "</button>") : '', "</div>");
+      }).join('');
+    }
+  } else if (screen === 'me') {
+    tab = 'me';
+    inner = "<div class=\"pagehead\"><h1 class=\"disp\" style=\"margin:0\">".concat(t.account, "</h1></div>\n      <div class=\"profile\"><div class=\"ava\">").concat(String(accountName(lang)).charAt(0), "</div><div class=\"pinfo\"><div class=\"pn\">").concat(accountName(lang), "</div><div class=\"pp\">+963 9\u2022 \u2022\u2022\u2022 4821</div></div><span class=\"schip ok\"><span class=\"dotc\"></span>").concat(t.verified, "</span></div>\n      <div class=\"menu\">\n        ").concat(menuRow('noop', svg('pin', 18, 1.7), t.myAddresses), "\n        ").concat(menuRow('noop', svg('gift', 18, 1.7), t.myCards), "\n        ").concat(menuRow('settings', svg('gear', 18, 1.7), t.settings), "\n        ").concat(menuRow('faq', svg('help', 18, 1.7), t.helpFaq), "\n        ").concat(menuRow('support', svg('chat', 18, 1.7), t.supportL), "\n      </div>\n      <button class=\"btn ghost logout\" data-act=\"noop\">").concat(t.logout, "</button>\n      <div style=\"height:8px\"></div>");
+  } else if (screen === 'settings') {
+    tab = 'me';
+    inner = "".concat(backBtn(lang), "<div class=\"pagehead\" style=\"margin-bottom:8px\"><h1 class=\"disp\" style=\"margin:0\">").concat(t.settings, "</h1></div>\n      <div class=\"seclabel\">").concat(t.appearance, "</div>\n      <div class=\"setrow\"><span class=\"sk\">").concat(t.theme, "</span><div class=\"seg2 mini\">").concat(['light', 'dark', 'system'].map(function (x) {
+      return "<button class=\"".concat((st.theme || 'system') === x ? 'on' : '', "\" data-theme=\"").concat(x, "\">").concat(t[x], "</button>");
+    }).join(''), "</div></div>\n      <div class=\"setrow\"><span class=\"sk\">").concat(t.language, "</span><div class=\"seg2 mini\"><button class=\"").concat(lang === 'en' ? 'on' : '', "\" data-setlang=\"en\">EN</button><button class=\"").concat(lang === 'ar' ? 'on' : '', "\" data-setlang=\"ar\">\u0639\u0631\u0628\u064A</button></div></div>\n      <div class=\"seclabel\">").concat(t.notifs2, "</div>\n      ").concat(toggleRow('ship', t.n_ship2, st.tog.ship)).concat(toggleRow('codes', t.n_codes, st.tog.codes)).concat(toggleRow('promo', t.n_promo, st.tog.promo), "\n      <div class=\"seclabel\">").concat(t.accountSec, "</div>\n      <div class=\"menu\">").concat(menuRow('noop', svg('user', 18, 1.7), t.editProfile)).concat(menuRow('noop', svg('bell', 18, 1.7), t.changePhone)).concat(menuRow('noop', svg('help', 18, 1.7), t.privacy), "</div>\n      <div style=\"height:8px\"></div>");
+  } else if (screen === 'faq') {
+    tab = 'me';
+    inner = "".concat(backBtn(lang), "<div class=\"pagehead\" style=\"margin-bottom:4px\"><h1 class=\"disp\" style=\"margin:0\">").concat(t.faqTitle, "</h1></div>\n      <p class=\"sub\">").concat(t.faqSub, "</p>\n      ").concat(FAQ.map(function (f, k) {
+      return "<div class=\"acc ".concat(st.faqOpen === k ? 'open' : '', "\" data-faq=\"").concat(k, "\"><div class=\"qrow\"><span class=\"q\">").concat(lang === 'ar' ? f.qa : f.qe, "</span><span class=\"qchev\">").concat(st.faqOpen === k ? '−' : '+', "</span></div>").concat(st.faqOpen === k ? "<div class=\"a\">".concat(lang === 'ar' ? f.aa : f.ae, "</div>") : '', "</div>");
+    }).join(''), "\n      <div style=\"height:8px\"></div>");
+  } else if (screen === 'support') {
+    tab = 'me';
+    var seg = st.variant === 'closed' ? 'closed' : st.variant === 'empty' ? 'empty' : 'open';
+    var _list = seg === 'empty' ? [] : TICKETS.filter(function (x) {
+      return seg === 'closed' ? x.status === 'closed' : x.status === 'open';
+    });
+    inner = "".concat(backBtn(lang), "<div class=\"pagehead\"><h1 class=\"disp\" style=\"margin:0\">").concat(t.supportTitle, "</h1></div>\n      <div class=\"seg2\"><button class=\"").concat(seg !== 'closed' ? 'on' : '', "\" data-seg=\"open\">").concat(t.openT, "</button><button class=\"").concat(seg === 'closed' ? 'on' : '', "\" data-seg=\"closed\">").concat(t.closedT, "</button></div>\n      ").concat(_list.length ? _list.map(function (tk) {
+      return ticketRow(tk, lang);
+    }).join('') : "<div class=\"emptybox\"><div class=\"big\">".concat(svg('chat', 46, 1.4), "</div>").concat(t.noTickets, "</div>"), "\n      <div style=\"height:10px\"></div>");
+    foot = "<button class=\"btn\" data-act=\"noop\">".concat(t.newTicket, "</button>");
+  } else if (screen === 'ticket') {
+    tab = 'me';
+    var tk = TICKETS.find(function (x) {
+      return x.id === st.ticketId;
+    }) || TICKETS[0];
+    inner = "".concat(backBtn(lang), "<div class=\"pagehead\" style=\"margin-bottom:8px\"><div><div class=\"eyebrow\">").concat(tk.id, "</div><h1 class=\"disp\" style=\"margin:0;font-size:19px\">").concat(lang === 'ar' ? tk.sa : tk.se, "</h1></div></div>\n      <div class=\"thread\">\n        <div class=\"msg you\"><div>").concat(lang === 'ar' ? tk.la : tk.le, "</div><div class=\"mt\">").concat(lang === 'ar' ? tk.ta : tk.te, "</div></div>\n        <div class=\"msg us\"><div>").concat(lang === 'ar' ? 'شكرًا لتواصلك — فريقنا يتابع طلبك وسنحدّثك قريبًا.' : 'Thanks for reaching out — our team is on it and will update you shortly.', "</div><div class=\"mt\">").concat(lang === 'ar' ? 'قبل ساعة' : '1h ago', "</div></div>\n      </div>\n      <div style=\"height:8px\"></div>");
+    foot = "<div class=\"replybar\"><input class=\"replyin\" placeholder=\"".concat(t.reply, "\" readonly><button class=\"btn\" style=\"width:auto;padding:13px 18px\" data-act=\"noop\">").concat(t.send, "</button></div>");
+  } else if (screen === 'pay') {
+    tab = 'ship';
+    var ids = st.payIds && st.payIds.length ? st.payIds : st.detailId ? [st.detailId] : [];
+    var _list2 = ids.map(function (id) {
+      return SHIPMENTS.find(function (x) {
+        return x.id === id;
+      });
+    }).filter(Boolean);
+    if (!_list2.length) _list2 = [SHIPMENTS.find(shipPayable) || SHIPMENTS[0]];
+    var total = _list2.reduce(function (n, s) {
+      return n + shipCost(s);
+    }, 0);
+    var inv = _list2.length === 1 ? "<div class=\"invoice\"><div class=\"ir\"><span>".concat(t.shipmentL, "</span><b>").concat(_list2[0].id, "</b></div><div class=\"ir\"><span>").concat(t.weightL, "</span><b>").concat(_list2[0].weight, "</b></div><div class=\"ir\"><span>").concat(t.rateL, "</span><b>").concat(RATES[_list2[0].origin], " ").concat(t.syp).concat(t.perKg, "</b></div><div class=\"ir total\"><span>").concat(t.totalDue, "</span><b>").concat(fmt(total), " ").concat(t.syp, "</b></div></div>") : "<div class=\"invoice\">".concat(_list2.map(function (s) {
+      return "<div class=\"ir\"><span>".concat(s.id, " \xB7 ").concat(s.weight, "</span><b>").concat(fmt(shipCost(s)), " ").concat(t.syp, "</b></div>");
+    }).join(''), "<div class=\"ir total\"><span>").concat(t.totalDue, "</span><b>").concat(fmt(total), " ").concat(t.syp, "</b></div></div>");
+    inner = "".concat(backBtn(lang), "<div class=\"pagehead\" style=\"margin-bottom:6px\"><h1 class=\"disp\" style=\"margin:0\">").concat(t.payTitle, "</h1></div>\n      <p class=\"sub\">").concat(t.paySub, "</p>\n      ").concat(inv, "\n      <div class=\"seclabel\">").concat(t.payMethod, "</div>\n      <div class=\"paymethods\">").concat(['card', 'transfer', 'cash'].map(function (m) {
+      return "<button class=\"paym ".concat((st.payM || 'card') === m ? 'on' : '', "\" data-paym=\"").concat(m, "\"><span class=\"pmi\">").concat(svg(m === 'cash' ? 'pin' : m === 'transfer' ? 'inbox' : 'gift', 18, 1.7), "</span><span class=\"pml\">").concat(t['pm_' + m], "</span><span class=\"rad\"></span></button>");
+    }).join(''), "</div>\n      <div style=\"height:8px\"></div>");
+    foot = "<button class=\"btn\" data-pay-go=\"1\">".concat(t.payNow(fmt(total)), "</button>");
+  } else if (screen === 'paid') {
+    tab = 'ship';
+    var _s2 = SHIPMENTS.find(function (x) {
+      return x.id === st.detailId;
+    }) || SHIPMENTS[0];
+    inner = "<div style=\"display:flex;flex-direction:column;align-items:center;text-align:center;padding-top:34px\">\n        <div class=\"check\">".concat(svg('check', 30, 2.2), "</div>\n        <div class=\"h2\" style=\"margin-top:6px\">").concat(t.paidTitle, "</div>\n        <p class=\"ptext\" style=\"max-width:260px\">").concat(st.paidCount > 1 ? t.paidMulti(st.paidCount) : _s2.stage >= 4 ? t.paidSub : t.paidSubT, "</p>\n      </div>");
+    foot = st.paidCount > 1 ? "<button class=\"btn\" data-go-ship=\"1\">".concat(t.backToShip, "</button>") : "<button class=\"btn\" data-ship=\"".concat(_s2.id, "\">").concat(t.trackShip, "</button>");
+  } else if (screen === 'pay-select') {
+    tab = 'ship';
+    var _due = SHIPMENTS.filter(shipPayable);
+    var isSel = function isSel(id) {
+      return st.paySel[id] !== false;
+    };
+    var selected = _due.filter(function (s) {
+      return isSel(s.id);
+    });
+    var _total = selected.reduce(function (n, s) {
+      return n + shipCost(s);
+    }, 0);
+    inner = "".concat(backBtn(lang), "<div class=\"pagehead\" style=\"margin-bottom:6px\"><h1 class=\"disp\" style=\"margin:0\">").concat(t.payTitle, "</h1></div>\n      <p class=\"sub\">").concat(t.paySelSub, "</p>\n      <div class=\"paysels\">\n        ").concat(_due.map(function (s) {
+      var on = isSel(s.id);
+      return "<button class=\"paysel ".concat(on ? 'on' : '', "\" data-paysel=\"").concat(s.id, "\"><span class=\"psbox\">").concat(on ? svg('check', 13, 2.6) : '', "</span><span class=\"psmid\"><span class=\"pstitle\">").concat(s.title, " \xB7 ").concat(s.id, "</span><span class=\"pssub\">").concat(s.weight, " \xD7 ").concat(RATES[s.origin], " ").concat(t.syp).concat(t.perKg, "</span></span><span class=\"psamt\">").concat(fmt(shipCost(s)), " ").concat(t.syp, "</span></button>");
+    }).join(''), "\n      </div>\n      <div class=\"invoice\" style=\"margin-top:12px\"><div class=\"ir total\"><span>").concat(t.totalDue, "</span><b>").concat(fmt(_total), " ").concat(t.syp, "</b></div></div>\n      <div style=\"height:6px\"></div>");
+    foot = "<button class=\"btn ".concat(selected.length ? '' : 'dis', "\" data-paysel-next=\"1\">").concat(selected.length ? "".concat(t.continueL, " \xB7 ").concat(fmt(_total), " ").concat(t.syp) : t.selectNone, "</button>");
+  }
+
+  // assemble phone: intro has no tab bar; app screens do
+  var rtl = lang === 'ar' ? 'rtl' : '';
+  var tb = screen !== 'intro' ? tabbar(lang, tab, 2) : '';
+  var ph = "<div class=\"phone ".concat(rtl, "\">").concat(sb(), "<div class=\"scr\">").concat(inner, "</div>").concat(foot ? "<div class=\"foot\">".concat(foot, "</div>") : '').concat(tb, "</div>");
+  return ph;
+}
+function framed(screen, variant, lang) {
+  return "<div class=\"framewrap\">".concat(screenHTML(screen, variant, lang), "</div>");
+}
+
+/* ── walkthrough harness ── */
+var SCREENS = [['intro', 'Intro'], ['home', 'Home'], ['ship', 'Shipments'], ['ship-detail', 'Tracking'], ['notifs', 'Notifications'], ['me', 'Account'], ['settings', 'Settings'], ['faq', 'FAQ'], ['support', 'Support'], ['pay', 'Pay shipping'], ['pay-select', 'Pay (multi)']];
+function renderWalk() {
+  var t = T[st.lang],
+    L = st.lang;
+  document.getElementById('hint').innerHTML = L === 'ar' ? 'مقدّمة (٥ شرائح) · الرئيسية · الشحنات (نشطة/سجلّ + إشعار وصول) · تتبّع بمراحل · الإشعارات. اختر الشاشة، وجرّب الحالات بالأسفل.' : 'Intro (5 slides) · Home · Shipments (active/history + arrival alert) · staged Tracking · Notifications. Pick a screen, try the states below.';
+  var picks = SCREENS.map(function (_ref3) {
+    var _ref4 = _slicedToArray(_ref3, 2),
+      k = _ref4[0],
+      l = _ref4[1];
+    return "<button class=\"".concat(st.screen === k ? 'on' : '', "\" data-s=\"").concat(k, "\">").concat(l, "</button>");
+  }).join('');
+  var sim = [];
+  if (st.screen === 'ship') sim = [['default', L === 'ar' ? 'النشطة' : 'Active'], ['history', L === 'ar' ? 'السجلّ' : 'History'], ['empty', L === 'ar' ? 'فارغ' : 'Empty']];else if (st.screen === 'notifs') sim = [['default', L === 'ar' ? 'قائمة' : 'List'], ['empty', L === 'ar' ? 'فارغ' : 'Empty']];else if (st.screen === 'support') sim = [['default', L === 'ar' ? 'مفتوحة' : 'Open'], ['closed', L === 'ar' ? 'مغلقة' : 'Closed'], ['empty', L === 'ar' ? 'فارغ' : 'Empty']];else if (st.screen === 'ship-detail') sim = [['SL-9502', L === 'ar' ? 'وصل' : 'Arrived'], ['SL-9471', L === 'ar' ? 'قيد النقل' : 'In transit'], ['SL-9420', L === 'ar' ? 'للتوصيل' : 'Out'], ['SL-9388', L === 'ar' ? 'سُلّم' : 'Delivered']];
+  var isDetail = st.screen === 'ship-detail';
+  var simHTML = sim.length ? "<div class=\"simrow\">" + sim.map(function (_ref5) {
+    var _ref6 = _slicedToArray(_ref5, 2),
+      v = _ref6[0],
+      l = _ref6[1];
+    var on = isDetail ? (st.detailId || 'SL-9471') === v : (st.variant || 'default') === v;
+    return "<button class=\"".concat(on ? 'on' : '', "\" data-v=\"").concat(v, "\">").concat(l, "</button>");
+  }).join('') + "</div>" : '';
+  document.getElementById('view').innerHTML = "<div class=\"screenpick\">".concat(picks, "</div>\n     <div class=\"stage\">").concat(framed(st.screen, st.variant, st.lang), "</div>\n     ").concat(st.screen === 'intro' ? "<div class=\"note\">slide ".concat(st.slide + 1, " of ").concat(t.intro.length, "</div>") : '', "\n     ").concat(simHTML);
+  bind(document.getElementById('view'));
+  document.querySelectorAll('#view .screenpick button').forEach(function (b) {
+    return b.onclick = function () {
+      st.screen = b.dataset.s;
+      st.slide = 0;
+      st.variant = 'default';
+      render();
+    };
+  });
+  document.querySelectorAll('#view .simrow button').forEach(function (b) {
+    return b.onclick = function () {
+      if (isDetail) {
+        st.detailId = b.dataset.v;
+      } else {
+        st.variant = b.dataset.v;
+      }
+      render();
+    };
+  });
+}
+function renderGallery() {
+  var L = st.lang,
+    t = T[L];
+  document.getElementById('hint').innerHTML = L === 'ar' ? 'كل شاشات المرحلة ١ كإطارات.' : 'Every Stage-1 screen as its own frame.';
+  var set = [];
+  t.intro.forEach(function (_, k) {
+    return set.push(['intro', k, L, 'default', 'Intro', "slide ".concat(k + 1)]);
+  });
+  set.push(['home', 0, L, 'default', 'Home', 'overview']);
+  set.push(['ship', 0, L, 'default', 'Shipments', 'active']);
+  set.push(['ship', 0, L, 'history', 'Shipments', 'history']);
+  set.push(['ship-detail', 'SL-9471', L, 'default', 'Tracking', 'in transit']);
+  set.push(['ship-detail', 'SL-9420', L, 'default', 'Tracking', 'out for delivery']);
+  set.push(['notifs', 0, L, 'default', 'Notifications', 'list']);
+  set.push(['me', 0, L, 'default', 'Account', 'profile']);
+  set.push(['settings', 0, L, 'default', 'Settings', 'theme · toggles']);
+  set.push(['faq', 0, L, 'default', 'FAQ', 'answers']);
+  set.push(['support', 0, L, 'default', 'Support', 'tickets']);
+  set.push(['pay', 0, L, 'default', 'Pay shipping', 'invoice']);
+  set.push(['pay-select', 0, L, 'default', 'Pay (multi)', 'select']);
+  set.push(['home', 0, L === 'en' ? 'ar' : 'en', 'default', 'Home', L === 'en' ? 'Arabic RTL' : 'English LTR']);
+  set.push(['ship-detail', 'SL-9388', L === 'en' ? 'ar' : 'en', 'default', 'Tracking', L === 'en' ? 'Arabic RTL' : 'English LTR']);
+  document.getElementById('view').innerHTML = "<div class=\"gallery\">" + set.map(function (_ref7) {
+    var _ref8 = _slicedToArray(_ref7, 6),
+      s = _ref8[0],
+      sl = _ref8[1],
+      lang = _ref8[2],
+      variant = _ref8[3],
+      title = _ref8[4],
+      subt = _ref8[5];
+    var savedSlide = st.slide,
+      savedVar = st.variant,
+      savedId = st.detailId;
+    if (s === 'intro') st.slide = sl;
+    if (s === 'ship-detail') st.detailId = sl;
+    st.variant = variant;
+    var html = screenHTML(s, variant, lang);
+    st.slide = savedSlide;
+    st.variant = savedVar;
+    st.detailId = savedId;
+    return "<div class=\"gcell\"><div class=\"scaler\">".concat(html, "</div><div class=\"glabel\">").concat(title, "<small>").concat(subt, "</small></div></div>");
+  }).join('') + "</div>";
+}
+function bind(host) {
+  var Q = function Q(s) {
+      return host.querySelector(s);
+    },
+    QA = function QA(s) {
+      return host.querySelectorAll(s);
+    };
+  QA('[data-act]').forEach(function (b) {
+    return b.onclick = function () {
+      var a = b.dataset.act;
+      if (a === 'next') {
+        st.slide = Math.min(T[st.lang].intro.length - 1, st.slide + 1);
+        render();
+      } else if (a === 'skip' || a === 'start') {
+        st.screen = 'home';
+        render();
+      }
+      /* buy-addr / buy-card open the address/card flows in the app; noop in this shell */
+    };
+  });
+  QA('[data-screen]').forEach(function (b) {
+    return b.onclick = function () {
+      st.from = st.screen;
+      st.screen = b.dataset.screen;
+      st.variant = 'default';
+      render();
+    };
+  });
+  QA('[data-ship]').forEach(function (b) {
+    return b.onclick = function () {
+      st.from = st.screen;
+      st.detailId = b.dataset.ship;
+      st.screen = 'ship-detail';
+      render();
+    };
+  });
+  QA('[data-seg]').forEach(function (b) {
+    return b.onclick = function () {
+      st.variant = b.dataset.seg === 'history' ? 'history' : 'default';
+      render();
+    };
+  });
+  QA('[data-nact]').forEach(function (b) {
+    return b.onclick = function () {
+      var a = b.dataset.nact;
+      if (a === 'shipnow') {
+        st.from = 'notifs';
+        st.detailId = 'SL-9502';
+        st.screen = 'ship-detail';
+        render();
+      } else if (a === 'detail') {
+        st.from = 'notifs';
+        st.detailId = 'SL-9420';
+        st.screen = 'ship-detail';
+        render();
+      }
+      /* renew -> address flow in the app */
+    };
+  });
+  QA('[data-tab]').forEach(function (b) {
+    return b.onclick = function () {
+      var k = b.dataset.tab;
+      if (k === 'home') {
+        st.screen = 'home';
+        render();
+      } else if (k === 'ship') {
+        st.screen = 'ship';
+        st.variant = 'default';
+        render();
+      } else if (k === 'me') {
+        st.screen = 'me';
+        st.variant = 'default';
+        render();
+      } else if (k === 'cards') {
+        window.open('ShopyLink_GiftCards.html', '_blank');
+      }
+      /* cards tab opens the gift-card flow in the app */
+    };
+  });
+  QA('[data-theme]').forEach(function (b) {
+    return b.onclick = function () {
+      st.theme = b.dataset.theme;
+      render();
+    };
+  });
+  QA('[data-setlang]').forEach(function (b) {
+    return b.onclick = function () {
+      st.lang = b.dataset.setlang;
+      document.querySelectorAll('#lang button').forEach(function (x) {
+        return x.classList.toggle('on', x.dataset.l === st.lang);
+      });
+      render();
+    };
+  });
+  QA('[data-toggle]').forEach(function (b) {
+    return b.onclick = function () {
+      var k = b.dataset.toggle;
+      st.tog[k] = !st.tog[k];
+      render();
+    };
+  });
+  QA('[data-faq]').forEach(function (b) {
+    return b.onclick = function () {
+      var k = +b.dataset.faq;
+      st.faqOpen = st.faqOpen === k ? null : k;
+      render();
+    };
+  });
+  QA('[data-ticket]').forEach(function (b) {
+    return b.onclick = function () {
+      st.from = 'support';
+      st.ticketId = b.dataset.ticket;
+      st.screen = 'ticket';
+      render();
+    };
+  });
+  QA('[data-go=pay]').forEach(function (b) {
+    return b.onclick = function () {
+      st.payIds = null;
+      st.screen = 'pay';
+      render();
+    };
+  });
+  QA('[data-go-ship]').forEach(function (b) {
+    return b.onclick = function () {
+      st.paidCount = 1;
+      st.screen = 'ship';
+      st.variant = 'default';
+      render();
+    };
+  });
+  QA('[data-paym]').forEach(function (b) {
+    return b.onclick = function () {
+      st.payM = b.dataset.paym;
+      render();
+    };
+  });
+  QA('[data-pay-go]').forEach(function (b) {
+    return b.onclick = function () {
+      var ids = st.payIds && st.payIds.length ? st.payIds : st.detailId ? [st.detailId] : [];
+      var list = ids.map(function (id) {
+        return SHIPMENTS.find(function (x) {
+          return x.id === id;
+        });
+      }).filter(Boolean);
+      if (!list.length) {
+        var f = SHIPMENTS.find(shipPayable);
+        if (f) list = [f];
+      }
+      list.forEach(function (s) {
+        return s.paid = true;
+      });
+      st.paidCount = list.length;
+      if (list[0]) st.detailId = list[0].id;
+      st.payIds = null;
+      st.screen = 'paid';
+      render();
+    };
+  });
+  QA('[data-go-pay]').forEach(function (b) {
+    return b.onclick = function () {
+      st.detailId = b.dataset.goPay;
+      st.payIds = null;
+      st.screen = 'pay';
+      render();
+    };
+  });
+  QA('[data-go-addrmod]').forEach(function (b) {
+    return b.onclick = function () {
+      window.open('ShopyLink_Addresses.html', '_blank');
+    };
+  });
+  QA('[data-go-paysel]').forEach(function (b) {
+    return b.onclick = function () {
+      st.paySel = {};
+      st.screen = 'pay-select';
+      render();
+    };
+  });
+  QA('[data-paysel]').forEach(function (b) {
+    return b.onclick = function () {
+      var id = b.dataset.paysel;
+      st.paySel[id] = st.paySel[id] === false;
+      render();
+    };
+  });
+  QA('[data-paysel-next]').forEach(function (b) {
+    return b.onclick = function () {
+      var due = SHIPMENTS.filter(shipPayable);
+      st.payIds = due.filter(function (s) {
+        return st.paySel[s.id] !== false;
+      }).map(function (s) {
+        return s.id;
+      });
+      if (st.payIds.length) {
+        st.screen = 'pay';
+      }
+      render();
+    };
+  });
+  QA('[data-go-buyaddr]').forEach(function (b) {
+    return b.onclick = function () {
+      window.open('ShopyLink_Addresses.html', '_blank');
+    };
+  });
+  QA('[data-go-buycard]').forEach(function (b) {
+    return b.onclick = function () {
+      window.open('ShopyLink_GiftCards.html', '_blank');
+    };
+  });
+  var bc = Q('.backchip');
+  if (bc) bc.onclick = function () {
+    if (st.screen === 'ship-detail') {
+      st.screen = st.from || 'ship';
+    } else if (st.screen === 'notifs') {
+      st.screen = st.from || 'home';
+    } else if (st.screen === 'pay-select') {
+      st.screen = 'ship';
+    } else if (st.screen === 'pay') {
+      st.screen = st.payIds ? 'pay-select' : 'ship-detail';
+    } else if (st.screen === 'paid') {
+      st.screen = 'ship';
+    } else if (st.screen === 'ticket') {
+      st.screen = 'support';
+    } else if (['settings', 'faq', 'support'].includes(st.screen)) {
+      st.screen = 'me';
+    } else if (st.screen !== 'intro') {
+      st.screen = 'intro';
+      st.slide = 0;
+    }
+    st.variant = 'default';
+    render();
+  };
+}
+/* ── paging ──────────────────────────────────────────────────────────
+   A cap with a "show all" is fine for an alert list, where the tail is noise.
+   A catalogue is different: every card is a real product someone may need to
+   reach, so the tail must be reachable in steps rather than in one lump that
+   freezes the page. Page size is the reader's choice — 20, 50 or 100 — and the
+   page number survives a filter change only if the page still exists. */
+var PAGE_SIZES=[20,50,100];
+var PGS={};                              /* one page state per list, by name */
+function pgOf(k){if(!PGS[k])PGS[k]={size:(k==='sups'?10:20),page:0};return PGS[k];}
+var PG=pgOf('cards');
+function pgUse(k){PG=pgOf(k);}
+function pgSet(k,n){var p=pgOf(k);p.size=Number(n);p.page=0;render();}
+function pgGo(k,p){pgOf(k).page=p;render();}
+function pgClamp(total){
+ var PG=arguments[1]||window.PG;
+ var last=Math.max(0,Math.ceil(total/PG.size)-1);
+ if(PG.page>last)PG.page=last;        // a filter that shortens the list must not strand you
+ return last;
+}
+function pager(key,total,label){
+ var PG=pgOf(key);
+ var last=pgClamp(total,PG);
+ if(!total)return '';
+ var from=PG.page*PG.size+1, to=Math.min(total,(PG.page+1)*PG.size);
+ var btn=function(p,txt,on,dis){
+  return '<button '+(dis?'disabled':'onclick="pgGo(\''+key+'\','+p+')"')+' style="cursor:'+(dis?'not-allowed':'pointer')
+   +';font-family:var(--body);font-size:var(--fs-sm);font-weight:800;min-width:34px;height:32px;padding:0 10px;border-radius:8px;'
+   +'border:1.5px solid '+(on?'#0EA5E9':'rgba(11,42,59,.14)')+';background:'+(on?'#E6F4FE':'#FFFFFF')
+   +';color:'+(dis?'rgba(11,42,59,.35)':(on?'#0A4A6B':'#0B2A3B'))+'">'+txt+'</button>';
+ };
+ var nums='', start=Math.max(0,Math.min(PG.page-2,last-4)), end=Math.min(last,start+4), i;
+ for(i=start;i<=end;i++)nums+=btn(i,String(i+1),i===PG.page,false);
+ return '<div class="pager" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:10px 0">'
+  +'<span class="hint machine">'+from+'–'+to+' '+t('of')+' '+total+(label?' '+t(label):'')+'</span>'
+  +'<span style="margin-inline-start:auto;display:flex;gap:5px;align-items:center">'
+  +'<span class="hint">'+t('per page')+'</span>'
+  +PAGE_SIZES.map(function(n){
+     var on=PG.size===n;
+     return '<button onclick="pgSet(\''+key+'\','+n+')" style="cursor:pointer;font-family:var(--body);font-size:var(--fs-sm);font-weight:800;padding:0 11px;height:32px;border-radius:8px;border:1.5px solid '+(on?'#0EA5E9':'rgba(11,42,59,.14)')+';background:'+(on?'#E6F4FE':'#FFFFFF')+';color:'+(on?'#0A4A6B':'#0B2A3B')+'">'+n+'</button>';
+   }).join('')
+  +'</span>'
+  /* Previous and Next are always drawn, disabled at the ends. Hiding them on a
+     single page means the reader cannot tell whether the list is complete or the
+     control is simply missing — and they were reported missing for exactly that. */
+  +'<span style="display:flex;gap:5px;width:100%;margin-top:4px;align-items:center">'
+     +btn(PG.page-1,'\u2039 '+t('Previous'),false,PG.page===0)
+     +(last>0?nums:'<span class="hint machine" style="padding:0 8px">'+t('page')+' 1 / 1</span>')
+     +btn(PG.page+1,t('Next')+' \u203A',false,PG.page===last)
+   +'</span>'
+  +'</div>';
+}
+function pgSlice(key,list){var PG=pgOf(key);pgClamp(list.length,PG);return list.slice(PG.page*PG.size,(PG.page+1)*PG.size);}
+
+function render() {
+  try{syncAccount();}catch(e){}
+  st.mode === 'gallery' ? renderGallery() : renderWalk();
+}
+document.querySelectorAll('#lang button').forEach(function (b) {
+  return b.onclick = function () {
+    document.querySelectorAll('#lang button').forEach(function (x) {
+      return x.classList.remove('on');
+    });
+    b.classList.add('on');
+    st.lang = b.dataset.l;
+    render();
+  };
+});
+document.querySelectorAll('#mode button').forEach(function (b) {
+  return b.onclick = function () {
+    document.querySelectorAll('#mode button').forEach(function (x) {
+      return x.classList.remove('on');
+    });
+    b.classList.add('on');
+    st.mode = b.dataset.m;
+    render();
+  };
+});
+render();
+</script>
+</body>
+</html>

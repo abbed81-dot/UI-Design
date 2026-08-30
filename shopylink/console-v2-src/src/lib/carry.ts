@@ -23,6 +23,52 @@ function b64ToBytes(b64: string): Uint8Array {
   return out;
 }
 
+/* ── merging, not redrawing ─────────────────────────────────────────────
+   Every module carries its own shell: a navy sidebar, a topbar with its own
+   breadcrumb, language switch and date. Inside the console that shell is a
+   SECOND one — two sidebars on one screen, two languages side by side. The
+   sheet below folds the module's shell away and leaves its working surface,
+   which is the part the console came for. Nothing of the form is touched:
+   no colour, no spacing, no control is overridden — only the chrome that the
+   console already provides is told to stand down. The module's own layout is
+   a flex row, so the working column simply takes the width the sidebar left. */
+const MERGE_SHEET = `<style id="sl-console-merge">
+  /* the console owns navigation; the module's shell stands down */
+  .sl-sb, .sl-overlay, .sl-top { display: none !important; }
+  /* the module's frame is the console's panel now, not a window of its own */
+  html, body { height: 100%; }
+  .sl-app { height: 100%; min-height: 100%; }
+</style>`;
+
+/* A stylesheet still being fetched BLOCKS the scripts that follow it. Every
+   module links the four brand faces from Google Fonts at the top of its head,
+   so on a slow, throttled or blocked network the module's own boot script does
+   not run and its working area stays blank — measured here at twenty seconds
+   before the request finally reset. The link is made non-blocking rather than
+   removed: the faces still arrive when the network answers, every family
+   already declares a real fallback stack, and the form is usable meanwhile. */
+function unblockFonts(html: string): string {
+  return html.replace(
+    /<link\b(?![^>]*\bmedia=)([^>]*\bhref=["']https:\/\/fonts\.googleapis\.com[^"']*["'][^>]*)>/gi,
+    (m, rest) => `<link${rest} media="print" onload="this.media='all'">`,
+  );
+}
+
+function merge(html: string): string {
+  if (html.indexOf('sl-console-merge') > -1) return html;
+  html = unblockFonts(html);
+  /* planted at the end of the head so it wins on order without !important
+     doing the arguing — and if a module has no head, at the top of the body */
+  const head = html.search(/<\/head\s*>/i);
+  if (head > -1) return html.slice(0, head) + MERGE_SHEET + html.slice(head);
+  const body = html.search(/<body[^>]*>/i);
+  if (body > -1) {
+    const end = html.indexOf('>', body) + 1;
+    return html.slice(0, end) + MERGE_SHEET + html.slice(end);
+  }
+  return MERGE_SHEET + html;
+}
+
 /* One decompression per module per session; the frame is remounted often. */
 const cache: Record<string, string> = {};
 
@@ -34,7 +80,7 @@ export async function loadModule(file: string): Promise<string> {
   const DS = (window as { DecompressionStream?: typeof DecompressionStream }).DecompressionStream;
   if (!DS) throw new Error('no-decompressor');
   const stream = new Blob([bytes as unknown as BlobPart]).stream().pipeThrough(new DS('gzip'));
-  const html = await new Response(stream).text();
+  const html = merge(await new Response(stream).text());
   cache[file] = html;
   return html;
 }

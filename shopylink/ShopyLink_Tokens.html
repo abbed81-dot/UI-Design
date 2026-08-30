@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ShopyLink — Token sheet</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Manrope:wght@400;600;800&family=JetBrains+Mono:wght@400;600;800&family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* ── surfaces ─────────────────────────────── */
+  --cream:#F7F4EC;      /* brand canvas — the page */
+  --paper:#FFFFFF;      /* cards and documents */
+  --ink:#0B2A3B;        /* brand ink — all body text */
+
+  /* ── neutral scale, 8 steps from the canvas to the ink ── */
+  --n1:#F7F4EC; --n2:#EDE9E0; --n3:#DDD8CD; --n4:#BFC5C9;
+  --n5:#95A1A9; --n6:#62707A; --n7:#44555F; --n8:#0B2A3B;
+
+  /* ── brand colours: bright for surfaces, deep for filled buttons ── */
+  --sky:#0EA5E9;        --sky-tint:#E6F4FE;   --sky-deep:#0B6E9B;
+  --green:#10B981;      --green-tint:#DCF5E9; --green-deep:#0A7250;
+  --amber:#F59E0B;      --amber-tint:#FDF0D5; --amber-deep:#8A5A06;
+  --red:#E1483B;        --red-tint:#FBE3E1;   --red-deep:#B23429;
+
+  /* ── type ─────────────────────────────────── */
+  --disp:'Bricolage Grotesque',sans-serif;
+  --body:'Manrope',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+  --ar:'Tajawal',system-ui,sans-serif;
+
+  --fs-eyebrow:10.5px; --fs-hint:12.5px; --fs-body:14px;
+  --fs-lead:15.5px; --fs-title:19px; --fs-figure:26px;
+
+  /* ── 4px grid ─────────────────────────────── */
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:20px; --s6:24px; --s7:32px; --s8:48px;
+  --ctl-h:42px; --row-h:38px; --radius:12px; --radius-sm:9px; --radius-pill:999px;
+
+  /* ── two shadow levels, no more ───────────── */
+  --sh-1:0 1px 2px rgba(11,42,59,.06);
+  --sh-2:0 14px 34px -14px rgba(11,42,59,.40);
+
+  /* ── motion ───────────────────────────────── */
+  --t-state:150ms; --t-panel:240ms; --ease:cubic-bezier(.2,.7,.3,1);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--cream);color:var(--ink);font-family:var(--body);font-size:var(--fs-body);line-height:1.6}
+.wrap{max-width:1180px;margin:0 auto;padding:var(--s8) var(--s6)}
+h1{font-family:var(--disp);font-weight:800;letter-spacing:-.03em;font-size:38px;margin:0 0 var(--s2)}
+h2{font-family:var(--disp);font-weight:800;letter-spacing:-.025em;font-size:var(--fs-title);margin:var(--s8) 0 var(--s3);
+   padding-bottom:var(--s2);border-bottom:1.5px solid var(--n3)}
+.eyebrow{font-family:var(--mono);font-size:var(--fs-eyebrow);font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--n6)}
+.sub{color:var(--n7);max-width:62ch}
+.machine{font-family:var(--mono);direction:ltr;unicode-bidi:isolate}
+.grid{display:grid;gap:var(--s3)}
+.g4{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
+.g3{grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+.card{background:var(--paper);border:1.5px solid var(--n3);border-radius:var(--radius);box-shadow:var(--sh-1)}
+.sw{border-radius:var(--radius);overflow:hidden;border:1.5px solid var(--n3);background:var(--paper)}
+.sw .chip{height:76px;display:flex;align-items:flex-end;padding:var(--s2) var(--s3)}
+.sw .meta{padding:var(--s2) var(--s3)}
+.sw .name{font-weight:800;font-size:var(--fs-body)}
+.sw .hex{font-family:var(--mono);font-size:var(--fs-hint);color:var(--n6)}
+.pass{font-family:var(--mono);font-size:var(--fs-hint);font-weight:800;color:var(--green-deep)}
+.fail{font-family:var(--mono);font-size:var(--fs-hint);font-weight:800;color:var(--red-deep)}
+.row{display:flex;gap:var(--s3);align-items:center;flex-wrap:wrap}
+.btn{font-family:var(--body);font-weight:800;font-size:var(--fs-body);height:var(--ctl-h);padding:0 var(--s5);
+     border-radius:var(--radius-sm);border:none;cursor:pointer;transition:transform var(--t-state) var(--ease)}
+.btn:active{transform:translateY(1px)}
+.btn-primary{background:var(--sky-deep);color:var(--paper)}
+.btn-go{background:var(--green-deep);color:var(--paper)}
+.btn-danger{background:var(--paper);color:var(--red-deep);border:1.5px solid var(--red)}
+.btn-quiet{background:var(--paper);color:var(--ink);border:1.5px solid var(--n4)}
+.status{display:inline-flex;align-items:center;gap:var(--s2);font-weight:800;font-size:var(--fs-hint);
+        padding:5px 11px;border-radius:var(--radius-pill)}
+.dot{width:9px;height:9px;border-radius:50%;flex:0 0 auto}
+table{width:100%;border-collapse:collapse;font-size:var(--fs-body)}
+th{font-family:var(--mono);font-size:var(--fs-eyebrow);font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+   color:var(--n6);text-align:left;padding:var(--s2) var(--s3);border-bottom:1.5px solid var(--n3)}
+td{padding:var(--s2) var(--s3);border-bottom:1px solid var(--n2)}
+td.num{font-family:var(--mono);text-align:right;direction:ltr;unicode-bidi:isolate}
+.note{background:var(--amber-tint);border:1.5px solid var(--amber);border-radius:var(--radius);padding:var(--s3) var(--s4);color:var(--ink)}
+.bad{background:var(--red-tint);border:1.5px solid var(--red);border-radius:var(--radius);padding:var(--s3) var(--s4)}
+@media print{body{background:#fff}.card,.sw{box-shadow:none}}
+
+/* ── control geometry ──────────────────────────────────────────────
+   A control styled with padding but no height takes the browser's default,
+   which differs per control type — that is why a select used to sit proud of
+   the input beside it, and why the native arrow was jammed against the edge.
+   The arrow is drawn here, so the room for it is reserved here.            */
+select{
+  height:var(--ctl-h,42px);
+  -webkit-appearance:none;-moz-appearance:none;appearance:none;
+  padding-right:32px;padding-left:12px;
+  background-image:url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 L6 6.5 L11 1.5' fill='none' stroke='%2362707A' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;
+  font-size:var(--fs-body,14px);color:var(--ink,#0B2A3B);line-height:normal;
+}
+select::-ms-expand{display:none}
+[dir="rtl"] select{padding-right:12px;padding-left:32px;background-position:left 12px center}
+input[type="text"],input[type="number"],input[type="tel"],input[type="email"],input[type="date"]{
+  height:var(--ctl-h,42px);font-size:var(--fs-body,14px);line-height:normal;
+}
+textarea{font-size:var(--fs-body,14px);line-height:1.6}
+
+/* ── the screen switcher is NAVIGATION, not debug chrome ───────────
+   It was 10px white at 40% on the dark bar: 3.35:1, below AA and unreadable,
+   which is why its destinations could not be found. Now 11.5px at 72% (7.18:1)
+   with a solid active pill, so it reads as what it is.                      */
+.sl-sim-btn{font-size:11.5px !important;font-weight:700 !important;padding:5px 13px !important;
+  color:rgba(255,255,255,.72) !important;background:rgba(255,255,255,.09) !important;
+  min-height:26px;white-space:nowrap}
+.sl-sim-btn:hover{background:rgba(255,255,255,.18) !important;color:#FFFFFF !important}
+.sl-sim-btn.on{background:#FFFFFF !important;color:#0B2A3B !important}
+.sl-sim-lbl{font-size:10px !important;color:rgba(255,255,255,.60) !important}
+
+/* ── mobile: every screen must be usable and complete on a phone ───
+   Nothing is hidden to make it fit. Rows wrap, tables scroll inside their own
+   box rather than pushing the page sideways, and touch targets keep their size. */
+@media (max-width:767px){
+  /* A control pushed past the edge is a control that does not exist.
+     Inline flex rows wrap, and auto-margin spacers stop shoving the last item
+     off-screen — which is what hid "simulate issue" on a narrow window. */
+  [style*="display:flex"]{flex-wrap:wrap !important}
+  [style*="margin-left:auto"]{margin-left:0 !important}
+  [dir="rtl"] [style*="margin-right:auto"]{margin-right:0 !important}
+  .sl-modal{width:auto !important;max-width:calc(100vw - 20px)}
+
+  /* the sidebar is handled by this module's own 767px rules — not duplicated here */
+  .sl-main,.sl-scroll{padding-left:12px !important;padding-right:12px !important}
+  .sl-sim{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:nowrap}
+  .card{border-radius:11px}
+  select,input[type="text"],input[type="number"],input[type="tel"],input[type="email"]{
+    min-height:44px;font-size:16px}          /* 16px stops iOS zooming on focus */
+  button{min-height:40px}
+}
+@media (max-width:560px){
+  .sl-scroll,.sl-main{padding-left:10px !important;padding-right:10px !important}
+  .figure{font-size:22px !important}
+}
+</style></head>
+<body><div class="wrap">
+
+<div class="eyebrow">ShopyLink · design tokens · v1</div>
+<h1>Token sheet</h1>
+<p class="sub">Every value below is taken from the brand guide, not invented — and every text-on-surface pair
+has been measured against WCAG AA before being written down. Where the brand colour could not carry white
+text, the fix was a deeper shade for filled buttons only; the bright brand colour is untouched and still does
+the work everywhere it is a surface, a border or a chip.</p>
+
+<div class="bad" style="margin-top:var(--s5)">
+  <div style="font-weight:800;margin-bottom:var(--s1)">What the audit found before this sheet was written</div>
+  White text on the brand sky reads <span class="machine">2.77:1</span>, on the brand green
+  <span class="machine">2.54:1</span>, on the brand amber <span class="machine">2.15:1</span> — all far below the
+  <span class="machine">4.5:1</span> minimum, across <span class="machine">42</span> places in the build.
+  The hint grey <span class="machine">rgba(11,42,59,.45)</span> reads <span class="machine">2.62:1</span> on cream.
+  This sheet fixes both at the source.
+</div>
+
+<h2>Surfaces</h2>
+<div class="grid g4">
+  <div class="sw"><div class="chip" style="background:#F7F4EC"></div><div class="meta">
+    <div class="name">Cream — canvas</div><div class="hex">#F7F4EC · brand</div>
+    <div class="pass">ink 13.56:1  PASS</div></div></div>
+  <div class="sw"><div class="chip" style="background:#FFFFFF"></div><div class="meta">
+    <div class="name">Paper — cards</div><div class="hex">#FFFFFF</div>
+    <div class="pass">ink 14.91:1  PASS</div></div></div>
+  <div class="sw"><div class="chip" style="background:#0B2A3B"></div><div class="meta">
+    <div class="name">Ink — all text</div><div class="hex">#0B2A3B · brand</div>
+    <div class="pass">on cream 13.56:1  PASS</div></div></div>
+</div>
+
+<h2>Neutral scale — eight steps, cream to ink</h2>
+<div class="grid g4">
+  <div class="sw"><div class="chip" style="background:#F7F4EC"></div><div class="meta"><div class="name">n1</div><div class="hex">#F7F4EC</div><div class="hex">page</div></div></div>
+  <div class="sw"><div class="chip" style="background:#EDE9E0"></div><div class="meta"><div class="name">n2</div><div class="hex">#EDE9E0</div><div class="hex">hairline, zebra</div></div></div>
+  <div class="sw"><div class="chip" style="background:#DDD8CD"></div><div class="meta"><div class="name">n3</div><div class="hex">#DDD8CD</div><div class="hex">borders</div></div></div>
+  <div class="sw"><div class="chip" style="background:#BFC5C9"></div><div class="meta"><div class="name">n4</div><div class="hex">#BFC5C9</div><div class="hex">control borders</div></div></div>
+  <div class="sw"><div class="chip" style="background:#95A1A9"></div><div class="meta"><div class="name">n5</div><div class="hex">#95A1A9</div><div class="fail">decorative only — 2.40:1</div></div></div>
+  <div class="sw"><div class="chip" style="background:#62707A"></div><div class="meta"><div class="name">n6 — hint text</div><div class="hex">#62707A</div><div class="pass">on cream 4.64:1  PASS</div></div></div>
+  <div class="sw"><div class="chip" style="background:#44555F"></div><div class="meta"><div class="name">n7 — secondary</div><div class="hex">#44555F</div><div class="pass">7.05:1  PASS</div></div></div>
+  <div class="sw"><div class="chip" style="background:#0B2A3B"></div><div class="meta"><div class="name">n8 = ink</div><div class="hex">#0B2A3B</div><div class="pass">13.56:1  PASS</div></div></div>
+</div>
+<div class="note" style="margin-top:var(--s4)">
+  <b>n5 is not a text colour.</b> It is for dividers, disabled fills and icon strokes. Every piece of hint text
+  moves from <span class="machine">rgba(11,42,59,.45)</span> to <b>n6 #62707A</b>.
+</div>
+
+<h2>Brand colours — bright surface, deep fill</h2>
+<div class="grid g3">
+  <div class="card" style="padding:var(--s4)">
+    <div class="eyebrow">sky · in transit</div>
+    <div class="row" style="margin-top:var(--s2)">
+      <span style="width:44px;height:44px;border-radius:10px;background:var(--sky)"></span>
+      <span style="width:44px;height:44px;border-radius:10px;background:var(--sky-tint)"></span>
+      <span style="width:44px;height:44px;border-radius:10px;background:var(--sky-deep)"></span>
+    </div>
+    <div class="hex machine" style="margin-top:var(--s2);color:var(--n6);font-size:var(--fs-hint)">#0EA5E9 · #E6F4FE · #0B6E9B</div>
+    <div class="pass">ink on tint 13.30 PASS · white on deep 5.65  PASS</div>
+  </div>
+  <div class="card" style="padding:var(--s4)">
+    <div class="eyebrow">green · cleared</div>
+    <div class="row" style="margin-top:var(--s2)">
+      <span style="width:44px;height:44px;border-radius:10px;background:var(--green)"></span>
+      <span style="width:44px;height:44px;border-radius:10px;background:var(--green-tint)"></span>
+      <span style="width:44px;height:44px;border-radius:10px;background:var(--green-deep)"></span>
+    </div>
+    <div class="hex machine" style="margin-top:var(--s2);color:var(--n6);font-size:var(--fs-hint)">#10B981 · #DCF5E9 · #0A7250</div>
+    <div class="pass">ink on tint 12.98 PASS · white on deep 5.94  PASS</div>
+  </div>
+  <div class="card" style="padding:var(--s4)">
+    <div class="eyebrow">amber · pending</div>
+    <div class="row" style="margin-top:var(--s2)">
+      <span style="width:44px;height:44px;border-radius:10px;background:var(--amber)"></span>
+      <span style="width:44px;height:44px;border-radius:10px;background:var(--amber-tint)"></span>
+      <span style="width:44px;height:44px;border-radius:10px;background:var(--amber-deep)"></span>
+    </div>
+    <div class="hex machine" style="margin-top:var(--s2);color:var(--n6);font-size:var(--fs-hint)">#F59E0B · #FDF0D5 · #8A5A06</div>
+    <div class="pass">ink on tint 13.21 PASS · white on deep 5.92  PASS</div>
+  </div>
+  <div class="card" style="padding:var(--s4)">
+    <div class="eyebrow">red · held</div>
+    <div class="row" style="margin-top:var(--s2)">
+      <span style="width:44px;height:44px;border-radius:10px;background:var(--red)"></span>
+      <span style="width:44px;height:44px;border-radius:10px;background:var(--red-tint)"></span>
+      <span style="width:44px;height:44px;border-radius:10px;background:var(--red-deep)"></span>
+    </div>
+    <div class="hex machine" style="margin-top:var(--s2);color:var(--n6);font-size:var(--fs-hint)">#E1483B · #FBE3E1 · #B23429</div>
+    <div class="pass">ink on tint 12.19 PASS · white on deep 6.15  PASS</div>
+    <div class="fail">ink on the bright red is 3.69 — never put text on it</div>
+  </div>
+</div>
+
+<h2>Status — chip, dot and word. Never colour alone.</h2>
+<div class="row">
+  <span class="status" style="background:var(--amber-tint);color:var(--ink)"><span class="dot" style="background:var(--amber)"></span>Pending</span>
+  <span class="status" style="background:var(--sky-tint);color:var(--ink)"><span class="dot" style="background:var(--sky)"></span>In transit</span>
+  <span class="status" style="background:var(--green-tint);color:var(--ink)"><span class="dot" style="background:var(--green)"></span>Cleared</span>
+  <span class="status" style="background:var(--red-tint);color:var(--ink)"><span class="dot" style="background:var(--red)"></span>Held</span>
+  <span class="status" style="background:var(--n2);color:var(--ink)"><span class="dot" style="background:var(--ink)"></span>Delivered</span>
+</div>
+<div class="note" style="margin-top:var(--s4)">
+  Printed in black and white the dot becomes a grey disc and the word carries the meaning — which is the test
+  the documents have to pass. <b>The dot is a placeholder for an SVG icon</b>, one per status, replacing the
+  1,158 emoji currently in the build.
+</div>
+
+<h2>Type</h2>
+<div class="card" style="padding:var(--s5)">
+  <div class="eyebrow">display · Bricolage Grotesque 800 · −0.025em</div>
+  <div style="font-family:var(--disp);font-weight:800;letter-spacing:-.025em;font-size:var(--fs-figure)">Damascus → Aleppo, 12 days</div>
+  <div class="eyebrow" style="margin-top:var(--s5)">body · Manrope 400 / 600 / 800</div>
+  <div>Four pallets arrived without a packing list. The driver said it follows by email.</div>
+  <div class="eyebrow" style="margin-top:var(--s5)">machine · JetBrains Mono — identifiers, weights, money, dates</div>
+  <div class="machine">BSH-240705-01 · 1,284 kg · 1.08 CBM · 2,550,000 SYP · 19 Aug 2026</div>
+  <div class="eyebrow" style="margin-top:var(--s5)">arabic · Tajawal</div>
+  <div style="font-family:var(--ar);font-size:var(--fs-lead)">أربع منصّات وصلت بلا قائمة تعبئة. قال السائق إنها تتبع بالبريد.</div>
+</div>
+<table style="margin-top:var(--s4)">
+  <tr><th>token</th><th>size</th><th>use</th></tr>
+  <tr><td class="machine">--fs-eyebrow</td><td class="num">10.5px</td><td>mono label above a block</td></tr>
+  <tr><td class="machine">--fs-hint</td><td class="num">12.5px</td><td>secondary line, always n6 or darker</td></tr>
+  <tr><td class="machine">--fs-body</td><td class="num">14px</td><td>everything else</td></tr>
+  <tr><td class="machine">--fs-lead</td><td class="num">15.5px</td><td>row title</td></tr>
+  <tr><td class="machine">--fs-title</td><td class="num">19px</td><td>section heading</td></tr>
+  <tr><td class="machine">--fs-figure</td><td class="num">26px</td><td>the one number that matters</td></tr>
+</table>
+
+<h2>Controls</h2>
+<div class="row">
+  <button class="btn btn-primary">Primary action</button>
+  <button class="btn btn-go">Confirm</button>
+  <button class="btn btn-quiet">Cancel</button>
+  <button class="btn btn-danger">Void</button>
+</div>
+<div class="note" style="margin-top:var(--s4)">
+  One primary per screen. <b>Destructive is never a filled button</b> — it is outlined in red and lives in an
+  overflow menu or the selection bar, never beside a routine action and never inside a row's hover area.
+</div>
+
+<h2>Spacing, surfaces, motion</h2>
+<table>
+  <tr><th>token</th><th>value</th><th>rule</th></tr>
+  <tr><td class="machine">4px grid</td><td class="num">4 · 8 · 12 · 16 · 20 · 24 · 32 · 48</td><td>nothing off-grid</td></tr>
+  <tr><td class="machine">--row-h</td><td class="num">38px</td><td>table row — scanning speed over comfort</td></tr>
+  <tr><td class="machine">--ctl-h</td><td class="num">42px</td><td>inputs and buttons</td></tr>
+  <tr><td class="machine">--sh-1 / --sh-2</td><td class="num">2 levels</td><td>card rest, and overlay. No third.</td></tr>
+  <tr><td class="machine">--t-state</td><td class="num">150ms</td><td>hover, toggle, chip</td></tr>
+  <tr><td class="machine">--t-panel</td><td class="num">240ms</td><td>drawer, modal</td></tr>
+  <tr><td class="machine">transform / opacity</td><td class="num">only</td><td>never animate layout</td></tr>
+  <tr><td class="machine">rows</td><td class="num">no entrance animation</td><td>it makes scanning feel slow</td></tr>
+</table>
+
+<h2>What this sheet forbids</h2>
+<div class="card" style="padding:var(--s5)">
+  <div>No gradient on any background · no third shadow level · no colour outside these tokens · no emoji ·
+  no exclamation marks · no confetti · no bottom navigation on desktop · no card grid where a table belongs ·
+  more than one primary button on a screen · a destructive button styled as primary · text on the bright red ·
+  hint text lighter than n6 · a status told by colour alone.</div>
+</div>
+
+<div style="margin-top:var(--s8);padding-top:var(--s4);border-top:1.5px solid var(--n3)" class="eyebrow">
+  world · to · door · العالم إلى البيت
+</div>
+</div></body></html>

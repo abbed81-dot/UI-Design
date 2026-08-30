@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ShopyLink — Gift Cards (states-first)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&family=Tajawal:wght@400;500;700;800&family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0B2A3B; --pri:#0EA5E9; --acc:#38BDF8; --pale:#E0F2FE; --cream:#F7F4EC;
+  --paper:#FFFFFF; --mute:rgba(11,42,59,0.55); --rule:rgba(11,42,59,0.12);
+  --warm:#FBBF24; --green:#10B981; --danger:#E1483B;
+  --disp:'Bricolage Grotesque',sans-serif; --body:'Manrope',sans-serif;
+  --mono:'JetBrains Mono',monospace; --ar:'Tajawal','Cairo',sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:#E9EFF3;color:var(--ink);font-family:var(--body);
+  background-image:radial-gradient(120% 90% at 12% -12%, #F3FAFE 0, transparent 52%),radial-gradient(90% 70% at 102% -6%, #FDF4E0 0, transparent 44%),radial-gradient(circle at 50% 120%, #E2EAF0 0, #EAF0F4 60%);min-height:100%}
+.wrap{max-width:1180px;margin:0 auto;padding:22px 20px 60px}
+.top{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:6px}
+.brand{font-family:var(--disp);font-weight:800;font-size:20px;letter-spacing:-0.02em}
+.brand .dot{color:var(--pri)}
+.tag{font-size:12px;color:var(--mute)}
+.controls{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.seg{display:inline-flex;background:#fff;border:1px solid var(--rule);border-radius:99px;padding:3px}
+.seg button{border:0;background:transparent;font-family:var(--body);font-size:13px;font-weight:600;color:var(--mute);padding:6px 13px;border-radius:99px;cursor:pointer}
+.seg button.on{background:var(--ink);color:#fff}
+.hint{font-size:12px;color:var(--mute);margin:10px 0 22px;max-width:700px;line-height:1.5}
+.stage{display:flex;justify-content:center}
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(244px,1fr));gap:30px 22px;align-items:start}
+.gcell{display:flex;flex-direction:column;align-items:center;gap:10px}
+.gcell .scaler{width:242px;height:486px;overflow:hidden;border-radius:34px}
+.gcell .scaler .phone{transform:scale(.6204);transform-origin:top left}
+.glabel{font-size:12px;font-weight:600;text-align:center}
+.glabel small{display:block;color:var(--mute);font-weight:500;font-size:11px;margin-top:1px}
+
+.phone{width:390px;height:783px;background:var(--cream);position:relative;display:flex;flex-direction:column;overflow:hidden}
+.framewrap{border-radius:42px;padding:11px;background:#0B2A3B;box-shadow:0 30px 60px -22px rgba(11,42,59,.5),0 6px 16px -8px rgba(11,42,59,.3)}
+.framewrap .phone{border-radius:32px}
+.sb{height:46px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 24px 6px;font-size:13px;font-weight:600;color:var(--ink);flex-shrink:0}
+.offline{background:var(--ink);color:#fff;font-size:12px;font-weight:600;text-align:center;padding:7px 12px;display:flex;align-items:center;justify-content:center;gap:7px;flex-shrink:0}
+.scr{flex:1;display:flex;flex-direction:column;padding:8px 22px 0;overflow-y:auto}
+.scr::-webkit-scrollbar{width:0}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--pri);margin-bottom:10px}
+h1.disp{font-family:var(--disp);font-weight:800;font-size:28px;line-height:1.08;letter-spacing:-0.02em;margin:0 0 8px}
+.sub{font-size:13.5px;color:var(--mute);line-height:1.5;margin:0 0 18px}
+.backchip{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--mute);background:transparent;border:0;cursor:pointer;padding:4px 0;margin-bottom:6px}
+.foot{padding:12px 22px 26px;flex-shrink:0;background:linear-gradient(to top,var(--cream) 72%,transparent)}
+.btn{width:100%;border:0;border-radius:14px;background:var(--ink);color:#fff;font-family:var(--body);font-weight:700;font-size:15px;padding:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;transition:.15s}
+.btn:disabled{opacity:.4;cursor:default}
+.btn.load{color:transparent;position:relative}
+.btn.load::after{content:"";position:absolute;width:18px;height:18px;border:2.5px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.err{color:var(--danger);font-size:12.5px;font-weight:600;margin-top:10px;display:flex;gap:6px;align-items:flex-start}
+.seclabel{display:flex;align-items:center;gap:10px;font-family:var(--disp);font-weight:800;font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink);margin:18px 0 12px}
+.seclabel::after{content:"";flex:1;height:1px;background:var(--rule)}
+.searchbar{display:flex;align-items:center;gap:9px;background:#fff;border:1.5px solid var(--rule);border-radius:12px;padding:11px 13px;margin-bottom:13px;color:var(--mute)}
+.searchbar input{border:0;outline:0;flex:1;font-family:var(--body);font-size:14px;color:var(--ink);background:transparent}
+.catchips{display:flex;gap:7px;overflow-x:auto;padding-bottom:4px;margin-bottom:15px}
+.catchips::-webkit-scrollbar{height:0}
+.catchip{flex-shrink:0;border:1px solid var(--rule);background:#fff;border-radius:99px;padding:6px 12px;font-size:12px;font-weight:600;color:var(--mute);cursor:pointer}
+.catchip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.ctile{border:1.5px solid var(--rule);background:#fff;border-radius:16px;padding:15px;cursor:pointer;display:flex;flex-direction:column;gap:5px}
+.ctile:active{border-color:var(--pri)}
+.ctile .fl{font-size:28px}
+.ctile .cn{font-family:var(--disp);font-weight:800;font-size:16px;color:var(--ink)}
+.ctile .ex{font-size:11px;color:var(--mute);line-height:1.35}
+.regionbar{display:flex;align-items:center;gap:8px;background:rgba(251,191,36,.14);color:#92660A;border-radius:12px;padding:10px 12px;font-size:12.5px;font-weight:600;margin-bottom:14px}
+.regionbar .flag{font-size:15px}
+.regionbar .change{margin-inline-start:auto;color:var(--pri);font-weight:700;cursor:pointer;text-decoration:underline}
+/* country chips */
+.cchips{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:16px}
+.cchips::-webkit-scrollbar{height:0}
+.cchip{flex-shrink:0;border:1.5px solid var(--rule);background:#fff;border-radius:99px;padding:8px 14px;font-size:13px;font-weight:600;color:var(--mute);cursor:pointer;display:flex;gap:6px;align-items:center}
+.cchip.on{border-color:var(--pri);background:var(--pale);color:var(--ink)}
+/* store grid */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.stile{border-radius:16px;overflow:hidden;cursor:pointer;border:1px solid var(--rule);background:#fff;display:flex;flex-direction:column}
+.stile .badge{height:84px;display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-weight:800;font-size:17px;letter-spacing:-.01em;text-align:center;padding:0 10px}
+.stile .meta{padding:9px 11px 11px}
+.stile .nm{font-size:13px;font-weight:700;color:var(--ink)}
+.stile .from{font-size:11.5px;color:var(--mute);margin-top:2px}
+.skel{background:linear-gradient(90deg,#eef2f5 25%,#e3e9ee 50%,#eef2f5 75%);background-size:200% 100%;animation:sh 1.2s infinite}
+@keyframes sh{to{background-position:-200% 0}}
+.empty{text-align:center;color:var(--mute);padding:40px 16px;font-size:13.5px}
+.empty .big{font-size:34px;margin-bottom:10px}
+/* store detail */
+.hero{border-radius:18px;height:130px;display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-weight:800;font-size:24px;color:#fff;margin-bottom:6px;position:relative;overflow:hidden}
+.hero .reg{position:absolute;top:12px;right:14px;font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;opacity:.8;font-weight:700}
+.denoms{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.denom{border:1.5px solid var(--rule);background:#fff;border-radius:13px;padding:14px 12px;text-align:center;cursor:pointer;position:relative}
+.denom .face{font-family:var(--disp);font-weight:800;font-size:18px;color:var(--ink)}
+.denom .syp{font-size:11.5px;color:var(--mute);margin-top:3px}
+.denom.on{border-color:var(--pri);background:var(--pale)}
+.denom.oos{opacity:.5;cursor:default}
+.denom.oos::after{content:"";position:absolute;inset:0}
+.pricebox{margin-top:18px;background:var(--ink);color:#fff;border-radius:16px;padding:16px 18px;display:flex;align-items:center;justify-content:space-between}
+.pricebox .l{font-size:12px;opacity:.7;font-weight:600}
+.pricebox .big{font-family:var(--disp);font-weight:800;font-size:22px;margin-top:2px}
+.pricebox .face2{font-size:12px;opacity:.85;font-weight:600}
+.pricebox.muted{background:#fff;color:var(--mute);border:1.5px dashed var(--rule);justify-content:center;font-weight:600;font-size:13.5px}
+.qty{display:flex;align-items:center;gap:12px;margin-top:14px}
+.qty .lab{font-size:12.5px;font-weight:600;color:var(--ink);flex:1}
+.qty button{width:34px;height:34px;border-radius:10px;border:1.5px solid var(--rule);background:#fff;font-size:18px;font-weight:700;color:var(--ink);cursor:pointer;line-height:1}
+.qty .n{width:24px;text-align:center;font-weight:700}
+/* payment */
+.sumrow{display:flex;align-items:center;justify-content:space-between;font-size:13.5px;padding:10px 0;border-bottom:1px solid var(--rule)}
+.sumrow .k{color:var(--mute)}.sumrow .v{font-weight:700}
+.sumtot{display:flex;align-items:center;justify-content:space-between;padding:14px 0 4px}
+.sumtot .k{font-weight:700}.sumtot .v{font-family:var(--disp);font-weight:800;font-size:20px}
+.pmethod{display:flex;align-items:center;gap:12px;border:1.5px solid var(--rule);background:#fff;border-radius:13px;padding:13px;margin-bottom:10px;cursor:pointer}
+.pmethod.on{border-color:var(--pri);background:var(--pale)}
+.pmethod .ico{width:34px;height:34px;border-radius:9px;background:var(--pale);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--pri);font-size:13px;flex-shrink:0}
+.pmethod .nm{flex:1;font-size:14px;font-weight:600;color:var(--ink)}
+.pmethod .rad{width:20px;height:20px;border-radius:50%;border:2px solid var(--rule)}
+.pmethod.on .rad{border-color:var(--pri);background:radial-gradient(circle,var(--pri) 0 6px,#fff 6px)}
+.banner{border-radius:12px;padding:12px 13px;font-size:12.5px;font-weight:600;line-height:1.45;display:flex;gap:8px;margin-bottom:14px}
+.banner.bad{background:rgba(225,72,59,.08);color:var(--danger)}
+.banner.warn{background:rgba(251,191,36,.14);color:#92660A}
+/* reveal */
+.center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 24px}
+.check{width:76px;height:76px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;margin-bottom:20px;box-shadow:0 14px 30px -10px rgba(16,185,129,.55)}
+.spinbig{width:54px;height:54px;border:4px solid var(--rule);border-top-color:var(--pri);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:20px}
+.revealcard{width:100%;border-radius:18px;padding:18px;color:#fff;margin:8px 0 14px;text-align:left}
+.revealcard .nm{font-family:var(--disp);font-weight:800;font-size:18px}
+.revealcard .face{font-size:13px;opacity:.85;margin-top:2px}
+.codebox{margin-top:14px;background:rgba(255,255,255,.16);border-radius:11px;padding:13px;font-family:var(--mono);font-weight:700;font-size:16px;letter-spacing:.12em;display:flex;align-items:center;justify-content:space-between}
+.codebox .copy{font-family:var(--body);font-size:11px;font-weight:700;background:#fff;color:var(--ink);border-radius:7px;padding:5px 9px;cursor:pointer}
+.reveal-btn{background:rgba(255,255,255,.18);border:0;color:#fff;font-family:var(--body);font-weight:700;font-size:13px;border-radius:9px;padding:11px;width:100%;cursor:pointer;margin-top:14px}
+.reveal-now{width:100%;border:1.5px solid var(--ink);background:#fff;color:var(--ink);font-family:var(--body);font-weight:700;font-size:14px;border-radius:13px;padding:14px;cursor:pointer;margin:2px 0 4px}
+.footrow{display:flex;gap:10px}
+.footrow .btn{flex:1}
+.btn.ghost{background:#fff;color:var(--ink);border:1.5px solid var(--rule)}
+.once{font-size:11px;color:var(--mute);text-align:center;margin-top:4px}
+.h2{font-family:var(--disp);font-weight:800;font-size:22px;margin:0 0 8px}
+.ptext{font-size:13.5px;color:var(--mute);line-height:1.5;margin:0 0 4px}
+.phone.rtl{direction:rtl;font-family:var(--ar)}
+.phone.rtl h1.disp,.phone.rtl .seclabel,.phone.rtl .h2,.phone.rtl .hero,.phone.rtl .revealcard .nm{font-family:var(--ar)}
+.phone.rtl .eyebrow,.phone.rtl .codebox{font-family:var(--mono)}
+.simrow{display:flex;gap:7px;flex-wrap:wrap;margin-top:14px;justify-content:center}
+.simrow button{font-size:12px;font-weight:600;border:1px solid var(--rule);background:#fff;color:var(--mute);border-radius:99px;padding:6px 12px;cursor:pointer}
+.simrow button.on{background:var(--pale);color:var(--ink);border-color:var(--pri)}
+.note{font-size:12px;color:var(--mute);text-align:center;margin-top:16px}
+
+/* ───────────────────────────────────────────────────────────
+   GIFT-CARD RENDER SYSTEM — dimensional, glossy, lightly festive.
+   Brand colours stay as the base (set via background-color in JS);
+   these layers add depth + sparkle over ANY colour. world · to · door.
+   ─────────────────────────────────────────────────────────── */
+:root{
+  --sparkle:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='104'%20height='104'%3E%3Cg%20fill='%23ffffff'%3E%3Cpath%20d='M20%2016%20L21.6%2020.4%20L26%2022%20L21.6%2023.6%20L20%2028%20L18.4%2023.6%20L14%2022%20L18.4%2020.4z'%20opacity='.9'/%3E%3Cpath%20d='M74%2012.4%20L74.9%2015.1%20L77.6%2016%20L74.9%2016.9%20L74%2019.6%20L73.1%2016.9%20L70.4%2016%20L73.1%2015.1z'%20opacity='.55'/%3E%3Cpath%20d='M54%2047.4%20L55.2%2050.8%20L58.6%2052%20L55.2%2053.2%20L54%2056.6%20L52.8%2053.2%20L49.4%2052%20L52.8%2050.8z'%20opacity='.7'/%3E%3Cpath%20d='M90%2066.6%20L90.9%2069.1%20L93.4%2070%20L90.9%2070.9%20L90%2073.4%20L89.1%2070.9%20L86.6%2070%20L89.1%2069.1z'%20opacity='.5'/%3E%3Cpath%20d='M30%2076%20L31%2079%20L34%2080%20L31%2081%20L30%2084%20L29%2081%20L26%2080%20L29%2079z'%20opacity='.6'/%3E%3Cpath%20d='M82%2093.2%20L82.7%2095.3%20L84.8%2096%20L82.7%2096.7%20L82%2098.8%20L81.3%2096.7%20L79.2%2096%20L81.3%2095.3z'%20opacity='.45'/%3E%3Ccircle%20cx='46'%20cy='34'%20r='1'%20opacity='.5'/%3E%3Ccircle%20cx='96'%20cy='40'%20r='.9'%20opacity='.45'/%3E%3Ccircle%20cx='12'%20cy='58'%20r='1'%20opacity='.45'/%3E%3Ccircle%20cx='64'%20cy='84'%20r='.9'%20opacity='.4'/%3E%3C/g%3E%3C/svg%3E");
+  --gloss:linear-gradient(138deg, rgba(255,255,255,.24) 0%, rgba(255,255,255,0) 44%),linear-gradient(312deg, rgba(0,0,0,.34) 0%, rgba(0,0,0,0) 58%);
+}
+/* Store tiles in the gallery read like little plastic gift cards */
+.stile{transition:transform .16s cubic-bezier(.3,.7,.4,1),box-shadow .16s,border-color .16s}
+.stile:hover{transform:translateY(-3px);box-shadow:0 16px 26px -16px rgba(11,42,59,.5);border-color:var(--acc)}
+.stile .badge{position:relative;overflow:hidden;letter-spacing:-.01em;text-shadow:0 1px 2px rgba(0,0,0,.18);
+  background-image:var(--gloss),radial-gradient(115% 80% at 84% -16%, rgba(255,255,255,.22), transparent 60%);
+  background-size:cover,cover;box-shadow:inset 0 1px 0 rgba(255,255,255,.18),inset 0 -10px 16px rgba(0,0,0,.14)}
+.stile .badge::after{content:"";position:absolute;inset:0;background:var(--sparkle);background-size:84px 84px;opacity:.55;mix-blend-mode:screen;pointer-events:none}
+.stile .badge.skel::after,.stile .badge.skel{background-image:none}
+/* Hero card on the store screen — the headline gift-card render */
+.hero{box-shadow:0 18px 34px -18px rgba(11,42,59,.55),inset 0 1px 0 rgba(255,255,255,.18),inset 0 -16px 26px rgba(0,0,0,.18);
+  text-shadow:0 1px 3px rgba(0,0,0,.24);letter-spacing:-.01em;
+  background-image:var(--gloss),radial-gradient(120% 90% at 82% -14%, rgba(255,255,255,.26), transparent 58%),var(--sparkle);
+  background-size:cover,cover,cover,104px 104px}
+.hero>*{position:relative;z-index:1}
+.hero .heroname{display:block}
+/* Reveal card — the celebratory finale */
+.revealcard{position:relative;overflow:hidden;
+  box-shadow:0 20px 38px -18px rgba(11,42,59,.55),inset 0 1px 0 rgba(255,255,255,.2),inset 0 -16px 28px rgba(0,0,0,.2);
+  background-image:var(--gloss),radial-gradient(120% 90% at 82% -10%, rgba(255,255,255,.26), transparent 56%),var(--sparkle);
+  background-size:cover,cover,cover,104px 104px}
+.revealcard>*{position:relative;z-index:1}
+.revealcard .nm{text-shadow:0 1px 3px rgba(0,0,0,.24)}
+.revealcard .codebox{box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)}
+/* travelling sheen — keeps cards alive without hurting legibility */
+@media (prefers-reduced-motion: no-preference){
+  .hero::before,.revealcard::before{content:"";position:absolute;top:-60%;bottom:-60%;left:-70%;width:48%;z-index:0;pointer-events:none;
+    background:linear-gradient(100deg,transparent,rgba(255,255,255,.32),transparent);transform:skewX(-16deg);
+    animation:sheen 6s ease-in-out infinite}
+  .revealcard:nth-child(odd)::before{animation-delay:.9s}
+  .revealcard:nth-child(even)::before{animation-delay:1.6s}
+}
+@keyframes sheen{0%{left:-70%}55%,100%{left:135%}}
+/* Festive glow + sparkle around the success check */
+.check{position:relative}
+.check::before{content:"";position:absolute;inset:-14px;border-radius:50%;z-index:-1;
+  background:radial-gradient(circle, rgba(16,185,129,.35), transparent 70%)}
+.check::after{content:"";position:absolute;inset:-22px;z-index:-1;background:var(--sparkle);background-size:80px 80px;opacity:.85;
+  filter:drop-shadow(0 0 1px rgba(251,191,36,.6))}
+/* Primary button — a touch more dimension */
+.btn{background-image:linear-gradient(180deg, #123f57 0%, var(--ink) 70%);
+  box-shadow:0 12px 26px -12px rgba(11,42,59,.6),inset 0 1px 0 rgba(255,255,255,.14)}
+.btn.ghost{background-image:none;box-shadow:0 6px 16px -12px rgba(11,42,59,.4)}
+.btn:not(:disabled):active{transform:translateY(1px)}
+/* Reveal-all button — ink outline, subtle lift */
+.reveal-now{transition:.15s;box-shadow:0 6px 16px -12px rgba(11,42,59,.4)}
+.reveal-now:hover{background:var(--pale)}
+.reveal-now:active{transform:translateY(1px)}
+/* Back chip — quiet but tappable */
+.backchip{transition:color .15s}
+.backchip:hover{color:var(--ink)}
+/* Festive sparkle beside the gallery headline */
+.festtitle{display:inline-flex;align-items:center;gap:10px}
+.festtitle .spk{color:var(--warm);font-size:.62em;line-height:1;filter:drop-shadow(0 1px 4px rgba(251,191,36,.45));transform:translateY(-.18em)}
+.denom.on{box-shadow:inset 0 0 0 1px var(--pri),0 6px 14px -8px rgba(14,165,233,.5)}
+.regionbar{box-shadow:inset 0 0 0 1px rgba(251,191,36,.28)}
+
+/* ── control geometry ──────────────────────────────────────────────
+   A control styled with padding but no height takes the browser's default,
+   which differs per control type — that is why a select used to sit proud of
+   the input beside it, and why the native arrow was jammed against the edge.
+   The arrow is drawn here, so the room for it is reserved here.            */
+select{
+  height:var(--ctl-h,42px);
+  -webkit-appearance:none;-moz-appearance:none;appearance:none;
+  padding-right:32px;padding-left:12px;
+  background-image:url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 L6 6.5 L11 1.5' fill='none' stroke='%2362707A' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;
+  font-size:var(--fs-body,14px);color:var(--ink,#0B2A3B);line-height:normal;
+}
+select::-ms-expand{display:none}
+[dir="rtl"] select{padding-right:12px;padding-left:32px;background-position:left 12px center}
+input[type="text"],input[type="number"],input[type="tel"],input[type="email"],input[type="date"]{
+  height:var(--ctl-h,42px);font-size:var(--fs-body,14px);line-height:normal;
+}
+textarea{font-size:var(--fs-body,14px);line-height:1.6}
+
+/* ── the screen switcher is NAVIGATION, not debug chrome ───────────
+   It was 10px white at 40% on the dark bar: 3.35:1, below AA and unreadable,
+   which is why its destinations could not be found. Now 11.5px at 72% (7.18:1)
+   with a solid active pill, so it reads as what it is.                      */
+.sl-sim-btn{font-size:11.5px !important;font-weight:700 !important;padding:5px 13px !important;
+  color:rgba(255,255,255,.72) !important;background:rgba(255,255,255,.09) !important;
+  min-height:26px;white-space:nowrap}
+.sl-sim-btn:hover{background:rgba(255,255,255,.18) !important;color:#FFFFFF !important}
+.sl-sim-btn.on{background:#FFFFFF !important;color:#0B2A3B !important}
+.sl-sim-lbl{font-size:10px !important;color:rgba(255,255,255,.60) !important}
+
+/* ── mobile: every screen must be usable and complete on a phone ───
+   Nothing is hidden to make it fit. Rows wrap, tables scroll inside their own
+   box rather than pushing the page sideways, and touch targets keep their size. */
+@media (max-width:767px){
+  /* A control pushed past the edge is a control that does not exist.
+     Inline flex rows wrap, and auto-margin spacers stop shoving the last item
+     off-screen — which is what hid "simulate issue" on a narrow window. */
+  [style*="display:flex"]{flex-wrap:wrap !important}
+  [style*="margin-left:auto"]{margin-left:0 !important}
+  [dir="rtl"] [style*="margin-right:auto"]{margin-right:0 !important}
+  .sl-modal{width:auto !important;max-width:calc(100vw - 20px)}
+
+  /* the sidebar is handled by this module's own 767px rules — not duplicated here */
+  .sl-main,.sl-scroll{padding-left:12px !important;padding-right:12px !important}
+  .sl-sim{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:nowrap}
+  .card{border-radius:11px}
+  select,input[type="text"],input[type="number"],input[type="tel"],input[type="email"]{
+    min-height:44px;font-size:16px}          /* 16px stops iOS zooming on focus */
+  button{min-height:40px}
+}
+@media (max-width:560px){
+  .sl-scroll,.sl-main{padding-left:10px !important;padding-right:10px !important}
+  .figure{font-size:22px !important}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="top">
+    <span class="brand">Shopy<span class="dot">Link</span></span>
+    <span class="tag">Gift cards · country → store → amount → price · states-first</span>
+    <div class="controls">
+      <div class="seg" id="lang"><button data-l="en" class="on">EN</button><button data-l="ar">عربي</button></div>
+      <div class="seg" id="mode"><button data-m="walk" class="on">Walkthrough</button><button data-m="gallery">All states</button></div>
+    </div>
+  </div>
+  <div class="hint" id="hint"></div>
+  <div id="view"></div>
+</div>
+
+<script>
+function slNum(n,dec){
+ // No Intl: the legacy engine may not have it, and toLocaleString drops trailing zeros.
+ var v=Number(n); if(!isFinite(v))v=0;
+ var neg=v<0; v=Math.abs(v);
+ var s2=dec?(Math.round(v*100)/100).toFixed(2):String(Math.round(v));
+ var p=s2.split('.'), whole=p[0], out='', i, c=0;
+ for(i=whole.length-1;i>=0;i--){out=whole.charAt(i)+out;c++;if(c%3===0&&i>0)out=','+out;}
+ return (neg?'-':'')+out+(dec?'.'+p[1]:'');
+}
+
+/* ── ShopyLink icons ────────────────────────────────────────────────
+   One family, one 1.7 stroke, 16px, outline, currentColor. Drawn here because
+   an emoji is rendered by the device, not by us — the same character is a
+   different picture on Android, Windows and iOS, which is how the wrong flag
+   reached a customer. These do not move between machines.                */
+/* ── option sets that grow ──────────────────────────────────────────
+   A row of pressable chips reads well at five and becomes a wall at twenty.
+   slPicker() paints chips while the set is small and switches to a searchable
+   list once it is not — the same control, the same handler, one decision made
+   by the data rather than by the day it was written.                        */
+var SL_CHIP_MAX=7;                 /* above this, chips stop being scannable */
+var SL_PICK_Q={};                  /* the search box per picker, by id */
+function slPickQ(id,v){SL_PICK_Q[id]=v;render();}
+function slPicker(id,items,current,onpick,opts){
+  opts=opts||{};
+  var all=items||[], i, h='';
+  var lbl=function(x){return opts.label?opts.label(x):(x.name||x.label||x.id||String(x));};
+  var val=function(x){return opts.value?opts.value(x):(x.id!==undefined?x.id:String(x));};
+  /* A choice is made from a dropdown, never from the whole set laid out on the page.
+     Five options or five hundred, the control is the same size and the page does not
+     change shape as the business grows. The native select carries its own search on
+     every platform, and our control-geometry rule already gives it a height and an arrow. */
+  h+='<select onchange="if(this.value){'+onpick.replace('{v}',"'+this.value+'")+'}" '
+   +'style="min-width:'+(opts.width||'220px')+';max-width:100%;border:1.5px solid rgba(11,42,59,.15);'
+   +'border-radius:10px;font-family:var(--body);background:#FFFFFF">';
+  if(opts.blank)h+='<option value="">'+opts.blank+'</option>';
+  for(i=0;i<all.length;i++){
+    var v=val(all[i]);
+    h+='<option value="'+String(v).replace(/"/g,'&quot;')+'"'+(v===current?' selected':'')+'>'
+      +String(lbl(all[i])).replace(/<[^>]*>/g,'')+'</option>';
+  }
+  h+='</select>';
+  if(opts.add)h+=' <button onclick="'+opts.add+'" style="cursor:pointer;font-family:var(--body);font-size:var(--fs-hint);font-weight:800;padding:0 14px;height:var(--ctl-h);border-radius:10px;border:1.5px dashed rgba(14,165,233,.55);background:#F4FBFF;color:#0A4A6B">+ '+(opts.addLabel||t('add'))+'</button>';
+  if(opts.count===true)h+=' <span class="hint machine" style="margin-'+(currentLang==='ar'?'right':'left')+':8px">'+all.length+'</span>';
+  return h;
+}
+function slMultiPicker(id,items,isOn,onToggle,opts){
+  opts=opts||{};
+  var all=items||[], q=String(SL_PICK_Q[id]||'').toLowerCase(), i, h='';
+  var lbl=function(x){return opts.label?opts.label(x):(x.name||x.label||String(x));};
+  var val=function(x){return opts.value?opts.value(x):(x.id!==undefined?x.id:String(x));};
+  var chosen=[]; for(i=0;i<all.length;i++){if(isOn(all[i]))chosen.push(all[i]);}
+  var chip=function(x,on){
+    return '<button onclick="'+onToggle.replace('{v}',val(x))+'" style="cursor:pointer;font-family:var(--body);font-size:var(--fs-hint);font-weight:800;'
+     +'padding:7px 13px;border-radius:999px;border:1.5px solid '+(on?'#0A7250':'rgba(11,42,59,.14)')+';'
+     +'background:'+(on?'#DCF5E9':'#FFFFFF')+';color:'+(on?'#0A7250':'#0B2A3B')+'">'+(on?'&#10003; ':'')+lbl(x)+'</button>';
+  };
+  if(all.length<=SL_CHIP_MAX&&!q){
+    h+='<div style="display:flex;gap:6px;flex-wrap:wrap">';
+    for(i=0;i<all.length;i++)h+=chip(all[i],isOn(all[i]));
+    return h+'</div>';
+  }
+  var hits=[]; for(i=0;i<all.length;i++){if(!q||String(lbl(all[i])).toLowerCase().indexOf(q)>-1)hits.push(all[i]);}
+  var shown=hits.slice(0,SL_CHIP_MAX);
+  h+='<div>';
+  if(chosen.length){
+    h+='<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:7px">';
+    for(i=0;i<Math.min(chosen.length,SL_CHIP_MAX);i++)h+=chip(chosen[i],true);
+    if(chosen.length>SL_CHIP_MAX)h+='<span class="hint" style="align-self:center">+'+(chosen.length-SL_CHIP_MAX)+'</span>';
+    h+='</div>';
+  }
+  h+='<input type="text" value="'+String(SL_PICK_Q[id]||'').replace(/"/g,'&quot;')+'" oninput="slPickQ(\''+id+'\',this.value)" '
+   +'placeholder="'+(opts.placeholder||t('search'))+'" style="width:100%;max-width:280px;border:1.5px solid rgba(11,42,59,.15);'
+   +'border-radius:9px;padding:0 11px;font-family:var(--body);font-size:var(--fs-body);background:#FFFFFF">'
+   +'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:7px">';
+  for(i=0;i<shown.length;i++)h+=chip(shown[i],isOn(shown[i]));
+  h+='</div><div class="hint" style="margin-top:5px">'
+   +t('chosen')+' <span class="machine">'+chosen.length+'</span> '+t('of')+' <span class="machine">'+all.length+'</span>'
+   +(hits.length>shown.length?' · '+t('keep typing to narrow it'):'')+'</div></div>';
+  return h;
+}
+
+var SL_ICONS={
+ hub:'<path d="M3 20h18M5 20V9l7-5 7 5v11M9 20v-5h6v5"/>',
+ city:'<path d="M3 21V9l5-3v4l5-3v14"/><path d="M13 21V11l6-3v13"/><path d="M6 12h1M6 15h1M6 18h1M16 12h1M16 15h1M16 18h1"/>',
+ blocked:'<circle cx="12" cy="12" r="8.5"/><path d="M6 6l12 12"/>',
+
+ idcard:'<rect x="2.5" y="5" width="19" height="14" rx="2.4"/><circle cx="8.5" cy="11" r="2.2"/><path d="M5 16.2a3.8 3.8 0 0 1 7 0M14 10h4M14 13.5h4"/>',
+ key:'<circle cx="8" cy="12" r="4"/><path d="M12 12h9M17.5 12v3M20.5 12v2.2"/>',
+ shield:'<path d="M12 3 5 6v6c0 4 3 6.7 7 8 4-1.3 7-4 7-8V6z"/><path d="M9 12l2 2 4-4"/>',
+
+ compass:'<circle cx="12" cy="12" r="9"/><path d="M15.5 8.5 13.5 13.5 8.5 15.5 10.5 10.5z"/>',
+ ruler:'<path d="M3.5 14.5 14.5 3.5l6 6-11 11z"/><path d="M7 11l2 2M10 8l2 2M13 5l2 2"/>',
+ depart:'<path d="M3 20h18"/><path d="M4 14.5 6.5 15 10 11 5.5 5.5l2.5-.5 6 4.5 4.5-1a2 2 0 1 1 .8 3.4L6.5 17z"/>',
+ abacus:'<rect x="3.5" y="3.5" width="17" height="17" rx="2"/><path d="M3.5 9h17M3.5 14.5h17M9 3.5v17M15 3.5v17"/>',
+ folders:'<path d="M3 8h6l2 2h10v9H3z"/><path d="M6 8V5h5l2 2"/>',
+ scroll:'<path d="M6 4h11v14a2.5 2.5 0 0 0 2.5 2.5H8A2.5 2.5 0 0 1 5.5 18V6"/><path d="M9 8h5M9 12h5"/>',
+ tag:'<path d="M11 3H4.5v6.5L14 19l6.5-6.5z"/><circle cx="8" cy="7" r="1.4"/>',
+ people:'<circle cx="9" cy="8" r="3.2"/><path d="M2.5 19a6.5 6.5 0 0 1 13 0"/><path d="M16 5.5a3.2 3.2 0 0 1 0 6M17.5 19a6 6 0 0 0-2-4.4"/>',
+ tools:'<path d="M14.5 6.5a3.5 3.5 0 1 0 4 4L21 13l-8 8-2.5-2.5"/><path d="M9 4 4 9l3.5 3.5L12.5 7.5z"/>',
+ bank:'<path d="M3 9.5 12 4l9 5.5"/><path d="M5 9.5V19M9.5 9.5V19M14.5 9.5V19M19 9.5V19M3 19h18"/>',
+ clipboard:'<rect x="5" y="4.5" width="14" height="16" rx="2"/><path d="M9 4.5V3h6v1.5"/><path d="M9 10h6M9 14h6"/>',
+ export:'<path d="M12 3v11M8 7l4-4 4 4"/><path d="M4 15v4h16v-4"/>',
+ gift:'<rect x="3" y="9" width="18" height="11" rx="1.6"/><path d="M3 13h18M12 9v11"/><path d="M12 9C10 5.5 6 6 6 8.2 6 9.4 8 9 12 9zM12 9c2-3.5 6-3 6-.8 0 1.2-2 .8-6 .8z"/>',
+ home:'<path d="M3.5 11 12 4l8.5 7"/><path d="M6 10.5V20h12v-9.5"/><path d="M10 20v-5h4v5"/>',
+ flask:'<path d="M10 3v6L4.5 18.5A2 2 0 0 0 6.3 21.5h11.4a2 2 0 0 0 1.8-3L14 9V3"/><path d="M9 3h6M7.5 15h9"/>',
+ trophy:'<path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4.5v1.5A3 3 0 0 0 7 10.4M17 6h2.5v1.5A3 3 0 0 1 17 10.4"/><path d="M12 14v3M8.5 20h7"/>',
+
+ plane:'<path d="M2.5 13.5 21 5l-4 9 4 9-18.5-8.5" /><path d="M8 11.6 8 6"/>',
+ ship:'<path d="M3 17.5c1.6 1 3.2 1 4.8 0s3.2-1 4.8 0 3.2 1 4.8 0 3.2-1 4.8 0"/><path d="M5 14l1.4-5h11.2L19 14"/><path d="M12 4v5"/>',
+ truck:'<path d="M2 16V6h11v10"/><path d="M13 9h4l4 4v3h-8"/><circle cx="6.5" cy="17.5" r="1.8"/><circle cx="17.5" cy="17.5" r="1.8"/>',
+ box:'<path d="M12 3 3 7.5V17l9 4.5 9-4.5V7.5z"/><path d="M3 7.5 12 12l9-4.5M12 12v9.5"/>',
+ pin:'<path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.6"/>',
+ person:'<circle cx="12" cy="8" r="3.6"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/>',
+ handshake:'<path d="M3 12.5 7 8.5l3 2.5 3-2.5 4 4"/><path d="M10 15.5 12 17.5l2-2 2 2"/><path d="M2 9.5 5.5 6M22 9.5 18.5 6"/>',
+ lock:'<rect x="4.5" y="10.5" width="15" height="9.5" rx="2.2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/>',
+ search:'<circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/>',
+ card:'<rect x="2.5" y="5" width="19" height="14" rx="2.6"/><path d="M2.5 10h19"/>',
+ camera:'<rect x="2.5" y="7" width="19" height="13" rx="2.4"/><circle cx="12" cy="13.5" r="4"/><path d="M8.5 7l1.5-3h4l1.5 3"/>',
+ globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.2 3 14.8 0 18M12 3c-3 3.2-3 14.8 0 18"/>',
+ bolt:'<path d="M13.5 2 5 13.5h6L10.5 22 19 10.5h-6z"/>',
+ scale:'<path d="M12 4v16M6 20h12M12 6 4 10M12 6l8 4"/><path d="M1.5 10.5a2.5 2.5 0 0 0 5 0M17.5 10.5a2.5 2.5 0 0 0 5 0"/>',
+ customs:'<rect x="3" y="9" width="18" height="11" rx="1.8"/><path d="M3 13h18M8 9V5h8v4"/>',
+ factory:'<path d="M3 20V11l5 3V11l5 3V6h8v14z"/><path d="M17 11v3M20 11v3"/>',
+ map:'<path d="M9 4 3 6.5v13L9 17l6 2.5 6-2.5v-13L15 6.5z"/><path d="M9 4v13M15 6.5v13"/>',
+ bell:'<path d="M6 9a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6z"/><path d="M10 19.5a2.2 2.2 0 0 0 4 0"/>',
+ clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5.4l3.4 2"/>',
+ doc:'<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/>',
+ chat:'<path d="M4 5h16v11H9l-5 4z"/>',
+ gear:'<circle cx="12" cy="12" r="3.2"/><path d="M12 3v2.4M12 18.6V21M3 12h2.4M18.6 12H21M5.6 5.6l1.7 1.7M16.7 16.7l1.7 1.7M18.4 5.6l-1.7 1.7M7.3 16.7l-1.7 1.7"/>',
+ palm:'<path d="M12 21V11"/><path d="M12 11c-3-3-6-2.5-8-1 1.5-4 5.5-5 8-2 2.5-3 6.5-2 8 2-2-1.5-5-2-8 1z"/>',
+ flag:'<path d="M6 21V4M6 4h11l-2.2 3.5L17 11H6"/>',
+ printer:'<path d="M7 9V3h10v6"/><rect x="3.5" y="9" width="17" height="7" rx="1.8"/><path d="M7 14h10v7H7z"/>'
+};
+function slIcon(name,size,stroke){
+ var p=SL_ICONS[name];
+ if(!p)return '';
+ var s=size||16;
+ return '<svg viewBox="0 0 24 24" width="'+s+'" height="'+s+'" fill="none" stroke="currentColor" '
+  +'stroke-width="'+(stroke||1.7)+'" stroke-linecap="round" stroke-linejoin="round" '
+  +'style="vertical-align:-0.18em;flex-shrink:0" aria-hidden="true">'+p+'</svg>';
+}
+
+function _slicedToArray(r, e) { return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest(); }
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(r, a) { if (r) { if ("string" == typeof r) return _arrayLikeToArray(r, a); var t = {}.toString.call(r).slice(8, -1); return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0; } }
+function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length); for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e]; return n; }
+function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t.return && (u = t.return(), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
+function _arrayWithHoles(r) { if (Array.isArray(r)) return r; }
+if (!Array.prototype.find) {
+  Array.prototype.find = function (fn, th) {
+    for (var i = 0; i < this.length; i++) {
+      if (fn.call(th, this[i], i, this)) return this[i];
+    }
+    return undefined;
+  };
+}
+if (!Array.prototype.findIndex) {
+  Array.prototype.findIndex = function (fn, th) {
+    for (var i = 0; i < this.length; i++) {
+      if (fn.call(th, this[i], i, this)) return i;
+    }
+    return -1;
+  };
+}
+var RATE = {
+    USD: 14700,
+    AED: 4010,
+    TRY: 430,
+    CNY: 2030
+  } /* managed EXCHANGE_RATE (admin-maintained per currency, not live) */,
+  MARGIN = 0.06 /* sale_price = stored snapshot of cost×rate+margin; computed inline here for demo only */; // illustrative SYP per unit (incl. markup)
+var fmt = function fmt(n) {
+  return slNum(n,0);
+};
+var COUNTRIES = [{
+  code: 'USA',
+  flag: '🇺🇸',
+  cur: 'USD',
+  sym: '$',
+  ar: 'أمريكا'
+}, {
+  code: 'UAE',
+  flag: '🇦🇪',
+  cur: 'AED',
+  sym: 'AED',
+  ar: 'الإمارات'
+}, {
+  code: 'Turkey',
+  flag: '🇹🇷',
+  cur: 'TRY',
+  sym: '₺',
+  ar: 'تركيا'
+}, {
+  code: 'China',
+  flag: '🇨🇳',
+  cur: 'CNY',
+  sym: '¥',
+  ar: 'الصين'
+}];
+var STORES = {
+  USA: [['Amazon', '#232F3E', '#FF9900', 'shopping'], ['App Store', '#0A84FF', '#fff', 'apps'], ['Google Play', '#01875F', '#fff', 'apps'], ['PlayStation', '#0070D1', '#fff', 'gaming'], ['Steam', '#1B2838', '#66C0F4', 'gaming'], ['Nike', '#111111', '#fff', 'fashion']],
+  UAE: [['Noon', '#FEEE00', '#0B2A3B', 'shopping'], ['Amazon.ae', '#232F3E', '#FF9900', 'shopping'], ['Namshi', '#111111', '#fff', 'fashion'], ['Apple', '#1D1D1F', '#fff', 'apps'], ['Careem', '#3FB549', '#fff', 'travel'], ['Sharaf DG', '#E4002B', '#fff', 'electronics']],
+  Turkey: [['Trendyol', '#F27A1A', '#fff', 'shopping'], ['Steam', '#1B2838', '#66C0F4', 'gaming'], ['Apple', '#1D1D1F', '#fff', 'apps'], ['Hepsiburada', '#FF6000', '#fff', 'electronics']],
+  China: [['Taobao', '#FF4400', '#fff', 'shopping'], ['JD.com', '#E1251B', '#fff', 'shopping'], ['Apple', '#1D1D1F', '#fff', 'apps'], ['Steam', '#1B2838', '#66C0F4', 'gaming']]
+};
+var CATEGORIES = [['all', 'All', 'الكل'], ['shopping', 'Shopping', 'تسوّق'], ['gaming', 'Gaming', 'ألعاب'], ['apps', 'Apps & Media', 'تطبيقات ووسائط'], ['travel', 'Travel', 'سفر'], ['electronics', 'Electronics', 'إلكترونيات'], ['fashion', 'Fashion', 'أزياء']];
+var DENOMS = {
+  USD: [10, 25, 50, 100],
+  AED: [50, 100, 200, 500],
+  TRY: [100, 250, 500, 1000],
+  CNY: [50, 100, 200, 500]
+};
+var T = {
+  en: {
+    tag: 'Gift cards',
+    g_h: 'Gift cards',
+    g_s: 'Store credit at the speed of a tap — the code lands in seconds. No courier, no customs, no waiting by the door.',
+    search: 'Search cards',
+    noResults: 'No cards match',
+    noResultsSub: 'Spelling is hard. Try another word or category.',
+    regionMsg: "Gift cards are homebodies: each one only works in its own country's store. A USA card won't spend a dirham in the UAE — so pick where you'll shop.",
+    chooseCountry: 'Choose a country',
+    regionBar: function regionBar(c) {
+      return "".concat(c, " cards \xB7 only work in ").concat(c, " stores");
+    },
+    change: 'Change',
+    region2: function region2(c) {
+      return "This card only works in ".concat(c, ".");
+    },
+    from: function from(c) {
+      return "from ".concat(c);
+    },
+    empty: 'No stores here yet',
+    emptySub: 'This country is still unpacking — more land soon. Try another for now.',
+    offline: "You're offline — we'll keep trying the second you're back.",
+    choose: 'Choose amount',
+    youpay: 'You pay',
+    selectAmt: 'Pick an amount to see your price',
+    face: function face(f) {
+      return "".concat(f, " face value");
+    },
+    qty: 'Quantity',
+    buy: 'Buy now',
+    oos: 'Sold out',
+    pay_h: 'Pay',
+    order: 'Order',
+    total: 'Total',
+    method: 'Payment method',
+    m_sham: 'ShamCash',
+    m_pay: 'Paymera',
+    m_bank: 'Bank transfer',
+    payNow: function payNow(s) {
+      return "Pay ".concat(s, " SYP");
+    },
+    declined: "Your payment wasn't approved. Try again or use another method.",
+    failed: "We couldn't confirm your payment and you weren't charged. Please try again.",
+    prov: 'Issuing your card…',
+    provSub: 'Hang tight — this takes a few seconds.',
+    paid: 'Payment received',
+    revealH: 'Your card is ready to spend',
+    reveal: 'Reveal code',
+    once: "Shown once, then it's gone for good — copy it now.",
+    copy: 'Copy',
+    copied: 'Copied',
+    done: 'Done',
+    buyAnother: 'Buy another',
+    pending: 'Confirming your payment',
+    pendingSub: "This can take a moment — we'll notify you when it's done.",
+    provfail: 'Issue generating your card',
+    provfailSub: "We're retrying and you won't be charged twice. We'll message you shortly.",
+    retry: 'Try again',
+    back: 'Back'
+  },
+  ar: {
+    tag: 'بطاقات الهدايا',
+    g_h: 'بطاقات الهدايا',
+    g_s: 'اشترِ رصيد متاجر — يصلك الرمز خلال ثوانٍ.',
+    search: 'ابحث عن بطاقة',
+    noResults: 'لا بطاقات مطابقة',
+    noResultsSub: 'جرّب كلمة أو فئة أخرى.',
+    regionMsg: 'بطاقات الهدايا تعمل فقط في متجر دولتها — اختر أين ستنفقها. بطاقة أمريكا لا تعمل في متجر إماراتي.',
+    chooseCountry: 'اختر الدولة',
+    regionBar: function regionBar(c) {
+      return "\u0628\u0637\u0627\u0642\u0627\u062A ".concat(c, " \xB7 \u062A\u0639\u0645\u0644 \u0641\u0642\u0637 \u0641\u064A \u0645\u062A\u0627\u062C\u0631 ").concat(c);
+    },
+    change: 'تغيير',
+    region2: function region2(c) {
+      return "\u0647\u0630\u0647 \u0627\u0644\u0628\u0637\u0627\u0642\u0629 \u062A\u0639\u0645\u0644 \u0641\u0642\u0637 \u0641\u064A ".concat(c, ".");
+    },
+    from: function from(c) {
+      return "\u0645\u0646 ".concat(c);
+    },
+    empty: 'لا متاجر هنا بعد',
+    emptySub: 'جرّب دولة أخرى — المزيد قادم.',
+    offline: 'أنت غير متصل — سنعيد المحاولة عند عودتك.',
+    choose: 'اختر القيمة',
+    youpay: 'تدفع',
+    selectAmt: 'اختر قيمة بالأعلى',
+    face: function face(f) {
+      return "\u0627\u0644\u0642\u064A\u0645\u0629 ".concat(f);
+    },
+    qty: 'الكمية',
+    buy: 'اشترِ الآن',
+    oos: 'نفد',
+    pay_h: 'الدفع',
+    order: 'الطلب',
+    total: 'الإجمالي',
+    method: 'طريقة الدفع',
+    m_sham: 'شام كاش',
+    m_pay: 'Paymera',
+    m_bank: 'تحويل بنكي',
+    payNow: function payNow(s) {
+      return "\u0627\u062F\u0641\u0639 ".concat(s, " \u0644.\u0633");
+    },
+    declined: 'لم تتم الموافقة على دفعتك. حاول مجددًا أو استخدم طريقة أخرى.',
+    failed: 'تعذّر تأكيد الدفع ولم يتم خصم أي مبلغ. حاول مجددًا.',
+    prov: 'جارٍ إصدار بطاقتك…',
+    provSub: 'يستغرق ثوانٍ قليلة.',
+    paid: 'تم استلام الدفعة',
+    revealH: 'بطاقتك جاهزة',
+    reveal: 'كشف الرمز',
+    once: 'يُعرض مرّة واحدة للأمان — انسخه الآن.',
+    copy: 'نسخ',
+    copied: 'تم النسخ',
+    done: 'تم',
+    buyAnother: 'اشترِ أخرى',
+    pending: 'جارٍ تأكيد دفعتك',
+    pendingSub: 'قد يستغرق لحظات — سنُعلمك عند الانتهاء.',
+    provfail: 'تعذّر إصدار البطاقة',
+    provfailSub: 'نعيد المحاولة ولن يُخصم منك مرتين. سنراسلك قريبًا.',
+    retry: 'إعادة المحاولة',
+    back: 'رجوع'
+  }
+};
+var st = {
+  lang: 'en',
+  mode: 'walk',
+  step: 1,
+  variant: 'default',
+  country: null,
+  store: 0,
+  denom: 1,
+  qty: 1,
+  method: 0,
+  revealed: false,
+  query: '',
+  category: 'all'
+};
+var ic = {
+  back: '<svg width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M6 1L1 6l5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  backR: '<svg width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M1 1l5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  warn: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 9v4M12 17h.01M10.3 3.9 2.4 18a2 2 0 001.7 3h15.8a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  check: '<svg width="36" height="36" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  off: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M1 1l22 22M16.7 11.1a6 6 0 00-2-1.4M5 12.5A10 10 0 018 11M8.5 16a5 5 0 015-1M12 20h.01" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>'
+};
+function sb() {
+  return "<div class=\"sb\"><span>9:41</span><span>\u25CF\u25CF\u25CF \u25AE</span></div>";
+}
+function backBtn(t) {
+  return "<button class=\"backchip\">".concat(st.lang === 'ar' ? ic.backR : ic.back).concat(t.back, "</button>");
+}
+function sypFor(face, cur) {
+  return Math.round(face * RATE[cur] * (1 + MARGIN));
+} /* DEV: real sale_price is stored on CARD_DENOMINATION, not recomputed live */
+
+function gridInner(lang, q, cat) {
+  var t = T[lang],
+    co = COUNTRIES.find(function (c) {
+      return c.code === st.country;
+    });
+  var list = STORES[st.country].map(function (s, i) {
+    return {
+      s: s,
+      i: i
+    };
+  }).filter(function (_ref) {
+    var s = _ref.s;
+    return (cat === 'all' || s[3] === cat) && (!q || s[0].toLowerCase().includes(q.toLowerCase()));
+  });
+  if (!list.length) return "<div class=\"empty\"><div class=\"big\">\uD83D\uDD0E</div><div style=\"font-weight:700;color:var(--ink);margin-bottom:4px\">".concat(t.noResults, "</div>").concat(t.noResultsSub, "</div>");
+  return "<div class=\"grid2\">" + list.map(function (_ref2) {
+    var s = _ref2.s,
+      i = _ref2.i;
+    var min = sypFor(DENOMS[co.cur][0], co.cur);
+    return "<div class=\"stile\" data-s=\"".concat(i, "\"><div class=\"badge\" style=\"background-color:").concat(s[1], ";color:").concat(s[2], "\">").concat(s[0], "</div><div class=\"meta\"><div class=\"nm\">").concat(s[0], "</div><div class=\"from\">").concat(t.from(fmt(min) + ' SYP'), "</div></div></div>");
+  }).join('') + "</div>";
+}
+function body(step, variant, lang) {
+  var t = T[lang],
+    off = variant === 'offline';
+  var offBar = off ? "<div class=\"offline\">".concat(ic.off).concat(t.offline, "</div>") : '';
+  var ctaLoad = variant === 'load' ? 'load' : '';
+  var co = COUNTRIES.find(function (c) {
+    return c.code === st.country;
+  });
+  var stores = co ? STORES[st.country] : [];
+  var store = stores[st.store] || ['', '#0B2A3B', '#fff', 'shopping'];
+  var denoms = co ? DENOMS[co.cur] : [10];
+  var inner = '',
+    foot = '';
+  if (step === 1) {
+    // gallery
+    var smag = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+    if (variant === 'pickcountry' || !st.country) {
+      var tiles = COUNTRIES.map(function (c) {
+        var ex = STORES[c.code].slice(0, 3).map(function (s) {
+          return s[0];
+        }).join(' · ');
+        return "<div class=\"ctile\" data-c=\"".concat(c.code, "\"><div class=\"fl\">").concat(c.flag, "</div><div class=\"cn\">").concat(lang === 'ar' ? c.ar : c.code, "</div><div class=\"ex\">").concat(ex, " \u2026</div></div>");
+      }).join('');
+      inner = "".concat(backBtn(t), "<div class=\"eyebrow\">").concat(t.tag, "</div><h1 class=\"disp festtitle\">").concat(t.g_h, "<span class=\"spk\">\u2726</span></h1><p class=\"sub\">").concat(t.g_s, "</p>\n        <div class=\"banner warn\">").concat(ic.warn).concat(t.regionMsg, "</div>\n        <div class=\"seclabel\">").concat(t.chooseCountry, "</div>\n        <div class=\"grid2\">").concat(tiles, "</div>");
+      foot = '';
+    } else {
+      var co2 = COUNTRIES.find(function (c) {
+        return c.code === st.country;
+      });
+      var q = variant === 'search' ? 'app' : variant === 'noresults' ? 'zzzz' : st.query;
+      var cat = variant === 'category' ? 'gaming' : st.category;
+      var cats = CATEGORIES.map(function (c) {
+        return "<div class=\"catchip ".concat(c[0] === cat ? 'on' : '', "\" data-cat=\"").concat(c[0], "\">").concat(lang === 'ar' ? c[2] : c[1], "</div>");
+      }).join('');
+      var grid;
+      if (variant === 'loading') {
+        grid = "<div class=\"grid2\">" + Array(6).fill(0).map(function () {
+          return "<div class=\"stile\"><div class=\"badge skel\" style=\"background:#eef2f5\"></div><div class=\"meta\"><div class=\"nm skel\" style=\"height:13px;border-radius:4px\"></div><div class=\"from skel\" style=\"height:11px;width:60%;border-radius:4px;margin-top:6px\"></div></div></div>";
+        }).join('') + "</div>";
+      } else if (variant === 'empty') {
+        grid = "<div class=\"empty\"><div class=\"big\">\uD83D\uDDFA\uFE0F</div><div style=\"font-weight:700;color:var(--ink);margin-bottom:4px\">".concat(t.empty, "</div>").concat(t.emptySub, "</div>");
+      } else {
+        grid = gridInner(lang, q, cat);
+      }
+      inner = "".concat(backBtn(t), "<div class=\"eyebrow\">").concat(t.tag, "</div><h1 class=\"disp festtitle\">").concat(t.g_h, "<span class=\"spk\">\u2726</span></h1>\n        <div class=\"regionbar\"><span class=\"flag\">").concat(co2.flag, "</span>").concat(t.regionBar(lang === 'ar' ? co2.ar : st.country), "<span class=\"change\">").concat(t.change, "</span></div>\n        <div class=\"searchbar\">").concat(smag, "<input id=\"cardsearch\" placeholder=\"").concat(t.search, "\" value=\"").concat(variant === 'search' || variant === 'noresults' ? q : st.query, "\"></div>\n        <div class=\"catchips\">").concat(cats, "</div>\n        <div id=\"grid\">").concat(grid, "</div>");
+      foot = '';
+    }
+  } else if (step === 2) {
+    // store + amount + price
+    var oosIdx = variant === 'oos' ? 3 : -1;
+    var sel = variant === 'empty' ? -1 : st.denom;
+    var priceLoad = variant === 'load';
+    var dchips = denoms.map(function (d, i) {
+      return "<div class=\"denom ".concat(i === sel ? 'on' : '', " ").concat(i === oosIdx ? 'oos' : '', "\" data-d=\"").concat(i, "\"><div class=\"face\">").concat(co.sym).concat(fmt(d), "</div><div class=\"syp\">").concat(i === oosIdx ? t.oos : fmt(sypFor(d, co.cur)) + ' SYP', "</div></div>");
+    }).join('');
+    var price = sel < 0 ? "<div class=\"pricebox muted\">".concat(t.selectAmt, "</div>") : "<div class=\"pricebox\"><div><div class=\"l\">".concat(t.youpay, "</div><div class=\"big\">").concat(fmt(sypFor(denoms[sel], co.cur) * st.qty), " SYP</div></div><div class=\"face2\">").concat(co.sym).concat(fmt(denoms[sel])).concat(st.qty > 1 ? ' ×' + st.qty : '', "</div></div>");
+    inner = "".concat(backBtn(t), "\n      <div class=\"hero\" style=\"background-color:").concat(store[1], ";color:").concat(store[2], "\"><span class=\"reg\">").concat(lang === 'ar' ? co.ar : st.country, " \xB7 gift card</span><span class=\"heroname\">").concat(store[0], "</span></div>\n      <div class=\"banner warn\">").concat(ic.warn).concat(t.region2(lang === 'ar' ? co.ar : st.country), "</div>\n      <div class=\"seclabel\">").concat(t.choose, "</div>\n      <div class=\"denoms\">").concat(dchips, "</div>\n      ").concat(price, "\n      <div class=\"qty\"><span class=\"lab\">").concat(t.qty, "</span><button data-q=\"-1\">\u2212</button><span class=\"n\">").concat(st.qty, "</span><button data-q=\"1\">+</button></div>");
+    foot = "<button class=\"btn ".concat(ctaLoad, "\" ").concat(sel < 0 ? 'disabled' : '', ">").concat(t.buy, "</button>");
+  } else if (step === 3) {
+    // pay
+    var tot = sypFor(denoms[st.denom], co.cur) * st.qty;
+    var methods = [t.m_sham, t.m_pay, t.m_bank];
+    var bad = variant === 'declined',
+      fail = variant === 'failed';
+    var pm = methods.map(function (m, i) {
+      return "<div class=\"pmethod ".concat(i === st.method ? 'on' : '', "\" data-m=\"").concat(i, "\"><div class=\"ico\">").concat(m[0], "</div><div class=\"nm\">").concat(m, "</div><div class=\"rad\"></div></div>");
+    }).join('');
+    inner = "".concat(backBtn(t), "<div class=\"eyebrow\">").concat(t.pay_h, "</div><h1 class=\"disp\">").concat(t.pay_h, "</h1>\n      ").concat(bad ? "<div class=\"banner bad\">".concat(ic.warn).concat(t.declined, "</div>") : '').concat(fail ? "<div class=\"banner bad\">".concat(ic.warn).concat(t.failed, "</div>") : '', "\n      <div class=\"sumrow\"><span class=\"k\">").concat(store[0], " \xB7 ").concat(co.sym).concat(fmt(denoms[st.denom]), "</span><span class=\"v\">\xD7").concat(st.qty, "</span></div>\n      <div class=\"sumtot\"><span class=\"k\">").concat(t.total, "</span><span class=\"v\">").concat(fmt(tot), " SYP</span></div>\n      <div class=\"seclabel\">").concat(t.method, "</div>").concat(pm);
+    foot = "<button class=\"btn ".concat(ctaLoad, "\">").concat(t.payNow(fmt(tot)), "</button>");
+  } else if (step === 4) {
+    // reveal / outcome
+    var _tot = sypFor(denoms[st.denom], co.cur);
+    if (variant === 'prov') {
+      inner = "<div class=\"center\"><div class=\"spinbig\"></div><div class=\"h2\">".concat(t.prov, "</div><p class=\"ptext\">").concat(t.provSub, "</p></div>");
+      foot = '';
+    } else if (variant === 'pending') {
+      inner = "<div class=\"center\"><div class=\"spinbig\"></div><div class=\"h2\">".concat(t.pending, "</div><p class=\"ptext\">").concat(t.pendingSub, "</p></div>");
+      foot = '';
+    } else if (variant === 'provfail') {
+      inner = "<div class=\"center\"><div class=\"check\" style=\"background:var(--warm)\">".concat(ic.warn.replace(/width="14" height="14"/, 'width="34" height="34"').replace(/currentColor/g, '#fff'), "</div><div class=\"h2\">").concat(t.provfail, "</div><p class=\"ptext\">").concat(t.provfailSub, "</p></div>");
+      foot = "<button class=\"btn\" style=\"background:var(--warm);color:#3a2c00\">".concat(t.retry, "</button>");
+    } else {
+      // card ready — one code per quantity + exit/continue bar
+      var rv = st.revealed || variant === 'revealed';
+      var n = st.qty,
+        codes = ['XK4P-9M2Q-7W1Z', '7H2D-5K9P-3L8Q', '9F4G-2W7M-1Z6X', '4B8N-6Q3R-5T2Y', '2C7V-8J4K-6P1W', '5G9X-3M2N-7R4T', '1Z6Q-9W4D-2K8L', '8N3F-5T7G-4B2M', '6P1R-2X9V-3J7K', '4K8M-7G2W-5N1Z'];
+      var cards = '';
+      for (var i = 0; i < n; i++) {
+        cards += "<div class=\"revealcard\" style=\"background-color:".concat(store[1], ";color:").concat(store[2], "\"><div class=\"nm\">").concat(store[0]).concat(n > 1 ? " \xB7 ".concat(i + 1, " ").concat(lang === 'ar' ? 'من' : 'of', " ").concat(n) : '', "</div><div class=\"face\">").concat(t.face(co.sym + fmt(_tot)), "</div>").concat(rv ? "<div class=\"codebox\">".concat(codes[i], "<span class=\"copy\">").concat(t.copy, "</span></div>") : '', "</div>");
+      }
+      var revealBtn = rv ? '' : "<button class=\"reveal-now\">".concat(t.reveal).concat(n > 1 ? " \xB7 ".concat(n) : '', "</button>");
+      inner = "<div style=\"display:flex;flex-direction:column;align-items:center;text-align:center;padding-top:6px\"><div class=\"check\">".concat(ic.check, "</div><div style=\"font-size:12.5px;font-weight:700;color:var(--green);letter-spacing:.04em;text-transform:uppercase;margin-bottom:4px\">").concat(t.paid, "</div><div class=\"h2\">").concat(t.revealH, "</div></div>").concat(cards).concat(revealBtn).concat(rv ? "<div class=\"once\">".concat(t.once, "</div>") : '');
+      foot = "<div class=\"footrow\"><button class=\"btn ghost\" data-act=\"buy\">".concat(t.buyAnother, "</button><button class=\"btn\" data-act=\"done\">").concat(t.done, "</button></div>");
+    }
+  }
+  return {
+    offBar: offBar,
+    inner: inner,
+    foot: foot
+  };
+}
+function phoneHTML(step, variant, lang, framed) {
+  var b = body(step, variant, lang);
+  var rtl = lang === 'ar' ? 'rtl' : '';
+  var content = b.raw ? b.inner : "<div class=\"scr\">".concat(b.inner, "</div>");
+  var ph = "<div class=\"phone ".concat(rtl, "\">").concat(sb()).concat(b.offBar).concat(content).concat(b.foot ? "<div class=\"foot\">".concat(b.foot, "</div>") : '', "</div>");
+  return framed ? "<div class=\"framewrap\">".concat(ph, "</div>") : ph;
+}
+function renderWalk() {
+  document.getElementById('hint').innerHTML = "Browse by country, tap a store, pick an amount (price shows in SYP), pay, then reveal the code once. Chips below preview each state of the current screen.";
+  var variants = {
+    1: [['default', 'grid'], ['loading', 'loading'], ['empty', 'empty country'], ['offline', 'offline']],
+    2: [['default', 'amount picked'], ['empty', 'none picked'], ['oos', 'sold-out value'], ['load', 'buying…']],
+    3: [['default', 'methods'], ['load', 'processing…'], ['declined', 'declined'], ['failed', 'failed']],
+    4: [['default', 'card ready'], ['revealed', 'code revealed'], ['prov', 'issuing…'], ['pending', 'confirming'], ['provfail', 'issue + retry']]
+  }[st.step];
+  var sims = variants.map(function (_ref3) {
+    var _ref4 = _slicedToArray(_ref3, 2),
+      v = _ref4[0],
+      lab = _ref4[1];
+    return "<button class=\"".concat(st.variant === v ? 'on' : '', "\" data-v=\"").concat(v, "\">").concat(lab, "</button>");
+  }).join('');
+  document.getElementById('view').innerHTML = "<div class=\"stage\">".concat(phoneHTML(st.step, st.variant, st.lang, true), "</div>\n     <div class=\"simrow\">").concat(sims, "</div>\n     <div class=\"note\">screen ").concat(st.step, " of 4</div>");
+  // interactions
+  document.querySelectorAll('#view .ctile').forEach(function (b) {
+    return b.onclick = function () {
+      st.country = b.dataset.c;
+      st.store = 0;
+      st.denom = 1;
+      st.query = '';
+      st.category = 'all';
+      st.variant = 'default';
+      renderWalk();
+    };
+  });
+  var chg = document.querySelector('#view .change');
+  if (chg) chg.onclick = function () {
+    st.country = null;
+    st.variant = 'default';
+    renderWalk();
+  };
+  function bindTiles() {
+    document.querySelectorAll('#view .stile[data-s]').forEach(function (b) {
+      return b.onclick = function () {
+        st.store = +b.dataset.s;
+        st.step = 2;
+        st.variant = 'default';
+        renderWalk();
+      };
+    });
+  }
+  bindTiles();
+  var si = document.querySelector('#view #cardsearch');
+  if (si) si.oninput = function () {
+    st.query = si.value;
+    var g = document.getElementById('grid');
+    if (g) {
+      g.innerHTML = gridInner(st.lang, st.query, st.category);
+      bindTiles();
+    }
+  };
+  document.querySelectorAll('#view .catchip').forEach(function (b) {
+    return b.onclick = function () {
+      st.category = b.dataset.cat;
+      renderWalk();
+    };
+  });
+  document.querySelectorAll('#view .denom:not(.oos)').forEach(function (b) {
+    return b.onclick = function () {
+      st.denom = +b.dataset.d;
+      st.variant = 'default';
+      renderWalk();
+    };
+  });
+  document.querySelectorAll('#view .qty button').forEach(function (b) {
+    return b.onclick = function () {
+      st.qty = Math.min(10, Math.max(1, st.qty + +b.dataset.q));
+      renderWalk();
+    };
+  });
+  document.querySelectorAll('#view .pmethod').forEach(function (b) {
+    return b.onclick = function () {
+      st.method = +b.dataset.m;
+      renderWalk();
+    };
+  });
+  var rn = document.querySelector('#view .reveal-now');
+  if (rn) rn.onclick = function () {
+    st.revealed = true;
+    renderWalk();
+  };
+  var advBtn = document.querySelector('#view .foot > .btn');
+  if (advBtn) advBtn.onclick = function () {
+    if (st.variant === 'load') return;
+    if (st.step === 2) {
+      st.step = 3;
+      st.variant = 'default';
+    } else if (st.step === 3) {
+      st.step = 4;
+      st.variant = 'default';
+      st.revealed = false;
+    } else if (st.step === 4) {
+      st.variant = 'default';
+    }
+    renderWalk();
+  };
+  document.querySelectorAll('#view .footrow .btn').forEach(function (b) {
+    return b.onclick = function () {
+      st.step = 1;
+      st.qty = 1;
+      st.denom = 1;
+      st.store = 0;
+      st.revealed = false;
+      st.variant = 'default';
+      if (b.dataset.act === 'done') {
+        st.country = null;
+        st.query = '';
+        st.category = 'all';
+      }
+      renderWalk();
+    };
+  });
+  var bc = document.querySelector('#view .backchip');
+  if (bc) bc.onclick = function () {
+    if (st.step > 1) {
+      st.step--;
+      st.variant = 'default';
+      renderWalk();
+    } else if (st.country) {
+      st.country = null;
+      st.variant = 'default';
+      renderWalk();
+    }
+  };
+  document.querySelectorAll('#view .simrow button').forEach(function (b) {
+    return b.onclick = function () {
+      st.variant = b.dataset.v;
+      if (b.dataset.v === 'revealed') st.revealed = true;
+      if (b.dataset.v === 'default' && st.step === 4) st.revealed = false;
+      renderWalk();
+    };
+  });
+}
+function renderGallery() {
+  st.country = st.country || 'USA';
+  document.getElementById('hint').innerHTML = "Every state as its own frame — the states-first baseline for the gift-card flow (gallery, amount, pay, reveal) including loading, empty, sold-out, declined, failed, the reveal-once code, provisioning retry, and Arabic RTL.";
+  var L = st.lang;
+  var set = [[1, 'pickcountry', L, 'Gallery', 'choose country (no default)'], [1, 'default', L, 'Gallery', 'store grid'], [1, 'search', L, 'Gallery', 'search query'], [1, 'noresults', L, 'Gallery', 'no matches'], [1, 'category', L, 'Gallery', 'category: gaming'], [1, 'loading', L, 'Gallery', 'loading'], [1, 'empty', L, 'Gallery', 'empty country'], [1, 'offline', L, 'Gallery', 'offline'], [2, 'default', L, 'Amount', 'picked + price (SYP)'], [2, 'empty', L, 'Amount', 'none picked'], [2, 'oos', L, 'Amount', 'sold-out value'], [2, 'load', L, 'Amount', 'buying'], [3, 'default', L, 'Pay', 'methods'], [3, 'load', L, 'Pay', 'processing'], [3, 'declined', L, 'Pay', 'declined'], [3, 'failed', L, 'Pay', 'failed'], [4, 'prov', L, 'Reveal', 'issuing'], [4, 'default', L, 'Reveal', 'card ready'], [4, 'revealed', L, 'Reveal', 'code revealed (once)'], [4, 'pending', L, 'Reveal', 'confirming'], [4, 'provfail', L, 'Reveal', 'issue + retry'], [1, 'default', L === 'en' ? 'ar' : 'en', 'Gallery', L === 'en' ? 'Arabic RTL' : 'English LTR'], [2, 'default', L === 'en' ? 'ar' : 'en', 'Amount', L === 'en' ? 'Arabic RTL' : 'English LTR'], [4, 'revealed', L === 'en' ? 'ar' : 'en', 'Reveal', L === 'en' ? 'Arabic RTL' : 'English LTR']];
+  document.getElementById('view').innerHTML = "<div class=\"gallery\">" + set.map(function (_ref5) {
+    var _ref6 = _slicedToArray(_ref5, 5),
+      s = _ref6[0],
+      v = _ref6[1],
+      lang = _ref6[2],
+      title = _ref6[3],
+      subt = _ref6[4];
+    return "<div class=\"gcell\"><div class=\"scaler\">".concat(phoneHTML(s, v, lang, false), "</div><div class=\"glabel\">").concat(title, "<small>").concat(subt, "</small></div></div>");
+  }).join('') + "</div>";
+}
+/* ── paging ──────────────────────────────────────────────────────────
+   A cap with a "show all" is fine for an alert list, where the tail is noise.
+   A catalogue is different: every card is a real product someone may need to
+   reach, so the tail must be reachable in steps rather than in one lump that
+   freezes the page. Page size is the reader's choice — 20, 50 or 100 — and the
+   page number survives a filter change only if the page still exists. */
+var PAGE_SIZES=[20,50,100];
+var PGS={};                              /* one page state per list, by name */
+function pgOf(k){if(!PGS[k])PGS[k]={size:(k==='sups'?10:20),page:0};return PGS[k];}
+var PG=pgOf('cards');
+function pgUse(k){PG=pgOf(k);}
+function pgSet(k,n){var p=pgOf(k);p.size=Number(n);p.page=0;render();}
+function pgGo(k,p){pgOf(k).page=p;render();}
+function pgClamp(total){
+ var PG=arguments[1]||window.PG;
+ var last=Math.max(0,Math.ceil(total/PG.size)-1);
+ if(PG.page>last)PG.page=last;        // a filter that shortens the list must not strand you
+ return last;
+}
+function pager(key,total,label){
+ var PG=pgOf(key);
+ var last=pgClamp(total,PG);
+ if(!total)return '';
+ var from=PG.page*PG.size+1, to=Math.min(total,(PG.page+1)*PG.size);
+ var btn=function(p,txt,on,dis){
+  return '<button '+(dis?'disabled':'onclick="pgGo(\''+key+'\','+p+')"')+' style="cursor:'+(dis?'not-allowed':'pointer')
+   +';font-family:var(--body);font-size:var(--fs-sm);font-weight:800;min-width:34px;height:32px;padding:0 10px;border-radius:8px;'
+   +'border:1.5px solid '+(on?'#0EA5E9':'rgba(11,42,59,.14)')+';background:'+(on?'#E6F4FE':'#FFFFFF')
+   +';color:'+(dis?'rgba(11,42,59,.35)':(on?'#0A4A6B':'#0B2A3B'))+'">'+txt+'</button>';
+ };
+ var nums='', start=Math.max(0,Math.min(PG.page-2,last-4)), end=Math.min(last,start+4), i;
+ for(i=start;i<=end;i++)nums+=btn(i,String(i+1),i===PG.page,false);
+ return '<div class="pager" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:10px 0">'
+  +'<span class="hint machine">'+from+'–'+to+' '+t('of')+' '+total+(label?' '+t(label):'')+'</span>'
+  +'<span style="margin-inline-start:auto;display:flex;gap:5px;align-items:center">'
+  +'<span class="hint">'+t('per page')+'</span>'
+  +PAGE_SIZES.map(function(n){
+     var on=PG.size===n;
+     return '<button onclick="pgSet(\''+key+'\','+n+')" style="cursor:pointer;font-family:var(--body);font-size:var(--fs-sm);font-weight:800;padding:0 11px;height:32px;border-radius:8px;border:1.5px solid '+(on?'#0EA5E9':'rgba(11,42,59,.14)')+';background:'+(on?'#E6F4FE':'#FFFFFF')+';color:'+(on?'#0A4A6B':'#0B2A3B')+'">'+n+'</button>';
+   }).join('')
+  +'</span>'
+  /* Previous and Next are always drawn, disabled at the ends. Hiding them on a
+     single page means the reader cannot tell whether the list is complete or the
+     control is simply missing — and they were reported missing for exactly that. */
+  +'<span style="display:flex;gap:5px;width:100%;margin-top:4px;align-items:center">'
+     +btn(PG.page-1,'\u2039 '+t('Previous'),false,PG.page===0)
+     +(last>0?nums:'<span class="hint machine" style="padding:0 8px">'+t('page')+' 1 / 1</span>')
+     +btn(PG.page+1,t('Next')+' \u203A',false,PG.page===last)
+   +'</span>'
+  +'</div>';
+}
+function pgSlice(key,list){var PG=pgOf(key);pgClamp(list.length,PG);return list.slice(PG.page*PG.size,(PG.page+1)*PG.size);}
+
+function render() {
+  st.mode === 'walk' ? renderWalk() : renderGallery();
+}
+document.querySelectorAll('#lang button').forEach(function (b) {
+  return b.onclick = function () {
+    st.lang = b.dataset.l;
+    document.querySelectorAll('#lang button').forEach(function (x) {
+      return x.classList.toggle('on', x === b);
+    });
+    render();
+  };
+});
+document.querySelectorAll('#mode button').forEach(function (b) {
+  return b.onclick = function () {
+    st.mode = b.dataset.m;
+    document.querySelectorAll('#mode button').forEach(function (x) {
+      return x.classList.toggle('on', x === b);
+    });
+    st.step = 1;
+    st.variant = 'default';
+    st.revealed = false;
+    st.query = '';
+    st.category = 'all';
+    st.country = null;
+    render();
+  };
+});
+render();
+</script>
+
+
+</body></html>

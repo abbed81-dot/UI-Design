@@ -1,0 +1,1508 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ShopyLink — Registration</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<style>/* vietnamese */
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  font-style: normal;
+  font-weight: 500;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("104e82c8-0686-4875-b776-985b7cd2c5ae") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  font-style: normal;
+  font-weight: 500;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("0482f172-bb11-4066-af0f-2e82750749cc") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  font-style: normal;
+  font-weight: 500;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("c04ff47c-9f1a-4569-9dd0-9ae595431372") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  font-style: normal;
+  font-weight: 700;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("104e82c8-0686-4875-b776-985b7cd2c5ae") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  font-style: normal;
+  font-weight: 700;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("0482f172-bb11-4066-af0f-2e82750749cc") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  font-style: normal;
+  font-weight: 700;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("c04ff47c-9f1a-4569-9dd0-9ae595431372") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  font-style: normal;
+  font-weight: 800;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("104e82c8-0686-4875-b776-985b7cd2c5ae") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  font-style: normal;
+  font-weight: 800;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("0482f172-bb11-4066-af0f-2e82750749cc") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  font-style: normal;
+  font-weight: 800;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("c04ff47c-9f1a-4569-9dd0-9ae595431372") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("6910eea1-d1e2-47a2-91ea-cf60bd3a16f4") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("d9afde6b-5816-4350-ab5b-e918c68ac66b") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek */
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("0fec3e2d-2ba2-406d-9922-1cfdfa9c7cdf") format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("1b4c825f-ffa9-4da3-99a3-0c60e4a38255") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("ad9666f9-2118-4d2b-9381-f78ee6ab5d9a") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("bb0ebb86-a124-469c-9c86-7c7962d7e22f") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("51387679-1637-4e2c-b8e3-b857b59ab71a") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("7ea2ed93-27db-49cc-a3c2-d14234822d7a") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("23c17db1-dce4-47be-82fd-21838a171a40") format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("a9520382-848a-4139-9a40-77a8b477714b") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("3646ee11-7998-4c6a-b7d9-a58b30041284") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("ad19bce0-f0ad-469b-b1f0-74728da6ac2e") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("51387679-1637-4e2c-b8e3-b857b59ab71a") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("7ea2ed93-27db-49cc-a3c2-d14234822d7a") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("23c17db1-dce4-47be-82fd-21838a171a40") format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("a9520382-848a-4139-9a40-77a8b477714b") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("3646ee11-7998-4c6a-b7d9-a58b30041284") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("ad19bce0-f0ad-469b-b1f0-74728da6ac2e") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("51387679-1637-4e2c-b8e3-b857b59ab71a") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("7ea2ed93-27db-49cc-a3c2-d14234822d7a") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("23c17db1-dce4-47be-82fd-21838a171a40") format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("a9520382-848a-4139-9a40-77a8b477714b") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("3646ee11-7998-4c6a-b7d9-a58b30041284") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("ad19bce0-f0ad-469b-b1f0-74728da6ac2e") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("51387679-1637-4e2c-b8e3-b857b59ab71a") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("7ea2ed93-27db-49cc-a3c2-d14234822d7a") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("23c17db1-dce4-47be-82fd-21838a171a40") format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("a9520382-848a-4139-9a40-77a8b477714b") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("3646ee11-7998-4c6a-b7d9-a58b30041284") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("ad19bce0-f0ad-469b-b1f0-74728da6ac2e") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url("51387679-1637-4e2c-b8e3-b857b59ab71a") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url("7ea2ed93-27db-49cc-a3c2-d14234822d7a") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url("23c17db1-dce4-47be-82fd-21838a171a40") format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url("a9520382-848a-4139-9a40-77a8b477714b") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url("3646ee11-7998-4c6a-b7d9-a58b30041284") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url("ad19bce0-f0ad-469b-b1f0-74728da6ac2e") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* arabic */
+@font-face {
+  font-family: 'Tajawal';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("3ac7be13-e73b-43a3-aae7-0b4e4261ce9c") format('woff2');
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC, U+102E0-102FB, U+10E60-10E7E, U+10EC2-10EC4, U+10EFC-10EFF, U+1EE00-1EE03, U+1EE05-1EE1F, U+1EE21-1EE22, U+1EE24, U+1EE27, U+1EE29-1EE32, U+1EE34-1EE37, U+1EE39, U+1EE3B, U+1EE42, U+1EE47, U+1EE49, U+1EE4B, U+1EE4D-1EE4F, U+1EE51-1EE52, U+1EE54, U+1EE57, U+1EE59, U+1EE5B, U+1EE5D, U+1EE5F, U+1EE61-1EE62, U+1EE64, U+1EE67-1EE6A, U+1EE6C-1EE72, U+1EE74-1EE77, U+1EE79-1EE7C, U+1EE7E, U+1EE80-1EE89, U+1EE8B-1EE9B, U+1EEA1-1EEA3, U+1EEA5-1EEA9, U+1EEAB-1EEBB, U+1EEF0-1EEF1;
+}
+/* latin */
+@font-face {
+  font-family: 'Tajawal';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("04484020-7a61-4c2c-b70f-f0279cca4c6c") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* arabic */
+@font-face {
+  font-family: 'Tajawal';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("b3f202f3-f108-4b78-8fbb-0c6797f0bb05") format('woff2');
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC, U+102E0-102FB, U+10E60-10E7E, U+10EC2-10EC4, U+10EFC-10EFF, U+1EE00-1EE03, U+1EE05-1EE1F, U+1EE21-1EE22, U+1EE24, U+1EE27, U+1EE29-1EE32, U+1EE34-1EE37, U+1EE39, U+1EE3B, U+1EE42, U+1EE47, U+1EE49, U+1EE4B, U+1EE4D-1EE4F, U+1EE51-1EE52, U+1EE54, U+1EE57, U+1EE59, U+1EE5B, U+1EE5D, U+1EE5F, U+1EE61-1EE62, U+1EE64, U+1EE67-1EE6A, U+1EE6C-1EE72, U+1EE74-1EE77, U+1EE79-1EE7C, U+1EE7E, U+1EE80-1EE89, U+1EE8B-1EE9B, U+1EEA1-1EEA3, U+1EEA5-1EEA9, U+1EEAB-1EEBB, U+1EEF0-1EEF1;
+}
+/* latin */
+@font-face {
+  font-family: 'Tajawal';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("cad9feac-7b95-40b1-a5be-c5ed8cf1b10d") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* arabic */
+@font-face {
+  font-family: 'Tajawal';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("21183d2d-e0a0-4bf7-8a4f-7de452dfc30e") format('woff2');
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC, U+102E0-102FB, U+10E60-10E7E, U+10EC2-10EC4, U+10EFC-10EFF, U+1EE00-1EE03, U+1EE05-1EE1F, U+1EE21-1EE22, U+1EE24, U+1EE27, U+1EE29-1EE32, U+1EE34-1EE37, U+1EE39, U+1EE3B, U+1EE42, U+1EE47, U+1EE49, U+1EE4B, U+1EE4D-1EE4F, U+1EE51-1EE52, U+1EE54, U+1EE57, U+1EE59, U+1EE5B, U+1EE5D, U+1EE5F, U+1EE61-1EE62, U+1EE64, U+1EE67-1EE6A, U+1EE6C-1EE72, U+1EE74-1EE77, U+1EE79-1EE7C, U+1EE7E, U+1EE80-1EE89, U+1EE8B-1EE9B, U+1EEA1-1EEA3, U+1EEA5-1EEA9, U+1EEAB-1EEBB, U+1EEF0-1EEF1;
+}
+/* latin */
+@font-face {
+  font-family: 'Tajawal';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("ff7765d7-aafa-4b37-ae6d-bc0c02fb8898") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* arabic */
+@font-face {
+  font-family: 'Tajawal';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url("4266bd25-3e54-4803-a1d6-a22d8da939cd") format('woff2');
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC, U+102E0-102FB, U+10E60-10E7E, U+10EC2-10EC4, U+10EFC-10EFF, U+1EE00-1EE03, U+1EE05-1EE1F, U+1EE21-1EE22, U+1EE24, U+1EE27, U+1EE29-1EE32, U+1EE34-1EE37, U+1EE39, U+1EE3B, U+1EE42, U+1EE47, U+1EE49, U+1EE4B, U+1EE4D-1EE4F, U+1EE51-1EE52, U+1EE54, U+1EE57, U+1EE59, U+1EE5B, U+1EE5D, U+1EE5F, U+1EE61-1EE62, U+1EE64, U+1EE67-1EE6A, U+1EE6C-1EE72, U+1EE74-1EE77, U+1EE79-1EE7C, U+1EE7E, U+1EE80-1EE89, U+1EE8B-1EE9B, U+1EEA1-1EEA3, U+1EEA5-1EEA9, U+1EEAB-1EEBB, U+1EEF0-1EEF1;
+}
+/* latin */
+@font-face {
+  font-family: 'Tajawal';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url("f64d2cff-f510-418a-aaa4-8b1c24d0024d") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* ── control geometry ──────────────────────────────────────────────
+   A control styled with padding but no height takes the browser's default,
+   which differs per control type — that is why a select used to sit proud of
+   the input beside it, and why the native arrow was jammed against the edge.
+   The arrow is drawn here, so the room for it is reserved here.            */
+select{
+  height:var(--ctl-h,42px);
+  -webkit-appearance:none;-moz-appearance:none;appearance:none;
+  padding-right:32px;padding-left:12px;
+  background-image:url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 L6 6.5 L11 1.5' fill='none' stroke='%2362707A' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;
+  font-size:var(--fs-body,14px);color:var(--ink,#0B2A3B);line-height:normal;
+}
+select::-ms-expand{display:none}
+[dir="rtl"] select{padding-right:12px;padding-left:32px;background-position:left 12px center}
+input[type="text"],input[type="number"],input[type="tel"],input[type="email"],input[type="date"]{
+  height:var(--ctl-h,42px);font-size:var(--fs-body,14px);line-height:normal;
+}
+textarea{font-size:var(--fs-body,14px);line-height:1.6}
+
+/* ── the screen switcher is NAVIGATION, not debug chrome ───────────
+   It was 10px white at 40% on the dark bar: 3.35:1, below AA and unreadable,
+   which is why its destinations could not be found. Now 11.5px at 72% (7.18:1)
+   with a solid active pill, so it reads as what it is.                      */
+.sl-sim-btn{font-size:11.5px !important;font-weight:700 !important;padding:5px 13px !important;
+  color:rgba(255,255,255,.72) !important;background:rgba(255,255,255,.09) !important;
+  min-height:26px;white-space:nowrap}
+.sl-sim-btn:hover{background:rgba(255,255,255,.18) !important;color:#FFFFFF !important}
+.sl-sim-btn.on{background:#FFFFFF !important;color:#0B2A3B !important}
+.sl-sim-lbl{font-size:10px !important;color:rgba(255,255,255,.60) !important}
+
+/* ── mobile: every screen must be usable and complete on a phone ───
+   Nothing is hidden to make it fit. Rows wrap, tables scroll inside their own
+   box rather than pushing the page sideways, and touch targets keep their size. */
+@media (max-width:767px){
+  /* A control pushed past the edge is a control that does not exist.
+     Inline flex rows wrap, and auto-margin spacers stop shoving the last item
+     off-screen — which is what hid "simulate issue" on a narrow window. */
+  [style*="display:flex"]{flex-wrap:wrap !important}
+  [style*="margin-left:auto"]{margin-left:0 !important}
+  [dir="rtl"] [style*="margin-right:auto"]{margin-right:0 !important}
+  .sl-modal{width:auto !important;max-width:calc(100vw - 20px)}
+
+  /* the sidebar is handled by this module's own 767px rules — not duplicated here */
+  .sl-main,.sl-scroll{padding-left:12px !important;padding-right:12px !important}
+  .sl-sim{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:nowrap}
+  .card{border-radius:11px}
+  select,input[type="text"],input[type="number"],input[type="tel"],input[type="email"]{
+    min-height:44px;font-size:16px}          /* 16px stops iOS zooming on focus */
+  button{min-height:40px}
+}
+@media (max-width:560px){
+  .sl-scroll,.sl-main{padding-left:10px !important;padding-right:10px !important}
+  .figure{font-size:22px !important}
+}
+</style>
+<style>
+:root{
+  --ink:#0B2A3B; --pri:#0EA5E9; --acc:#38BDF8; --pale:#E0F2FE; --cream:#F7F4EC;
+  --paper:#FFFFFF; --mute:rgba(11,42,59,0.55); --rule:rgba(11,42,59,0.12);
+  --warm:#FBBF24; --green:#10B981; --danger:#E1483B;
+  --disp:'Bricolage Grotesque',sans-serif; --body:'Manrope',sans-serif;
+  --mono:'JetBrains Mono',monospace; --ar:'Tajawal','Cairo',sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:#E9EEF2;color:var(--ink);font-family:var(--body);
+  background-image:radial-gradient(circle at 18% -8%, #F4F8FB 0, #E4EAEF 62%);min-height:100%}
+.wrap{max-width:1180px;margin:0 auto;padding:24px 22px 64px}
+.top{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:4px}
+.brand{display:flex;align-items:center;gap:0;font-family:var(--disp);font-weight:800;font-size:21px;letter-spacing:-0.04em;line-height:1}
+.brand .s1{color:var(--ink)} .brand .s2{color:var(--pri)} .brand svg{display:block;margin:0 -1px}
+.tag{font-size:12px;color:var(--mute);align-self:center}
+.controls{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.seg{display:inline-flex;background:#fff;border:1px solid var(--rule);border-radius:99px;padding:3px}
+.seg button{border:0;background:transparent;font-family:var(--body);font-size:13px;font-weight:600;
+  color:var(--mute);padding:6px 13px;border-radius:99px;cursor:pointer}
+.seg button.on{background:var(--ink);color:#fff}
+.hint{font-size:12.5px;color:var(--mute);margin:12px 0 24px;max-width:680px;line-height:1.55}
+
+.stage{display:flex;justify-content:center}
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(244px,1fr));gap:32px 22px;align-items:start}
+.gcell{display:flex;flex-direction:column;align-items:center;gap:11px}
+.gcell .scaler{width:242px;height:486px;overflow:hidden;border-radius:34px}
+.gcell .scaler .phone{transform:scale(.6204);transform-origin:top left}
+.glabel{font-size:12px;font-weight:700;text-align:center;color:var(--ink)}
+.glabel small{display:block;color:var(--mute);font-weight:500;font-size:11px;margin-top:2px}
+
+.phone{width:390px;height:783px;background:var(--cream);position:relative;display:flex;flex-direction:column;overflow:hidden}
+.framewrap{border-radius:42px;padding:11px;background:linear-gradient(160deg,#13354a,#0B2A3B);
+  box-shadow:0 34px 70px -24px rgba(11,42,59,.55),0 8px 20px -10px rgba(11,42,59,.34)}
+.framewrap .phone{border-radius:32px}
+.sb{height:46px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 24px 6px;
+  font-size:13px;font-weight:700;color:var(--ink);flex-shrink:0}
+.sb .dots{display:flex;gap:4px;align-items:center;font-size:11px}
+.offline{background:var(--ink);color:#fff;font-size:12px;font-weight:600;text-align:center;
+  padding:7px 12px;display:flex;align-items:center;justify-content:center;gap:7px;flex-shrink:0}
+.scr{flex:1;display:flex;flex-direction:column;padding:6px 26px 0;overflow-y:auto}
+.scr::-webkit-scrollbar{width:0}
+.scr>*{flex-shrink:0}
+
+.brandrow{display:flex;align-items:center;justify-content:space-between;margin:4px 0 16px;flex-shrink:0}
+.wm{display:flex;align-items:center;gap:0;font-family:var(--disp);font-weight:800;letter-spacing:-0.04em;font-size:18px;line-height:1}
+.wm .s1{color:var(--ink)} .wm .s2{color:var(--pri)} .wm svg{display:block;margin:0 -1px}
+.wm-tag{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+
+.prog{display:flex;gap:6px;margin:0 0 24px}
+.prog i{height:4px;border-radius:99px;background:var(--rule);flex:1;transition:.3s}
+.prog i.on{background:var(--pri)}
+.prog i.done{background:var(--ink)}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--pri);margin-bottom:12px}
+h1.disp{font-family:var(--disp);font-weight:700;font-size:30px;line-height:1.08;letter-spacing:-0.02em;margin:0 0 10px}
+.sub{font-size:14px;color:var(--mute);line-height:1.5;margin:0 0 24px}
+.field{margin-bottom:15px}
+.lab{font-size:12px;font-weight:600;color:var(--ink);margin-bottom:7px;display:block}
+.lab .opt{color:var(--mute);font-weight:500}
+.inp{width:100%;border:1.5px solid var(--rule);background:var(--paper);border-radius:14px;
+  padding:14px 14px;font-family:var(--body);font-size:15px;color:var(--ink);outline:none;transition:.15s}
+.inp::placeholder{color:#62707A}
+.inp:focus{border-color:var(--pri);box-shadow:0 0 0 4px var(--pale)}
+.inp.bad{border-color:var(--danger);box-shadow:0 0 0 4px rgba(225,72,59,.10)}
+.row{display:flex;gap:10px}
+.row>*{flex:1}
+.phonefield{display:flex;gap:10px;direction:ltr}
+.phonefield .inp:not(.cc){text-align:left}
+.cc{flex:0 0 96px}
+select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%230B2A3B' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:34px}
+.err{color:var(--danger);font-size:12.5px;font-weight:600;margin-top:8px;display:flex;gap:6px;align-items:flex-start}
+.recipient{background:var(--pale);border-radius:14px;padding:12px 13px;font-size:12.5px;color:var(--ink);line-height:1.45;display:flex;gap:9px;margin-bottom:18px}
+.recipient svg{flex-shrink:0;margin-top:1px;color:var(--pri)}
+.gender{display:flex;gap:8px}
+.gender button{flex:1;border:1.5px solid var(--rule);background:#fff;border-radius:14px;padding:13px;
+  font-family:var(--body);font-weight:600;font-size:14px;color:var(--mute);cursor:pointer;transition:.15s}
+.gender button.on{border-color:var(--pri);background:var(--pale);color:var(--ink)}
+.gender.bad button{border-color:var(--danger)}
+.otp{display:flex;gap:10px;margin-bottom:8px}
+.otp .box{flex:1;aspect-ratio:1/1.15;border:1.5px solid var(--rule);border-radius:14px;background:#fff;
+  display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:24px;color:var(--ink)}
+.otp .box.fill{border-color:var(--ink)}
+.otp .box.bad{border-color:var(--danger)}
+.resend{font-size:13px;color:var(--mute);text-align:center;margin-top:4px}
+.resend b{color:var(--pri);font-weight:700}
+.gmap{position:relative;height:204px;border-radius:18px;overflow:hidden;border:1.5px solid var(--rule);margin-bottom:14px;background:#EAEEE6;
+  box-shadow:0 10px 26px -16px rgba(11,42,59,.4)}
+.gmap .search{position:absolute;top:12px;left:12px;right:12px;background:#fff;border-radius:12px;box-shadow:0 3px 12px rgba(11,42,59,.16);
+  display:flex;align-items:center;gap:8px;padding:11px 14px;font-size:13px;font-weight:500;color:var(--mute);z-index:3}
+.gmap .search svg{color:var(--pri);flex-shrink:0}
+.gmap .center-pin{position:absolute;top:52%;left:50%;transform:translate(-50%,-100%);z-index:2;pointer-events:none;
+  color:var(--danger);filter:drop-shadow(0 7px 5px rgba(11,42,59,.28))}
+.gmap .pinground{position:absolute;left:50%;bottom:-4px;transform:translateX(-50%);width:14px;height:5px;border-radius:50%;
+  background:rgba(11,42,59,.28);filter:blur(1px)}
+.gmap .loc{position:absolute;bottom:13px;right:13px;background:#fff;border:0;border-radius:50%;width:40px;height:40px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(11,42,59,.2);z-index:3;color:var(--pri)}
+.smap{position:absolute;inset:0;background-color:#EAEEE6;background-image:
+  linear-gradient(0deg,transparent calc(63% - 5px),#fff calc(63% - 5px),#fff calc(63% + 5px),transparent calc(63% + 5px)),
+  linear-gradient(0deg,transparent calc(28% - 3px),#F4F6F1 calc(28% - 3px),#F4F6F1 calc(28% + 3px),transparent calc(28% + 3px)),
+  linear-gradient(90deg,transparent calc(38% - 5px),#fff calc(38% - 5px),#fff calc(38% + 5px),transparent calc(38% + 5px)),
+  linear-gradient(90deg,transparent calc(76% - 3px),#F4F6F1 calc(76% - 3px),#F4F6F1 calc(76% + 3px),transparent calc(76% + 3px)),
+  linear-gradient(116deg,transparent 11%,#BFE0F2 11%,#BFE0F2 17%,transparent 17%)}
+.smap::before{content:"";position:absolute;left:7%;top:34%;width:24%;height:26%;background:#CFE6C2;border-radius:9px}
+.smap::after{content:"";position:absolute;right:6%;top:36%;width:16%;height:20%;background:#E4E8DE;border-radius:6px;
+  box-shadow:-30px 44px 0 -1px #E4E8DE,4px -52px 0 -2px #E4E8DE}
+.pinrow{display:flex;align-items:center;gap:11px;border-radius:14px;padding:11px 13px;margin-bottom:20px}
+.pinrow.set{background:var(--pale)}
+.pinrow.unset{background:transparent;border:1.5px dashed var(--rule)}
+.pinrow .pico{width:36px;height:36px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;background:var(--pri)}
+.pinrow.unset .pico{background:transparent;color:var(--mute);border:1.5px solid var(--rule)}
+.pinrow .ptext{flex:1;min-width:0}
+.pinrow .ptext b{display:block;font-size:13px;font-weight:700;color:var(--ink)}
+.pinrow .ptext small{display:block;font-size:11.5px;color:var(--mute);margin-top:2px;line-height:1.35}
+.pinrow .pcheck{width:22px;height:22px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.seclabel{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);margin:4px 0 13px;
+  display:flex;align-items:center;gap:10px}
+.seclabel::after{content:"";flex:1;height:1px;background:var(--rule)}
+.mapcta{position:relative;width:100%;display:flex;align-items:center;gap:13px;text-align:start;cursor:pointer;
+  border:1.5px solid var(--rule);border-radius:18px;background:var(--paper);padding:13px 14px;margin-bottom:20px;
+  font-family:var(--body);transition:.15s}
+.mapcta:hover{border-color:var(--pri);box-shadow:0 0 0 4px var(--pale)}
+.mapcta .mapcta-ico{width:54px;height:54px;border-radius:13px;flex-shrink:0;position:relative;overflow:hidden;border:1px solid var(--rule)}
+.mapcta .mini-smap{position:absolute;inset:0;background-color:#EAEEE6;background-image:
+  linear-gradient(0deg,transparent calc(60% - 3px),#fff calc(60% - 3px),#fff calc(60% + 3px),transparent calc(60% + 3px)),
+  linear-gradient(90deg,transparent calc(44% - 3px),#fff calc(44% - 3px),#fff calc(44% + 3px),transparent calc(44% + 3px)),
+  linear-gradient(116deg,transparent 6%,#BFE0F2 6%,#BFE0F2 15%,transparent 15%)}
+.mapcta .mini-smap::after{content:"";position:absolute;left:9%;top:54%;width:30%;height:30%;background:#CFE6C2;border-radius:3px}
+.mapcta .mini-pin{position:absolute;top:50%;left:50%;transform:translate(-50%,-64%);color:var(--danger);filter:drop-shadow(0 2px 1px rgba(11,42,59,.3))}
+.mapcta .ptext{flex:1;min-width:0}
+.mapcta .ptext b{display:block;font-size:14px;font-weight:700;color:var(--ink)}
+.mapcta .ptext small{display:block;font-size:11.5px;color:var(--mute);margin-top:2px;line-height:1.35}
+.mapcta .mapcta-chev{font-size:24px;color:var(--mute);font-weight:300;flex-shrink:0;line-height:1}
+.foot{padding:14px 26px 28px;flex-shrink:0;background:linear-gradient(to top, var(--cream) 70%, transparent)}
+.btn{width:100%;border:0;border-radius:14px;background:var(--ink);color:#fff;font-family:var(--body);
+  font-weight:700;font-size:15px;padding:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;transition:.15s}
+.btn:active{transform:translateY(1px)}
+.btn:disabled{opacity:.45;cursor:default}
+.btn.load{color:transparent;position:relative}
+.btn.load::after{content:"";position:absolute;width:18px;height:18px;border:2.5px solid rgba(255,255,255,.4);
+  border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.backchip{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--mute);
+  background:transparent;border:0;cursor:pointer;padding:4px 0;margin-bottom:6px}
+
+/* celebratory success */
+.phone.success{background:radial-gradient(ellipse at 50% -12%, var(--acc) 0%, var(--pri) 42%, var(--ink) 100%)}
+.phone.success .sb{color:#fff}
+.phone.success .foot{background:transparent}
+.phone.success .btn{background:#fff;color:var(--ink);box-shadow:0 16px 34px -14px rgba(0,0,0,.5)}
+.done{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 30px;position:relative;overflow:hidden}
+.medallion{width:92px;height:92px;border-radius:50%;background:rgba(255,255,255,.18);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  display:flex;align-items:center;justify-content:center;font-size:50px;margin-bottom:24px;
+  box-shadow:0 18px 40px -12px rgba(0,0,0,.35);position:relative;z-index:2}
+.done .ebrow{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.82);margin-bottom:14px;position:relative;z-index:2}
+.done h1{font-family:var(--disp);font-weight:800;font-size:33px;line-height:1.06;letter-spacing:-.03em;margin:0 0 14px;color:#fff;position:relative;z-index:2}
+.done h1 .warm{color:var(--warm)}
+.done p{font-size:14.5px;color:rgba(255,255,255,.82);margin:0;line-height:1.55;max-width:28ch;position:relative;z-index:2}
+.confetti{position:absolute;inset:0;pointer-events:none;z-index:1;overflow:hidden}
+.confetti i{position:absolute;border-radius:2px;opacity:.92}
+
+.phone.rtl{direction:rtl;font-family:var(--ar)}
+.phone.rtl h1.disp,.phone.rtl .done h1{font-family:var(--ar);font-weight:800}
+.phone.rtl .eyebrow,.phone.rtl .done .ebrow{font-family:var(--mono)}
+.phone.rtl .wm{font-family:var(--ar);font-weight:800}
+.simrow{display:flex;gap:7px;flex-wrap:wrap;margin-top:16px;justify-content:center}
+.simrow button{font-size:12px;font-weight:600;border:1px solid var(--rule);background:#fff;color:var(--mute);
+  border-radius:99px;padding:6px 12px;cursor:pointer}
+.simrow button.on{background:var(--pale);color:var(--ink);border-color:var(--pri)}
+.note{font-size:12px;color:var(--mute);text-align:center;margin-top:16px}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="top">
+    <span class="brand"><span class="s1">shopy</span><span id="brandchain"></span><span class="s2">link</span></span>
+    <span class="tag">Registration · 3 steps · world · to · door</span>
+    <div class="controls">
+      <div class="seg" id="lang"><button data-l="en" class="on">EN</button><button data-l="ar">عربي</button></div>
+      <div class="seg" id="mode"><button data-m="walk" class="on">Walkthrough</button><button data-m="gallery">All states</button></div>
+    </div>
+  </div>
+  <div class="hint" id="hint"></div>
+  <div id="view"></div>
+</div>
+
+<script>
+function slNum(n,dec){
+ // No Intl: the legacy engine may not have it, and toLocaleString drops trailing zeros.
+ var v=Number(n); if(!isFinite(v))v=0;
+ var neg=v<0; v=Math.abs(v);
+ var s2=dec?(Math.round(v*100)/100).toFixed(2):String(Math.round(v));
+ var p=s2.split('.'), whole=p[0], out='', i, c=0;
+ for(i=whole.length-1;i>=0;i--){out=whole.charAt(i)+out;c++;if(c%3===0&&i>0)out=','+out;}
+ return (neg?'-':'')+out+(dec?'.'+p[1]:'');
+}
+
+/* ── ShopyLink icons ────────────────────────────────────────────────
+   One family, one 1.7 stroke, 16px, outline, currentColor. Drawn here because
+   an emoji is rendered by the device, not by us — the same character is a
+   different picture on Android, Windows and iOS, which is how the wrong flag
+   reached a customer. These do not move between machines.                */
+/* ── option sets that grow ──────────────────────────────────────────
+   A row of pressable chips reads well at five and becomes a wall at twenty.
+   slPicker() paints chips while the set is small and switches to a searchable
+   list once it is not — the same control, the same handler, one decision made
+   by the data rather than by the day it was written.                        */
+var SL_CHIP_MAX=7;                 /* above this, chips stop being scannable */
+var SL_PICK_Q={};                  /* the search box per picker, by id */
+function slPickQ(id,v){SL_PICK_Q[id]=v;render();}
+function slPicker(id,items,current,onpick,opts){
+  opts=opts||{};
+  var all=items||[], i, h='';
+  var lbl=function(x){return opts.label?opts.label(x):(x.name||x.label||x.id||String(x));};
+  var val=function(x){return opts.value?opts.value(x):(x.id!==undefined?x.id:String(x));};
+  /* A choice is made from a dropdown, never from the whole set laid out on the page.
+     Five options or five hundred, the control is the same size and the page does not
+     change shape as the business grows. The native select carries its own search on
+     every platform, and our control-geometry rule already gives it a height and an arrow. */
+  h+='<select onchange="if(this.value){'+onpick.replace('{v}',"'+this.value+'")+'}" '
+   +'style="min-width:'+(opts.width||'220px')+';max-width:100%;border:1.5px solid rgba(11,42,59,.15);'
+   +'border-radius:10px;font-family:var(--body);background:#FFFFFF">';
+  if(opts.blank)h+='<option value="">'+opts.blank+'</option>';
+  for(i=0;i<all.length;i++){
+    var v=val(all[i]);
+    h+='<option value="'+String(v).replace(/"/g,'&quot;')+'"'+(v===current?' selected':'')+'>'
+      +String(lbl(all[i])).replace(/<[^>]*>/g,'')+'</option>';
+  }
+  h+='</select>';
+  if(opts.add)h+=' <button onclick="'+opts.add+'" style="cursor:pointer;font-family:var(--body);font-size:var(--fs-hint);font-weight:800;padding:0 14px;height:var(--ctl-h);border-radius:10px;border:1.5px dashed rgba(14,165,233,.55);background:#F4FBFF;color:#0A4A6B">+ '+(opts.addLabel||t('add'))+'</button>';
+  if(opts.count===true)h+=' <span class="hint machine" style="margin-'+(currentLang==='ar'?'right':'left')+':8px">'+all.length+'</span>';
+  return h;
+}
+function slMultiPicker(id,items,isOn,onToggle,opts){
+  opts=opts||{};
+  var all=items||[], q=String(SL_PICK_Q[id]||'').toLowerCase(), i, h='';
+  var lbl=function(x){return opts.label?opts.label(x):(x.name||x.label||String(x));};
+  var val=function(x){return opts.value?opts.value(x):(x.id!==undefined?x.id:String(x));};
+  var chosen=[]; for(i=0;i<all.length;i++){if(isOn(all[i]))chosen.push(all[i]);}
+  var chip=function(x,on){
+    return '<button onclick="'+onToggle.replace('{v}',val(x))+'" style="cursor:pointer;font-family:var(--body);font-size:var(--fs-hint);font-weight:800;'
+     +'padding:7px 13px;border-radius:999px;border:1.5px solid '+(on?'#0A7250':'rgba(11,42,59,.14)')+';'
+     +'background:'+(on?'#DCF5E9':'#FFFFFF')+';color:'+(on?'#0A7250':'#0B2A3B')+'">'+(on?'&#10003; ':'')+lbl(x)+'</button>';
+  };
+  if(all.length<=SL_CHIP_MAX&&!q){
+    h+='<div style="display:flex;gap:6px;flex-wrap:wrap">';
+    for(i=0;i<all.length;i++)h+=chip(all[i],isOn(all[i]));
+    return h+'</div>';
+  }
+  var hits=[]; for(i=0;i<all.length;i++){if(!q||String(lbl(all[i])).toLowerCase().indexOf(q)>-1)hits.push(all[i]);}
+  var shown=hits.slice(0,SL_CHIP_MAX);
+  h+='<div>';
+  if(chosen.length){
+    h+='<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:7px">';
+    for(i=0;i<Math.min(chosen.length,SL_CHIP_MAX);i++)h+=chip(chosen[i],true);
+    if(chosen.length>SL_CHIP_MAX)h+='<span class="hint" style="align-self:center">+'+(chosen.length-SL_CHIP_MAX)+'</span>';
+    h+='</div>';
+  }
+  h+='<input type="text" value="'+String(SL_PICK_Q[id]||'').replace(/"/g,'&quot;')+'" oninput="slPickQ(\''+id+'\',this.value)" '
+   +'placeholder="'+(opts.placeholder||t('search'))+'" style="width:100%;max-width:280px;border:1.5px solid rgba(11,42,59,.15);'
+   +'border-radius:9px;padding:0 11px;font-family:var(--body);font-size:var(--fs-body);background:#FFFFFF">'
+   +'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:7px">';
+  for(i=0;i<shown.length;i++)h+=chip(shown[i],isOn(shown[i]));
+  h+='</div><div class="hint" style="margin-top:5px">'
+   +t('chosen')+' <span class="machine">'+chosen.length+'</span> '+t('of')+' <span class="machine">'+all.length+'</span>'
+   +(hits.length>shown.length?' · '+t('keep typing to narrow it'):'')+'</div></div>';
+  return h;
+}
+
+var SL_ICONS={
+ hub:'<path d="M3 20h18M5 20V9l7-5 7 5v11M9 20v-5h6v5"/>',
+ idcard:'<rect x="2.5" y="5" width="19" height="14" rx="2.4"/><circle cx="8.5" cy="11" r="2.2"/><path d="M5 16.2a3.8 3.8 0 0 1 7 0M14 10h4M14 13.5h4"/>',
+ key:'<circle cx="8" cy="12" r="4"/><path d="M12 12h9M17.5 12v3M20.5 12v2.2"/>',
+ shield:'<path d="M12 3 5 6v6c0 4 3 6.7 7 8 4-1.3 7-4 7-8V6z"/><path d="M9 12l2 2 4-4"/>',
+
+ compass:'<circle cx="12" cy="12" r="9"/><path d="M15.5 8.5 13.5 13.5 8.5 15.5 10.5 10.5z"/>',
+ ruler:'<path d="M3.5 14.5 14.5 3.5l6 6-11 11z"/><path d="M7 11l2 2M10 8l2 2M13 5l2 2"/>',
+ depart:'<path d="M3 20h18"/><path d="M4 14.5 6.5 15 10 11 5.5 5.5l2.5-.5 6 4.5 4.5-1a2 2 0 1 1 .8 3.4L6.5 17z"/>',
+ abacus:'<rect x="3.5" y="3.5" width="17" height="17" rx="2"/><path d="M3.5 9h17M3.5 14.5h17M9 3.5v17M15 3.5v17"/>',
+ folders:'<path d="M3 8h6l2 2h10v9H3z"/><path d="M6 8V5h5l2 2"/>',
+ scroll:'<path d="M6 4h11v14a2.5 2.5 0 0 0 2.5 2.5H8A2.5 2.5 0 0 1 5.5 18V6"/><path d="M9 8h5M9 12h5"/>',
+ tag:'<path d="M11 3H4.5v6.5L14 19l6.5-6.5z"/><circle cx="8" cy="7" r="1.4"/>',
+ people:'<circle cx="9" cy="8" r="3.2"/><path d="M2.5 19a6.5 6.5 0 0 1 13 0"/><path d="M16 5.5a3.2 3.2 0 0 1 0 6M17.5 19a6 6 0 0 0-2-4.4"/>',
+ tools:'<path d="M14.5 6.5a3.5 3.5 0 1 0 4 4L21 13l-8 8-2.5-2.5"/><path d="M9 4 4 9l3.5 3.5L12.5 7.5z"/>',
+ bank:'<path d="M3 9.5 12 4l9 5.5"/><path d="M5 9.5V19M9.5 9.5V19M14.5 9.5V19M19 9.5V19M3 19h18"/>',
+ clipboard:'<rect x="5" y="4.5" width="14" height="16" rx="2"/><path d="M9 4.5V3h6v1.5"/><path d="M9 10h6M9 14h6"/>',
+ export:'<path d="M12 3v11M8 7l4-4 4 4"/><path d="M4 15v4h16v-4"/>',
+ gift:'<rect x="3" y="9" width="18" height="11" rx="1.6"/><path d="M3 13h18M12 9v11"/><path d="M12 9C10 5.5 6 6 6 8.2 6 9.4 8 9 12 9zM12 9c2-3.5 6-3 6-.8 0 1.2-2 .8-6 .8z"/>',
+ home:'<path d="M3.5 11 12 4l8.5 7"/><path d="M6 10.5V20h12v-9.5"/><path d="M10 20v-5h4v5"/>',
+ flask:'<path d="M10 3v6L4.5 18.5A2 2 0 0 0 6.3 21.5h11.4a2 2 0 0 0 1.8-3L14 9V3"/><path d="M9 3h6M7.5 15h9"/>',
+ trophy:'<path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4.5v1.5A3 3 0 0 0 7 10.4M17 6h2.5v1.5A3 3 0 0 1 17 10.4"/><path d="M12 14v3M8.5 20h7"/>',
+
+ plane:'<path d="M2.5 13.5 21 5l-4 9 4 9-18.5-8.5" /><path d="M8 11.6 8 6"/>',
+ ship:'<path d="M3 17.5c1.6 1 3.2 1 4.8 0s3.2-1 4.8 0 3.2 1 4.8 0 3.2-1 4.8 0"/><path d="M5 14l1.4-5h11.2L19 14"/><path d="M12 4v5"/>',
+ truck:'<path d="M2 16V6h11v10"/><path d="M13 9h4l4 4v3h-8"/><circle cx="6.5" cy="17.5" r="1.8"/><circle cx="17.5" cy="17.5" r="1.8"/>',
+ box:'<path d="M12 3 3 7.5V17l9 4.5 9-4.5V7.5z"/><path d="M3 7.5 12 12l9-4.5M12 12v9.5"/>',
+ pin:'<path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.6"/>',
+ person:'<circle cx="12" cy="8" r="3.6"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/>',
+ handshake:'<path d="M3 12.5 7 8.5l3 2.5 3-2.5 4 4"/><path d="M10 15.5 12 17.5l2-2 2 2"/><path d="M2 9.5 5.5 6M22 9.5 18.5 6"/>',
+ lock:'<rect x="4.5" y="10.5" width="15" height="9.5" rx="2.2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/>',
+ search:'<circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/>',
+ card:'<rect x="2.5" y="5" width="19" height="14" rx="2.6"/><path d="M2.5 10h19"/>',
+ camera:'<rect x="2.5" y="7" width="19" height="13" rx="2.4"/><circle cx="12" cy="13.5" r="4"/><path d="M8.5 7l1.5-3h4l1.5 3"/>',
+ globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.2 3 14.8 0 18M12 3c-3 3.2-3 14.8 0 18"/>',
+ bolt:'<path d="M13.5 2 5 13.5h6L10.5 22 19 10.5h-6z"/>',
+ scale:'<path d="M12 4v16M6 20h12M12 6 4 10M12 6l8 4"/><path d="M1.5 10.5a2.5 2.5 0 0 0 5 0M17.5 10.5a2.5 2.5 0 0 0 5 0"/>',
+ customs:'<rect x="3" y="9" width="18" height="11" rx="1.8"/><path d="M3 13h18M8 9V5h8v4"/>',
+ factory:'<path d="M3 20V11l5 3V11l5 3V6h8v14z"/><path d="M17 11v3M20 11v3"/>',
+ map:'<path d="M9 4 3 6.5v13L9 17l6 2.5 6-2.5v-13L15 6.5z"/><path d="M9 4v13M15 6.5v13"/>',
+ bell:'<path d="M6 9a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6z"/><path d="M10 19.5a2.2 2.2 0 0 0 4 0"/>',
+ clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5.4l3.4 2"/>',
+ doc:'<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/>',
+ chat:'<path d="M4 5h16v11H9l-5 4z"/>',
+ gear:'<circle cx="12" cy="12" r="3.2"/><path d="M12 3v2.4M12 18.6V21M3 12h2.4M18.6 12H21M5.6 5.6l1.7 1.7M16.7 16.7l1.7 1.7M18.4 5.6l-1.7 1.7M7.3 16.7l-1.7 1.7"/>',
+ palm:'<path d="M12 21V11"/><path d="M12 11c-3-3-6-2.5-8-1 1.5-4 5.5-5 8-2 2.5-3 6.5-2 8 2-2-1.5-5-2-8 1z"/>',
+ flag:'<path d="M6 21V4M6 4h11l-2.2 3.5L17 11H6"/>',
+ printer:'<path d="M7 9V3h10v6"/><rect x="3.5" y="9" width="17" height="7" rx="1.8"/><path d="M7 14h10v7H7z"/>'
+};
+function slIcon(name,size,stroke){
+ var p=SL_ICONS[name];
+ if(!p)return '';
+ var s=size||16;
+ return '<svg viewBox="0 0 24 24" width="'+s+'" height="'+s+'" fill="none" stroke="currentColor" '
+  +'stroke-width="'+(stroke||1.7)+'" stroke-linecap="round" stroke-linejoin="round" '
+  +'style="vertical-align:-0.18em;flex-shrink:0" aria-hidden="true">'+p+'</svg>';
+}
+
+function _slicedToArray(r, e) { return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest(); }
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(r, a) { if (r) { if ("string" == typeof r) return _arrayLikeToArray(r, a); var t = {}.toString.call(r).slice(8, -1); return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0; } }
+function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length); for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e]; return n; }
+function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t.return && (u = t.return(), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
+function _arrayWithHoles(r) { if (Array.isArray(r)) return r; }
+var T = {
+  en: {
+    step: function step(n) {
+      return "Step ".concat(n, " of 3");
+    },
+    p1: {
+      h: "What's your number?",
+      s: "We'll text you a code to make sure it's really you. No spam — pinky promise.",
+      lab: "Phone number",
+      ph: "50 123 4567",
+      cta: "Send my code",
+      err: "Hmm, that number looks a little off. Mind a quick check?"
+    },
+    p2: {
+      h: "Check your texts",
+      s: function s(n) {
+        return "We just sent 4 digits to ".concat(n, ". Go grab them.");
+      },
+      cta: "That's me",
+      err: "Those didn't match — give it another shot.",
+      exp: "That code took a nap and expired. Grab a fresh one.",
+      resendIn: function resendIn(s) {
+        return "New code in 0:".concat(String(s).padStart(2, '0'));
+      },
+      resend: "Send a fresh code"
+    },
+    about: {
+      h: "Who are we shipping to?",
+      rec: "Use this exact name when you shop abroad — it's how we match every package to you.",
+      first: "First name",
+      mid: "Middle name",
+      last: "Last name",
+      opt: "optional",
+      dob: "Date of birth",
+      gender: "Gender",
+      male: "Male",
+      female: "Female",
+      cta: "Looks good, continue",
+      err: "Almost there — we just need your name, birthday and gender."
+    },
+    addr: {
+      h: "Register your address here",
+      s: "Where should your treasures land? Your address in Syria.",
+      gov: "Governorate",
+      city: "City",
+      area: "Area / neighbourhood",
+      bldg: "Building",
+      flat: "Flat",
+      land: "Nearby landmark",
+      pin: "Drop a pin on your building",
+      pinset: "Pin dropped",
+      cta: "Register address",
+      err: "Pop in your governorate, city and building to wrap up."
+    },
+    p5: {
+      eb: function eb(n) {
+        return "Welcome aboard, ".concat(n);
+      },
+      h: function h(n) {
+        return "You're all set,<br>".concat(n, "!");
+      },
+      s1: "The whole world is now a tap from your door. Go fill it with good stuff.",
+      cta: "Start shopping",
+      saved: function saved(id) { return "Registered \u00B7 " + id; }
+    },
+    back: "Back",
+    offline: "You're offline — we'll retry the moment you're back.",
+    govs: ["Damascus", "Rural Damascus", "Aleppo", "Homs", "Hama", "Latakia", "Tartus", "Daraa", "Deir ez-Zor", "Idlib"]
+  },
+  ar: {
+    step: function step(n) {
+      return "\u0627\u0644\u062E\u0637\u0648\u0629 ".concat(n, " \u0645\u0646 3");
+    },
+    p1: {
+      h: "ما رقمك؟",
+      s: "سنرسل لك رمزًا لنتأكد أنه أنت فعلاً.",
+      lab: "رقم الهاتف",
+      ph: "50 123 4567",
+      cta: "أرسل رمزي",
+      err: "يبدو أن الرقم غير صحيح قليلاً، تحقق منه؟"
+    },
+    p2: {
+      h: "افتح رسائلك",
+      s: function s(n) {
+        return "\u0623\u0631\u0633\u0644\u0646\u0627 4 \u0623\u0631\u0642\u0627\u0645 \u0625\u0644\u0649 ".concat(n, ". \u0623\u062D\u0636\u0631\u0647\u0627 \u0628\u0633\u0631\u0639\u0629.");
+      },
+      cta: "هذا أنا",
+      err: "الأرقام غير مطابقة — جرّب مرة أخرى.",
+      exp: "انتهت صلاحية الرمز. اطلب رمزًا جديدًا.",
+      resendIn: function resendIn(s) {
+        return "\u0631\u0645\u0632 \u062C\u062F\u064A\u062F \u062E\u0644\u0627\u0644 0:".concat(String(s).padStart(2, '0'));
+      },
+      resend: "أرسل رمزًا جديدًا"
+    },
+    about: {
+      h: "إلى مَن نشحن؟",
+      rec: "استخدم هذا الاسم تمامًا عند التسوق من الخارج — به نطابق كل طرودك بك.",
+      first: "الاسم الأول",
+      mid: "الاسم الأوسط",
+      last: "اسم العائلة",
+      opt: "اختياري",
+      dob: "تاريخ الميلاد",
+      gender: "الجنس",
+      male: "ذكر",
+      female: "أنثى",
+      cta: "يبدو رائعًا، متابعة",
+      err: "بقي القليل — نحتاج اسمك وتاريخ ميلادك وجنسك."
+    },
+    addr: {
+      h: "سجّل عنوانك هنا",
+      s: "أين تصل كنوزك؟ عنوانك في سوريا.",
+      gov: "المحافظة",
+      city: "المدينة",
+      area: "الحي / المنطقة",
+      bldg: "المبنى",
+      flat: "الشقة",
+      land: "أقرب معلم",
+      pin: "حدّد موقع مبناك على الخريطة",
+      pinset: "تم تحديد الموقع",
+      cta: "تسجيل العنوان",
+      err: "أضف المحافظة والمدينة والمبنى لنكمل."
+    },
+    p5: {
+      eb: function eb(n) {
+        return "\u0623\u0647\u0644\u0627\u064B \u0628\u0643 ".concat(n);
+      },
+      h: function h(n) {
+        return "\u062A\u0645! \u0623\u0647\u0644\u0627\u064B<br>".concat(n, "!");
+      },
+      s1: "أصبح العالم كله على بُعد نقرة من بابك. املأه بكل ما هو جميل.",
+      cta: "ابدأ التسوق",
+      saved: function saved(id) { return "تم التسجيل \u00B7 " + id; }
+    },
+    back: "رجوع",
+    offline: "أنت غير متصل — سنعيد المحاولة فور عودتك.",
+    govs: ["دمشق", "ريف دمشق", "حلب", "حمص", "حماة", "اللاذقية", "طرطوس", "درعا", "دير الزور", "إدلب"]
+  }
+};
+var st = {
+  lang: 'en',
+  mode: 'walk',
+  step: 1,
+  variant: 'default',
+  name: 'Layla',
+  phonenum: '+971 50 123 4567',
+  gov: 'Damascus'
+};
+
+/* ── pricing mirrored from the Pricing dashboard: the delivery governorate decides
+      the address-plan price AND the per-kg city extra, so we ask for it up front ── */
+var SL_PLAN_BASE = {
+  per_shipment: 75000,
+  monthly: 250000,
+  annual: 2400000
+}; /* main hub (Damascus) */
+var SL_GOVX = {
+  'Damascus': 0,
+  'Rural Damascus': 6000,
+  'Aleppo': 15000,
+  'Homs': 9000,
+  'Hama': 12000,
+  'Latakia': 16000,
+  'Tartus': 16000,
+  'Daraa': 11000,
+  'Deir ez-Zor': 34000,
+  'Idlib': 21000
+};
+var SL_KGX = {
+  'Damascus': 0,
+  'Rural Damascus': 4,
+  'Aleppo': 9,
+  'Homs': 6,
+  'Hama': 8,
+  'Latakia': 11,
+  'Tartus': 11,
+  'Daraa': 7,
+  'Deir ez-Zor': 22,
+  'Idlib': 14
+};
+function planPrice(plan, gov) {
+  var base = SL_PLAN_BASE[plan] || 0,
+    x = SL_GOVX[gov] || 0;
+  return plan === 'annual' ? base + x * 10 : base + x;
+}
+function kgExtra(gov) {
+  return SL_KGX[gov] || 0;
+}
+function setGov(g) {
+  st.gov = g;
+  setReg('gov', g);        /* the pick was for the price only; it is the address too */
+  render();
+}
+function govNote(lang) {
+  var g = st.gov,
+    x = kgExtra(g);
+  var en = x ? "Door-to-door to ".concat(g, " \u2014 included in your price. Shipping adds ").concat(x, " SYP/kg over the Damascus rate.") : "Door-to-door to ".concat(g, " \u2014 the main hub, no extra over the base rate.");
+  var ar = x ? "\u0627\u0644\u062A\u0648\u0635\u064A\u0644 \u0625\u0644\u0649 ".concat(g, " \u0645\u0634\u0645\u0648\u0644 \u0641\u064A \u0633\u0639\u0631\u0643. \u0648\u0627\u0644\u0634\u062D\u0646 \u064A\u0632\u064A\u062F ").concat(x, " \u0644.\u0633/\u0643\u063A \u0639\u0646 \u0633\u0639\u0631 \u062F\u0645\u0634\u0642.") : "\u0627\u0644\u062A\u0648\u0635\u064A\u0644 \u0625\u0644\u0649 ".concat(g, " \u0645\u0634\u0645\u0648\u0644 \u2014 \u0648\u0647\u064A \u0627\u0644\u0645\u0631\u0643\u0632 \u0627\u0644\u0631\u0626\u064A\u0633\u064A\u060C \u0628\u0644\u0627 \u0632\u064A\u0627\u062F\u0629 \u0639\u0644\u0649 \u0627\u0644\u0633\u0639\u0631 \u0627\u0644\u0623\u0633\u0627\u0633.");
+  return lang === 'ar' ? ar : en;
+}
+function planStrip(lang) {
+  var keys = ['per_shipment', 'monthly', 'annual'];
+  var lbl = lang === 'ar' ? {
+    per_shipment: 'لكل شحنة',
+    monthly: 'شهري',
+    annual: 'سنوي'
+  } : {
+    per_shipment: 'Per shipment',
+    monthly: 'Monthly',
+    annual: 'Annual'
+  };
+  var head = lang === 'ar' ? 'أسعار عنوانك في ' + st.gov : 'Your address price in ' + st.gov;
+  return "<div style=\"margin-top:14px;padding:13px 15px;border-radius:12px;background:#F4FBFF;border:1.5px solid rgba(14,165,233,.35)\">\n    <div style=\"font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#0A4A6B;margin-bottom:8px\">".concat(head, "</div>\n    ").concat(keys.map(function (k) {
+    return "<div style=\"display:flex;justify-content:space-between;padding:4px 0;font-size:13px\">\n        <span>".concat(lbl[k], "</span>\n        <b style=\"direction:ltr;unicode-bidi:isolate;font-family:'JetBrains Mono',monospace\">").concat(planPrice(k, slNum(st.gov),0), " SYP</b>\n      </div>");
+  }).join(''), "\n    <div style=\"margin-top:8px;font-size:11.5px;color:#62707A;font-weight:600\">\uD83D\uDCE6 ").concat(govNote(lang), "</div>\n  </div>");
+}
+
+/* ── Brand chain mark (interlocking rings) ───────────────── */
+var _wm = 0;
+function chain(size, a, b) {
+  var id = 'c' + _wm++;
+  var w = size * 1.55;
+  return "<svg width=\"".concat(w, "\" height=\"").concat(size, "\" viewBox=\"0 0 124 80\" aria-hidden=\"true\">\n    <defs><clipPath id=\"").concat(id, "\"><rect x=\"50\" y=\"44\" width=\"24\" height=\"22\"/></clipPath></defs>\n    <rect x=\"6\" y=\"20\" rx=\"20\" ry=\"20\" width=\"68\" height=\"40\" fill=\"none\" stroke=\"").concat(a, "\" stroke-width=\"9\"/>\n    <rect x=\"50\" y=\"20\" rx=\"20\" ry=\"20\" width=\"68\" height=\"40\" fill=\"none\" stroke=\"").concat(b, "\" stroke-width=\"9\"/>\n    <g clip-path=\"url(#").concat(id, ")\"><rect x=\"6\" y=\"20\" rx=\"20\" ry=\"20\" width=\"68\" height=\"40\" fill=\"none\" stroke=\"").concat(a, "\" stroke-width=\"9\"/></g>\n  </svg>");
+}
+function wordmark(lang) {
+  var ar = lang === 'ar';
+  var s1 = ar ? 'شوبي' : 'shopy',
+    s2 = ar ? 'لينك' : 'link';
+  var tag = ar ? 'العالم إلى البيت' : 'world · to · door';
+  return "<div class=\"brandrow\"><span class=\"wm\"><span class=\"s1\">".concat(s1, "</span>").concat(chain(13, '#0B2A3B', '#0EA5E9'), "<span class=\"s2\">").concat(s2, "</span></span><span class=\"wm-tag\">").concat(tag, "</span></div>");
+}
+var ic = {
+  back: '<svg width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M6 1L1 6l5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  backR: '<svg width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M1 1l5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  pin: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 21s7-6.3 7-11a7 7 0 10-14 0c0 4.7 7 11 7 11z" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="10" r="2.4" fill="currentColor"/></svg>',
+  info: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 11v5M12 8h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+  warn: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 9v4M12 17h.01M10.3 3.9 2.4 18a2 2 0 001.7 3h15.8a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  offline: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M1 1l22 22M16.7 11.1a6 6 0 00-2-1.4M5 12.5A10 10 0 018 11M8.5 16a5 5 0 015-1M12 20h.01" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>',
+  tick: '<svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+};
+function statusbar() {
+  return "<div class=\"sb\"><span>9:41</span><span class=\"dots\">\u25CF\u25CF\u25CF \u25AE</span></div>";
+}
+function prog(step) {
+  var s1 = step <= 2 ? 'on' : 'done';
+  var s2 = step === 3 ? 'on' : step > 3 ? 'done' : '';
+  var s3 = step === 4 ? 'on' : step > 4 ? 'done' : '';
+  return "<div class=\"prog\"><i class=\"".concat(s1, "\"></i><i class=\"").concat(s2, "\"></i><i class=\"").concat(s3, "\"></i></div>");
+}
+/* ── the door into the system ─────────────────────────────────────────
+   Five screens of registration existed and registered nobody: every field was a
+   picture of a field, no button was wired to anything, and the account whose
+   identity the whole customer app is built on had to be written into the source
+   by hand. A registration that produces no record is a demo of a door.
+   What it writes, and who owns what:
+     · the CLIENT goes onto SL_CLIENTS_V1 — D1's register — WITHOUT touching the
+       fields D1 owns on anyone already there (the same fan-out rule billing
+       learned the hard way when it wiped a credit facility);
+     · a `client.registered` event goes on the shared log, so the fact has a
+       time and a name and cannot be quietly un-happened;
+     · and SL_ACCOUNT_V1 says who this device belongs to, which is what the
+       individual app reads instead of a name typed into its own source.
+   Nothing here decides a price or a facility: a new client is prepaid, like
+   every account until a manager grants otherwise. */
+var SL_REG_CLIENTS = 'SL_CLIENTS_V1';
+var SL_ACCOUNT_KEY = 'SL_ACCOUNT_V1';
+var SL_EV_REG = 'SL_EVENTS_V1';
+var REG = { name: '', phone: '', gov: '', city: '', area: '', street: '', flat: '', land: '', done: null };
+function setReg(k, v) { REG[k] = v; }
+function regReady() {
+  return !!(String(REG.name || '').replace(/\s/g, '') &&
+            String(REG.phone || '').replace(/\s/g, '').length >= 8 &&
+            String(REG.gov || ''));
+}
+function clientsRead() {
+  try {
+    var r = window.localStorage.getItem(SL_REG_CLIENTS);
+    if (!r) return [];
+    var o = JSON.parse(r);
+    return (o && o.clients) ? o.clients : [];
+  } catch (e) { return []; }
+}
+function nameKey(x) { return String(x || '').replace(/^\s+|\s+$/g, '').toLowerCase(); }
+function evRead() {
+  try {
+    var r = window.localStorage.getItem(SL_EV_REG);
+    if (!r) return [];
+    var l = JSON.parse(r);
+    return l && l.length ? l : [];
+  } catch (e) { return []; }
+}
+function evEmit(type, o) {
+  var l = evRead();
+  var ev = { id: 'EV-' + (l.length + 1) + '-' + (new Date()).getTime(),
+             at: (new Date()).getTime(), type: type,
+             ship: null, client: o.client || null, actor: o.actor || '',
+             payload: o.payload || {} };
+  l.push(ev);
+  try { window.localStorage.setItem(SL_EV_REG, JSON.stringify(l)); } catch (e) {}
+  return ev;
+}
+/* ── the district is chosen, not typed ────────────────────────────────
+   It was a free field, so a man wrote "Mezzeh" while the zone register says
+   "Mazzeh" and his parcel could never be placed in a delivery zone — it would
+   have waited as unzoned for ever, and nobody would have known why. The
+   districts come from C10, the module that owns them, exactly as a date is
+   picked from a calendar and never typed.
+   With the register unpublished the field stays free, because a registration
+   desk is not blocked by a bus being down — and what is typed then is marked as
+   typed, so it can be corrected later rather than trusted. */
+var SL_REG_ZONES='SL_ZONES_V1';
+function zonesRead(){
+  try{var r=window.localStorage.getItem(SL_REG_ZONES);if(!r)return null;
+   var o=JSON.parse(r);return (o&&o.zones&&o.zones.length)?o.zones:null;}catch(e){return null;}
+}
+function districtsFor(gov){
+  var zs=zonesRead(); if(!zs)return null;
+  var out=[];
+  zs.forEach(function(z){
+    if(!z.active)return;
+    if(gov && String(z.gov).toLowerCase().indexOf(String(gov).toLowerCase())===-1
+           && String(gov).toLowerCase().indexOf(String(z.gov).toLowerCase())===-1)return;
+    if(out.indexOf(z.name)===-1)out.push(z.name);
+    (z.areas||[]).forEach(function(a){if(out.indexOf(a)===-1)out.push(a);});
+  });
+  return out.length?out:null;
+}
+function areaTyped(){
+  var list=districtsFor(REG.gov);
+  return !list || list.indexOf(REG.area)===-1;   /* true when nobody offered it */
+}
+function submitRegistration() {
+  if (!regReady()) return { ok: false, why: 'name, phone and governorate are all needed' };
+  var list = clientsRead(), key = nameKey(REG.name), already = null;
+  list.forEach(function (c) { if (nameKey(c.name) === key) already = c; });
+  if (already) return { ok: false, why: 'this name is already registered' };
+  var id = 'CL-R' + (list.length + 1);
+  var rec = { id: id, name: String(REG.name).replace(/^\s+|\s+$/g, ''), type: 'individual',
+              country: 'Syria', tax: '', city: REG.gov, phone: REG.phone, email: '',
+              /* the district he lives in. A dispatcher assigns a driver to a
+                 district, and until this travelled with the client nobody could
+                 say which one a shipment was going to. */
+              area: REG.area || '',
+              /* whether he picked it from the register or typed it himself:
+                 a typed district may not match any zone, and somebody should
+                 be able to find those rather than wonder why a parcel waits */
+              areaTyped: areaTyped(),
+              status: 'ACTIVE',
+              /* prepaid until a manager grants a facility — registration grants nothing */
+              facility: { active: false, days: 0, limit: 0, cur: 'USD' } };
+  var out = [], k;
+  for (k = 0; k < list.length; k++) out.push(list[k]);   /* nobody else is touched */
+  out.push(rec);
+  try {
+    window.localStorage.setItem(SL_REG_CLIENTS, JSON.stringify({ at: (new Date()).getTime(), clients: out }));
+  } catch (e) {}
+  try {
+    window.localStorage.setItem(SL_ACCOUNT_KEY, JSON.stringify({
+      at: (new Date()).getTime(),
+      account: { id: id, name: rec.name, phone: rec.phone, gov: REG.gov,
+                 address: { city: REG.city, area: REG.area, street: REG.street,
+                            flat: REG.flat, landmark: REG.land } }
+    }));
+  } catch (e) {}
+  evEmit('client.registered', { client: rec.name, actor: rec.name,
+    payload: { id: id, phone: rec.phone, gov: REG.gov, channel: 'self-registration' } });
+  REG.done = id;
+  if (typeof render === 'function') render();
+  return { ok: true, id: id };
+}
+function backBtn(t) {
+  return "<button class=\"backchip\">".concat(st.lang === 'ar' ? ic.backR : ic.back).concat(t.back, "</button>");
+}
+function confetti() {
+  var cols = ['#FBBF24', '#FFFFFF', '#38BDF8', '#FBCFE8', '#10B981'];
+  var out = '';
+  for (var i = 0; i < 20; i++) {
+    var left = (i * 23 + 7) % 100,
+      top = (i * 17 + 4) % 70,
+      sz = 5 + i % 3 * 3,
+      c = cols[i % cols.length],
+      rot = i * 37 % 360,
+      round = i % 2 ? '50%' : '2px';
+    out += "<i style=\"left:".concat(left, "%;top:").concat(top, "%;width:").concat(sz, "px;height:").concat(sz, "px;background:").concat(c, ";border-radius:").concat(round, ";transform:rotate(").concat(rot, "deg)\"></i>");
+  }
+  return "<div class=\"confetti\">".concat(out, "</div>");
+}
+function mapTile(set, lang) {
+  var ar = lang === 'ar';
+  var mag = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+  var locate = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3.4" stroke="currentColor" stroke-width="2"/><path d="M12 2v3.2M12 18.8V22M2 12h3.2M18.8 12H22" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+  var pinm = '<div class="center-pin"><div class="pinground"></div><svg width="36" height="36" viewBox="0 0 24 24" fill="none"><path d="M12 22s7-6.6 7-12a7 7 0 10-14 0c0 5.4 7 12 7 12z" fill="currentColor"/><circle cx="12" cy="10" r="2.7" fill="#fff"/></svg></div>';
+  var q = ar ? 'ابحث عن شارعك…' : 'Search your street…';
+  return "<div class=\"gmap\"><div class=\"smap\"></div><div class=\"search\">".concat(mag, "<span>").concat(set ? 'Mazzeh, Damascus' : q, "</span></div>").concat(pinm, "<button class=\"loc\">").concat(locate, "</button></div>");
+}
+function pinnedStrip(set, c, lang) {
+  var ar = lang === 'ar';
+  if (set) {
+    var _b = ar ? 'تم تحديد موقعك' : 'Pinned on the map';
+    var _s = ar ? 'المزة، دمشق · انقر على الخريطة للتعديل' : 'Mazzeh, Damascus · tap the map to adjust';
+    return "<div class=\"pinrow set\"><div class=\"pico\">".concat(ic.pin, "</div><div class=\"ptext\"><b>").concat(_b, "</b><small>").concat(_s, "</small></div><div class=\"pcheck\">").concat(ic.tick, "</div></div>");
+  }
+  var b = c.pin;
+  var s = ar ? 'حرّك الخريطة حتى يقف الدبوس على بابك' : 'Drag the map so the pin sits on your door';
+  return "<div class=\"pinrow unset\"><div class=\"pico\">".concat(ic.pin, "</div><div class=\"ptext\"><b>").concat(b, "</b><small>").concat(s, "</small></div></div>");
+}
+function mapCta(c, lang) {
+  var ar = lang === 'ar';
+  var small = ar ? 'ضع الدبوس على موقع مبناك' : 'Place the pin on your building';
+  var chev = ar ? '‹' : '›';
+  var pin = '<svg viewBox="0 0 24 24" width="17" height="17" fill="none"><path d="M12 22s7-6.6 7-12a7 7 0 10-14 0c0 5.4 7 12 7 12z" fill="currentColor"/><circle cx="12" cy="10" r="2.7" fill="#fff"/></svg>';
+  return "<button class=\"mapcta\" data-showmap><div class=\"mapcta-ico\"><div class=\"mini-smap\"></div><div class=\"mini-pin\">".concat(pin, "</div></div><div class=\"ptext\"><b>").concat(c.pin, "</b><small>").concat(small, "</small></div><div class=\"mapcta-chev\">").concat(chev, "</div></button>");
+}
+function body(step, variant, lang) {
+  var t = T[lang],
+    off = variant === 'offline';
+  var offBar = off ? "<div class=\"offline\">".concat(ic.offline).concat(t.offline, "</div>") : '';
+  var ctaLoad = variant === 'load' ? 'load' : '';
+  var inner = '',
+    foot = '';
+  if (step === 1) {
+    var bad = variant === 'err';
+    inner = "<div class=\"eyebrow\">".concat(t.step(1), "</div><h1 class=\"disp\">").concat(t.p1.h, "</h1><p class=\"sub\">").concat(t.p1.s, "</p>\n      <div class=\"field\"><label class=\"lab\">").concat(t.p1.lab, "</label>\n      <div class=\"phonefield\"><select class=\"inp cc\"><option>\uD83C\uDDE6\uD83C\uDDEA +971</option><option>\uD83C\uDDF8\uD83C\uDDFE +963</option><option>\uD83C\uDDFA\uD83C\uDDF8 +1</option><option>\uD83C\uDDF9\uD83C\uDDF7 +90</option></select>\n      <input class=\"inp ").concat(bad ? 'bad' : '', "\" placeholder=\"").concat(t.p1.ph, "\" oninput=\"setReg('phone',this.value)\" value=\"").concat(REG.phone || (bad ? '50 12' : '50 123 4567'), "\"></div>\n      ").concat(bad ? "<div class=\"err\">".concat(ic.warn).concat(t.p1.err, "</div>") : '', "</div>");
+    foot = "<button class=\"btn ".concat(ctaLoad, "\">").concat(t.p1.cta, "</button>");
+  } else if (step === 2) {
+    var _bad = variant === 'err',
+      exp = variant === 'expired';
+    var digits = ['5', '2', _bad ? '9' : '8', exp ? '' : '1'];
+    inner = "".concat(backBtn(t), "<div class=\"eyebrow\">").concat(t.step(1), "</div><h1 class=\"disp\">").concat(t.p2.h, "</h1><p class=\"sub\">").concat(t.p2.s(st.phonenum), "</p>\n      <div class=\"otp\">").concat(digits.map(function (d) {
+      return "<div class=\"box ".concat(d ? 'fill' : '', " ").concat(_bad ? 'bad' : '', "\">").concat(d, "</div>");
+    }).join(''), "</div>\n      ").concat(_bad ? "<div class=\"err\">".concat(ic.warn).concat(t.p2.err, "</div>") : '').concat(exp ? "<div class=\"err\">".concat(ic.warn).concat(t.p2.exp, "</div>") : '', "\n      <div class=\"resend\">").concat(exp ? "<b>".concat(t.p2.resend, "</b>") : t.p2.resendIn(28), "</div>");
+    foot = "<button class=\"btn ".concat(ctaLoad, "\" ").concat(exp ? 'disabled' : '', ">").concat(t.p2.cta, "</button>");
+  } else if (step === 3) {
+    var a = t.about,
+      _bad2 = variant === 'err',
+      empty = variant === 'empty';
+    var filled = !_bad2 && !empty,
+      v = function v(x) {
+        return filled ? x : '';
+      };
+    inner = "".concat(backBtn(t), "<div class=\"eyebrow\">").concat(t.step(2), "</div><h1 class=\"disp\">").concat(a.h, "</h1>\n      <div class=\"recipient\">").concat(ic.info, "<span>").concat(a.rec, "</span></div>\n      <div class=\"field\"><label class=\"lab\">").concat(a.first, "</label><input class=\"inp ").concat(_bad2 ? 'bad' : '', "\" oninput=\"setReg('name',this.value)\" value=\"").concat(REG.name || v('Layla'), "\"></div>\n      <div class=\"field\"><label class=\"lab\">").concat(a.mid, " <span class=\"opt\">\xB7 ").concat(a.opt, "</span></label><input class=\"inp\" value=\"").concat(v('Hadi'), "\"></div>\n      <div class=\"field\"><label class=\"lab\">").concat(a.last, "</label><input class=\"inp ").concat(_bad2 ? 'bad' : '', "\" value=\"").concat(v('Al-Rifai'), "\"></div>\n      <div class=\"row\">\n        <div class=\"field\"><label class=\"lab\">").concat(lang === 'ar' ? 'محافظة التوصيل' : 'Delivery governorate', "</label>\n          <select class=\"inp\" onchange=\"setGov(this.value)\">").concat(t.govs.map(function (g) {
+      return "<option ".concat(g === st.gov ? 'selected' : '', ">").concat(g, "</option>");
+    }).join(''), "</select></div>\n        <div class=\"field\"><label class=\"lab\">").concat(a.dob, "</label><input type=\"text\" class=\"inp ").concat(_bad2 ? 'bad' : '', "\" placeholder=\"DD / MM / YYYY\" value=\"").concat(v('12 / 04 / 1996'), "\"></div>\n        <div class=\"field\"><label class=\"lab\">").concat(a.gender, "</label>\n          <div class=\"gender ").concat(_bad2 ? 'bad' : '', "\"><button class=\"").concat(filled ? 'on' : '', "\">").concat(a.female, "</button><button>").concat(a.male, "</button></div></div>\n      </div>\n      ").concat(planStrip(lang), "\n      ").concat(_bad2 ? "<div class=\"err\">".concat(ic.warn).concat(a.err, "</div>") : '');
+    foot = "<button class=\"btn ".concat(ctaLoad, "\">").concat(a.cta, "</button>");
+  } else if (step === 4) {
+    var c = t.addr,
+      _bad3 = variant === 'err',
+      _empty = variant === 'empty',
+      long = variant === 'longname';
+    var _filled = !_bad3 && !_empty,
+      _v = function _v(x) {
+        return _filled ? x : '';
+      };
+    var set = _filled || long;
+    inner = "".concat(backBtn(t), "<div class=\"eyebrow\">").concat(t.step(3), "</div><h1 class=\"disp\">").concat(c.h, "</h1><p class=\"sub\">").concat(c.s, "</p>\n      ").concat(mapTile(set, lang)).concat(pinnedStrip(set, c, lang), "\n      <div class=\"seclabel\">").concat(lang === 'ar' ? 'تفاصيل العنوان' : 'Address details', "</div>\n      <div class=\"row\"><div class=\"field\"><label class=\"lab\">").concat(c.gov, "</label><select class=\"inp ").concat(_bad3 ? 'bad' : '', "\" onchange=\"setGov(this.value)\">").concat(t.govs.map(function (g) {
+      return "<option ".concat(g === st.gov ? 'selected' : '', ">").concat(g, "</option>");
+    }).join(''), "</select></div>\n        <div class=\"field\"><label class=\"lab\">").concat(c.city, "</label><input class=\"inp ").concat(_bad3 ? 'bad' : '', "\" value=\"").concat(_v('Damascus'), "\"></div></div>\n      <div class=\"field\"><label class=\"lab\">").concat(c.area, "</label><input class=\"inp\" value=\"").concat(_v('Mazzeh'), "\"></div>\n      <div class=\"row\"><div class=\"field\"><label class=\"lab\">").concat(c.bldg, "</label><input class=\"inp ").concat(_bad3 ? 'bad' : '', "\" value=\"").concat(_v(long ? 'Western Villas Compound, Block 14' : 'Bldg 4'), "\"></div>\n        <div class=\"field\"><label class=\"lab\">").concat(c.flat, "</label><input class=\"inp\" value=\"").concat(_v('7'), "\"></div></div>\n      <div class=\"field\"><label class=\"lab\">").concat(c.land, " <span class=\"opt\">\xB7 ").concat(c.opt || t.about.opt, "</span></label><input class=\"inp\" value=\"").concat(_v('Near Mazzeh Hospital'), "\"></div>\n      ").concat(_bad3 ? "<div class=\"err\">".concat(ic.warn).concat(c.err, "</div>") : '');
+    foot = "<button class=\"btn ".concat(ctaLoad, "\">").concat(c.cta, "</button>");
+  } else if (step === 5) {
+    inner = "<div class=\"done\">".concat(confetti(), "<div class=\"medallion\">\uD83C\uDF89</div><div class=\"ebrow\">").concat(t.p5.eb(st.name), "</div><h1>").concat(t.p5.h(st.name).replace(st.name, "<span class=\"warm\">".concat(st.name, "</span>")), "</h1><p>").concat(t.p5.s1, "</p></div>");
+    /* the door: this was a picture of a button on a screen that registered
+       nobody. It writes the client, says so on the log, and tells this device
+       who it belongs to. */
+    foot = REG.done
+      ? "<div class=\"banner ok\">".concat(t.p5.saved(REG.done), "</div>")
+      : "<button class=\"btn\" onclick=\"submitRegistration()\">".concat(t.p5.cta, "</button>");
+  }
+  return {
+    offBar: offBar,
+    inner: inner,
+    foot: foot
+  };
+}
+function phoneHTML(step, variant, lang, framed) {
+  var b = body(step, variant, lang);
+  var rtl = lang === 'ar' ? 'rtl' : '';
+  var content = step === 5 ? "<div class=\"scr\" style=\"padding:0\">".concat(b.inner, "</div>") : "<div class=\"scr\">".concat(wordmark(lang)).concat(prog(step)).concat(b.inner, "</div>");
+  var succ = step === 5 ? 'success' : '';
+  var ph = "<div class=\"phone ".concat(rtl, " ").concat(succ, "\">").concat(statusbar()).concat(b.offBar).concat(content, "<div class=\"foot\">").concat(b.foot, "</div></div>");
+  return framed ? "<div class=\"framewrap\">".concat(ph, "</div>") : ph;
+}
+function renderWalk() {
+  document.getElementById('hint').innerHTML = "Three steps — verify your phone, tell us who's shopping, then where home is. Tap the button to advance; the chips below preview every state of the current screen.";
+  var variants = {
+    1: [['default', 'default'], ['err', 'invalid number'], ['load', 'sending…'], ['offline', 'offline']],
+    2: [['default', 'default'], ['err', 'wrong code'], ['expired', 'expired'], ['load', 'verifying…']],
+    3: [['default', 'filled'], ['empty', 'empty'], ['err', 'missing fields']],
+    4: [['default', 'filled'], ['empty', 'empty'], ['err', 'missing fields'], ['load', 'saving…'], ['longname', 'long name']],
+    5: [['default', 'success']]
+  }[st.step];
+  var sims = variants.map(function (_ref) {
+    var _ref2 = _slicedToArray(_ref, 2),
+      v = _ref2[0],
+      lab = _ref2[1];
+    return "<button class=\"".concat(st.variant === v ? 'on' : '', "\" data-v=\"").concat(v, "\">").concat(lab, "</button>");
+  }).join('');
+  var lstep = st.step <= 2 ? 1 : st.step === 3 ? 2 : st.step === 4 ? 3 : '✓';
+  document.getElementById('view').innerHTML = "<div class=\"stage\">".concat(phoneHTML(st.step, st.variant, st.lang, true), "</div>\n     <div class=\"simrow\">").concat(sims, "</div>\n     <div class=\"note\">Step ").concat(lstep, " of 3 \xB7 screen ").concat(st.step, " of 5</div>");
+  var btn = document.querySelector('#view .btn');
+  if (btn) btn.onclick = function () {
+    if (st.variant === 'load') return;
+    if (st.step < 5) {
+      st.step++;
+    } else {
+      st.step = 1;
+    }
+    st.variant = 'default';
+    renderWalk();
+  };
+  var bc = document.querySelector('#view .backchip');
+  if (bc) bc.onclick = function () {
+    if (st.step > 1) {
+      st.step--;
+      st.variant = 'default';
+      renderWalk();
+    }
+  };
+  var mc = document.querySelector('#view [data-showmap]');
+  if (mc) mc.onclick = function () {
+    st.variant = 'default';
+    renderWalk();
+  };
+  document.querySelectorAll('#view .simrow button').forEach(function (b) {
+    return b.onclick = function () {
+      st.variant = b.dataset.v;
+      renderWalk();
+    };
+  });
+}
+function renderGallery() {
+  document.getElementById('hint').innerHTML = "Every state as its own frame — the full states-first set for the 3-step flow. Identity and address each get their own page so the Google Maps pin has room to work.";
+  var L = st.lang;
+  var set = [[1, 'default', L, 'Phone', 'default'], [1, 'err', L, 'Phone', 'invalid number'], [1, 'load', L, 'Phone', 'sending code'], [1, 'offline', L, 'Phone', 'offline'], [2, 'default', L, 'Code', 'default'], [2, 'err', L, 'Code', 'wrong code'], [2, 'expired', L, 'Code', 'expired'], [3, 'default', L, 'Who', 'filled (name+DOB+gender)'], [3, 'empty', L, 'Who', 'empty'], [3, 'err', L, 'Who', 'missing fields'], [4, 'default', L, 'Address', 'filled + pin set'], [4, 'empty', L, 'Address', 'empty'], [4, 'err', L, 'Address', 'missing fields'], [4, 'load', L, 'Address', 'saving'], [4, 'longname', L, 'Address', 'long name overflow'], [5, 'default', L, 'Done', 'success'], [4, 'default', L === 'en' ? 'ar' : 'en', 'Address', L === 'en' ? 'Arabic RTL' : 'English LTR'], [3, 'default', L === 'en' ? 'ar' : 'en', 'Who', L === 'en' ? 'Arabic RTL' : 'English LTR']];
+  document.getElementById('view').innerHTML = "<div class=\"gallery\">" + set.map(function (_ref3) {
+    var _ref4 = _slicedToArray(_ref3, 5),
+      s = _ref4[0],
+      v = _ref4[1],
+      lang = _ref4[2],
+      title = _ref4[3],
+      subt = _ref4[4];
+    return "<div class=\"gcell\"><div class=\"scaler\">".concat(phoneHTML(s, v, lang, false), "</div><div class=\"glabel\">").concat(title, "<small>").concat(subt, "</small></div></div>");
+  }).join('') + "</div>";
+}
+/* ── paging ──────────────────────────────────────────────────────────
+   A cap with a "show all" is fine for an alert list, where the tail is noise.
+   A catalogue is different: every card is a real product someone may need to
+   reach, so the tail must be reachable in steps rather than in one lump that
+   freezes the page. Page size is the reader's choice — 20, 50 or 100 — and the
+   page number survives a filter change only if the page still exists. */
+var PAGE_SIZES=[20,50,100];
+var PGS={};                              /* one page state per list, by name */
+function pgOf(k){if(!PGS[k])PGS[k]={size:(k==='sups'?10:20),page:0};return PGS[k];}
+var PG=pgOf('cards');
+function pgUse(k){PG=pgOf(k);}
+function pgSet(k,n){var p=pgOf(k);p.size=Number(n);p.page=0;render();}
+function pgGo(k,p){pgOf(k).page=p;render();}
+function pgClamp(total){
+ var PG=arguments[1]||window.PG;
+ var last=Math.max(0,Math.ceil(total/PG.size)-1);
+ if(PG.page>last)PG.page=last;        // a filter that shortens the list must not strand you
+ return last;
+}
+function pager(key,total,label){
+ var PG=pgOf(key);
+ var last=pgClamp(total,PG);
+ if(!total)return '';
+ var from=PG.page*PG.size+1, to=Math.min(total,(PG.page+1)*PG.size);
+ var btn=function(p,txt,on,dis){
+  return '<button '+(dis?'disabled':'onclick="pgGo(\''+key+'\','+p+')"')+' style="cursor:'+(dis?'not-allowed':'pointer')
+   +';font-family:var(--body);font-size:var(--fs-sm);font-weight:800;min-width:34px;height:32px;padding:0 10px;border-radius:8px;'
+   +'border:1.5px solid '+(on?'#0EA5E9':'rgba(11,42,59,.14)')+';background:'+(on?'#E6F4FE':'#FFFFFF')
+   +';color:'+(dis?'rgba(11,42,59,.35)':(on?'#0A4A6B':'#0B2A3B'))+'">'+txt+'</button>';
+ };
+ var nums='', start=Math.max(0,Math.min(PG.page-2,last-4)), end=Math.min(last,start+4), i;
+ for(i=start;i<=end;i++)nums+=btn(i,String(i+1),i===PG.page,false);
+ return '<div class="pager" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:10px 0">'
+  +'<span class="hint machine">'+from+'–'+to+' '+t('of')+' '+total+(label?' '+t(label):'')+'</span>'
+  +'<span style="margin-inline-start:auto;display:flex;gap:5px;align-items:center">'
+  +'<span class="hint">'+t('per page')+'</span>'
+  +PAGE_SIZES.map(function(n){
+     var on=PG.size===n;
+     return '<button onclick="pgSet(\''+key+'\','+n+')" style="cursor:pointer;font-family:var(--body);font-size:var(--fs-sm);font-weight:800;padding:0 11px;height:32px;border-radius:8px;border:1.5px solid '+(on?'#0EA5E9':'rgba(11,42,59,.14)')+';background:'+(on?'#E6F4FE':'#FFFFFF')+';color:'+(on?'#0A4A6B':'#0B2A3B')+'">'+n+'</button>';
+   }).join('')
+  +'</span>'
+  /* Previous and Next are always drawn, disabled at the ends. Hiding them on a
+     single page means the reader cannot tell whether the list is complete or the
+     control is simply missing — and they were reported missing for exactly that. */
+  +'<span style="display:flex;gap:5px;width:100%;margin-top:4px;align-items:center">'
+     +btn(PG.page-1,'\u2039 '+t('Previous'),false,PG.page===0)
+     +(last>0?nums:'<span class="hint machine" style="padding:0 8px">'+t('page')+' 1 / 1</span>')
+     +btn(PG.page+1,t('Next')+' \u203A',false,PG.page===last)
+   +'</span>'
+  +'</div>';
+}
+function pgSlice(key,list){var PG=pgOf(key);pgClamp(list.length,PG);return list.slice(PG.page*PG.size,(PG.page+1)*PG.size);}
+
+function render() {
+  st.mode === 'walk' ? renderWalk() : renderGallery();
+}
+document.getElementById('brandchain').innerHTML = chain(15, '#0B2A3B', '#0EA5E9');
+document.querySelectorAll('#lang button').forEach(function (b) {
+  return b.onclick = function () {
+    st.lang = b.dataset.l;
+    document.querySelectorAll('#lang button').forEach(function (x) {
+      return x.classList.toggle('on', x === b);
+    });
+    render();
+  };
+});
+document.querySelectorAll('#mode button').forEach(function (b) {
+  return b.onclick = function () {
+    st.mode = b.dataset.m;
+    document.querySelectorAll('#mode button').forEach(function (x) {
+      return x.classList.toggle('on', x === b);
+    });
+    st.step = 1;
+    st.variant = 'default';
+    render();
+  };
+});
+render();
+</script>
+
+
+</body></html>

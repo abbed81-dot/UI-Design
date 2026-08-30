@@ -1,0 +1,63 @@
+const fs=require('fs');const {JSDOM,VirtualConsole}=require('/home/claude/work/node_modules/jsdom');
+const dom=new JSDOM(fs.readFileSync('ShopyLink_D1_Control.html','utf8'),{runScripts:'dangerously',pretendToBeVisual:true,virtualConsole:new VirtualConsole()});
+const w=dom.window,d=w.document;const sh=()=>d.getElementById('shell').innerHTML;
+let f=0,n=0;const ok=(c,m)=>{n++;console.log((c?'  ✓ ':'  ✗ FAIL ')+m);if(!c)f++;};
+
+console.log('§33 prepaid is the default for EVERYONE');
+ok(w.isPrepaid(w.clientById('CL-003')),'33.1 an individual is prepaid');
+ok(w.isPrepaid(w.clientById('CL-002')),'33.2 a BUSINESS with no facility is prepaid too — being a business grants nothing');
+ok(w.checkCredit('CL-002',99999).prepaid===true,'33.3 a huge booking on that business is simply prepaid, with no limit logic');
+ok(w.hasCredit(w.clientById('CL-001'))===true,'33.4 only an account with a granted facility carries credit');
+w.go('s7');
+ok(/prepaid|دفع مسبق/.test(sh()),'33.5 the board says prepaid on the accounts without a facility');
+
+console.log('§34 granting is an exception, made on the record');
+w.setActor('U-02');
+let r=w.grantCredit('CL-002',30,3000,'good customer','ops');
+ok(r.ok===false&&/manager/.test(r.why),'34.1 only the manager may grant');
+w.setActor('U-00');
+r=w.grantCredit('CL-002',30,3000,'','manager');
+ok(r.ok===false&&/reason/.test(r.why),'34.2 a reason is mandatory');
+r=w.grantCredit('CL-002',0,3000,'they asked nicely','manager');
+ok(r.ok===false&&/days and a limit/.test(r.why),'34.3 a facility needs both days AND a limit — no open-ended credit');
+const noAp=w.quickCreate({name:'No Accounts Co',country:'Syria',contact:'x',phone:'+963 909 090 909',type:'business'});
+w.completeProfile(noAp.id,{tax:'SY-9',address:'Damascus',bizType:'importer',contactRole:'owner'});
+r=w.grantCredit(noAp.id,30,1000,'long relationship','manager');
+ok(r.ok===false&&/accounts-payable/.test(r.why),'34.4 credit cannot be granted with nobody to send the invoice to');
+w.addContact(noAp.id,{name:'Accounts',role:'ap',phone:'+963 909 000 000'});
+r=w.grantCredit(noAp.id,30,1000,'three years of clean payment','manager');
+ok(r.ok===true&&w.hasCredit(noAp.id),'34.4b …and is granted once that contact exists');
+const fc=w.resolveClient(noAp.id).facility;
+ok(fc.by&&fc.at&&fc.reason&&fc.days===30&&fc.limit===1000,'34.5 the grant records who, when, why, and the terms');
+r=w.grantCredit('CL-003',30,1000,'she is a good customer','manager');
+ok(r.ok===false&&/individuals are prepaid/.test(r.why),'34.6 an individual can never be granted a facility');
+const prov=w.quickCreate({name:'Still Provisional Co',country:'Syria',contact:'p',phone:'+963 902 000 000',type:'business'});
+r=w.grantCredit(prov.id,30,1000,'we know them','manager');
+ok(r.ok===false&&/provisional/.test(r.why),'34.7 a provisional business stays prepaid until its profile is complete');
+
+console.log('§35 revoking returns it to prepaid');
+r=w.revokeCredit(noAp.id,'two invoices went 60 days overdue','manager');
+ok(r.ok===true&&w.isPrepaid(noAp.id),'35.1 revoking puts the account back on prepaid');
+ok(w.resolveClient(noAp.id).creditDays===0&&w.resolveClient(noAp.id).creditLimit===0,'35.1b …with the terms cleared');
+ok(w.resolveClient(noAp.id).facilityLog.length===2,'35.2 both the grant and the revocation stay in the record');
+w.setActor('U-01');
+ok(w.revokeCredit('CL-001','x reason here','docs').ok===false,'35.3 only the manager may revoke');
+w.setActor('U-00');
+ok(w.revokeCredit('CL-001','','manager').ok===false,'35.4 a revocation needs a reason too');
+ok(w.checkCredit(noAp.id,50000).prepaid===true,'35.5 after revocation the limit logic is gone — it is simply prepaid again');
+
+console.log('§36 the limit still works where a facility exists');
+const cc=w.checkCredit('CL-001',4000);
+ok(cc.ok===false&&cc.over===800,'36.1 a booking beyond a granted limit warns with the overage');
+ok(w.creditContactGap('CL-001')===false,'36.2 the accounts-payable gap check reads the facility, not the client type');
+
+console.log('§37 standing rules');
+w.go('s7');
+ok(/credit facility|تسهيل/.test(sh()),'37.0 the facility is shown as a facility, with who granted it');
+const warm=['prepaid — no facility granted','every account is prepaid by default — this is an exception you are creating, on the record','the account returns to prepaid, like every other account','an accounts-payable contact is required before credit is granted'];
+ok(warm.filter(s=>!w.T_w[s]).length===0,'37.1 every warm string has an Arabic twin');
+w.setLang('ar');
+ok(/دفع مسبق/.test(sh()),'37.1b AR renders');
+w.setLang('en');
+console.log('\n'+(f?('FAIL — '+f+' of '+n):('ALL PASS — '+n+' checks')));
+process.exit(f?1:0);

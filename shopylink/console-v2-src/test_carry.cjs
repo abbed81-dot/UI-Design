@@ -126,7 +126,7 @@ function makeStorage() {
   let m;
   while ((m = re.exec(source)) !== null) map[m[1]] = m[2];
   const names = Object.keys(map);
-  ok(names.length === 24, 'all 24 modules are carried (' + names.length + ')');
+  ok(names.length === 22, 'all 22 console modules are carried (' + names.length + ')');
   let good = 0, bad = [];
   for (const n of names) {
     try {

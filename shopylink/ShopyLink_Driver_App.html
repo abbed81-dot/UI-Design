@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0B2A3B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>ShopyLink Driver — Last-mile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html{height:100%;}
+body{background:#F7F4EC;font-family:'Manrope','Tajawal',system-ui,sans-serif;color:#0B2A3B;-webkit-text-size-adjust:100%;min-height:100%;}
+html[lang="ar"] body{font-family:'Tajawal','Manrope',system-ui,sans-serif;}
+button{font-family:inherit;-webkit-user-select:none;user-select:none;}
+
+/* ── app header ── */
+.hdr{background:linear-gradient(135deg,#0B2A3B 0%,#0A3A52 100%);color:#fff;position:sticky;top:0;z-index:10;
+ padding:calc(10px + env(safe-area-inset-top,0px)) 16px 0;border-radius:0 0 22px 22px;box-shadow:0 6px 18px rgba(11,42,59,.22);}
+.hdr-row{display:flex;align-items:center;gap:10px;max-width:520px;margin:0 auto;padding-bottom:9px;}
+.hdr-t{font-size:12px;font-weight:800;flex:1;line-height:1.3;}
+.hdr-s{font-family:'JetBrains Mono',monospace;font-size:9.5px;opacity:.55;display:block;font-weight:500;}
+.hdr-back{width:34px;height:34px;border-radius:12px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#fff;font-size:16px;cursor:pointer;flex-shrink:0;}
+.hdr-av{width:34px;height:34px;border-radius:12px;background:#0B6E9B;color:#fff;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.lang{border:1px solid rgba(255,255,255,.25);border-radius:10px;overflow:hidden;display:flex;flex-shrink:0;}
+.lang button{background:none;border:none;color:rgba(255,255,255,.6);font-size:11px;font-weight:800;padding:7px 10px;cursor:pointer;}
+.lang button.on{background:#0B6E9B;color:#fff;}
+.prog{max-width:520px;margin:0 auto;padding-bottom:12px;}
+.prog-lbl{display:flex;justify-content:space-between;font-size:9.5px;font-weight:700;color:rgba(255,255,255,.55);margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em;}
+.prog-bar{height:6px;border-radius:99px;background:rgba(255,255,255,.14);overflow:hidden;}
+.prog-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#0EA5E9,#38BDF8);transition:width .3s;}
+
+/* ── content ── */
+.wrap{max-width:520px;margin:0 auto;padding:16px 14px calc(96px + env(safe-area-inset-bottom,0px));}
+.card{background:#FFFFFF;border:1px solid rgba(11,42,59,.07);border-radius:16px;margin-bottom:10px;box-shadow:0 1px 2px rgba(11,42,59,.04),0 4px 12px rgba(11,42,59,.05);}
+.stat{display:flex;gap:9px;margin-bottom:14px;}
+.stat>div{flex:1;text-align:center;padding:12px 8px;background:#FFFFFF;border-radius:14px;border:1px solid rgba(11,42,59,.07);box-shadow:0 1px 2px rgba(11,42,59,.04);}
+.stat .v{font-family:'Bricolage Grotesque',sans-serif;font-size:24px;font-weight:800;line-height:1.1;}
+.stat .l{font-size:8.5px;color:#62707A;text-transform:uppercase;letter-spacing:.07em;font-weight:700;margin-top:2px;}
+
+/* ── stop cards ── */
+.stop{border:1.5px solid rgba(11,42,59,.07);border-radius:16px;background:#FFFFFF;margin-bottom:10px;padding:13px 14px;box-shadow:0 1px 2px rgba(11,42,59,.04),0 4px 12px rgba(11,42,59,.05);}
+.stop.next{border-color:#0B6E9B;box-shadow:0 4px 16px rgba(14,165,233,.16);}
+.stop.dlv{border-color:rgba(16,185,129,.35);opacity:.9;}
+.stop.unv{border-color:rgba(225,72,59,.4);opacity:.9;}
+.n{width:34px;height:34px;border-radius:12px;text-align:center;line-height:34px;font-family:'Bricolage Grotesque',sans-serif;font-size:15px;font-weight:800;background:#E6F4FE;color:#0B6E9B;display:inline-block;flex-shrink:0;}
+.stop.dlv .n{background:#0A7250;color:#fff;}
+.stop.unv .n{background:#B23429;color:#fff;}
+.chev{font-size:20px;color:#62707A;flex-shrink:0;font-weight:800;}
+html[dir="rtl"] .chev{transform:scaleX(-1);}
+.chip{display:inline-block;font-size:9.5px;font-weight:800;padding:4px 9px;border-radius:999px;white-space:nowrap;}
+.c-ok{background:rgba(16,185,129,.12);color:#065F46;}
+.c-bad{background:rgba(225,72,59,.10);color:#991B1B;}
+.c-warn{background:rgba(251,191,36,.16);color:#78500A;}
+.c-mut{background:#EEF2F7;color:#62707A;}
+.mono{font-family:'JetBrains Mono',monospace;}
+.mut{color:#62707A;}
+
+/* ── buttons: 50px touch targets ── */
+.btn{display:block;width:100%;border:none;border-radius:14px;min-height:50px;padding:14px;font-size:14.5px;font-weight:800;cursor:pointer;margin-bottom:9px;text-align:center;box-shadow:0 2px 8px rgba(11,42,59,.08);}
+.btn:active{transform:scale(.985);}
+.btn:disabled{background:#E4E9F0!important;color:#62707A!important;cursor:not-allowed;box-shadow:none;}
+.b-pri{background:#0B6E9B;color:#fff;}
+.b-grn{background:#0A7250;color:#fff;}
+.b-dng{background:transparent;color:#B23429;border:1.5px solid #E1483B;box-shadow:none;}
+.b-sec{background:#FFFFFF;color:#0B2A3B;border:1.5px solid rgba(11,42,59,.12);box-shadow:none;}
+.act-row{display:flex;gap:9px;margin-bottom:10px;}
+.act-row a{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;min-height:46px;border-radius:13px;text-decoration:none;font-size:12.5px;font-weight:800;border:1.5px solid rgba(11,42,59,.1);background:#FFFFFF;color:#0B2A3B;box-shadow:0 1px 2px rgba(11,42,59,.04);}
+.act-row a:active{transform:scale(.985);}
+
+/* ── checklist rows ── */
+.chk{display:flex;align-items:center;gap:11px;min-height:52px;padding:13px 14px;border:1.5px solid rgba(11,42,59,.08);border-radius:14px;background:#FFFFFF;margin-bottom:9px;cursor:pointer;font-size:13.5px;font-weight:700;box-shadow:0 1px 2px rgba(11,42,59,.04);}
+.chk:active{transform:scale(.99);}
+.chk.on{border-color:#0A7250;background:rgba(16,185,129,.07);}
+.chk .bx{width:24px;height:24px;border-radius:8px;border:1.5px solid rgba(11,42,59,.18);text-align:center;line-height:22px;font-weight:800;color:#fff;flex-shrink:0;}
+.chk.on .bx{background:#10B981;border-color:#0A7250;}
+
+#sig-pad{width:100%;height:150px;border:1.5px dashed rgba(14,165,233,.5);border-radius:14px;background:#fff;display:block;touch-action:none;}
+.cod{padding:14px;text-align:center;border-radius:16px;margin-bottom:10px;}
+.cod .a{font-family:'Bricolage Grotesque',sans-serif;font-size:26px;font-weight:800;}
+
+/* ── map strip ── */
+.map-strip{height:96px;border-radius:14px;margin-bottom:10px;position:relative;overflow:hidden;background:linear-gradient(135deg,#E6F4FE 0%,#F4FBFF 55%,#E8F7EE 100%);border:1px solid rgba(14,165,233,.2);}
+.map-strip .pin{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);font-size:26px;}
+.map-strip .coord{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:#0A4A6B;background:rgba(255,255,255,.85);padding:3px 9px;border-radius:99px;}
+
+/* ── tab bar ── */
+.tabs{display:flex;gap:6px;}
+.tab{flex:1;border:none;background:none;border-radius:12px;padding:7px 4px 6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;color:#62707A;}
+.tab .ti{font-size:19px;line-height:1;filter:grayscale(1) opacity(.55);}
+.tab .tl{font-size:9.5px;font-weight:800;letter-spacing:.02em;}
+.tab.on{background:#E6F4FE;color:#0B6E9B;}
+.tab.on .ti{filter:none;}
+.tab:active{transform:scale(.96);}
+html[dir="rtl"] .tabs{flex-direction:row-reverse;}
+
+/* ── bottom bar ── */
+.foot{position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);border-top:1px solid rgba(11,42,59,.08);padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px));box-shadow:0 -4px 16px rgba(11,42,59,.06);z-index:9;}
+.foot-in{max-width:520px;margin:0 auto;}
+.foot .btn{margin:0;}
+.foot>div .btn,#foot .btn{margin-bottom:0;}
+.sum{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid rgba(11,42,59,.05);font-size:12px;align-items:center;}
+html[dir="rtl"] .hdr-row,html[dir="rtl"] .chk,html[dir="rtl"] .sum,html[dir="rtl"] .act-row{flex-direction:row-reverse;}
+html[dir="rtl"] .stop .row{flex-direction:row-reverse;}
+
+/* ── control geometry ──────────────────────────────────────────────
+   A control styled with padding but no height takes the browser's default,
+   which differs per control type — that is why a select used to sit proud of
+   the input beside it, and why the native arrow was jammed against the edge.
+   The arrow is drawn here, so the room for it is reserved here.            */
+select{
+  height:var(--ctl-h,42px);
+  -webkit-appearance:none;-moz-appearance:none;appearance:none;
+  padding-right:32px;padding-left:12px;
+  background-image:url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 L6 6.5 L11 1.5' fill='none' stroke='%2362707A' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;
+  font-size:var(--fs-body,14px);color:var(--ink,#0B2A3B);line-height:normal;
+}
+select::-ms-expand{display:none}
+[dir="rtl"] select{padding-right:12px;padding-left:32px;background-position:left 12px center}
+input[type="text"],input[type="number"],input[type="tel"],input[type="email"],input[type="date"]{
+  height:var(--ctl-h,42px);font-size:var(--fs-body,14px);line-height:normal;
+}
+textarea{font-size:var(--fs-body,14px);line-height:1.6}
+
+/* ── the screen switcher is NAVIGATION, not debug chrome ───────────
+   It was 10px white at 40% on the dark bar: 3.35:1, below AA and unreadable,
+   which is why its destinations could not be found. Now 11.5px at 72% (7.18:1)
+   with a solid active pill, so it reads as what it is.                      */
+.sl-sim-btn{font-size:11.5px !important;font-weight:700 !important;padding:5px 13px !important;
+  color:rgba(255,255,255,.72) !important;background:rgba(255,255,255,.09) !important;
+  min-height:26px;white-space:nowrap}
+.sl-sim-btn:hover{background:rgba(255,255,255,.18) !important;color:#FFFFFF !important}
+.sl-sim-btn.on{background:#FFFFFF !important;color:#0B2A3B !important}
+.sl-sim-lbl{font-size:10px !important;color:rgba(255,255,255,.60) !important}
+
+/* ── mobile: every screen must be usable and complete on a phone ───
+   Nothing is hidden to make it fit. Rows wrap, tables scroll inside their own
+   box rather than pushing the page sideways, and touch targets keep their size. */
+@media (max-width:767px){
+  /* A control pushed past the edge is a control that does not exist.
+     Inline flex rows wrap, and auto-margin spacers stop shoving the last item
+     off-screen — which is what hid "simulate issue" on a narrow window. */
+  [style*="display:flex"]{flex-wrap:wrap !important}
+  [style*="margin-left:auto"]{margin-left:0 !important}
+  [dir="rtl"] [style*="margin-right:auto"]{margin-right:0 !important}
+  .sl-modal{width:auto !important;max-width:calc(100vw - 20px)}
+
+  /* the sidebar is handled by this module's own 767px rules — not duplicated here */
+  .sl-main,.sl-scroll{padding-left:12px !important;padding-right:12px !important}
+  .sl-sim{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:nowrap}
+  .card{border-radius:11px}
+  select,input[type="text"],input[type="number"],input[type="tel"],input[type="email"]{
+    min-height:44px;font-size:16px}          /* 16px stops iOS zooming on focus */
+  button{min-height:40px}
+}
+@media (max-width:560px){
+  .sl-scroll,.sl-main{padding-left:10px !important;padding-right:10px !important}
+  .figure{font-size:22px !important}
+}
+</style>
+</head>
+<body>
+<div class="hdr"><div class="hdr-row"><span id="hdr-left"></span><div class="hdr-t" id="hdr-t"></div><div class="lang"><button class="on" data-lang="en" onclick="setLang('en')">EN</button><button data-lang="ar" onclick="setLang('ar')">AR</button></div></div><div class="prog" id="hdr-prog"></div></div>
+<div class="wrap" id="app"><noscript><div style="padding:14px;border:2px solid #E1483B;border-radius:10px;background:#FDECEA;color:#7F1D1D">JavaScript is disabled — this app needs JS.</div></noscript></div>
+<div class="foot"><div class="foot-in" id="foot"></div></div>
+<script>
+window.onerror=function(m,s2,l,c){try{var a=document.getElementById('app');a.innerHTML='<div style="padding:14px;border:2px solid #E1483B;border-radius:10px;background:#FDECEA;color:#7F1D1D;font-family:monospace;font-size:12px;word-break:break-all">ERROR: '+m+' @'+l+':'+c+'</div>';}catch(e){}return false;};
+if(!Array.prototype.find){Array.prototype.find=function(fn){for(var i=0;i<this.length;i++){if(fn(this[i],i,this))return this[i];}return undefined;};}
+</script>
+<script>
+/* ── ShopyLink icons ────────────────────────────────────────────────
+   One family, one 1.7 stroke, 16px, outline, currentColor. Drawn here because
+   an emoji is rendered by the device, not by us — the same character is a
+   different picture on Android, Windows and iOS, which is how the wrong flag
+   reached a customer. These do not move between machines.                */
+/* ── option sets that grow ──────────────────────────────────────────
+   A row of pressable chips reads well at five and becomes a wall at twenty.
+   slPicker() paints chips while the set is small and switches to a searchable
+   list once it is not — the same control, the same handler, one decision made
+   by the data rather than by the day it was written.                        */
+var SL_CHIP_MAX=7;                 /* above this, chips stop being scannable */
+var SL_PICK_Q={};                  /* the search box per picker, by id */
+function slPickQ(id,v){SL_PICK_Q[id]=v;render();}
+function slPicker(id,items,current,onpick,opts){
+  opts=opts||{};
+  var all=items||[], i, h='';
+  var lbl=function(x){return opts.label?opts.label(x):(x.name||x.label||x.id||String(x));};
+  var val=function(x){return opts.value?opts.value(x):(x.id!==undefined?x.id:String(x));};
+  /* A choice is made from a dropdown, never from the whole set laid out on the page.
+     Five options or five hundred, the control is the same size and the page does not
+     change shape as the business grows. The native select carries its own search on
+     every platform, and our control-geometry rule already gives it a height and an arrow. */
+  h+='<select onchange="if(this.value){'+onpick.replace('{v}',"'+this.value+'")+'}" '
+   +'style="min-width:'+(opts.width||'220px')+';max-width:100%;border:1.5px solid rgba(11,42,59,.15);'
+   +'border-radius:10px;font-family:var(--body);background:#FFFFFF">';
+  if(opts.blank)h+='<option value="">'+opts.blank+'</option>';
+  for(i=0;i<all.length;i++){
+    var v=val(all[i]);
+    h+='<option value="'+String(v).replace(/"/g,'&quot;')+'"'+(v===current?' selected':'')+'>'
+      +String(lbl(all[i])).replace(/<[^>]*>/g,'')+'</option>';
+  }
+  h+='</select>';
+  if(opts.add)h+=' <button onclick="'+opts.add+'" style="cursor:pointer;font-family:var(--body);font-size:var(--fs-hint);font-weight:800;padding:0 14px;height:var(--ctl-h);border-radius:10px;border:1.5px dashed rgba(14,165,233,.55);background:#F4FBFF;color:#0A4A6B">+ '+(opts.addLabel||t('add'))+'</button>';
+  if(opts.count===true)h+=' <span class="hint machine" style="margin-'+(currentLang==='ar'?'right':'left')+':8px">'+all.length+'</span>';
+  return h;
+}
+function slMultiPicker(id,items,isOn,onToggle,opts){
+  opts=opts||{};
+  var all=items||[], q=String(SL_PICK_Q[id]||'').toLowerCase(), i, h='';
+  var lbl=function(x){return opts.label?opts.label(x):(x.name||x.label||String(x));};
+  var val=function(x){return opts.value?opts.value(x):(x.id!==undefined?x.id:String(x));};
+  var chosen=[]; for(i=0;i<all.length;i++){if(isOn(all[i]))chosen.push(all[i]);}
+  var chip=function(x,on){
+    return '<button onclick="'+onToggle.replace('{v}',val(x))+'" style="cursor:pointer;font-family:var(--body);font-size:var(--fs-hint);font-weight:800;'
+     +'padding:7px 13px;border-radius:999px;border:1.5px solid '+(on?'#0A7250':'rgba(11,42,59,.14)')+';'
+     +'background:'+(on?'#DCF5E9':'#FFFFFF')+';color:'+(on?'#0A7250':'#0B2A3B')+'">'+(on?'&#10003; ':'')+lbl(x)+'</button>';
+  };
+  if(all.length<=SL_CHIP_MAX&&!q){
+    h+='<div style="display:flex;gap:6px;flex-wrap:wrap">';
+    for(i=0;i<all.length;i++)h+=chip(all[i],isOn(all[i]));
+    return h+'</div>';
+  }
+  var hits=[]; for(i=0;i<all.length;i++){if(!q||String(lbl(all[i])).toLowerCase().indexOf(q)>-1)hits.push(all[i]);}
+  var shown=hits.slice(0,SL_CHIP_MAX);
+  h+='<div>';
+  if(chosen.length){
+    h+='<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:7px">';
+    for(i=0;i<Math.min(chosen.length,SL_CHIP_MAX);i++)h+=chip(chosen[i],true);
+    if(chosen.length>SL_CHIP_MAX)h+='<span class="hint" style="align-self:center">+'+(chosen.length-SL_CHIP_MAX)+'</span>';
+    h+='</div>';
+  }
+  h+='<input type="text" value="'+String(SL_PICK_Q[id]||'').replace(/"/g,'&quot;')+'" oninput="slPickQ(\''+id+'\',this.value)" '
+   +'placeholder="'+(opts.placeholder||t('search'))+'" style="width:100%;max-width:280px;border:1.5px solid rgba(11,42,59,.15);'
+   +'border-radius:9px;padding:0 11px;font-family:var(--body);font-size:var(--fs-body);background:#FFFFFF">'
+   +'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:7px">';
+  for(i=0;i<shown.length;i++)h+=chip(shown[i],isOn(shown[i]));
+  h+='</div><div class="hint" style="margin-top:5px">'
+   +t('chosen')+' <span class="machine">'+chosen.length+'</span> '+t('of')+' <span class="machine">'+all.length+'</span>'
+   +(hits.length>shown.length?' · '+t('keep typing to narrow it'):'')+'</div></div>';
+  return h;
+}
+
+var SL_ICONS={
+ hub:'<path d="M3 20h18M5 20V9l7-5 7 5v11M9 20v-5h6v5"/>',
+ city:'<path d="M3 21V9l5-3v4l5-3v14"/><path d="M13 21V11l6-3v13"/><path d="M6 12h1M6 15h1M6 18h1M16 12h1M16 15h1M16 18h1"/>',
+ blocked:'<circle cx="12" cy="12" r="8.5"/><path d="M6 6l12 12"/>',
+
+ idcard:'<rect x="2.5" y="5" width="19" height="14" rx="2.4"/><circle cx="8.5" cy="11" r="2.2"/><path d="M5 16.2a3.8 3.8 0 0 1 7 0M14 10h4M14 13.5h4"/>',
+ key:'<circle cx="8" cy="12" r="4"/><path d="M12 12h9M17.5 12v3M20.5 12v2.2"/>',
+ shield:'<path d="M12 3 5 6v6c0 4 3 6.7 7 8 4-1.3 7-4 7-8V6z"/><path d="M9 12l2 2 4-4"/>',
+
+ compass:'<circle cx="12" cy="12" r="9"/><path d="M15.5 8.5 13.5 13.5 8.5 15.5 10.5 10.5z"/>',
+ ruler:'<path d="M3.5 14.5 14.5 3.5l6 6-11 11z"/><path d="M7 11l2 2M10 8l2 2M13 5l2 2"/>',
+ depart:'<path d="M3 20h18"/><path d="M4 14.5 6.5 15 10 11 5.5 5.5l2.5-.5 6 4.5 4.5-1a2 2 0 1 1 .8 3.4L6.5 17z"/>',
+ abacus:'<rect x="3.5" y="3.5" width="17" height="17" rx="2"/><path d="M3.5 9h17M3.5 14.5h17M9 3.5v17M15 3.5v17"/>',
+ folders:'<path d="M3 8h6l2 2h10v9H3z"/><path d="M6 8V5h5l2 2"/>',
+ scroll:'<path d="M6 4h11v14a2.5 2.5 0 0 0 2.5 2.5H8A2.5 2.5 0 0 1 5.5 18V6"/><path d="M9 8h5M9 12h5"/>',
+ tag:'<path d="M11 3H4.5v6.5L14 19l6.5-6.5z"/><circle cx="8" cy="7" r="1.4"/>',
+ people:'<circle cx="9" cy="8" r="3.2"/><path d="M2.5 19a6.5 6.5 0 0 1 13 0"/><path d="M16 5.5a3.2 3.2 0 0 1 0 6M17.5 19a6 6 0 0 0-2-4.4"/>',
+ tools:'<path d="M14.5 6.5a3.5 3.5 0 1 0 4 4L21 13l-8 8-2.5-2.5"/><path d="M9 4 4 9l3.5 3.5L12.5 7.5z"/>',
+ bank:'<path d="M3 9.5 12 4l9 5.5"/><path d="M5 9.5V19M9.5 9.5V19M14.5 9.5V19M19 9.5V19M3 19h18"/>',
+ clipboard:'<rect x="5" y="4.5" width="14" height="16" rx="2"/><path d="M9 4.5V3h6v1.5"/><path d="M9 10h6M9 14h6"/>',
+ export:'<path d="M12 3v11M8 7l4-4 4 4"/><path d="M4 15v4h16v-4"/>',
+ gift:'<rect x="3" y="9" width="18" height="11" rx="1.6"/><path d="M3 13h18M12 9v11"/><path d="M12 9C10 5.5 6 6 6 8.2 6 9.4 8 9 12 9zM12 9c2-3.5 6-3 6-.8 0 1.2-2 .8-6 .8z"/>',
+ home:'<path d="M3.5 11 12 4l8.5 7"/><path d="M6 10.5V20h12v-9.5"/><path d="M10 20v-5h4v5"/>',
+ flask:'<path d="M10 3v6L4.5 18.5A2 2 0 0 0 6.3 21.5h11.4a2 2 0 0 0 1.8-3L14 9V3"/><path d="M9 3h6M7.5 15h9"/>',
+ trophy:'<path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4.5v1.5A3 3 0 0 0 7 10.4M17 6h2.5v1.5A3 3 0 0 1 17 10.4"/><path d="M12 14v3M8.5 20h7"/>',
+
+ plane:'<path d="M2.5 13.5 21 5l-4 9 4 9-18.5-8.5" /><path d="M8 11.6 8 6"/>',
+ ship:'<path d="M3 17.5c1.6 1 3.2 1 4.8 0s3.2-1 4.8 0 3.2 1 4.8 0 3.2-1 4.8 0"/><path d="M5 14l1.4-5h11.2L19 14"/><path d="M12 4v5"/>',
+ truck:'<path d="M2 16V6h11v10"/><path d="M13 9h4l4 4v3h-8"/><circle cx="6.5" cy="17.5" r="1.8"/><circle cx="17.5" cy="17.5" r="1.8"/>',
+ box:'<path d="M12 3 3 7.5V17l9 4.5 9-4.5V7.5z"/><path d="M3 7.5 12 12l9-4.5M12 12v9.5"/>',
+ pin:'<path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.6"/>',
+ person:'<circle cx="12" cy="8" r="3.6"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/>',
+ handshake:'<path d="M3 12.5 7 8.5l3 2.5 3-2.5 4 4"/><path d="M10 15.5 12 17.5l2-2 2 2"/><path d="M2 9.5 5.5 6M22 9.5 18.5 6"/>',
+ lock:'<rect x="4.5" y="10.5" width="15" height="9.5" rx="2.2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/>',
+ search:'<circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/>',
+ card:'<rect x="2.5" y="5" width="19" height="14" rx="2.6"/><path d="M2.5 10h19"/>',
+ camera:'<rect x="2.5" y="7" width="19" height="13" rx="2.4"/><circle cx="12" cy="13.5" r="4"/><path d="M8.5 7l1.5-3h4l1.5 3"/>',
+ globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.2 3 14.8 0 18M12 3c-3 3.2-3 14.8 0 18"/>',
+ bolt:'<path d="M13.5 2 5 13.5h6L10.5 22 19 10.5h-6z"/>',
+ scale:'<path d="M12 4v16M6 20h12M12 6 4 10M12 6l8 4"/><path d="M1.5 10.5a2.5 2.5 0 0 0 5 0M17.5 10.5a2.5 2.5 0 0 0 5 0"/>',
+ customs:'<rect x="3" y="9" width="18" height="11" rx="1.8"/><path d="M3 13h18M8 9V5h8v4"/>',
+ factory:'<path d="M3 20V11l5 3V11l5 3V6h8v14z"/><path d="M17 11v3M20 11v3"/>',
+ map:'<path d="M9 4 3 6.5v13L9 17l6 2.5 6-2.5v-13L15 6.5z"/><path d="M9 4v13M15 6.5v13"/>',
+ bell:'<path d="M6 9a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6z"/><path d="M10 19.5a2.2 2.2 0 0 0 4 0"/>',
+ clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5.4l3.4 2"/>',
+ doc:'<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/>',
+ chat:'<path d="M4 5h16v11H9l-5 4z"/>',
+ gear:'<circle cx="12" cy="12" r="3.2"/><path d="M12 3v2.4M12 18.6V21M3 12h2.4M18.6 12H21M5.6 5.6l1.7 1.7M16.7 16.7l1.7 1.7M18.4 5.6l-1.7 1.7M7.3 16.7l-1.7 1.7"/>',
+ palm:'<path d="M12 21V11"/><path d="M12 11c-3-3-6-2.5-8-1 1.5-4 5.5-5 8-2 2.5-3 6.5-2 8 2-2-1.5-5-2-8 1z"/>',
+ flag:'<path d="M6 21V4M6 4h11l-2.2 3.5L17 11H6"/>',
+ printer:'<path d="M7 9V3h10v6"/><rect x="3.5" y="9" width="17" height="7" rx="1.8"/><path d="M7 14h10v7H7z"/>'
+};
+function slIcon(name,size,stroke){
+ var p=SL_ICONS[name];
+ if(!p)return '';
+ var s=size||16;
+ return '<svg viewBox="0 0 24 24" width="'+s+'" height="'+s+'" fill="none" stroke="currentColor" '
+  +'stroke-width="'+(stroke||1.7)+'" stroke-linecap="round" stroke-linejoin="round" '
+  +'style="vertical-align:-0.18em;flex-shrink:0" aria-hidden="true">'+p+'</svg>';
+}
+
+if (!window.__slm) window.__slm = 0;
+function slMark(h, tone) {
+  var id = 'slm' + (++window.__slm);
+  var w  = (h * 124 / 80).toFixed(1);
+  var cL = (tone === 'white') ? '#ffffff' : '#0B2A3B';
+  var cR = (tone === 'white') ? 'rgba(255,255,255,0.72)' : '#0EA5E9';
+  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 124 80" width="' + w + '" height="' + h + '" fill="none">'
+    + '<defs>'
+    + '<clipPath id="' + id + 'T"><rect x="46" y="6" width="32" height="34"/></clipPath>'
+    + '<clipPath id="' + id + 'B"><rect x="46" y="40" width="32" height="34"/></clipPath>'
+    + '<mask id="' + id + 'MA"><rect width="124" height="80" fill="#fff"/><g clip-path="url(#' + id + 'T)"><rect x="50" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#000" stroke-width="15"/></g></mask>'
+    + '<mask id="' + id + 'MB"><rect width="124" height="80" fill="#fff"/><g clip-path="url(#' + id + 'B)"><rect x="6" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#000" stroke-width="15"/></g></mask>'
+    + '</defs>'
+    + '<rect x="6"  y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="' + cL + '" stroke-width="9" mask="url(#' + id + 'MA)"/>'
+    + '<rect x="50" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="' + cR + '" stroke-width="9" mask="url(#' + id + 'MB)"/>'
+    + '</svg>';
+}
+function slLockup(h, tone) {
+  var ink = (tone === 'white') ? '#ffffff' : '#0B2A3B';
+  var sky = (tone === 'white') ? '#38BDF8' : '#0EA5E9';
+  return '<span style="display:inline-flex;align-items:center;gap:5px;line-height:1">'
+    + '<span style="font-family:Bricolage Grotesque,sans-serif;font-weight:800;font-size:' + h + 'px;color:' + ink + ';letter-spacing:-0.02em">shopy</span>'
+    + slMark(h * 0.7, tone)
+    + '<span style="font-family:Bricolage Grotesque,sans-serif;font-weight:800;font-size:' + h + 'px;color:' + sky + ';letter-spacing:-0.02em">link</span>'
+    + '</span>';
+}
+
+var currentLang='en';
+var T={
+ 'My run today':'جولتي اليوم','stops':'محطات','Progress':'التقدّم','Call':'اتصال',
+ 'My Run':'جولتي','History':'السجل','Account':'حسابي','Today':'اليوم',
+ 'Language':'اللغة','English':'English','Arabic':'العربية',
+ 'Driver profile':'ملف السائق','Vehicle':'المركبة','Plate':'اللوحة','Phone':'الهاتف','Zones covered':'مناطق التغطية',
+ 'Support (WhatsApp)':'الدعم (واتساب)','App version':'إصدار التطبيق','Sign out':'تسجيل الخروج',
+ 'Tap again to confirm':'اضغط مرة أخرى للتأكيد','Signed out — demo restarts the day':'سُجّل الخروج — يعيد النموذج بدء اليوم',
+ 'No completed stops yet':'لا محطات منجزة بعد','Resolved stops appear here during the day':'تظهر المحطات المحسومة هنا خلال اليوم',
+ 'attempted':'محاولة','Settings':'الإعدادات','Next':'التالي','Delivered':'سُلِّم','Unavailable':'غير متاح',
+ 'cartons':'كرتون','Arrived at door':'وصلت إلى الباب','Confirm recipient':'تأكيد المستلم',
+ 'Signature':'التوقيع','signed':'وُقِّع',
+ 'Sign in the box':'وقّع داخل الإطار','Clear':'مسح','Confirm signature (fallback)':'اعتماد التوقيع (بديل)',
+ 'Attach photo (optional)':'إرفاق صورة (اختياري)','Photo attached':'الصورة مرفقة',
+ 'Mark delivered':'تأكيد التسليم','Customer unavailable':'العميل غير متاح','Reason':'السبب',
+ 'No answer':'لا يجيب','Wrong address':'عنوان خاطئ','Refused':'رفض الاستلام','Rescheduled by customer':'أجّله العميل',
+ 'Confirm unavailable':'تأكيد عدم التوفر','Back to run':'العودة للجولة','Back':'رجوع',
+ 'End run':'إنهاء الجولة','Run complete':'اكتملت الرحلة','pending stops remain':'محطات معلّقة متبقية',
+ 'Attempt':'محاولة','locked until signature':'محجوب حتى التوقيع',
+ 'Prepaid — no cash handling':'مدفوعة مسبقًا — لا تعامل نقدي','New day':'يوم جديد',
+ 'All shipments prepaid — no cash handling':'كل الشحنات مدفوعة مسبقًا — لا تعامل نقدي',
+ 'unavailable stops return to the hub for reverse receive':'المحطات غير المتاحة تعود للمستودع للاستلام العكسي',
+ 'tap any pending stop — order is fixed, skipping allowed':'انقر أي محطة معلّقة — الترتيب ثابت والتخطّي مسموح',
+ 'customer notified':'أُشعر العميل','max attempts reached':'بلغت الحد الأقصى للمحاولات',
+};
+function t(s){return currentLang==='ar'&&T[s]?T[s]:s;}
+function setLang(l){currentLang=l;document.documentElement.dir=l==='ar'?'rtl':'ltr';document.documentElement.lang=l;
+ var bs=document.querySelectorAll('.lang button');for(var i=0;i<bs.length;i++){bs[i].className=bs[i].getAttribute('data-lang')===l?'on':'';}
+ render();}
+
+var MAX_ATTEMPTS=3;
+var RUN={id:'RUN-260818-01',driver:'Samer Haddad',zone:'Mezzeh · Damascus'};
+var DRIVER={id:'DRV-01',name:'Samer Haddad',phone:'+963 944 111 222',plate:'DMS 4721',vehicle:'Yamaha 125 — Motorbike',zones:['Mezzeh','Midan']};
+var tab='run'; var soConfirm=false;
+var STOPS=[
+ {id:'DLV-2608-01',n:1,customer:'Layla Al-Rifai',phone:'+963 944 555 111',addr:'Mezzeh, Western Villas, Bldg 14, Fl 3',map:'33.5019, 36.2361',cartons:['C01','C02','C03','C04','C05','C06'],attempts:0,stt:'pending',rcpt:false,sig:false,photo:false,reason:null,dlvAt:null,sigAt:null},
+ {id:'DLV-2608-02',n:2,customer:'Omar Khalil',phone:'+963 933 222 444',addr:'Mezzeh 86, Street 12, Bldg 4',map:'33.4980, 36.2405',cartons:['C01','C02'],attempts:0,stt:'pending',rcpt:false,sig:false,photo:false,reason:null,dlvAt:null,sigAt:null},
+ {id:'DLV-2608-04',n:3,customer:'TechLine Trading',phone:'+963 955 777 000',addr:'Jaramana, Industrial Rd 3, Gate B',map:'33.4862, 36.3461',cartons:['C01','C02','C03','C04'],attempts:0,stt:'pending',rcpt:false,sig:false,photo:false,reason:null,dlvAt:null,sigAt:null},
+ {id:'DLV-2608-03',ship:'CON-240703-02',n:4,customer:'Ahmad Khalil',phone:'+963 933 444 121',addr:'Midan, Al-Zahra St 5',map:'',cartons:['C01','C02','C03','C04','C05','C06','C07','C08'],attempts:2,stt:'pending',rcpt:false,sig:false,photo:false,reason:null,dlvAt:null,sigAt:null}
+];
+var scr='run'; var cur=null;
+
+function stamp(){return new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});}
+function fmt(n){
+ // Money: two decimals always, thousands separated, done by hand.
+ // toLocaleString() drops the trailing zero and is an Intl call the legacy rule forbids.
+ var v=Number(n); if(!isFinite(v))v=0;
+ var neg=v<0; v=Math.abs(v);
+ var s2=(Math.round(v*100)/100).toFixed(2), p=s2.split('.'), whole=p[0], out='', i, c=0;
+ for(i=whole.length-1;i>=0;i--){out=whole.charAt(i)+out;c++;if(c%3===0&&i>0)out=','+out;}
+ return (neg?'-':'')+out+'.'+p[1];
+}
+function stopById(id){return STOPS.find(function(s){return s.id===id;});}
+function nextStop(){return STOPS.find(function(s){return s.stt==='pending';});}
+function allResolved(){for(var i=0;i<STOPS.length;i++){if(STOPS[i].stt!=='delivered'&&STOPS[i].stt!=='unavailable')return false;}return true;}
+
+function openStop(id){var s=stopById(id);if(!s||(s.stt!=='pending'&&s.stt!=='arrived'))return;cur=id;scr='stop';render();}
+function backRun(){scr='run';cur=null;render();}
+function arrive(id){var s=stopById(id);if(!s||s.stt!=='pending')return;s.stt='arrived';render();}
+function toggleRcpt(id){var s=stopById(id);if(!s||s.stt!=='arrived')return;s.rcpt=!s.rcpt;render();}
+function togglePhoto(id){var s=stopById(id);if(!s)return;s.photo=!s.photo;render();}
+function applySig(id){var s=stopById(id);if(!s||s.stt!=='arrived'||s.sig)return;s.sig=true;s.sigAt=stamp();render();}
+function clearSig(id){var s=stopById(id);if(!s)return;s.sig=false;s.sigAt=null;render();}
+function canDeliver(s){return s.stt==='arrived'&&s.rcpt&&s.sig;}
+function markDelivered(id){var s=stopById(id);if(!s||!canDeliver(s))return;s.stt='delivered';s.dlvAt=stamp();backRun();}
+function openUnavail(id){var s=stopById(id);if(!s||s.stt!=='arrived')return;scr='unav';render();}
+function setReason(id,r){var s=stopById(id);if(!s)return;s.reason=r;render();}
+function confirmUnavail(id){var s=stopById(id);if(!s||!s.reason)return;s.stt='unavailable';backRun();}
+function endRun(){if(!allResolved())return;scr='end';render();}
+function goTab(x){tab=x;soConfirm=false;if(x==='run'&&scr!=='end')scr=(scr==='stop'||scr==='unav')?scr:'run';render();}
+function signOut(){if(!soConfirm){soConfirm=true;render();return;}soConfirm=false;tab='run';resetDay();}
+function resetDay(){for(var i=0;i<STOPS.length;i++){var s=STOPS[i];s.stt='pending';s.rcpt=false;s.sig=false;s.photo=false;s.reason=null;s.dlvAt=null;s.sigAt=null;}STOPS[3].attempts=2;scr='run';cur=null;render();}
+
+function wireSig(){
+ var c=document.getElementById('sig-pad'); if(!c)return;
+ var ctx=null; try{ctx=c.getContext('2d');}catch(e){}
+ var down=false,drawn=false;
+ function pos(e){var r=c.getBoundingClientRect();var p=e.touches?e.touches[0]:e;return{x:(p.clientX-r.left)*(c.width/r.width),y:(p.clientY-r.top)*(c.height/r.height)};}
+ function st2(e){down=true;if(ctx){var p=pos(e);ctx.beginPath();ctx.moveTo(p.x,p.y);}if(e.preventDefault)e.preventDefault();}
+ function mv(e){if(!down)return;drawn=true;if(ctx){var p=pos(e);ctx.lineWidth=2.2;ctx.lineCap='round';ctx.strokeStyle='#0B2A3B';ctx.lineTo(p.x,p.y);ctx.stroke();}if(e.preventDefault)e.preventDefault();}
+ function up(){if(down&&drawn)applySig(cur);down=false;}
+ c.addEventListener('mousedown',st2);c.addEventListener('mousemove',mv);window.addEventListener('mouseup',up);
+ c.addEventListener('touchstart',st2);c.addEventListener('touchmove',mv);c.addEventListener('touchend',up);
+}
+
+function sttChip(s){
+ if(s.stt==='delivered')return '<span class="chip c-ok">✓ '+t('Delivered')+' '+s.dlvAt+'</span>';
+ if(s.stt==='unavailable')return '<span class="chip c-bad">✕ '+t('Unavailable')+'</span>';
+ if(s.stt==='arrived')return '<span class="chip c-warn">📍 '+t('Arrived at door')+'</span>';
+ return '<span class="chip c-mut">—</span>';
+}
+
+function vRun(){
+ var nx=nextStop(),done=0,unv=0,i;
+ for(i=0;i<STOPS.length;i++){if(STOPS[i].stt==='delivered')done++;else if(STOPS[i].stt==='unavailable')unv++;}
+ var h='<div class="stat"><div><div class="v" style="color:#0A7250">'+done+'</div><div class="l">'+t('Delivered')+'</div></div>'
+  +'<div><div class="v" style="color:'+(unv?'#E1483B':'rgba(11,42,59,.52)')+'">'+unv+'</div><div class="l">'+t('Unavailable')+'</div></div>'
+  +'<div><div class="v">'+STOPS.length+'</div><div class="l">'+t('stops')+'</div></div></div>'
+  +'<div class="mut" style="font-size:10.5px;margin-bottom:8px">'+t('tap any pending stop — order is fixed, skipping allowed')+'</div>';
+ for(i=0;i<STOPS.length;i++){var s=STOPS[i];
+  var cls=s.stt==='delivered'?'dlv':(s.stt==='unavailable'?'unv':(nx&&nx.id===s.id?'next':''));
+  var open=(s.stt==='pending'||s.stt==='arrived');
+  h+='<div class="stop '+cls+'" '+(open?'onclick="openStop(\''+s.id+'\')"':'')+'>'
+   +'<div class="row" style="display:flex;align-items:center;gap:10px">'
+   +'<span class="n">'+(s.stt==='delivered'?'✓':s.n)+'</span>'
+   +'<div style="flex:1"><div style="font-size:13.5px;font-weight:800">'+s.customer+(nx&&nx.id===s.id?' <span style="font-size:9px;color:#0B6E9B;font-weight:800">● '+t('Next')+'</span>':'')+'</div>'
+   +'<div class="mut" style="font-size:10.5px">'+s.addr+'</div>'
+   +'<div class="mono mut" style="font-size:9.5px">'+s.id+' · '+s.cartons.length+' '+t('cartons')+(s.attempts?' · '+t('Attempt')+' '+(s.attempts+1)+'/'+MAX_ATTEMPTS:'')+'</div></div>'
+   +'<div style="text-align:right">'+sttChip(s)+'</div>'+(open?'<span class="chev">›</span>':'')
+   +'</div></div>';
+ }
+ return h;
+}
+function vStop(){
+ var s=stopById(cur); if(!s)return vRun();
+ var arr=s.stt==='arrived';
+ var h='<div class="card" style="padding:13px">'
+  +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:7px"><span class="n">'+s.n+'</span><div style="flex:1"><div style="font-size:16px;font-weight:800">'+s.customer+'</div><div class="mono mut" style="font-size:10px">'+s.id+'</div></div>'+sttChip(s)+'</div>'
+  +'<div style="font-size:12.5px;margin-bottom:4px">📍 '+s.addr+'</div>'
+  +'</div>'
+ h+='<div class="map-strip"><span class="pin">📍</span><span class="coord">'+s.map+'</span></div>'
+ +'<div class="act-row"><a href="tel:'+s.phone.replace(/ /g,'')+'">📞 '+t('Call')+'</a><a href="https://wa.me/'+s.phone.replace(/[^0-9]/g,'')+'">💬 WhatsApp</a></div>'
+ +'<div class="card" style="padding:10px 13px"><div style="font-size:11px;font-weight:800;margin-bottom:6px">📦 '+s.cartons.length+' '+t('cartons')+'</div><div>';
+ for(var i=0;i<s.cartons.length;i++)h+='<span class="mono" style="font-size:10px;font-weight:700;padding:3px 7px;border-radius:5px;background:#EEF2F7;border:1px solid rgba(11,42,59,.09);margin:0 3px 3px 0;display:inline-block">'+s.cartons[i]+'</span>';
+ h+='</div></div>';
+ h+='<div class="cod" style="background:rgba(16,185,129,.08);border:1.5px solid rgba(16,185,129,.35);padding:9px"><div style="font-size:12px;font-weight:800;color:#065F46">✓ '+t('Prepaid — no cash handling')+'</div></div>';
+ if(!arr){
+  h+='<button class="btn b-pri" onclick="arrive(\''+s.id+'\')">📍 '+t('Arrived at door')+'</button>';
+ }else{
+  h+='<div class="chk '+(s.rcpt?'on':'')+'" onclick="toggleRcpt(\''+s.id+'\')"><span class="bx">'+(s.rcpt?'✓':'')+'</span>'+t('Confirm recipient')+' — '+s.customer+'</div>';
+  h+='<div class="card" style="padding:11px">'
+   +'<div style="display:flex;align-items:center;margin-bottom:7px"><span style="font-size:12.5px;font-weight:800;flex:1">✍ '+t('Signature')+'</span>'
+   +(s.sig?'<button onclick="clearSig(\''+s.id+'\')" style="font-size:10px;font-weight:700;border:1px solid rgba(11,42,59,.15);background:none;border-radius:5px;padding:3px 8px;color:#62707A;font-family:inherit;cursor:pointer">'+t('Clear')+'</button>':'')+'</div>';
+  if(s.sig){h+='<div style="text-align:center;padding:18px;background:rgba(16,185,129,.10);border-radius:10px;font-weight:800;color:#065F46">✓ '+t('signed')+' · '+s.sigAt+'</div>';}
+  else{h+='<canvas id="sig-pad" width="340" height="140"></canvas>'
+   +'<div class="mut" style="font-size:9.5px;text-align:center;margin:5px 0 7px">'+t('Sign in the box')+'</div>'
+   +'<button class="btn b-sec" style="margin-bottom:0;padding:10px;font-size:11.5px" onclick="applySig(\''+s.id+'\')">✓ '+t('Confirm signature (fallback)')+'</button>';}
+  h+='</div>'
+   +'<div class="chk '+(s.photo?'on':'')+'" onclick="togglePhoto(\''+s.id+'\')"><span class="bx">'+(s.photo?'✓':'')+'</span>📷 '+(s.photo?t('Photo attached'):t('Attach photo (optional)'))+'</div>'
+   +'<button class="btn b-grn" '+(canDeliver(s)?'onclick="markDelivered(\''+s.id+'\')"':'disabled')+'>✓ '+t('Mark delivered')+(s.sig?'':' — '+t('locked until signature'))+'</button>'
+   +'<button class="btn b-dng" onclick="openUnavail(\''+s.id+'\')">✕ '+t('Customer unavailable')+'</button>';
+ }
+ return h;
+}
+function vUnav(){
+ var s=stopById(cur); if(!s)return vRun();
+ var R=['No answer','Wrong address','Refused','Rescheduled by customer'];
+ var last=(s.attempts+1)>=MAX_ATTEMPTS;
+ var h='<div style="font-size:16px;font-weight:800;margin-bottom:3px">✕ '+t('Customer unavailable')+'</div>'
+  +'<div class="mut" style="font-size:11px;margin-bottom:10px">'+s.customer+' · '+s.id+' · '+t('Attempt')+' '+(s.attempts+1)+'/'+MAX_ATTEMPTS+(last?' — '+t('max attempts reached'):'')+'</div>'
+  +'<div style="font-size:12.5px;font-weight:800;margin-bottom:6px">'+t('Reason')+'</div>';
+ for(var i=0;i<R.length;i++){var r=R[i];
+  h+='<div class="chk '+(s.reason===r?'on':'')+'" onclick="setReason(\''+s.id+'\',\''+r+'\')"><span class="bx">'+(s.reason===r?'✓':'')+'</span>'+t(r)+'</div>';}
+ h+='<div class="chk '+(s.photo?'on':'')+'" onclick="togglePhoto(\''+s.id+'\')"><span class="bx">'+(s.photo?'✓':'')+'</span>📷 '+(s.photo?t('Photo attached'):t('Attach photo (optional)'))+'</div>'
+  +'<button class="btn" style="background:#B23429;color:#fff" '+(s.reason?'onclick="confirmUnavail(\''+s.id+'\')"':'disabled')+'>'+t('Confirm unavailable')+' → '+t('Back to run')+'</button>';
+ return h;
+}
+function vEnd(){
+ var done=0; for(var i=0;i<STOPS.length;i++)if(STOPS[i].stt==='delivered')done++;
+ var h='<div style="text-align:center;padding:10px 0 4px"><div style="font-size:44px">🏁</div>'
+  +'<div style="font-family:\'Bricolage Grotesque\',sans-serif;font-size:21px;font-weight:800">'+t('Run complete')+'</div>'
+  +'<div class="mut" style="font-size:12px;margin-bottom:12px">'+done+' '+t('Delivered')+' · '+(STOPS.length-done)+' '+t('Unavailable')+'</div></div>'
+  +'<div class="card" style="padding:13px">';
+ for(var j=0;j<STOPS.length;j++){var s=STOPS[j];
+  h+='<div class="sum"><span class="mono" style="font-size:11px">'+s.id+' · '+s.customer+'</span>'
+   +'<span style="font-size:11px;font-weight:800;color:'+(s.stt==='delivered'?'#065F46':'#991B1B')+'">'+(s.stt==='delivered'?'✓ '+t('Delivered')+' '+s.dlvAt:'✕ '+t(s.reason||'Unavailable'))+'</span></div>';}
+ h+='</div>'
+  +'<div class="card" style="padding:12px;border-color:rgba(16,185,129,.4);background:rgba(16,185,129,.06)"><div style="font-size:12px;font-weight:800;color:#065F46">💳 '+t('All shipments prepaid — no cash handling')+'</div><div class="mut" style="font-size:10.5px;margin-top:3px">'+t('unavailable stops return to the hub for reverse receive')+'</div></div>'
+  +'<button class="btn b-sec" onclick="resetDay()">↺ '+t('New day')+'</button>';
+ return h;
+}
+function vHistory(){
+ var res=[]; for(var i=0;i<STOPS.length;i++){var x=STOPS[i];if(x.stt==='delivered'||x.stt==='unavailable')res.push(x);}
+ var done=0;for(var j=0;j<res.length;j++)if(res[j].stt==='delivered')done++;
+ var h='<div class="stat"><div><div class="v" style="color:#0A7250">'+done+'</div><div class="l">'+t('Delivered')+'</div></div>'
+  +'<div><div class="v" style="color:'+(res.length-done?'#E1483B':'rgba(11,42,59,.52)')+'">'+(res.length-done)+'</div><div class="l">'+t('Unavailable')+'</div></div>'
+  +'<div><div class="v">'+STOPS.length+'</div><div class="l">'+t('stops')+'</div></div></div>';
+ if(!res.length)return h+'<div class="card" style="padding:34px 16px;text-align:center"><div style="font-size:38px;margin-bottom:8px">🕘</div>'
+  +'<div style="font-size:14px;font-weight:800">'+t('No completed stops yet')+'</div>'
+  +'<div class="mut" style="font-size:11.5px;margin-top:4px">'+t('Resolved stops appear here during the day')+'</div></div>';
+ for(var k2=0;k2<res.length;k2++){var s2=res[k2];var okS=s2.stt==='delivered';
+  h+='<div class="stop '+(okS?'dlv':'unv')+'"><div class="row" style="display:flex;align-items:center;gap:10px">'
+   +'<span class="n">'+(okS?'✓':'✕')+'</span>'
+   +'<div style="flex:1"><div style="font-size:13.5px;font-weight:800">'+s2.customer+'</div>'
+   +'<div class="mono mut" style="font-size:9.5px">'+s2.id+' · '+s2.cartons.length+' '+t('cartons')+'</div></div>'
+   +'<div style="text-align:right">'+(okS?'<span class="chip c-ok">✓ '+t('Delivered')+' '+s2.dlvAt+'</span>':'<span class="chip c-bad">✕ '+t(s2.reason||'Unavailable')+'</span>')
+   +(okS&&s2.sigAt?'<div class="mono mut" style="font-size:9px;margin-top:4px">✍ '+s2.sigAt+(s2.photo?' · 📷':'')+'</div>':'')+'</div>'
+   +'</div></div>';}
+ return h;
+}
+
+// ── Account screen ──
+function accRow(ic,lbl,val,extra){
+ return '<div class="chk" style="cursor:default"'+(extra||'')+'><span style="font-size:17px;width:24px;text-align:center">'+ic+'</span>'
+  +'<span style="flex:1">'+lbl+'</span><span class="mono mut" style="font-size:11px;font-weight:700">'+val+'</span></div>';
+}
+function vAccount(){
+ var h='<div class="card" style="padding:16px;text-align:center">'
+  +'<div class="hdr-av" style="width:64px;height:64px;border-radius:20px;font-size:24px;margin:0 auto 9px">'+DRIVER.name.charAt(0)+'</div>'
+  +'<div style="font-family:\'Bricolage Grotesque\',sans-serif;font-size:19px;font-weight:800">'+DRIVER.name+'</div>'
+  +'<div class="mono mut" style="font-size:10.5px;margin-top:2px">'+DRIVER.id+' · '+t('Driver profile')+'</div>'
+  +'<div style="margin-top:8px"><span class="chip c-ok">● '+t('My run today')+' — '+RUN.id+'</span></div>'
+  +'</div>'
+  +'<div style="font-size:10px;font-weight:800;color:#62707A;text-transform:uppercase;letter-spacing:.07em;margin:14px 4px 7px">'+t('Language')+'</div>'
+  +'<div class="chk '+(currentLang==='en'?'on':'')+'" onclick="setLang(\'en\')"><span class="bx">'+(currentLang==='en'?'✓':'')+'</span>🇬🇧 English'+'</div>'
+  +'<div class="chk '+(currentLang==='ar'?'on':'')+'" onclick="setLang(\'ar\')"><span class="bx">'+(currentLang==='ar'?'✓':'')+'</span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 20" width="18" height="12" style="border-radius:2px;vertical-align:-2px;display:inline-block;box-shadow:0 1px 2px rgba(0,0,0,.22)"><rect width="30" height="20" fill="#007A3D"/><rect y="6.67" width="30" height="6.66" fill="#FFFFFF"/><rect y="13.33" width="30" height="6.67" fill="#000000"/><g fill="#CE1126" transform="translate(7.5,10)"><polygon points="0,-2.2 0.52,-0.72 2.09,-0.72 0.85,0.17 1.29,1.67 0,0.8 -1.29,1.67 -0.85,0.17 -2.09,-0.72 -0.52,-0.72"/></g><g fill="#CE1126" transform="translate(15,10)"><polygon points="0,-2.2 0.52,-0.72 2.09,-0.72 0.85,0.17 1.29,1.67 0,0.8 -1.29,1.67 -0.85,0.17 -2.09,-0.72 -0.52,-0.72"/></g><g fill="#CE1126" transform="translate(22.5,10)"><polygon points="0,-2.2 0.52,-0.72 2.09,-0.72 0.85,0.17 1.29,1.67 0,0.8 -1.29,1.67 -0.85,0.17 -2.09,-0.72 -0.52,-0.72"/></g></svg> العربية'+'</div>'
+  +'<div style="font-size:10px;font-weight:800;color:#62707A;text-transform:uppercase;letter-spacing:.07em;margin:14px 4px 7px">'+t('Settings')+'</div>'
+  +accRow('📞',t('Phone'),DRIVER.phone)
+  +accRow('🛵',t('Vehicle'),DRIVER.vehicle)
+  +accRow('🔖',t('Plate'),DRIVER.plate)
+  +accRow('🗺',t('Zones covered'),DRIVER.zones.join(' · '))
+  +'<a href="https://wa.me/963944111222" style="text-decoration:none;color:inherit">'+accRow('💬',t('Support (WhatsApp)'),'›')+'</a>'
+  +accRow('ℹ',t('App version'),'B8 · 1.0.0')
+  +'<button class="btn b-dng" style="margin-top:14px" onclick="signOut()">'+(soConfirm?'⚠ '+t('Tap again to confirm'):'⎋ '+t('Sign out'))+'</button>'
+  +(soConfirm?'<div class="mut" style="font-size:10.5px;text-align:center">'+t('Signed out — demo restarts the day')+'</div>':'');
+ return h;
+}
+
+function footHtml(){
+ var act='';
+ if(tab==='run'){
+  if(scr==='run'){
+   var ok2=allResolved(),rem=0;for(var i=0;i<STOPS.length;i++)if(STOPS[i].stt==='pending'||STOPS[i].stt==='arrived')rem++;
+   act='<button class="btn '+(ok2?'b-grn':'b-sec')+'" '+(ok2?'onclick="endRun()"':'disabled')+'>🏁 '+t('End run')+(ok2?'':' — '+rem+' '+t('pending stops remain'))+'</button>';
+  }else if(scr==='stop'){act='<button class="btn b-sec" onclick="backRun()">← '+t('Back to run')+'</button>';}
+  else if(scr==='unav'){act='<button class="btn b-sec" onclick="scr=\'stop\';render()">← '+t('Back')+'</button>';}
+ }
+ var TB=[['run','🚛',t('My Run')],['history','🕘',t('History')],['account','👤',t('Account')]];
+ var tb='<div class="tabs">';
+ for(var j=0;j<TB.length;j++){var x=TB[j];
+  tb+='<button class="tab'+(tab===x[0]?' on':'')+'" onclick="goTab(\''+x[0]+'\')"><span class="ti">'+x[1]+'</span><span class="tl">'+x[2]+'</span></button>';}
+ tb+='</div>';
+ return (act?'<div style="margin-bottom:8px">'+act+'</div>':'')+tb;
+}
+/* ── paging ──────────────────────────────────────────────────────────
+   A cap with a "show all" is fine for an alert list, where the tail is noise.
+   A catalogue is different: every card is a real product someone may need to
+   reach, so the tail must be reachable in steps rather than in one lump that
+   freezes the page. Page size is the reader's choice — 20, 50 or 100 — and the
+   page number survives a filter change only if the page still exists. */
+var PAGE_SIZES=[20,50,100];
+var PGS={};                              /* one page state per list, by name */
+function pgOf(k){if(!PGS[k])PGS[k]={size:(k==='sups'?10:20),page:0};return PGS[k];}
+var PG=pgOf('cards');
+function pgUse(k){PG=pgOf(k);}
+function pgSet(k,n){var p=pgOf(k);p.size=Number(n);p.page=0;render();}
+function pgGo(k,p){pgOf(k).page=p;render();}
+function pgClamp(total){
+ var PG=arguments[1]||window.PG;
+ var last=Math.max(0,Math.ceil(total/PG.size)-1);
+ if(PG.page>last)PG.page=last;        // a filter that shortens the list must not strand you
+ return last;
+}
+function pager(key,total,label){
+ var PG=pgOf(key);
+ var last=pgClamp(total,PG);
+ if(!total)return '';
+ var from=PG.page*PG.size+1, to=Math.min(total,(PG.page+1)*PG.size);
+ var btn=function(p,txt,on,dis){
+  return '<button '+(dis?'disabled':'onclick="pgGo(\''+key+'\','+p+')"')+' style="cursor:'+(dis?'not-allowed':'pointer')
+   +';font-family:var(--body);font-size:var(--fs-sm);font-weight:800;min-width:34px;height:32px;padding:0 10px;border-radius:8px;'
+   +'border:1.5px solid '+(on?'#0EA5E9':'rgba(11,42,59,.14)')+';background:'+(on?'#E6F4FE':'#FFFFFF')
+   +';color:'+(dis?'rgba(11,42,59,.35)':(on?'#0A4A6B':'#0B2A3B'))+'">'+txt+'</button>';
+ };
+ var nums='', start=Math.max(0,Math.min(PG.page-2,last-4)), end=Math.min(last,start+4), i;
+ for(i=start;i<=end;i++)nums+=btn(i,String(i+1),i===PG.page,false);
+ return '<div class="pager" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:10px 0">'
+  +'<span class="hint machine">'+from+'–'+to+' '+t('of')+' '+total+(label?' '+t(label):'')+'</span>'
+  +'<span style="margin-inline-start:auto;display:flex;gap:5px;align-items:center">'
+  +'<span class="hint">'+t('per page')+'</span>'
+  +PAGE_SIZES.map(function(n){
+     var on=PG.size===n;
+     return '<button onclick="pgSet(\''+key+'\','+n+')" style="cursor:pointer;font-family:var(--body);font-size:var(--fs-sm);font-weight:800;padding:0 11px;height:32px;border-radius:8px;border:1.5px solid '+(on?'#0EA5E9':'rgba(11,42,59,.14)')+';background:'+(on?'#E6F4FE':'#FFFFFF')+';color:'+(on?'#0A4A6B':'#0B2A3B')+'">'+n+'</button>';
+   }).join('')
+  +'</span>'
+  /* Previous and Next are always drawn, disabled at the ends. Hiding them on a
+     single page means the reader cannot tell whether the list is complete or the
+     control is simply missing — and they were reported missing for exactly that. */
+  +'<span style="display:flex;gap:5px;width:100%;margin-top:4px;align-items:center">'
+     +btn(PG.page-1,'\u2039 '+t('Previous'),false,PG.page===0)
+     +(last>0?nums:'<span class="hint machine" style="padding:0 8px">'+t('page')+' 1 / 1</span>')
+     +btn(PG.page+1,t('Next')+' \u203A',false,PG.page===last)
+   +'</span>'
+  +'</div>';
+}
+function pgSlice(key,list){var PG=pgOf(key);pgClamp(list.length,PG);return list.slice(PG.page*PG.size,(PG.page+1)*PG.size);}
+
+function render(){
+ var el=document.getElementById('app');
+ try{
+  el.innerHTML = tab==='history'?vHistory():tab==='account'?vAccount():(scr==='stop'?vStop():scr==='unav'?vUnav():scr==='end'?vEnd():vRun());
+ }catch(e){
+  el.innerHTML='<div style="padding:14px;border:2px solid #E1483B;border-radius:10px;background:#FDECEA;color:#7F1D1D;font-family:monospace;font-size:12px;word-break:break-all">RENDER ERROR: '+(e&&e.message?e.message:e)+'</div>';return;
+ }
+ document.getElementById('foot').innerHTML=footHtml();
+ // header: contextual left slot + title + live progress
+ var L=document.getElementById('hdr-left'), T=document.getElementById('hdr-t'), P=document.getElementById('hdr-prog');
+ if(tab==='history'){
+  L.innerHTML='<div class="hdr-av">SH</div>';
+  T.innerHTML=t('History')+'<span class="hdr-s">'+t('Today')+' · '+RUN.id+'</span>';
+ }else if(tab==='account'){
+  L.innerHTML='<div class="hdr-av">SH</div>';
+  T.innerHTML=t('Account')+'<span class="hdr-s">'+DRIVER.name+' · '+DRIVER.id+'</span>';
+ }else if(scr==='stop'||scr==='unav'){
+  L.innerHTML='<button class="hdr-back" onclick="'+(scr==='unav'?"scr='stop';render()":"backRun()")+'">‹</button>';
+  var sc2=stopById(cur);
+  T.innerHTML=(sc2?sc2.customer:'')+'<span class="hdr-s">'+(sc2?sc2.id:'')+'</span>';
+ }else{
+  L.innerHTML='<div class="hdr-av">SH</div>';
+  T.innerHTML=(scr==='end'?t('Run complete'):t('My run today'))+'<span class="hdr-s">'+RUN.id+' · '+RUN.driver+' · '+RUN.zone+'</span>';
+ }
+ var done=0,res=0;for(var i=0;i<STOPS.length;i++){if(STOPS[i].stt==='delivered')done++;if(STOPS[i].stt==='delivered'||STOPS[i].stt==='unavailable')res++;}
+ var pct=Math.round(res*100/STOPS.length);
+ if(tab==='account'){P.innerHTML='<div style="height:6px"></div>';}else P.innerHTML='<div class="prog-lbl"><span>'+t('Progress')+'</span><span>'+res+' / '+STOPS.length+' · '+pct+'%</span></div><div class="prog-bar"><div class="prog-fill" style="width:'+pct+'%"></div></div>';
+ try{wireSig();}catch(e2){}
+ try{window.scrollTo(0,0);}catch(e3){}
+}
+render();
+</script>
+</body>
+</html>

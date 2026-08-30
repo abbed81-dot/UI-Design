@@ -1065,7 +1065,7 @@ function ServiceView({ file, ar, t, tasks, focus, onAct, onChat, onBack, onOpenF
   const Icon = cat ? (CAT_ICONS[cat.id] || Inbox) : Inbox;
   if (!item || !cat) return null;
   return (
-    <div style={{ maxWidth: 860, marginInline: 'auto' }}>
+    <div style={{ maxWidth: 1400, marginInline: 'auto', display: 'flex', flexDirection: 'column', height: '100%' }}>
       <nav aria-label={t('مسار', 'Breadcrumb')} style={{
         display: 'flex', alignItems: 'center', gap: 'var(--s2)',
         fontSize: 'var(--fs-hint)', color: 'var(--n6)', marginBottom: 'var(--s4)',
@@ -1078,31 +1078,39 @@ function ServiceView({ file, ar, t, tasks, focus, onAct, onChat, onBack, onOpenF
       </nav>
 
       <section style={{
+        display: 'flex', alignItems: 'center', gap: 'var(--s3)', flexWrap: 'wrap',
         background: 'var(--paper)', border: '1px solid var(--n3)',
-        borderRadius: 'var(--radius)', boxShadow: 'var(--sh-1)', overflow: 'hidden',
-        marginBottom: 'var(--s5)',
+        borderRadius: 'var(--radius)', boxShadow: 'var(--sh-1)',
+        padding: 'var(--s2) var(--s4)', marginBottom: 'var(--s3)', flex: '0 0 auto',
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--s4)', padding: 'var(--s5) var(--s6)' }}>
-          <span aria-hidden style={{
-            width: 44, height: 44, borderRadius: 'var(--radius)', background: 'var(--sky-tint)',
-            color: 'var(--sky-deep)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}><Icon size={20} /></span>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 'var(--fs-eyebrow)', color: 'var(--n5)', fontWeight: 800, letterSpacing: '.08em', textTransform: 'uppercase' }}>
-              {ar ? cat.ar : cat.en}
-            </div>
-            <h2 style={{ fontSize: 21, fontWeight: 800, lineHeight: 1.3, margin: 0 }}>{ar ? item.ar : item.en}</h2>
-            <p style={{ margin: 'var(--s1) 0 0', fontSize: 'var(--fs-hint)', color: 'var(--n6)' }}>
-              {ar ? (item.descAr || '') : (item.descEn || '')}
-            </p>
-          </div>
-          {onOpenFile && (
-            <button onClick={() => onOpenFile(file)} style={{
-              height: 32, padding: '0 var(--s3)', border: '1.5px solid var(--n3)',
-              borderRadius: 'var(--radius-sm)', fontSize: 'var(--fs-eyebrow)', fontWeight: 700, color: 'var(--n7)',
-            }}>{t('ملف الوحدة', 'Module file')}</button>
-          )}
-        </div>
+        <span aria-hidden style={{
+          width: 30, height: 30, borderRadius: 'var(--radius-sm)', background: 'var(--sky-tint)',
+          color: 'var(--sky-deep)', display: 'flex', alignItems: 'center', justifyContent: 'center', flex: '0 0 auto',
+        }}><Icon size={16} /></span>
+        <span style={{ minWidth: 0, lineHeight: 1.25 }}>
+          <span className="sl-nowrap" style={{ display: 'block', fontSize: 'var(--fs-eyebrow)', color: 'var(--n5)', fontWeight: 800, letterSpacing: '.08em', textTransform: 'uppercase' }}>
+            {ar ? cat.ar : cat.en}
+          </span>
+          <span style={{ display: 'block', fontSize: 'var(--fs-lead)', fontWeight: 800 }}>{ar ? item.ar : item.en}</span>
+        </span>
+        <span style={{ flex: 1, minWidth: 120, fontSize: 'var(--fs-hint)', color: 'var(--n6)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          {ar ? (item.descAr || '') : (item.descEn || '')}
+        </span>
+        <span className="machine" style={{ fontSize: 'var(--fs-eyebrow)', fontWeight: 800, color: 'var(--n6)', background: 'var(--n1)', padding: '3px 9px', borderRadius: 'var(--radius-pill)' }}>
+          {tasks.length}
+        </span>
+        {tasks.length > 0 && (
+          <button onClick={() => onChat(tasks[0])} title={t('عمل هذه الخدمة', "This service's work")}
+            className="sl-row-chat" style={{ color: 'var(--n5)', display: 'flex', padding: 4, borderRadius: 'var(--radius-sm)' }}>
+            <MessageSquare size={15} />
+          </button>
+        )}
+        {onOpenFile && (
+          <button onClick={() => onOpenFile(file)} style={{
+            height: 28, padding: '0 var(--s3)', border: '1.5px solid var(--n3)',
+            borderRadius: 'var(--radius-sm)', fontSize: 'var(--fs-eyebrow)', fontWeight: 700, color: 'var(--n7)',
+          }}>{t('ملف الوحدة', 'Module file')}</button>
+        )}
       </section>
 
       {/* which task brought him here — the console's own signpost, no act on it:
@@ -1133,7 +1141,7 @@ function ServiceView({ file, ar, t, tasks, focus, onAct, onChat, onBack, onOpenF
 
       {/* the package's own file, carried and shown — nothing redrawn */}
       {hasModule(file)
-        ? <ModuleFrame file={file} ar={ar} t={t} title={ar ? item.ar : item.en} />
+        ? <ModuleFrame file={file} ar={ar} t={t} title={ar ? item.ar : item.en} fill />
         : (
           <div style={{
             background: 'var(--amber-tint)', color: 'var(--amber-deep)', border: '1.5px solid var(--amber)',
@@ -1144,26 +1152,25 @@ function ServiceView({ file, ar, t, tasks, focus, onAct, onChat, onBack, onOpenF
           </div>
         )}
 
-      <Panel
-        icon={<Timer size={14} />}
-        eyebrow={ar ? item.ar : item.en}
-        title={t('عمل هذه الخدمة اليوم', "This service's work today")}
-        meta={<span className="machine" style={{ fontSize: 'var(--fs-lead)', fontWeight: 700, color: 'var(--n6)' }}>{tasks.length}</span>}
-      >
-        {tasks.length === 0
-          ? (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--s2)', padding: 'var(--s7) var(--s6)', color: 'var(--n6)' }}>
-              <CircleCheckBig size={26} strokeWidth={1.5} style={{ color: 'var(--green)' }} />
-              <div style={{ fontSize: 'var(--fs-body)', fontWeight: 700, color: 'var(--ink)' }}>
-                {t('لا عمل معلّقاً لهذه الخدمة الآن.', 'No pending work for this service right now.')}
-              </div>
-              <div style={{ fontSize: 'var(--fs-hint)' }}>
-                {t('ما يخصّها يظهر هنا وعلى طابور يومك معاً.', 'What belongs to it appears here and on your day queue alike.')}
-              </div>
-            </div>
-          )
-          : <TaskList tasks={tasks} ar={ar} t={t} onAct={onAct} onChat={onChat} />}
-      </Panel>
+      {tasks.length > 0 && (
+        <details style={{ flex: '0 0 auto', marginTop: 'var(--s3)' }}>
+          <summary style={{
+            cursor: 'pointer', listStyle: 'none', display: 'flex', alignItems: 'center', gap: 'var(--s2)',
+            background: 'var(--paper)', border: '1px solid var(--n3)', borderRadius: 'var(--radius)',
+            padding: 'var(--s2) var(--s4)', fontSize: 'var(--fs-hint)', fontWeight: 800,
+          }}>
+            <Timer size={14} style={{ color: 'var(--n5)' }} />
+            {t('عمل هذه الخدمة اليوم', "This service's work today")}
+            <span className="machine" style={{ color: 'var(--n6)' }}>{tasks.length}</span>
+          </summary>
+          <div style={{
+            background: 'var(--paper)', border: '1px solid var(--n3)', borderTop: 0,
+            borderRadius: '0 0 var(--radius) var(--radius)', overflow: 'hidden',
+          }}>
+            <TaskList tasks={tasks} ar={ar} t={t} onAct={onAct} onChat={onChat} />
+          </div>
+        </details>
+      )}
     </div>
   );
 }
@@ -1174,8 +1181,8 @@ function ServiceView({ file, ar, t, tasks, focus, onAct, onChat, onBack, onOpenF
    its validation and its act — and writes to the same SL_* channels the
    console reads. That sharing is the wiring; a form the console redrew
    would be a second place the truth lives. */
-function ModuleFrame({ file, ar, t, title }: {
-  file: string; ar: boolean; t: (a: string, e: string) => string; title: string;
+function ModuleFrame({ file, ar, t, title, fill }: {
+  file: string; ar: boolean; t: (a: string, e: string) => string; title: string; fill?: boolean;
 }) {
   const [html, setHtml] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
@@ -1197,15 +1204,31 @@ function ModuleFrame({ file, ar, t, title }: {
     return () => { live = false; };
   }, [file, t]);
 
-  /* the module owns its own language switch; the console only tells it which
-     language the person is working in, so one toggle moves the whole console */
+  /* The module owns its own language switch; the console only tells it which
+     language the person is working in, so one toggle moves the whole console.
+     The frame's load event fires before its own scripts have defined setLang,
+     so telling it once told it nothing — measured: the module stayed English
+     under an Arabic console. The console keeps asking until the module's own
+     documentElement says it heard, then stops. */
   const syncLang = useCallback(() => {
-    try {
-      const w = frame.current?.contentWindow as (Window & { setLang?: (l: string) => void }) | null;
-      w?.setLang?.(ar ? 'ar' : 'en');
-    } catch { /* a frame that is not ready yet is not an error */ }
+    const want = ar ? 'ar' : 'en';
+    let tries = 0;
+    const tell = (): boolean => {
+      try {
+        const doc = frame.current?.contentDocument;
+        const w = frame.current?.contentWindow as (Window & { setLang?: (l: string) => void }) | null;
+        if (!doc || typeof w?.setLang !== 'function') return false;
+        w.setLang(want);
+        return doc.documentElement.getAttribute('lang') === want;
+      } catch { return false; }   /* a frame still parsing is not an error */
+    };
+    if (tell()) return;
+    const id = window.setInterval(() => {
+      if (tell() || ++tries > 60) window.clearInterval(id);
+    }, 120);
+    return () => window.clearInterval(id);
   }, [ar]);
-  useEffect(() => { syncLang(); }, [syncLang, html]);
+  useEffect(() => syncLang(), [syncLang, html]);
 
   if (err) {
     return (
@@ -1229,14 +1252,20 @@ function ModuleFrame({ file, ar, t, title }: {
   return (
     <div style={{
       background: 'var(--paper)', border: '1px solid var(--n3)', borderRadius: 'var(--radius)',
-      boxShadow: 'var(--sh-1)', overflow: 'hidden', marginBottom: 'var(--s5)',
+      boxShadow: 'var(--sh-1)', overflow: 'hidden',
+      ...(fill
+        ? { flex: '1 1 auto', minHeight: 460, display: 'flex' }
+        : { marginBottom: 'var(--s5)' }),
     }}>
       <iframe
         ref={frame}
         title={title}
         srcDoc={html}
-        onLoad={syncLang}
-        style={{ display: 'block', width: '100%', height: '78vh', minHeight: 560, border: 0, background: 'var(--paper)' }}
+        onLoad={() => { syncLang(); }}
+        style={{
+          display: 'block', width: '100%', border: 0, background: 'var(--paper)',
+          height: fill ? '100%' : '78vh', ...(fill ? {} : { minHeight: 560 }),
+        }}
       />
     </div>
   );

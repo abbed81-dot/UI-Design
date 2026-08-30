@@ -17,8 +17,6 @@ export const CATEGORIES: Category[] = [
     items: [
       { file: 'ShopyLink_Action_01_ReceiveParcel.html', ar: 'استلام طرد', en: 'Receive a parcel', perm: 'b1_ind', descAr: 'استلام الطرود في المركز: وزن وقياس وتصوير وطباعة ملصق لكل قطعة.', descEn: 'Intake at the centre: weigh, measure, photograph and label every piece.' },
       { file: 'ShopyLink_Action_02_Consolidation.html', ar: 'التجميع', en: 'Consolidation', perm: 'b2_con', descAr: 'تجميع طرود العملاء في حمولات جاهزة للرحلة.', descEn: 'Consolidate client parcels into trip-ready loads.' },
-      { file: 'ShopyLink_Addresses.html', ar: 'العناوين', en: 'Addresses', perm: 'b0_reg', descAr: 'عناوين التسوّق التي تُمنح للعملاء في بلدان الشراء.', descEn: 'The shopping addresses issued to clients in the buying countries.' },
-      { file: 'ShopyLink_SmartRegistration.html', ar: 'تسجيل عميل', en: 'Register a client', perm: 'b0_reg', descAr: 'تسجيل عميل جديد وإصدار عنوانه.', descEn: 'Register a new client and issue their address.' },
     ],
   },
   {
@@ -54,7 +52,7 @@ export const CATEGORIES: Category[] = [
   {
     id: 'network', ar: 'الشبكة', en: 'Network',
     items: [
-      { file: 'ShopyLink_Action_C7_Hubs.html', ar: 'المراكز', en: 'Hubs', perm: 'nw_map', descAr: 'الدول والمدن والمراكز والمعابر — شبكة التشغيل.', descEn: 'Countries, cities, hubs and stops — the operating network.' },
+      { file: 'ShopyLink_Action_C7_Hubs.html', ar: 'المراكز والعناوين', en: 'Hubs & addresses', perm: 'nw_map', descAr: 'الدول والمدن والمراكز والمعابر — وعنوان كل مركز واشتراكه، وهو المكان الذي يُقرَّر فيه العنوان الذي يراه العميل.', descEn: 'Countries, cities, hubs and stops — and each centre\u2019s address and subscription: the one place the address a client sees is settled.' },
       { file: 'ShopyLink_Action_C8_Agents.html', ar: 'الوكلاء', en: 'Agents', perm: 'nw_agents', descAr: 'وكلاء التخليص وخدماتهم على المعابر.', descEn: 'Clearing agents and their services at the crossings.' },
       { file: 'ShopyLink_Action_C1_Trucks.html', ar: 'الشاحنات', en: 'Trucks', perm: 'nw_fleet', descAr: 'الشاحنات وأوراقها وصيانتها.', descEn: 'Trucks, their papers and maintenance.' },
       { file: 'ShopyLink_Action_C2_Drivers.html', ar: 'السائقون', en: 'Drivers', perm: 'nw_fleet', descAr: 'السائقون: وثائقهم وتأشيراتهم وإجازاتهم.', descEn: 'Drivers: documents, visas, leave.' },

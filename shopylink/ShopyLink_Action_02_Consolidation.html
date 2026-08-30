@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>B1 — Receive Parcel · ShopyLink</title>
+<title>B2 — Consolidation · ShopyLink</title>
 <style>
 
 
@@ -445,6 +445,77 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; }
 }
 
 
+/* ══ B2 Consolidation extra classes ════════════════════════════ */
+
+/* Summary bar */
+.summary-bar {
+  display: flex; align-items: center; gap: 0;
+  background: var(--ink); border-radius: var(--rm);
+  padding: 12px 16px; margin-bottom: 16px; gap: 16px;
+  flex-wrap: wrap;
+}
+.sum-bar-num   { font-family: var(--disp); font-size: 22px; font-weight: 800; color: var(--acc); line-height: 1; }
+.sum-bar-val   { font-family: var(--mono); font-size: 16px; font-weight: 700; color: #fff; line-height: 1; }
+.sum-bar-label { font-size: 10px; color: rgba(255,255,255,.4); text-transform: uppercase; letter-spacing: .06em; margin-top: 3px; }
+.sum-bar-div   { width: 1px; height: 32px; background: rgba(255,255,255,.10); }
+
+/* Shipment rows */
+.ship-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px; border-radius: var(--r);
+  border: 1.5px solid var(--rule); background: var(--paper);
+  margin-bottom: 8px; cursor: pointer; transition: all .14s;
+}
+.ship-row:hover  { border-color: var(--pri); background: var(--pale); }
+.ship-row.selected { border-color: var(--pri); background: rgba(14,165,233,.06); }
+.ship-row.held     { border-color: var(--warm); background: var(--warn-bg); }
+.ship-check { width: 20px; height: 20px; border-radius: 6px; border: 2px solid var(--rule); background: var(--bg); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all .14s; }
+.ship-row.selected .ship-check { background: var(--pri); border-color: var(--pri); color: #fff; }
+.ship-id     { font-family: var(--mono); font-size: 12px; font-weight: 600; color: var(--mute); }
+.ship-name   { font-size: 13px; font-weight: 600; }
+.ship-meta   { font-size: 11px; color: var(--mute); margin-top: 1px; }
+.ship-weight { font-family: var(--mono); font-size: 13px; font-weight: 600; color: var(--mute); }
+.ship-info   { flex: 1; }
+.ship-right  { text-align: right; }
+.ship-sum    { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--bg); border-radius: var(--r); margin-bottom: 8px; }
+.ship-sum-id   { font-family: var(--mono); font-size: 11px; font-weight: 600; color: var(--mute); }
+.ship-sum-name { font-size: 13px; font-weight: 600; flex: 1; }
+.ship-sum-wt   { font-family: var(--mono); font-size: 12px; color: var(--mute); }
+
+/* Scan */
+.scan-wrap { position: relative; display: flex; gap: 8px; }
+.scan-wrap .field { flex: 1; }
+.scan-btn {
+  background: var(--ink); color: #fff; border: none;
+  border-radius: var(--r); padding: 10px 16px;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  flex-shrink: 0; transition: background .14s;
+}
+.scan-btn:hover { background: var(--deep); }
+.ok-msg  { font-size: 12px; color: var(--ok-ink); font-weight: 600; margin-top: 4px; display: flex; align-items: center; gap: 5px; }
+
+/* Pallet / load */
+.pl-header { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--bg); border-radius: var(--r) var(--r) 0 0; border-bottom: 1px solid var(--hair); }
+.pl-title  { font-size: 13px; font-weight: 700; flex: 1; }
+.pl-dl     { font-size: 11px; color: var(--mute); font-family: var(--mono); }
+.load-row  { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 1px solid var(--hair); }
+.load-row:last-child { border-bottom: none; }
+.load-label{ font-size: 13px; font-weight: 600; flex: 1; }
+.load-sub  { font-size: 11px; color: var(--mute); }
+.load-btn  { padding: 6px 14px; border-radius: 6px; border: 1.5px solid var(--rule); background: var(--paper); font-size: 12px; font-weight: 600; cursor: pointer; transition: all .14s; }
+.load-btn.on { background: var(--pale); border-color: var(--pri); color: var(--pri); }
+
+/* Done actions */
+.done-actions { display: flex; gap: 8px; justify-content: center; margin-top: 16px; flex-wrap: wrap; }
+
+/* Alert */
+.alert      { border-radius: var(--r); padding: 10px 14px; font-size: 13px; line-height: 1.5; display: flex; gap: 8px; align-items: flex-start; margin-bottom: 12px; }
+.alert-ok   { background: var(--ok-bg);   color: var(--ok-ink);   border: 1px solid rgba(16,185,129,.2); }
+.alert-info { background: var(--pale);    color: var(--deep);     border: 1px solid rgba(14,165,233,.2); }
+.alert-warn { background: var(--warn-bg); color: var(--warn-ink); border: 1px solid rgba(251,191,36,.25); }
+.alert-bad  { background: var(--bad-bg);  color: var(--bad-ink);  border: 1px solid rgba(225,72,59,.2); }
+
+
 /* ══ FIXES — missing + corrected classes ════════════════════════ */
 
 /* Item card selected state — the main reported bug */
@@ -594,258 +665,6 @@ button, input, select, textarea { font-family: inherit; font-size: inherit; }
   .fw            { grid-template-columns: 1fr; }
   .mn            { grid-column: 1; }
   .g3            { grid-template-columns: 1fr 1fr; }
-}
-
-
-/* ── AWB Sticker ─────────────────────────────────────────────── */
-.awb {
-  background: #fff;
-  border: 1.5px solid var(--ink);
-  border-radius: 10px;
-  overflow: hidden;
-  break-inside: avoid;
-  page-break-inside: avoid;
-  margin-bottom: 16px;
-  display: flex;
-  flex-direction: column;
-}
-.awb-hd {
-  background: var(--ink);
-  padding: 10px 14px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  flex-shrink: 0;
-}
-.awb-brand {
-  display: flex;
-  align-items: center;
-  gap: 0;
-  font-family: var(--disp);
-  font-weight: 800;
-  font-size: 14px;
-  color: #fff;
-}
-.awb-mode-tag {
-  background: rgba(255,255,255,.15);
-  color: #fff;
-  border: 1px solid rgba(255,255,255,.25);
-  font-size: 9px;
-  font-weight: 700;
-  padding: 2px 7px;
-  border-radius: 4px;
-  letter-spacing: .08em;
-}
-.awb-ctag {
-  background: var(--pri);
-  color: #fff;
-  font-size: 9px;
-  font-weight: 700;
-  padding: 2px 7px;
-  border-radius: 4px;
-  letter-spacing: .04em;
-}
-.awb-bc {
-  padding: 10px 14px 8px;
-  border-bottom: 1px dashed var(--rule);
-  flex-shrink: 0;
-}
-.awb-id {
-  font-family: var(--mono);
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--mute);
-  margin-bottom: 4px;
-}
-.awb-zone-title {
-  font-size: 9px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .06em;
-  color: var(--mute);
-  margin-bottom: 2px;
-}
-.awb-zone-val {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--ink);
-  line-height: 1.3;
-}
-.awb-info {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  border-bottom: 1px dashed var(--rule);
-  flex-shrink: 0;
-}
-.awb-row {
-  padding: 6px 8px 6px 14px;
-  border-bottom: 1px solid var(--hair);
-}
-.awb-row:nth-child(even) { border-left: 1px solid var(--hair); }
-.awb-row:last-child, .awb-row:nth-last-child(2) { border-bottom: none; }
-.awb-k { font-size: 9px; font-weight: 700; color: var(--mute); text-transform: uppercase; letter-spacing: .04em; }
-.awb-v { font-size: 11px; font-weight: 600; margin-top: 1px; }
-.awb-v.mn { grid-column: 1 / -1; }
-.awb-wt {
-  display: flex;
-  padding: 8px 14px;
-  gap: 0;
-  border-bottom: 1px dashed var(--rule);
-  flex-shrink: 0;
-}
-.awb-wt > div {
-  flex: 1;
-  padding-right: 10px;
-  border-right: 1px solid var(--hair);
-  margin-right: 10px;
-}
-.awb-wt > div:last-child { border-right: none; margin-right: 0; padding-right: 0; }
-.awb-wt-lbl  { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--mute); }
-.awb-wt-val  { font-family: var(--mono); font-size: 16px; font-weight: 800; color: var(--ink); line-height: 1.1; margin-top: 1px; }
-.awb-wt-unit { font-size: 10px; color: var(--mute); }
-.awb-items {
-  padding: 8px 14px;
-  flex: 1;
-}
-.awb-items-lbl { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--mute); margin-bottom: 4px; }
-.awb-item-line { font-size: 10px; color: var(--mute); padding: 1px 0; line-height: 1.4; }
-.awb-ft {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 6px 14px;
-  background: var(--bg);
-  border-top: 1px solid var(--hair);
-  flex-shrink: 0;
-}
-.awb-ft-txt { font-size: 9px; color: var(--mute); font-family: var(--mono); }
-
-/* ── Done screen ──────────────────────────────────────────────── */
-.done-wrap {
-  text-align: center;
-  padding: 24px 0 16px;
-  background: linear-gradient(to bottom, var(--ok-bg), transparent);
-  border-radius: var(--rm);
-  margin-bottom: 20px;
-  border: 1px solid rgba(16,185,129,.15);
-}
-.done-check {
-  width: 52px; height: 52px;
-  background: var(--green);
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 22px; color: #fff;
-  margin: 0 auto 10px;
-}
-.done-title { font-family: var(--disp); font-size: 24px; font-weight: 800; color: var(--ink); }
-.done-sub   { font-size: 13px; color: var(--mute); margin-top: 4px; }
-.done-id    { font-family: var(--mono); font-size: 12px; font-weight: 700; color: var(--pri); margin-top: 6px; background: var(--pale); display: inline-block; padding: 3px 10px; border-radius: 6px; }
-
-/* ── Action bar on done ───────────────────────────────────────── */
-.done-awb-bar {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 16px;
-  background: var(--paper);
-  border-radius: var(--rm);
-  box-shadow: var(--sh);
-  border: 1px solid var(--hair);
-  margin-bottom: 20px;
-}
-.done-awb-label { font-size: 13px; font-weight: 700; }
-.done-count     { font-size: 11px; color: var(--mute); margin-top: 2px; }
-.print-btn {
-  margin-left: auto;
-  display: flex; align-items: center; gap: 6px;
-  background: var(--ink); color: #fff;
-  border: none; border-radius: var(--r);
-  padding: 9px 16px; font-size: 13px; font-weight: 600;
-  cursor: pointer; flex-shrink: 0;
-  transition: background .15s;
-}
-.print-btn:hover { background: var(--deep); }
-
-/* ── Stickers grid ────────────────────────────────────────────── */
-.stickers-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
-}
-@media (max-width: 640px) {
-  .stickers-grid { grid-template-columns: 1fr; }
-}
-
-
-/* ── Done page full layout fix ───────────────────────────────── */
-.done-page-wrap {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-/* Print bar at top, stickers below */
-.done-awb-bar {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 16px;
-  background: var(--paper);
-  border-radius: var(--rm);
-  box-shadow: var(--sh);
-  border: 1px solid var(--hair);
-  position: sticky;
-  top: 0;
-  z-index: 10;
-}
-.done-awb-bar > div:first-child { flex: 1; }
-
-/* Stickers 2-col grid */
-.stickers-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
-  align-items: start;
-}
-@media (max-width: 640px) {
-  .stickers-grid { grid-template-columns: 1fr; }
-}
-
-/* AWB sticker final */
-.awb {
-  background: #fff;
-  border: 1.5px solid #0B2A3B;
-  border-radius: 10px;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 2px 8px rgba(11,42,59,.10);
-}
-
-/* Remove old incorrect AWB rules that might conflict */
-.awb-hd { background: #0B2A3B !important; padding: 10px 14px !important; display: flex !important; align-items: center !important; justify-content: space-between !important; }
-.awb-brand { display: flex !important; align-items: center !important; }
-.awb-wt { display: flex !important; padding: 8px 14px !important; gap: 0 !important; }
-.awb-wt > div { flex: 1 !important; padding-right: 10px !important; border-right: 1px solid var(--hair) !important; margin-right: 10px !important; }
-.awb-wt > div:last-child { border-right: none !important; margin-right: 0 !important; padding-right: 0 !important; }
-.awb-ft { display: flex !important; align-items: center !important; justify-content: space-between !important; padding: 6px 14px !important; background: var(--bg) !important; border-top: 1px solid var(--hair) !important; }
-
-/* Done wrap green box */
-.done-wrap {
-  text-align: center !important;
-  padding: 24px !important;
-  background: linear-gradient(135deg, rgba(16,185,129,.08), rgba(14,165,233,.06)) !important;
-  border-radius: var(--rm) !important;
-  border: 1px solid rgba(16,185,129,.18) !important;
-}
-.done-check {
-  width: 52px !important; height: 52px !important;
-  background: var(--green) !important;
-  border-radius: 50% !important;
-  display: flex !important; align-items: center !important; justify-content: center !important;
-  font-size: 22px !important; color: #fff !important;
-  margin: 0 auto 12px !important;
 }
 
 
@@ -1078,34 +897,22 @@ textarea{font-size:var(--fs-body,14px);line-height:1.6}
   .sl-scroll,.sl-main{padding-left:10px !important;padding-right:10px !important}
   .figure{font-size:22px !important}
 }
-
-@media print{
-  /* the screen is not the document: only the labels reach the printer */
-  body *{visibility:hidden}
-  #stickers-grid, #stickers-grid *{visibility:visible}
-  #stickers-grid{position:absolute;left:0;top:0;width:100%;
-    display:block;gap:0;margin:0;padding:0;background:#fff}
-  .awb{page-break-inside:avoid;break-inside:avoid;margin:0 0 4mm 0;
-    box-shadow:none;border:1.2px solid #0B2A3B}
-  .noprint,.sl-sim,.sl-sb,.foot,button{display:none !important}
-  @page{size:A4;margin:8mm}
-}
 </style>
 </head>
 <body>
 <div class="sl-app">
-<aside class="sl-sb"><div class="sl-sb-logo"><div id="sl-logo"></div><div class="sl-sb-sub">Operations Dashboard</div></div><div class="sl-sb-staff"><div class="sl-sb-av">W</div><div><div class="sl-sb-name">Warehouse</div><div class="sl-sb-role">Damascus Hub</div></div></div><div class="sl-sb-nav"><div class="sl-sb-sec">B Operations</div><button class="sl-sb-item on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg><span>Receive Parcel</span></button><button class="sl-sb-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg><span>Consolidation</span></button><button class="sl-sb-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11a2 2 0 012 2v3"/><rect x="9" y="11" width="14" height="10" rx="2"/></svg><span>Create Trip</span></button><button class="sl-sb-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/></svg><span>Loading</span></button><button class="sl-sb-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span>Dispatch</span></button><button class="sl-sb-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11a2 2 0 012 2v3"/><rect x="9" y="11" width="14" height="10" rx="2"/><path d="M13 16l2 2 4-4"/></svg><span>Last Mile</span></button><button class="sl-sb-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg><span>Billing</span></button><div class="sl-sb-div"></div><div class="sl-sb-sec">Management</div><button class="sl-sb-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><span>Customers</span></button><button class="sl-sb-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg><span>Shipments</span></button></div></aside>
+<aside class="sl-sb"><div class="sl-sb-logo"><div id="sl-logo"></div><div class="sl-sb-sub">Operations Dashboard</div></div><div class="sl-sb-staff"><div class="sl-sb-av">W</div><div><div class="sl-sb-name">Warehouse</div><div class="sl-sb-role">Damascus Hub</div></div></div><div class="sl-sb-nav"><div class="sl-sb-sec">B Operations</div><button class="sl-sb-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg><span>Receive Parcel</span></button><button class="sl-sb-item on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg><span>Consolidation</span></button><button class="sl-sb-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11a2 2 0 012 2v3"/><rect x="9" y="11" width="14" height="10" rx="2"/></svg><span>Create Trip</span></button><button class="sl-sb-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/></svg><span>Loading</span></button><button class="sl-sb-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span>Dispatch</span></button><button class="sl-sb-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11a2 2 0 012 2v3"/><rect x="9" y="11" width="14" height="10" rx="2"/><path d="M13 16l2 2 4-4"/></svg><span>Last Mile</span></button><button class="sl-sb-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg><span>Billing</span></button><div class="sl-sb-div"></div><div class="sl-sb-sec">Management</div><button class="sl-sb-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><span>Customers</span></button><button class="sl-sb-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg><span>Shipments</span></button></div></aside>
 <div class="sl-overlay"></div>
 <div class="sl-main">
 <header class="sl-top">
 <button class="sl-menu" aria-label="Menu"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
-<div class="sl-bc"><span class="d">Operations</span><span class="s">›</span><span class="a" id="bc-action">Receive Parcel</span></div>
+<div class="sl-bc"><span class="d">Operations</span><span class="s">›</span><span class="a" id="bc-action">Consolidation</span></div>
 <div class="sl-top-r"><div class="lang-btn"><button class="lang-opt on" data-lang="en" onclick="setLang('en')">EN</button><button class="lang-opt" data-lang="ar" onclick="setLang('ar')">AR</button></div><span class="sl-date" id="sl-date"></span></div>
 </header>
 <div class="sl-sim">
 <span class="sl-sim-lbl">Simulate</span>
 <div class="sl-sim-sep"></div>
-<button class="sl-sim-btn on" onclick="go('s1')">1 · Individual</button><button class="sl-sim-btn" onclick="go('s1exp')">1 · Expired</button><button class="sl-sim-btn" onclick="go('s1nf')">1 · Not found</button><button class="sl-sim-btn" onclick="go('s1x')">1 · No match</button><div class="sl-sim-sep"></div><button class="sl-sim-btn" onclick="go('s2')">2 · Items</button><button class="sl-sim-btn" onclick="go('s2m')">2 · Business</button><button class="sl-sim-btn" onclick="go('s2nohs')">2 · No HS</button><div class="sl-sim-sep"></div><button class="sl-sim-btn" onclick="go('s3')">3 · Cartons</button><button class="sl-sim-btn" onclick="go('s3m')">3 · Business</button><div class="sl-sim-sep"></div><button class="sl-sim-btn" onclick="go('s4')">4 · AWB</button><button class="sl-sim-btn" onclick="go('done')">✓ Done</button>
+<button class="sl-sim-btn on" onclick="go('s1')">1 · Select</button><button class="sl-sim-btn" onclick="go('s1-none')">1 · Empty</button><button class="sl-sim-btn" onclick="go('s1-scan-ok')">1 · Scan OK</button><button class="sl-sim-btn" onclick="go('s1-scan-err')">1 · Scan Err</button><div class="sl-sim-sep"></div><button class="sl-sim-btn" onclick="go('s2')">2 · Repack</button><button class="sl-sim-btn" onclick="go('s2-repack')">2 · Repacked</button><div class="sl-sim-sep"></div><button class="sl-sim-btn" onclick="go('s3')">3 · Review</button><button class="sl-sim-btn" onclick="go('done')">✓ Done</button>
 </div>
 <div class="sl-scroll">
 <div class="sl-body" id="shell"></div>
@@ -3970,22 +3777,16 @@ function slIcon(name,size,stroke){
   +'style="vertical-align:-0.18em;flex-shrink:0" aria-hidden="true">'+p+'</svg>';
 }
 
-function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
-function _toConsumableArray(r) { return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread(); }
-function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-function _iterableToArray(r) { if ("undefined" != typeof Symbol && null != r[Symbol.iterator] || null != r["@@iterator"]) return Array.from(r); }
-function _arrayWithoutHoles(r) { if (Array.isArray(r)) return _arrayLikeToArray(r); }
 function _slicedToArray(r, e) { return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest(); }
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-function _unsupportedIterableToArray(r, a) { if (r) { if ("string" == typeof r) return _arrayLikeToArray(r, a); var t = {}.toString.call(r).slice(8, -1); return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0; } }
-function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length); for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e]; return n; }
 function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t.return && (u = t.return(), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
 function _arrayWithHoles(r) { if (Array.isArray(r)) return r; }
-function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
-function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
-function _defineProperty(e, r, t) { return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, { value: t, enumerable: !0, configurable: !0, writable: !0 }) : e[r] = t, e; }
-function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : i + ""; }
-function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
+function _toConsumableArray(r) { return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread(); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(r, a) { if (r) { if ("string" == typeof r) return _arrayLikeToArray(r, a); var t = {}.toString.call(r).slice(8, -1); return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0; } }
+function _iterableToArray(r) { if ("undefined" != typeof Symbol && null != r[Symbol.iterator] || null != r["@@iterator"]) return Array.from(r); }
+function _arrayWithoutHoles(r) { if (Array.isArray(r)) return _arrayLikeToArray(r); }
+function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length); for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e]; return n; }
 function slDateStr(d) {
   var M = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   d = d || new Date();
@@ -3994,87 +3795,51 @@ function slDateStr(d) {
 }
 // ── i18n ────────────────────────────────────────────────────────
 var currentLang = 'en';
-var T_b1 = {
-  'port to port — handed over at the arrival port, no local delivery':'ميناء إلى ميناء — تُسلَّم عند ميناء الوصول، بلا توصيل محلي',
-  'carried on from our hub there — no door delivery yet':'تُنقل من هبّنا هناك — لا توصيل حتى الباب بعد',
-  'a forwarding address delivers into Syria — the person who bought it is here':'العنوان المستأجَر يُسلَّم داخل سوريا — صاحبه هنا',
-  'Charged by': 'يُحسب بـ',
-  'this lane is sold both ways — weight for dense cargo, volume for bulky': 'هذا الخطّ يُباع بالطريقتين — بالوزن للبضاعة الكثيفة، وبالحجم للضخمة',
-  'the price agreed with this client': 'السعر المتفق عليه مع هذا الزبون',
-  'his price category': 'فئته السعرية',
-  'category discount': 'خصم الفئة', 'personal discount': 'خصم شخصي',
-  'the approved list — this account is not registered': 'قائمة الأسعار المعتمدة — هذا الحساب غير مسجّل',
-  /* the route and its price — every warm string has its twin */
-  'Route': 'خطّ السير',
-  'Arrived at': 'وصل إلى',
-  'Destination': 'الوجهة',
-  'Method': 'الآلية',
-  'air': 'جوّي', 'sea': 'بحري', 'land': 'برّي',
-  'perkg': 'للكيلوغرام', 'percbm': 'للمتر المكعّب', 'per truck': 'للشاحنة', 'per container': 'للحاوية',
-  'Priced at': 'سُعِّر بـ',
-  'No approved price for this route': 'لا سعر معتمد لهذا الخطّ',
-  'the parcel cannot be received until the tariff covers it': 'لا يمكن استلام الطرد حتى تشمله التعرفة',
-  'The tariff is not published here': 'التعرفة غير منشورة هنا',
-  'a parcel cannot be received unpriced — open Pricing once, then return': 'لا يُستلم طرد بلا سعر — افتح التسعير مرة ثم عُد',
-  'You may not do that': 'لا يجوز لك ذلك',
-  'Receive Parcel': 'استلام طرد',
+var T_b2 = {
+  'Consolidation': 'الدمج',
   'Operations': 'العمليات',
-  'Customer': 'العميل',
-  'Items & condition': 'البنود والحالة',
-  'Packing': 'التعبئة',
-  'Review': 'المراجعة',
-  'Find customer': 'البحث عن العميل',
-  'Add items — HS code required for each': 'أضف البنود — رمز HS مطلوب لكل بند',
-  'Enter carton weights and dimensions': 'أدخل أوزان وأبعاد الكراتين',
-  'Confirm and create shipment': 'تأكيد وإنشاء الشحنة',
-  'Create shipment': 'إنشاء الشحنة',
+  'Shipments': 'الشحنات',
+  'Cartons': 'الكراتين',
+  'Total weight': 'الوزن الإجمالي',
+  'Total cartons': 'إجمالي الكراتين',
   'Continue': 'متابعة',
-  'Name or phone': 'الاسم أو الهاتف',
-  'Min. 7 characters to search': 'أدخل 7 أحرف على الأقل',
-  'Search by full name or phone number': 'ابحث بالاسم الكامل أو رقم الهاتف',
-  'Exact name on parcel label': 'الاسم الدقيق على ملصق الطرد',
-  'Recipient name as on parcel label': 'اسم المستلم كما هو على الملصق',
-  'Change': 'تغيير',
-  'Active address': 'عنوان نشط',
-  'Expired': 'منتهي الصلاحية',
-  'No address on file': 'لا يوجد عنوان',
-  'Customer not found': 'العميل غير موجود',
-  'Store or shop name': 'اسم المتجر',
-  'Description': 'الوصف',
-  'Qty': 'الكمية',
-  'Unit price (USD)': 'سعر الوحدة (USD)',
-  'Condition': 'الحالة',
-  'Good': 'جيدة',
-  'Damaged': 'تالفة',
-  'Damage description': 'وصف التلف',
-  'HS Code': 'رمز HS',
-  'Auto-detected': 'كشف تلقائي',
-  'HS code needed for customs clearance': 'رمز HS مطلوب للتخليص الجمركي',
-  'Length cm': 'الطول سم',
-  'Width cm': 'العرض سم',
-  'Height cm': 'الارتفاع سم',
-  'Weight kg': 'الوزن كغ',
-  'Repack': 'إعادة تعبئة',
-  'Individual': 'فردي',
-  'Business': 'تجاري',
-  'Total weight': 'Total weight · الوزن الإجمالي',
-  'Cartons': 'Cartons · عدد الطرود',
-  'Items': 'البنود',
-  'Stage 0 — Received': 'المرحلة 0 — مستلم',
-  'Shipment created immediately': 'الشحنة تُنشأ فوراً',
-  'AWB + labels printed': 'AWB + الملصقات تُطبع',
-  'Customer notified': 'العميل يُبلَّغ',
-  'Push + WhatsApp sent automatically': 'Push + WhatsApp تُرسل تلقائياً',
-  'Invoice created': 'الفاتورة تُنشأ',
-  'Accounting team calculates shipping fee': 'فريق المحاسبة يحسب رسوم الشحن',
-  'Parcel received': 'تم استلام الطرد',
-  'Receive another': 'استلام طرد آخر',
-  'Damascus': 'دمشق',
   'Back': 'رجوع',
-  'Yes — repacked': 'نعم — تمت إعادة التعبئة'
+  'Scan or enter shipment ID': 'امسح أو أدخل رقم الشحنة',
+  'Tap to select shipments that ship together': 'اختر الشحنات التي تُدمج معاً',
+  'Ready to consolidate': 'جاهز للدمج',
+  'Held — cannot consolidate': 'محجوز — لا يمكن الدمج',
+  'Already added to this consolidation.': 'تمت الإضافة لهذا الدمج مسبقاً.',
+  'Forwarding address expired or unmatched': 'عنوان الإعادة منتهي أو غير متطابق',
+  'Load type': 'نوع التحميل',
+  'Full load': 'تحميل كامل',
+  'Partial': 'جزئي',
+  'FCL / full truck — billed per unit': 'FCL / شاحنة كاملة — يُفوتر بالوحدة',
+  'LCL / part truck — billed per kg': 'LCL / جزء من شاحنة — يُفوتر بالكغ',
+  'How these shipments share the vehicle space': 'كيف تشترك الشحنات في مساحة المركبة',
+  'Pallet #': 'بالت #',
+  'Repacking': 'إعادة التعبئة',
+  'Repacked cartons': 'كراتين معاد تعبئتها',
+  'New carton dimensions after repacking': 'أبعاد الكرتون الجديد بعد التعبئة',
+  'Original cartons, no changes': 'الكراتين الأصلية، لا تغييرات',
+  'As received': 'كما استُلمت',
+  'Repacked': 'معاد تعبئتها',
+  'Yes — repacked': 'نعم — تمت إعادة التعبئة',
+  'Items consolidated — add repacking fee': 'البنود مدموجة — أضف رسوم إعادة التعبئة',
+  'Consolidation summary': 'ملخص الدمج',
+  'Consolidation record': 'سجل الدمج',
+  'Shipments in this batch': 'الشحنات في هذه الدفعة',
+  'Shipments selected': 'الشحنات المختارة',
+  'Reference': 'المرجع',
+  'Packing list': 'قائمة التعبئة',
+  'Download PDF': 'تحميل PDF',
+  'Labels generated': 'الملصقات جاهزة',
+  'New consolidation': 'دمج جديد',
+  'AWB / House B/L': 'AWB / سند الشحن',
+  'Consolidated': 'مدموج',
+  'Once confirmed, all selected shipments move to': 'بعد التأكيد، كل الشحنات المختارة تنتقل إلى'
 };
 function t(s) {
-  if (currentLang === 'ar' && T_b1[s]) return T_b1[s];
+  if (currentLang === 'ar' && T_b2[s]) return T_b2[s];
   return s;
 }
 
@@ -4086,7 +3851,7 @@ function setLang(lang) {
     b.classList.toggle('on', b.dataset.lang === lang);
   });
   var bc = document.querySelector('#bc-action');
-  if (bc) bc.textContent = lang === 'ar' ? 'استلام طرد' : t('Receive Parcel');
+  if (bc) bc.textContent = lang === 'ar' ? 'الدمج' : t('Consolidation');
   render();
 }
 if (!window.__slm) window.__slm = 0;
@@ -4097,10 +3862,6 @@ function slMark(h, tone) {
   var cR = tone === 'white' ? 'rgba(255,255,255,0.72)' : '#0EA5E9';
   return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 124 80" width="' + w + '" height="' + h + '" fill="none">' + '<defs>' + '<clipPath id="' + id + 'T"><rect x="46" y="6" width="32" height="34"/></clipPath>' + '<clipPath id="' + id + 'B"><rect x="46" y="40" width="32" height="34"/></clipPath>' + '<mask id="' + id + 'MA"><rect width="124" height="80" fill="#fff"/><g clip-path="url(#' + id + 'T)"><rect x="50" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#000" stroke-width="15"/></g></mask>' + '<mask id="' + id + 'MB"><rect width="124" height="80" fill="#fff"/><g clip-path="url(#' + id + 'B)"><rect x="6" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="#000" stroke-width="15"/></g></mask>' + '</defs>' + '<rect x="6"  y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="' + cL + '" stroke-width="9" mask="url(#' + id + 'MA)"/>' + '<rect x="50" y="20" rx="20" ry="20" width="68" height="40" fill="none" stroke="' + cR + '" stroke-width="9" mask="url(#' + id + 'MB)"/>' + '</svg>';
 }
-var SL_WM_WHITE='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABXgAAAEuCAQAAACemrJFAABD00lEQVR42u3dd5wURfrH8U/tLptYckYEDCCoKIiKiooYwQiKiv4Mp2fO4fRMd575TGdOmDNmRIygIiqiAiZQRFAkqeS8bHx+fwC6wO6krpnp2f2+fd3rgJ2trqqu7n6mugKIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIgE41QFIiISPrbm+ZS15i+YM9WJiCjgFRGRzA9z86mPoxsHsSnNaEw+OUAZ85jG93zJj1RQ7EpUUyIiIiKSecHuFtbHXrYFVmk1q7A5drftZa1UXyIiIiKSScHu9vY/m2qxKrcJdqG1U72JiIiISCYEu/XsXzbL4veVHa7aE5FY1NExvHYBZ5ATMJHX3cVqQCJSx+6eD7JPwCeH4yr3fJUU2/A22yeY1mqe4GxXWQfq3fEZzQMmcqF7Qy1Y6qqcOlru7dgqcBot1HxEpM7pxpaB02hTJZDbkhcSDnchnzMos0vd6lpf7/XpRNOAaXRU85W6K6uOlrtUp15EJAFeQ0trwj3sEDCRc/lPnaj54CtTVKj5igJeERGRVDuFfh5SOd32UFWKiAJeEREJHWvEP7wk1Jh/WSPVp4go4BURkbC5kpaeUtqPXqpOEVHAKyIioWJZHOcxuVMsR3UqIgp4RUQkTLajmcfU9iNPVSoiCnhFRCRMBpHtMbXGdFWViogCXhERCZMeXgNe2E1VKiIKeEVEJEzyPae3papURBTwiohImPgec9tRVSoiCnhFRKQ2P3+0Eq+IKOAVEZFQKQt5eiKigFdERCSQUs/p/aEqFREFvCIiEibLPac3Q1UqIgp4RUQkTHwHqMNUpSKigFdERMLkJa+jbsv4UVUqIgp4RUQkRNxnLPCY3CesVp2KiAJeEREJl+Ee0/qfK1WFiogCXhERCZfrWeYppS8Yp+oUEQW8IiISNr9xFeYhnTJucAtUnSKigFdERELGVfAcn1MZMJly7uct1aaIKOAVEZEwhrwLOZCvAoW8xitc5spVlyKigFdERMIZ8i7mAMYlPLChgjs5yWl9BhFRwCsiIiEOeRdyCKcltO/aRPpzhStWHYqIAl4REQl3yLuIx+nGE3EEvRXM4V/s5Uaqd1dEYpGjKhARkTSHvBX8ykl2AcdzGO1pTMsaA935zGMqj/GOM9WbiCjgFRGRzAp7l3Iv91oBu9ON1tQnCyggC6OYSkpZxq9848arpkREAa+IiGRy2FvMSEaqHkTEJ43hFREREREFvFItjR8TERERyQChGdJgm9CcfCoo5bsMmYoQeKFz60xDHCUZU+J1+W5PC4wZblEd+4bTmI7kUcyPrkS3DhGp4U6RRVcKqWSJm67aEKnDAa85dqIdm9CY+hRQn/rkk0c+OfRkCdMosRKKWcUyVrKKpcxnhvusltwI+7I1ralPAxpSnyKa0YyprLbVLGU+y1jEVD4I055B1pQ+dKQJhVTSgAYUUJ8C8jCKrZhVrGAFJcByFjGDD92KWvXg2oHOtKcxzSiiiAIK2Z5vWGlLWcIyylnKTD5zP+tGIlKnQ9zm7M7mtKCA+jSiiAK2ZQarrIRVrGY2q1nITL50M1VXIrU+4DVHfY5gT9rRmoZ0rOFjhbTd6N9W84ct5ndm8Qkvu1Whqbs4wlJrwVn0pjUtabXRD9us97c/+N1+4jOed7+l8fZdn8HsQRsKaUNRNXmu3u+ssPksYQ7jeDaTV8c0x74cQU+a05bcDX7Ye72/rWS+zWUWn/Oc+0M3FJE6Fur25UQ2py0NabHBj5pv9CSbY9OYwjA3WvUmknou6beDehSxK2exLU3I3yh4iE8JZSxhPHfyDauDBFT2IKcHLtq97tyox8mmHgO5iK7kkx1H2hUUM4qrmZrKsNHqUUBLjmMgHQOeqxJKmc5LPMdCVrpKT7lrmuCY8xKWxdprbvXYhOvYl6Zxl38JY7iKqVTE20Nv2RRSP+C1uNCVBqrdbApoECgHlSzRUI86EeK9z96BE7nY/e/P9HJoHPDJUMEiV1alLRdRmFAqS2NvwZZDcy7gKNpRL+770Rwe5yGW/JXnmI5YxNQNukfid7a7P+E7ROHaZeJ8KGZ5mN5kigS/MW5h+9jTtsD8K7ZXbKB1sqJEA14Pebgt6lHa2Fm2PNAxJlhfa5CSc9XCetlDNtv7mfrJ7rRe1txDDu+3EitL6L/ldlRMR8i37vaIlQQq7xQ73TaJs2TdbHaCJfvrv88D1u5+tiBgDkrtDd3z6kbA6+G+cFGV9C61lYHb3sNV0jvQFiaYyvCY66CjvWCrAj7DHrRtLI5g2YpsbuB6Pyvhs97Fw13qr/9+siN1JUmqJWlIgxWxF4eyN1skKd/5HM7hLOcNG8qbfnoQ47YsYg00YiAXs23AY+zAB7xkdyR3DLNtwwEMYtekJL4l53M+H9lQ3nW/BEqpQ8K9QEW0juXrGZdzNEUBy7sVDzLZ7uHZOEYzb8omgeu5fsDf35pmgfOQpxuqJGCzhPpj19ewyp870jTRnFhW9KeJbc3JHBfzQK+an2GncyTP2gPuh4w4Szt7uEtVLf0sNXypBQGv1eMYTqBPCsYHN+BYDuQ7e5mn3JKU112EgMZ2YAjdAr6mW+dI+tpd3OQqknCuHPswmH3pkOS66kMfptow7nWJ3+aCvACL/hAbzL/Y2lNpt+FBBtpN7qMYP+9CcCfw0VYrEEntlV1d2wvSAeKi3jFP4l81zkGJV1POpZ/91z0W9lNkBRznNcGpbpwavqSa53V4LcuOYjJD2Cdl0+Easwd3MdnOstSuKbyIGkJsy7bBvE1PT+EuQHOu4w1r5vlcOevMh7zO35Me7q7RmYv4zl6ywrBdBJZtj/G4t3B3jQN41x5OzXAUEUnJnSKH23nYW7i7Rifus2ct7CviF9LXZ0XysVqTZHjAa1vyPi/QKQ2vNttyHyOth+Wm7IglzK7hlngdT9HS+/H685F5DMmsCdfxFX1IZfiZQyMG8audbEXhuQSsPm9wEvneE87jFIZZR0SkNoS7m/IqFyZhs6Z8juVLaxHqwm/ntQtrBY+rPUkGB7zW1q7lM/ZKY1n2Zhz/sLYpOloF46uphWyGclncs3Zjsw1P2rZezlUTO4lPuZL09LU251Fesj1D8hBrx+v0T2KbfNV66DYjkvHh7mYM5ZCkJb8D74X6TnGB19R+cL+qRUnGBry2F6/zL5qnuTS5XM/b1j0lxyph8Ua14HiEw5I4InNHngreY2i78TyP0TWtZ6ofL9kt1ibdzd9a8Sz7JPUQPXjD9teNRiSjw91GPMJuST1Ed562rUNa+gb08Zrgw2pRkrEBr53GMHYMRXkc2zHCeqXgSMUbbgdsjpsZnOSxyz0YaoGOYIN4kwNCcKZacgmjbcu03sZzeYDk9zRvwst2CCKSqeFuLi96WHs4mm14MoWD8uJxBD5nI5TzktqUpEPg8MzqczUXE6Yh95vwnh3Lu0le1rp0o3D3bC5I0mCGqnpxB+cmeK7qcS63hWJNgDU685ENZIJL1+z+WxiYkuM04BHr7ybqdpOUYCSHZjSgXtLadQXFLHHLYroXNqEwiV95y1jBIm3ukYYWdhOpeUuzY1IHWCXuSK9P+PdYqVYlGRjwWhNu5e+hK1VDXuUiu3/DPlivNnzsdOCmFIS7ACfbePdkAueqFVdzZsjOVFtGc4S9m46VlO1szk7ZwVoyxAa5GbrheDp32ezGTmzHVmwWeD3U2I64iplMYzIT+bzq+ENrxS7swLZ0pv16a8EmLycLmcGPfMcExjoFDqlwNBel7FgH2C3u0pBdbV3o7jXB/2mPNcnAgNcKuI2TQ1muXP5HCY8k8QjrPWqskGGkauWBQi6x0fEO+rdODEnrlMKaFDCcs+yxVPfy2vZcmbKl8wB6crcNdqt0ywl43jpyGP3YJ0VfLqtedV3owsEANoX3GMFKDuEAUj/RqBnN6Lm2NsbwDsPdZLWLJLa4tvwzhYdznGrvuA9CVQV98TkV/AO+UquS9AjwosLq8WhIw901Ie9/LZkB3vqvOC9jmxSWbRvOiPNcbcp7oQx313zpuo+bLaUDLSyXa0j1lLlD+J9uOIHO2vH2Hr9wJ/1SHu6urwvn8R6fchnpnle/JzcyycbaWVag9pGUNlePi+mW0kM25vr0T+etUgM5HOgxuUoedYvUriTDAl7L4haODnXZmvGkbZ601GdWqYs9OTulvYVwejzbUFhLXqd9iM9UPc7hhNQtvW5Z7MN+aSjnKTYQSeSMFdoVNoen0nLWwm9X7mOe3ZyyJRnrku4pHM7w1/kcZDmhqYGeXjed/5YP1Kgk4wJeTuYCwr47THuetuQslVbOz38+jJtwacJ7tyeqCU/HHCw04g56hPxc5fGQ1518ImvBQ2lZgzibf1tzJN5w91JmcQMK5yIp4lJm2Y3h28cwo1teFk+m5cCXE5JtKCyfE/C3x+dqHne/q11JhgW8thWXZ0T5duO85NwHmPDnn3t4feUTq/1jW5HXcriMYzPgTOXxqG2Xklu4YxCbpqmU3TlNN524ztYAm8zNKf9Cmal388uZZierIrwZQOe0HLcNp4akBlpwksfU5moFXsm4gNdyuYLNM6SEl1oyXuZXMmltXeRxfloW+srm5pg+dy6XZciZ6sCL1joFxynkmjSW8tT0rj2cUcFugQ3hNbZWTcQVKj1qr9qmqggP7S+H88hO08EvCcm7oFPwOTr8QVesdiUZFvCyHydkTAnzuDMJqZb/uQ7v1hyappLtH31fHhvEbRnUGrdiuOUn/SgXenxFF7+OXGnZSPRwow9fhaafK7MM5CsbpGoI7MA0Tkos4sIQXIP1vOZitqbtSsYFvJbNQxlVxn7mf4+c1X/+6Z60latxtKEK1p5bQz/Oen07JmkIyl91ksXpaS7jUalZOTbDw90zGM1WqocENeMl+7eqIVALLGRQalZWrkEYvrJc4XWHtX+kbYshkUQDXq7KsOkjBYnuTBZBMZUAtjM7pbFku0f5+T/pmGHt0XG2dU3qEU5P+3SQQm7UjSdKsHE9D6gWArrGNF4yiC4cmdbjb2ppXgXJusa7/GVErzBcjUoyLOC1PI4O0ea0sdnFdvec4u9rAl5OIZ17n29j+0Y4U4dwTAa2yPZckLyZ5uYYSF7ayzhIC0hFPEv3cKVqwYNT7CVVQsJ6kp/W4xekbbDcOpfjb07FbG7S+F3JuICXQaFe0bV6renkOcXvAaxJmjdzaE6vGoOGRvyHJhnZJk/zuu7j+nZj+xCUsH5K927KtHD3Xs5RLXj7avWKKiGhVtggBEMKdrR2aayB3vTzlxgPuAlqVZJhAa8VcDD1k5CP35jF/CSW8wBr4DW9r1w50C/twf8B1rLa8+S4gh0ytlXea8naSWsnWoaihANSsh5FJgYa/+Vs1YJHh9tTqoQENGH/tOdhU3ZL23XYkCs8Dv76nvvVpCT94t3PZRsO8nbsJczhJ+YxgwWsoIQc2tCKxhRRRE/PoeT+tGS5x/S+BqBv2l+P70Bz5lXz75slYdxy6nTh3/wrCTfxVqHZG7A9R6ZxumN4w93zE+r7NhZSjHnNSovAyzGV8ofnPOXTNIEdHY+335zeKMQrDHv6FdAlTdehYxeP/bslnO2WqElJ5gW8m3matbmCe/mckW5lDRfc9nTnQPbA157iTdiM6R7r7XewzvRJ+/mrT4c1wys2cL3X1RNT7zS72a3wnmq7moeApNzeCng3uur7xbmE4CjGMJ4f+NWZ55zcwiWBE8nlY/d/3utoE7qwA7tzQBxfti+1n9wjal9x1HIW54ciI/1tSFp2JtuClzyu7/Ow+0htSjIx4PWzUNAD3MUvrrTmD7hv+MaeYUuO4N+eelH7McpjvZUBndO0C8/6DreRrnyD2/VmHJCEI83hbV5lCZU4sqgkm00YyKFJ2aS3Cedyk/dUdwnRdMse1sN9pRtQlVbbnCExf3gMT/GyW5qknAz2EO4CHGtfOc/rYLs5zOF9brUcjuA4Do7x14bYBLW2uL6shGN7mF60IeUBrxXygscF2b5HC+RJSMT1Lc4a0zfwEUs5lXPdj5HC3bW39gr3I/+lNzPXrogQzFZW5K3WKqm0PHYOxRkcUE1f7jn4HbFcwQT2oTNnubfdZ+5zN86NdePcp+5FTqINA5lEqedS1eMI8zzlzuqHZkADQIdQfF0Kk3ti3PB5BH1dH/do0sLdNtzrLbFbLUl3CVfuXnCHsAPPxPZxvU+Iy35pXqHhr/NWL9WHtGyuobvHbpIDWaoGJRkY8NLMw0v8Y90jsS8/7SrdBHrypIeS9khg9FtNFlBOfQaE4gw22XBhNOvMYV5vk9M51u3oPnCrXNlG52e1W+aG0Z2T+cVzuXp4nzRSRO8YzuxE3ucNXuAV3mIsv3kehVnVnslbfi3z2IkMjuFjUznCHeJGJzUrt8W0E98IXowptduTGg995Y6nL5/F8NHedpVaWcwOjfFdUDnTmMCPzExaTva1nBSXfQAXehvOsIRz3K+uUg1KwiG+i6kw8M7i1zMs7pv6Avs7i7ko4JF97pkznnIa0S2GTxYzgh+opIJscmhOX++7R2XTnoXr/cvBbOEx/aFc4aIEs66CZ+0LruREr1/FBtpbzudEw14Rb+PGh7zPWD6pOkDEdmQn+iSpZ/gobmSVbkEAFttmHEM4Z+MvXZ5zcni0/QsBOMM9BPYiD0Sdyb67XeDuTGrQO5rd7PoYVi6+zl52U9TWYhJ98cJvGcMUZrOALyhiV5rSmv3o671HdiB3UZ7CK7Er1+Fr6/Ny7nTD1JgkUx9LO1kwy23rBI/c0t4PeOwSq9JvYw8GSuseK7LDon7qLTvQtl1/OTTbwgbYm+bX1esdobVN9Jj2YxbzFwWrb1d7Ltm266X/eoCUzrEiGxbh569Zb6shdLEGtouNsGTYce0RDvKQ1qSA1/YlHvLwdsJHvzmG1FOy7oh9GzUfP9mfUx9tc/sk6ueXWArWw7ajrCxqTp73dKz3PbSVKh0Ydo+H9J6rkt4ZCafynWWDNbO5ET/1mR1j1Qy/sWa2uz3t+R6x8q/WY0VR8hWLsyKe2WYxtOfYPWtOUZOESXyvLloFPNpbzE6wF2MeF/NHwJ5Qf/t4T8JxQsTewu/pzeHuLTdp/T5KN90N43AuZbXHc7j+i/q29PCW8kuc7pbFfI5WcoPniWYDzd9M4bwax6X9zpEMdp+6GtaBdsvdOAZxGSXer76jEcA6cmnUDx3lUjAK1c6K+t5mPHu7z/9sGz/TlxFRfqMRlyU/5+5F9mFRlA8Ntj5qbTHoH2EOxGrOZl/3vJtVzTlY6D7h75zh9b1Nfuom2loRb8Uw7CtWn3CiMzUmydyAd9OAR5sSe/i00c3ka64iyNaEzuOghvnkRpi+V8wQerqxroag1pW4WxnIAm+52bzKLSvH4/5A33JsfC+QXTlXxj9kJWJA6GuiYTEFNew79w5d3csuSjDrVrubOdb71ij7Wi4CF0b9xCCXmk1yow2c+oaD1w91XJk7hHei/NbFloLtTtwYDmFlwPIJwHY13ne+Zy93v4tQy67UPcTB+FtSMYvmKQp3G/Gyx4nYUxjgytWUJJMD3k0CHi3Y7z8dsI/X37fNEgprvCUu53TOdFF6cN073IavncXzq7w4yvPWa/g7Z8d/w3LGqUz2Vs9be/uSUszu1a5MPJzjY10S3b3KxZ7nG3dK/Rzs8LHmUbcSPt2lZINcOynK6Pf5HO2quwcduXYjmppkp2b3ODc26sS/Q9cNo5EImtbw76M54K/e/Qjn4cMY3ljEbteUtP0i7vC4mOUvnO4WqiFJBge8lk/bgEfb3joEuJ2X8EbAoMeXpfStYbpfCQe6p2N5keNujtovFKuCKqFcUzbzlOqD7pOEztICzvC2SJljL29fUXpVE1y+yd9dHD3t7mmu9DgwBgq8TqXMVKdEuQvd6YakKCenRvn5ye7HatvFCk6K0i5OTU0B3Aj+EbW2JdoTsfrtjr7n7y7WIXlP8ri3HPVOfqEtl1s5yWO4e4Ibo6YkGR3wkhN4SMOO1A/0+3dRFoI6m8ky9qp2ZFUZJ8S0RNAad3gayVuvyv5hgzyN+JrJ0IR/90vu81bXJ3hKp0s1L+s+5CgX78CS+3ne69XXD4l8jse7C1OTDds5Sl/aTa7G0bru6yhbebexFI3XdrfzWsQPnGgFanIRFFkHquuWWczR7ueYz8IqnvTWwbJV0lt+E4Zxhsfn4/6JdZaIhCngrWRW4OM9akEW9J4VYBSlv7UA52J0rebfS7mdV+NYY/hjJngKeP+apuZnYbBSHq++LyumcpXwuIeWskYPT9PWrt4omPmDI1zck0uccTo+l3aq8wGv7VnttfSXf6YsK5FD0snuiogt4wHeDpC6T5dGHLyVz1F67EW8m25d7VJzZ7v41kEZy7uecpTkNT6sBxPo7y25KfRy09SMJOMDXreKxYGPtwt3BAph5iV+XXurs9mUVHtL/J7r4hz1eo2X/OTTcW0R8wL3wa+xPFgfrfsuxkX5o2vInp4eYxv2fN/iEmrNbhU+F/DfPCO/+vo0IOJPn3AfpCwnAwNeq5E/MdDjTo+RW+g0rg1QzrrO0ZyNpxgO5+U4kynjCU9v8IqSt7iX1bMjeNPbMDgYx77udzUiqQUBL3hZWeBkhliik9cq+SHh4/obezmLVjTe6F+LOT/uHsNPPN0S1+VmcMAhI+uMcUHXI3jGw5cjgFyOTEq7H8VTCf/uh4zylo8WoVmpMl0B70ERf3prqrJhO0Z87H8afZUI9znPRvzAgSmr01siTq480DRVMtIzZuP9D0u5PoENT97ytBJP0nZaswIu4KUaRiwnYixHuTlqQlJbAt7fvIQwf+dt+1tiV2iU2dCRg/WVnupsEdtUs9P6wwkM069gopccrQtze5Pn4z7ILUGTcF97Gq4BXZLQ6pdxi0v4YeQW8Zi39wVFMe3XV2tZZzpH+PFQ933KsrJPxJ/eH1Ma9wc4gkduVcSc1EtdTjIy4N14jYb7+C6Bs1AW4GlVVXZyVrO1zRjGLR5X+f1kwyX7RDI74P3G01G78YhNs1MtP76+BlcR89jQZSxjIb8zkx/4jJe5iYu9bRwwn7Yb9aT+ltDi8uU85yVH68Lv1l5SW+IlDL/dU203TkKrn+BGBvr9Ed7C+ewYNjGN9YtkMDmkw+4Rf/pECnOyR4Sf/e5iuk7d2IhTVvdIYWmeCFDrdf2JuNlGHRxvusTexA31c2Vbnt8iWpYV2oV8w77ekizhLvZxi9V8JNxy4mzWvmSzBUO4k+H2IH8w1cU6pay6kM74hVJWsYISVrGM+cxlFuOYSwUOA8/fkMur2XHucZfAnFxXaX5ms677lt7IS2qveBn+MZKFNPOQTjNrmPh2JdWqDBpIueX2Lt29hIiNvb1QzLIsV5lx959IC93Pcu+GJCexj998OcJKD12tqVuUmsK4qTYmwuj3nZGan4gbLr45ltEJfzEu93KXyPP45C2xhrTlBbbzWGe/cqV7Vk1HalvAu5plXlcOLWQwg5nNRPuYKUx2v0T9jZ9YQDFTmcc8SljNKpaxmHl8XsPuN/5fBs1l6UaBXDmPpfUs5gFYUbVT6eL3kvMR8FbyHsd4SKeAfaIstBSveR6m1N3NeRG2H42Hr4DXkU3mBbyR+rffSl02rEPEa+fNOEKc2yOW9sOUFemtCAFvdz34am4KG4SCq3ks4fthBcVe7hI+92Pcmd04iiKP9TWWs9y3ajhS+wLehYzmUO95aEc7DqWMqTaJH/nYRZoSNJK9yWJ57CsiereS8o36AB5kbqLft730AawZ0tDb0+v/X73EX2aPewl4W9LB8xl8yAWeKujm2Q+e+skaeyqVIy/QKtXpmcgUaUmy0SnMR+SR4jGHqW6q/Rxh5Y0uKQx4Ix2phbV085DqZG2wH+g8Xg/wpX+Jl4DX58rJp3mtrXJu4i7tqSa1MuB1S+2VJAS86x6427ANsMwWM5vRPMVsSjdc5suVJDJ9wKslrNpgWsMqPnSJLjK+kvHs4uFbNkB7L72FE7xN7puGeZkS0crr+bMYJyBF876ngLfQW8AbrB+oQeovJWsRcRDOFynMSqQVGsa7eF4ofxkh4E3hInTuCyuL8CVmcxTw1hTwrj+v5aMAA4Uq+MzLQpH1Q1pXixnIp/FvQC+Svss7PrNJ9re5hnSgN1fyA/MYbZfbzralNQ9RjS3HbbD3zY8kvlboAnz0VWeZg2pWj0zEV/zhqaZWMs5LOn7XL53gaTzc057yU+jtSg42gnvTNFxLkZYnXJHStzjtIvxsclwpTU6wvP59H5qcZA7baMhegIXxXImnad55IaypCkazk/tI4a5kknhfp4/hhxTN8c2iPr3pDRhj7X2+YxbT3YK019jyjQKLcW5JwrfEYvvVS105zFMf3XfO0/bNbp59E2Wz1uBhUfzGuaVe0vmNMi/DAHzto5TLdvyS6C/bFp770WMTadzsjJTmpLm3nMxIsLz+zYgwQjpMXQhh0nCDdaF/Z2qg9H70kKdyr2N4/ficexmqYFdqecDryu2VlC9q49YGvsV8al/zLa+6lWmssfkb9AEUB5xS5WMplyxyKN1oZHFifPbg+1m8q7V1dlO95Wm0p3TK+cHLTOcC83PeWgca0NIwLROZIn1FS+0r94becjIvwaP4F56cZI4OG6xB/irBgrraOLr1Z+5hqPZTkzoQ8ALPcw5bpCWvBezLvqzgRpvOFzzsfkpLLo7cYNn2OQH33fKx11oeOZR66uH1+WXCzyJM3b3uJu8rkCphuJeAN8fb1RSk/zCfojRcS/kpaoexXEE1WxFXSisSPIp/K0OTk8z1WsAVa4prWX0Ucz83pmpxPRHf4t5Q1P3hcZ+pRBTRjj78g0n2nf3dWlh+io/faIMJLt8EXOXXR11WkmPO02jQVR7ryk/QkudxBYGfPAXhuDJPy2Z181a6IF8LwrfZbGrvMa4WHSWWGnRILBZmVCtOrlV8QDcuUbgrdSjgBW7h07Tn25HLtjzC7zxlA2yLNOYk6OQlX7fEbb302nzHEq8Bb6mXNupvDNtkpoTsCnTkeVo/N0gfbXp6/CK1jsKU5iTSRMb4FoUqTPAo/hUmWPOyziQWqBLWttwPOZ393HRnqgzJXAmsAevK7e987XVtwCDB0JEcyRQbyTA+TMPFWMGYgCn42iygHlt6SGUZkzzWzmK+YScP6fgLeKd62VRjjXJv16CfaYJBaqlBWq7e5RF+ltppVZEGIsQ3VKR5guX1Lzw5yVQT3ayAKdSG8HAarzGST90qNQipgwEvMJ0jGO5l00Q/utCFY/nIbnOfpfjIC0IzSquel3n2i33e1txk8/P6y1/A67OPrczbxqF++tuCTETqnZY2G+mFcfsUX8e+ctIhwfL61yHB8so6E+p8DUzmTka5GWoKUjskMqQBV8EorgjZa7FmHM4oG2EdLTuFR33DU+9ccNn4KPdqz7n6zVMw70uFx7KVe6qtfE/9QG0twbV0rSF7pKXNRtqfsKltEpKcbB1XSl0TPIp/4clJplpaZ0tuFPMhu7Gje2RduGtNrak1tZbW0hpbkRqHZKIEe6hcmd3BlpwYstm+hRzEgTxjtzHFpSYcf81VhKTs9bxMRPHdX+1n2pq/KTY+v54U8wV7ezlzfoa1dKETib2CzadHOpqsm2vFEYZG7cSclGUl0grGPeNKaccEj+I7Ytku4v5cM/Toi8GKOlvyGZzLlzSkmxWQSzta0ojmtGMTCihlGT/YNH5gIZUUM9/NVlORWh3wgiu3s/iZ60M0sGFdcHQ8g/mHPeGWpeBo4VmN0M9Xj3AuJe6vz95nwDvT0wS/LE+13ijhQS0N03YVT4kQau/JsJTlI9IGAfm2p4txpL61i9gfnMoJk30i/GypQpQYlNTh7ZcLOIV76FDjG+Ddqvx5go1lEtOY4Jaq0Ui4ZSX+q66C2zkslCsN1uMuXrDNUnCk8ASIOaFsX376v/0FvB7H8Loy5nsqXYmnQQ2JrsR7SNraR6StV/un8FvyTyzzkpMDI/70uxTWbL8IP/tWD74YfJfCNwxh05oBbBZjdNCTc3mIt3jL/m2t1Gyklga84Mp5l15MDOVc1AMYZ/sl+RjFhGfmajhX1rSQlc3v17OFnkq3wtPaGNtbYtP7BqStfYyP8LMutmsKc/JlhJ8dEXMqkT75i0vZyFlrEzH0/lIPvhj84X5WJcQsj924gkk21LRttdTOgBdchfuOPbmTZaErmaMlI+xqa5TEY3wYolFefkLLnFDmKnxLia1R6ilP8z29PN01kT5ey45zWpZPn0T86YkhyUknOyimmtyG/RMuq18nBqh1WUOb58Yf9DbnaKbZTdZAlSG1MOAFcCvdRezNI/wRutLl8h+eTeLF90OIdhT3E3zV95yryhClAj4HRwC09BPwut89LRPVNaFRvCdU2aNtWcCNsuO9d3xDpNGkp1ublGXlg4g/PSOmNM4McAS/Tg9NTjJXuaogIY24jNG2typCamXAC+AmuFM5iMdDuKD5QTxpydo4dUaIyulnOpbvjZr9BJj+Al6/LaGFl1RK8Neb1N/iv6IHVTlLP/AvUrvuyNsRf/qPlIXeYyKOyD7Y9omWgnXi7IgfeCdVZbHz6Bjhx6M0uSjm61ISswPP2lmWpYqQWhnwrgl6OYXuvBaalWn/CnlvSNKlF6Y+gDIvwwcKQtlK/bUoj+WzVjT2ktBq/C2AdE68Ib11onuVv670uMlHbIZF/OlFtl1IcvLvqL8f+ROjUvU2yBrzrwDllL+uBUlca+6L8sZDJJMDXnCV7meOYBueDdX4p1zO5aCkhLxh6gMo9xJ+53ruDfczJtjfdhg+S9e8ylCAoOG8r5C+NV3i/I1D1uunTnmLdm9FmQv/35Rl5cWIP93TLowYZg7iuIi//0LKynFzlG2ZX9JjLybafjmou2yQKkFqbcAL4Mz95I6jG6czIjT7+eQzlJ3M/zoGq0N0Jiu83KAL2MFvc/BUtjAGvDn46H0spQQ8Tvq8Mp4P2yYcv16dlKRhxZWnI/60v12WotB7FJMjfuB/tlON9diGuyP+7kqeSU0p7DhOi/iBoa7uri4bn0WqgoCyuT/pKyWJpDPgXfvwWOCGuEM4jDP5KBQv/gt5m07eUw3TGsSlXlb57Op5FK+PNTLM4ybWPr/01PMSPk+lHDwucX+AxbxNsNXj+PUGNMCKNAxIeiTKz2+yQ0OSk0etYQ0/eYzI0+secSn5cmw9o5bhESQWv3tadLBua8G91l3VILU84F0bXYx3DzKIXpzBGI8TjxLThGcs23Oaq0J0Jr/3En4X0NTzDS+4co8BbxOPZcv1Ej6XMxn4ydu2sw251mLddW8Lrt/gX5akPuB106P08cLzKVqR94EovXrdqh+YYI9G3OYB4P6UhLsdGRplx8Ux7n099GJSpu05vOjMI5anapA6EPACuAVuonuIfrRkMGNYmsb+3u6c5DW9yWFafdhVeBpgUeTxAdzNS4A5yePI0u7W0ltafqZ3lbMU3Beedm0D6MXhsYxYtyzu2WAVjVIWkJ2GxntHlJ8XMtx2S8E1VML/onyknw3bcGiUPcjJUX7rYTc1BeHu5gxny4A1LetUqIfXk55cpkqQOhLwrn2UFLuF7gXXh+acxDNM9Ph4j109zrHWHtNbym+hOpd+xpz5XLW4iHYeUlnscfm3rnhqAVYv4iYDsSt2a/qv/Q1qKOAeekQLea0+j7Lvhv/IhHRspeK+ivqivTmj7LAUZOWWqNvJHsYH1vbPCsuxoVHWvAW4OQXh7q68T7coHxrphumRF6Oy0K02lLnOsyaqBAmDnNQezpXzDM+Yoy870old2Dalh9+eA3nM4y1xZqjOpZ8pgt085qgRPjYOmOUWe8tRa2+DGvI42Es6S9b+v8+pRM0YxcF8GiE8asrd/N9G/1zKJFqmpe1eywlReswLGGZXuhuTfH8qs2t5KMqH9mKcne7eBtuRB+kZNdEb3PSkh7unRc01wDV64MVepbV044nPGLvBUKwKGlFEEY3YJOobgsQ05aYYt24RqU0B79rHivEBH4BtQQe2ZAD7pSwfB9vjztc89FJnoTqXfpbR6WptnK+eaz/DI/y+DWjmLeDdyks661b7/MlrKRvzpv2Dp1y1o5+tD1dU2z9dynI6pOWOMMuu4LbooaPtxWVuYlJzMsQGEW1m+aa8ZbezlGtjSHCKuyrJkVlHbmJwDB+8232qB14cAW/t7OF93D1cQ4Eb0pkWFLEbp3rfcXOgPeq+VKOSdEvSkAbLtlzLt3zLt/pW3xpYtaGPm+4+cEM4ivb04n/8THHSp7b12mBWehBh6wHwExju5vFm19ZLKn73hRroaUXmhp7G8K4bB/6553U/G3EP39oJlme5lgNgOZZr9Wx3+4g3axiOsRSXljG8gLudWKZT7ccEu8vaJzUrse3udnFM4W6S94qzRnYN02IKd6dyiR53cQW8FbWyXDWuLOOWufHubfcSl9GRAXzj9agtOcNy1Kgk3bw0QmtGIblkkUsWkMfmbMUWbElLGlJADtn8alu7Gm4gbgUr+I0v7FJy6c8AtqF9lKXTg4RgXfnK2y0xXGYwk+ChQD1f09asAX7m1vtdzXkfmrLAQzoHe8rPuqkxo1nhdfw05LMVT3InM/ncvmIlPdiBrrSIsLbEzLR+iTuPr2L6EnEe59njPOVGJyn0/tbO5y5Pid3m3kxaRLYjx3FazHsHnudKkXju7lY3C+5KKOF1G8E/ucDT5ukAR/Ag6uOVTAt4rRmb04B8csknhyza0IHWbMK25EXoHepAQbTpMK6CYl7lVbAd6UN3etDecwgAcLS97vxsGhm2B8h4TxOOBtq3zkdPewP28JDKbKZ4raU29MJHEHKUp/ysHT7izKZ7GfG8oSY0YfsYPzsunW3afW+n8USMHz6Jk+wX3mEM49007zm523pygoeEPnBJ6FW19uzAHuwf1/yHq9y7etjFV83O6nLxXQU32oc8R0dPCTZiVwW8kkEBr7XjfrJpRIMEdpiqR9PYwzE3nvFgrdiJ7TmEXl5L3Jv6nnZJLwnXqXTLzc+ghuO5wUvg05BNPKSyki88V9Q/gge81sLLLmuwkJ///PML7J7mJvS6W5XOp7x70rrEsYTRZpzJmWCrmckCir32yDmWBt40ZTW5NtJrnvJoyqYJdAI87W7Qoy7eS1xV4D6z/ozychcHGGxPe5x+LJLcgJeOHJDwuMUs9uKpOC+3PxjBCHuYVpzC0bTyVOKm3raXDd+kBj+3k4609rL+xN5ecrPA+X7Nvpt1Drwu6hkUeslLeZW1FIZyV6qWCaxWpbfNLxJ/xF5ubePuW82nM51DeG/NT/sXmDVGuRMQSeR6nGJ9+MrTe9ZdaYACXkmreB6wwSbp9EnwkpvnvnPnswWXMM/LNALnbZ5++PoAfvUShDv+7qFysjnGS5mWeK+lXK4OWLYGHOhpXZHV7q/yrU7z42Acq9PfhN2JvKbbstezOkiVIAn7hZu9de2cpOqUuhLwBlrEya10t7ENL3oJefertWdzqKdVLgZa8E1zG3kZilLBh0mopwNsl0C/39/bMJs/qga/1W9cmzJvu6VhaMTucIW83nzGIeE4q5KZXCW38omnxI63eqpRyZSAN5gtLOBLYLeAE7neQ042saxaejY/99Qf2ongu1pd5GXoSAlPJqGemnFW4r9sjTkB5ykn31Zp3+W8kubWE5aH7OFJOet1z7vs7xaoGiTQ1VjKg55mvWzmae1ykRQEvMECmKYcF/jSK+NOD982W9XWk+nM0zzYfC60QP35lu9pFYPfvD2wX1tvIt4AG5xwSv05yNspG7He3ybza9oazyJmrTl13oL5IC35b9yIBPOo6+dWqBok8NX4It97ijbOVW1KpgS8ZYH6g3MZbIG3NHBLPGyP2bQWn8/7PKWzPQcE+v3j2DQJAWEQ1zCnyt8acIs1TiiUr8913vJUxnsbBJ2Ppq3ljFgbbNcjFO8/3JWcQLFu0Am72J2iShBP3vI0Y6WnqlIyJeD9KWDfT29285Dj4AtmNQ5DH1aSfOZpf6BGnJFYQAhgLTmFfC/5eMhbzZTyw3p/35Q3LS/ukmXzEFt4y9OS9VuiK2MM89LSbpYxwq0JL4NMxvM6jdM9zQ6MROI3kT3c/1QN4s2jnia0ttF+a5IpAe+CgFOicjnQQ45XBV7/tjYPnN8wrEtc/wCT+w71NKlrEb97q5l2bLj0/m68bvFu9XAtgz2erc83bMvuI2/7AMZnBsPX/ikvQCqeV3lwU9z+XMgq3abjcp3r6T5RNYjHK3EWP3lJqIG3HSpFkhzwVgbuPTzG9vCQ4+yAKSypxYuKl3l7Ke64x7ZP5BdtM/7pKQ+veQx2ejNqo387gOesXRwlO4/zA7e+qt6qZrvt19PSbj5yJX9+LU1cEjYmdneyJQ/qRh2joWzr/q1qEO9Gewp4d1FVSmYEvBWBH2iteDToWg0UBV4B9Y9a/E28nPe9rVzbiuEW93hny+IBtvT1+Hb+drPrwdxqvrDtxSjrE1u57FpupL7X0/VxNf/2PDNS3mxWV9nSN0hAn5StWNxv7ky6pXF0c6Z4mT3cMW6yKkKSwNeSiW1VlZIZAa+xKPDxOvGBBXhpajkeFjb5pVZvG/njBhOhgmjPA3Gv1vDfgNPd/jKZqR7rpRel1W7ssBUf2N3RAntrzDNc5Tnc/ZZqtoJ2S7gq5e3zZTfxzz8H6eFNWr7dJHcKHbg2/XvBhdJ87qCbO1IDGSRppnta430ba6/KlEwIeEu8vNboFWgiUkuuCpyD2a4WB7yulGc9JncUd1sce6nbbVzk7djPuZkeS9IIeL6Ga+Bcxtu/bafqp+nZ1nYlX3GM96mOw1z17xqeq7LdcCoUrzcEJchkw9KktuyZ7mq3OftxL9PTfJFV8BYXch4vszzNOZnLYwxwLd1FbpIeZpJEpZ7mU3TTWrySPnEMD3CVNhwfu7IfYwVcl8gN2vK4zcMrkdr+aPiMz73tBAans71d7MbGcHZacS0neBvjOtvzaNZcGjCyxnUgN+MaLme0fc1sfmUcKyiiBy3Zik7sQscknCWraUVpZ3Yhn5G62cw38FuVvwUpa2nyM+tGMQpsK3qzE9uxlbeNwqOr5CcmM5FxjHFrBm/cA9abXenJtnQKNN0vPsuYyrdMYKz7Wo8wSdHX4pGc6CGdep4WrBRJbsALnl4x53IUu9u93OziekliLXmAgR4CjZm1+5S6+faqx4AXduFNu5xHXcQRmrYXd7Gdx6O+63k0YhadmMdimtT4iXz60Q+Yy0pWk0c+yXz5Nj7CYu6TeZFjU9RcZvHEX288rChQ/0tpytr4j/zIYwDWmLY0o4jcpC02WMEqljDPzao2J5+u64+3NrSmCYVJ+6pilLOCRR43YxGJ9Ypbbe94CXihuWpTMiPgXU6Jp36MttzIEXYmP7LaRX1MWj4NOIBbaeXhobakDixn/xgXed1PrjH3cZndxxMs2TDstVzy6MpN9PUacBRzt/da6cs9fBHDCOPUTKv42M2p8eFSbFezE51SkIsVnMrcKn9vGWiV4WVpeBAv8TZJM2hOfluvp1ykdvG1Qng3a+CWqzol/AHvAl7x2PPUky+YyzAbyqKaevOsGW3pwvEc6O1V+XBq/cXmFtjzXOA1ySw6cAuX8Z69x++UYmRRgaOQ/hyYhFf+77lvvae5Azl87G1KXTDLGRPxDE6zC3iORknORTkvMnK9Ee35dAuQXgkiUjv5WmV7V5qigFfCH/C6Ffa651etbTmLs/jVvuV7SihnNSspJYdCCqlHAV3ZP9C88epCqdV14Lxex2Bae0+1KYO9brxQc+B0URJSbUdZmrZ12Ng03ohyrb1l93BFkrf5ncw5GwwrCja+brFuqCK11LKIA8JitwVN1m5jLhLmgBeYyBS6eM9FBzpwSErKu5I6MZvZLbKTeINM3cbx1qSsRdsE+Jwv2Dnt5TPuj2H8+n/ontR9iRYw2K03vMeyOSJAegu9LiMnImGykIns4yWlfFWmpEecPUhu2kYbtGaWt9KwrH96fMxrGZrzr7jLVSYh3Ty31C3kk8D7BQY3wz0Sw7VWwRF8kLS1beexp5uywb/lMiBAiqt5XzdUkdrJ/RZhmm18tlBtSkYEvMCodExN8WQ5w9yyunFi3UquycgXR0u4MEmz0HMtF3jY43bFibomxnNYSn9GJGX/sjkMdj9s9K9NAi3ytdRVICK1la9JmXtbripTMiPgfZMvMra0v/ByHfpGPpkhGTiN6AX3UZJSzmErcFNI9+ar38XeCl0phzPUe8g7lZPdh9X8+z8DjRn+AxGpvXx1FfRO4ZrVIkECXmf8M2NnY7/gSuvU2b0pNJO0YvUT/0pa2tn0BOC6NJfxVrcyjuutnL9xEyu8Hd0YTn9XzfbTVhBoBC/8pNupSC22xFM6HTN2donUtYAX3EReyciyTuX2unVynfF/zM+gDJdyvktefhutXYNgJF+msYzfxDvS1VVyPdvxlZfRvCu5iGPdz9X+bCAtAgXSH+t2KlKLzfe0Fm+epq1JxgS8wLnMycCynurq3Dqh7mcOZ2mGZLaYc93bST1CWwBXxuVpK+NS/u3mxn0Wy9wv7Mo/WRQo6F3JO/Ryd1bfv2x5HBFoAcBK3tPtVKQW+9nbwoN9VZmSMQGvW8SlGVfSh/mkLp5g9wkXZ8gy3ze5IUk+QsO1/z+eUWkpYSUjoq2/W+N5LHG3sju38E1Cv17BSwxy/SNs17x/wG27S7SYvEitfpZMYaGnpPqrNiVjAl5gGHdlVDm/48akLHWVCbepR7k1A7J5dwoGnNRfWyNLuSctZZzLWS5AH637wV3GoRzC83FNEBvLJfThb+6dmj9ijTkz4NbQi6mj15dIneGrh3dbVaWkQ4KDx90qu4W92D5DSrmKs92MOnyWb6Edp4U6h69w2fqbICQz4AXe5UHOSHEZyzkl+qJ4dgnNuLzmsNjNZKa9xeY0ZQ/6szOFOPjzf2AYDqOc+XzG24zjDxe9X6ZP4D6XiZTrdipSq630lE5zVaVkUMALbq4dzrhA01xSpYRT6+Zwhj/PVYmdSWOOCm0GJ3JcSjZ8blSlRm7lMNqktJRPMDKGTx3M7nSyv7kIAwRcJdOAL+we8siiGW3pwGa0poCV/MZcZvETSymj3MW0oJkVcEfg0r2sVXhFajlfPbyNrKlbpOqUjAl4wf1sfXmDzUJewnIuc8/V9dPsKu0YvueSKn2c4fEI56Yk3IX6f91m3c/2D54iO2WlHMZF0QfVWE82JYvDaWRnuagb9bpSSoGl/BzkC51l82bgq9j4CBGp3XxtPZHDQB5VdUqqBVloHjeZwWlfxj9auHuSu1OnGVylu4aLPC0r488SruK8FIW7kMdOVf72PI+krJwfcYaLZVLXlmtDz3142fpbVkrydiN9AqfxmaasidR60z3ts1rADqpMybCAF9wXHMG7oS1dCYczVCf5z7M1hOOYG6IMLeRUd0MKxu6uswVFVWrDuIzXU/SYONnFNs2s9Z9/6sZr/NcaJjtrdj5nEjywHq4XlCK13kfeRuq3VWVKxgW84H7kYB4K5QztX9mdN52m0lQ9WyPZiW+8bGHgIwzcyaV6q+f1Vpp1SzgrBW8oFnNQDVs9bBh8FrJzlb/mcRGf27bJ6+e1bLuQG2ngIalvdG2J1Hqzve2y2lqVKRkY8IIrd2dwMj+ErGRD6enGOy2VtOHZmksPrmB2mrMxj3vo7n5J+XELNqqNY/klqV8APqe3+zHGz7Zg1/X+nk0XvuQG2zQp4W49LuYWCj0k9S0/6soSqfVPD/O2TkML2171KRkY8AK4J+nLlaF57E3kZI53C3V6q79puf/Sn+dYlaYMrOZNDnXnuRVpOHbeRrXxLXslrZe3lOc52MX+VbBxNZPH8rmMsXaddfEc7nbmaW70tKf9l2n46iIiqefrrr05XVWZkqEBL7g/3I0cyH88DWpP3Fyu5FD3uIYyRDxbk/gb/fgyDYf+koMY5D5PU8HrVVMXM9mfEUkJ7G/k/9yCOH6jfQ3/3o6rGG532s7ewt2/8TpHe1uj4gtdUSJ1gq9pz45NVJmSsQEvgPuZG+nGEErTVJql3MvW7kY3Ryc26rkqcx+zH4P5OoUjemdzOvu7D1K2KkNMAS+43ziO/1Lm9UhT2Ztr49lXzXI4LMKPO3E+I22snW4NLNCeaLa3fcwD+OsxnstoXU8idcJUbyk1VGVKRge84MrcTHc6PXmNGd5G+8Sikhlcz+buXLdUJzXms7XUvcAO9GN00heVWsxHHER7N8QtSWuRc2qsicvp6+lmXs7vXMJ27rM4txEu4OCoj4hdeZC5DLdDrL01jjPQzbcWtq+NYRS7k++xTie5qbqWROoEf9NTt7Umqk4JRQAQMJCaxOHmOJLd2ZVtNpwo5N1PfMnHPB9XqOsjT3lecu+jX7GQhHe5csZ7vGd7cAz70MFTmdYv31SG85r7MhTtvV6EmvjUduZiBtMp0BFW8AB3u9kJtadmMX2uiIM5mAo+treZzgJmuF+jBrs9aMVBDKCd9xqt8LBLm2QWH9vXuCTejXNDUkZYjeEC52TdG9MsDzUVdKjfGCo9dZNtSlNvO7eJxH3bSQJrzo5sx2HslpTkZ/AyY5kcfw+T7U6PwEf/ynnYsNjacWDgMHOee8FDTjqwA105yNu5Mj7gA37kCzfLS3Kvc2jgRK5210Y5Sif687cEW8dYXuFDvklsbRDrywcJHfULJrOQpSxgDl+zkFKMfArZhUJa0oqGbEVnOibpEp9AL20qXLfYAIKvG/KO++nP9HajZ+D0vnV/7vVnnekXeKDWYveMh5qqz9GBQ2fHfeuuMDs3cLg7Itjd2HI400sjyuJXRrqVupqkFgW8ay+SFrSiPb3Zm840iNTLFlMYVcoC3uIdprGQRSnctqBuPMxa0JLtOIMdyU/wm3w5C3mXp5jL/LimbIUi4F1bB1twKofQIuY2uYBXuZ1FQVYGsSGcGrB0symmnHIqySWbemyanDc469nDx9c+ERGRWhDwrn2g16MeOTiacgB70Inm5JBN9tpctKz2l+aRhaOMlRSziF/5hjeZg1HiynTyknamssgmn3p04hB6sCmNyKvhLC1jNZBFBStZzDS+YCQzqaDYf6+fl4D3OvfvGI+WTT225hy60Joicslbb9xrGcsxKljMdN5mGAspCbrms31F94xrKuPYx63SFSMiIgp4o4VWBTSiBV1pSAMa0hDIpYzVrKCEFZQwg2999hNKQuepiGZsTgca0YD6FFFCDitZxnIW8R1LmJf8LyCpDXjXO3I+B7AJDWhIIbmsYgkLmMcE5vpb/M5ymE2rjGsYg30MphEREUm2nPQe3lWykpXM1dakIf9etIIV/FpnS7+a15N+kL29bPGbWl8yRteGiIhkgixVgUgI7O1lk9/Uesb9phMnIiIKeEUkNpm30eYvDNdpExERBbwiEqsOGZbfEm5zM3TaREREAa+IxMT2qmGVkvB6l4d03kRERAGviMRqa9pkVH7ncIq2mxAREQW8IhK71hmV22KOQEsFioiIAl4RiZU1o1dGZfgxJjjTeRMREQW8IhKrtuycQbkdz83+NtwQERFRwCtSFzSlccbkdSVXuVk6ZSIiooBXROLRKWNyatzu3tUJExGRTJOjKhBJawxZQL8MyWoFd7irdcZEREQBr4jEp2GGBLwl3Ocu0ekSEZFMpCENIulVQP0MyGUp97uLdbJEREQBr4jELxNWaDDudRfpVImIiAJeEUnE4AwId29T766IiGQyjeEVSWcs6dgh5FlczX3uUp0pERFRwCsiicmjUajzN4fb3J06TSIiooBXRBLVlOIQbzvxJSe7STpJIiKS6TSGVySN3Fy250FWhjBrZTzKPgp3RUREAa+IBA1557sz6cwjLAlVsDudgznNLdf5ERERBbwi4iPonetOpTd3MD0U2ZnLf+ju3nOVOjMiIlI7aAyvSDiC3u+5yB5mJwbQh6Zpy8YsHudV943Oh4iIKOAVkWQEvT/wg73AFuzORWyV8sPP434ecXN0HkRERAGviCQz6C3he5vCk7TjMvrQgkJyk37QVczkAYa41ap/ERFRwCsiqQh6KylhOqeCbcL/0ZMutKV5Ug5l/MgnPMsYjdgVEREFvCLp5qOfsyLjQt853AJgB7AVW9Kdbt5W7Z3POD5mKhPdLDUuERGp3ZyqQDKDdWXzgO21nK/d7xldB21pSSMa0JN96EEB2XEnUckS3mE0v/AH090qtSsREVHAKyJhDHzrUUABuWSRx7ZszzZ0pIg8cnHkkLV2ucFyKjBKWc08pjKJSfzMaspYqUBXREQU8IpIZgXAjjX/Va8SMGeqJxERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERGpc/4fwtpZiksfzRUAAAAASUVORK5CYII=';
-function slLockupImg(h){
- return '<img src="'+SL_WM_WHITE+'" alt="ShopyLink" style="height:'+h+'px;width:auto;display:block">';
-}
 function slLockup(h, tone) {
   var ink = tone === 'white' ? '#ffffff' : '#0B2A3B';
   var sky = tone === 'white' ? '#38BDF8' : '#0EA5E9';
@@ -4110,325 +3871,90 @@ if (!window.__slm) window.__slm = 0;
 
 
 // ══ DATA ═════════════════════════════════════════════════════
-var CUSTOMERS = [{
-  id: 'C-001',
-  name: 'Layla Al-Rifai',
-  phone: '+963 501 111 111',
-  ships: 4,
-  addrs: 2,
-  addrStatus: 'active'
-}, {
-  id: 'C-002',
-  name: 'Layla Hassan',
-  phone: '+963 501 222 222',
-  ships: 1,
-  addrs: 1,
-  addrStatus: 'active'
-}, {
-  id: 'C-003',
-  name: 'Omar Khalil',
-  phone: '+963 502 222 222',
-  ships: 2,
-  addrs: 1,
-  addrStatus: 'expired'
-}, {
-  id: 'C-004',
-  name: 'Sara Al-Ahmad',
-  phone: '+963 503 333 333',
-  ships: 7,
-  addrs: 3,
-  addrStatus: 'active'
-}, {
-  id: 'C-005',
-  name: 'Khaled Noureddine',
-  phone: '+963 504 444 444',
-  ships: 1,
-  addrs: 0,
-  addrStatus: 'none'
-}];
-
-// Store history — saved from previous receipts; new entries added on each submit
-var STORE_HISTORY_DEFAULT = ['Amazon', 'SHEIN', 'AliExpress', 'Noon', 'eBay', 'Zara', 'H&M', 'Nike', 'Adidas', 'Apple Store', 'Samsung', 'Ikea', 'Namshi', '6thStreet', 'Farfetch'];
-var storeHistory = [].concat(STORE_HISTORY_DEFAULT);
-var HS_DB = {
-  '6204420000': {
-    desc: "Women's cotton trousers",
-    unit: 'per_kg'
-  },
-  '6109100000': {
-    desc: 'T-shirts & cotton tops',
-    unit: 'per_kg'
-  },
-  '6211420000': {
-    desc: 'Sportswear & tracksuits',
-    unit: 'per_kg'
-  },
-  '8518300000': {
-    desc: 'Headphones & earphones',
-    unit: 'per_item'
-  },
-  '8517120000': {
-    desc: 'Smartphones & mobile phones',
-    unit: 'per_item'
-  },
-  '8471300000': {
-    desc: 'Laptops & portable computers',
-    unit: 'per_item'
-  },
-  '8471600000': {
-    desc: 'Mice, keyboards, input devices',
-    unit: 'per_item'
-  },
-  '3304990000': {
-    desc: 'Cosmetics & beauty products',
-    unit: 'percentage'
-  },
-  '6402910000': {
-    desc: 'Sports footwear',
-    unit: 'per_item'
-  },
-  '6403990000': {
-    desc: 'Leather footwear',
-    unit: 'per_item'
-  },
-  '9503000000': {
-    desc: 'Toys & games',
-    unit: 'per_item'
-  }
-};
-var CAT = [{
-  kw: ['shein', 'zara', 'hm', 'h&m', 'clothing', 'dress', 'shirt', 'trouser', 'blouse', 'jeans', 'skirt', 'top'],
-  hs: '6204420000'
-}, {
-  kw: ['tshirt', 't-shirt', 'tee', 'polo'],
-  hs: '6109100000'
-}, {
-  kw: ['sportswear', 'tracksuit', 'gym wear', 'sport top'],
-  hs: '6211420000'
-}, {
-  kw: ['airpods', 'headphone', 'earphone', 'earbuds', 'headset'],
-  hs: '8518300000'
-}, {
-  kw: ['iphone', 'samsung', 'phone', 'smartphone', 'mobile', 'xiaomi', 'huawei'],
-  hs: '8517120000'
-}, {
-  kw: ['laptop', 'macbook', 'notebook', 'dell', 'lenovo', 'hp laptop'],
-  hs: '8471300000'
-}, {
-  kw: ['mouse', 'keyboard', 'gaming mouse', 'usb hub', 'input'],
-  hs: '8471600000'
-}, {
-  kw: ['makeup', 'cosmetic', 'skincare', 'serum', 'foundation', 'lipstick', 'perfume', 'cream', 'beauty'],
-  hs: '3304990000'
-}, {
-  kw: ['sneaker', 'shoe', 'shoes', 'footwear', 'boots', 'nike', 'adidas shoe', 'sport shoe'],
-  hs: '6402910000'
-}, {
-  kw: ['leather shoe', 'oxford', 'formal shoe', 'loafer'],
-  hs: '6403990000'
-}, {
-  kw: ['toy', 'lego', 'game', 'puzzle', 'doll', 'action figure'],
-  hs: '9503000000'
-}];
-function detectHS(desc) {
-  if (!desc || desc.trim().length < 2) return null;
-  var l = desc.toLowerCase();
-  for (var _i = 0, _CAT = CAT; _i < _CAT.length; _i++) {
-    var c = _CAT[_i];
-    if (c.kw.some(function (k) {
-      return l.includes(k);
-    })) return c.hs;
-  }
-  return null;
+/* ── what is waiting to be consolidated comes from the register ───────
+   This queue was seeded here, so a parcel received an hour ago never appeared
+   in it and a parcel in it might never have been received. A parcel waits for
+   consolidation when it has been TAKEN IN and has not moved past that.
+   The rows below stay as the gallery's fallback, named as seed. */
+var SL_REG_SHIPS='SL_SHIPMENTS_V1';
+function shipRegRead(){
+ try{var r=window.localStorage.getItem(SL_REG_SHIPS);if(!r)return null;
+  var o=JSON.parse(r);return (o&&o.shipments&&o.shipments.length)?o.shipments:null;}catch(e){return null;}
 }
+function queueFromRegister(){
+ var reg=shipRegRead(); if(!reg)return null;
+ var out=[];
+ reg.forEach(function(x){
+  if(x.stage!=='received'||!x.open)return;
+  out.push({id:x.ship,customer:x.client||'',phone:'',cartons:0,weight:0,store:'',held:false});
+ });
+ return out;
+}
+function queue(){
+ var live=queueFromRegister();
+ return (live&&live.length)?live:QUEUE_SEED;
+}
+var QUEUE_SEED = [{
+  id: 'SL-9489',
+  customer: 'Layla Al-Rifai',
+  phone: '+963501111111',
+  cartons: 2,
+  weight: 1.60,
+  store: 'SHEIN',
+  held: false
+}, {
+  id: 'SL-9502',
+  customer: 'Omar Khalil',
+  phone: '+963502222222',
+  cartons: 1,
+  weight: 0.40,
+  store: 'Apple Store',
+  held: false
+}, {
+  id: 'SL-9420',
+  customer: 'Khaled Noureddine',
+  phone: '+963504444444',
+  cartons: 1,
+  weight: 1.10,
+  store: 'Nike',
+  held: false
+}, {
+  id: 'SL-9398',
+  customer: 'Rima Faris',
+  phone: '+963505555555',
+  cartons: 1,
+  weight: 0.30,
+  store: 'Amazon',
+  held: false
+}, {
+  id: 'SL-9451',
+  customer: 'Sara Al-Ahmad',
+  phone: '+963503333333',
+  cartons: 3,
+  weight: 2.20,
+  store: 'Noon',
+  held: true
+}];
 
 // ══ STATE ════════════════════════════════════════════════════
 var sim = 's1';
-var searchQ = '',
-  searchR = [],
-  customer = null;
-/* the route: stated by the clerk, never assumed. Not named `origin` — that
-   would overwrite window.origin and break the page in a real browser. */
-var arrivedAt = '', destCity = '', chargeBasis = '';
-var store = '';
-var liveItems = [{
-  desc: '',
-  brand: '',
-  qty: '',
-  weight: '',
-  unitPrice: '',
-  hs: null
-}];
-var liveCartons = [{
+var selected = []; // shipment IDs selected
+var scanVal = '';
+var scanStatus = null; // null | 'ok' | 'err' | 'dup'
+var repack = 'no';
+var loadType = 'partial';
+var repackCartons = [{
   weight: '',
   dimL: '',
   dimW: '',
   dimH: ''
 }];
-var repack = 'no';
-var mode = 'air';
-var condition = 'ok';
-var generatedId = null;
-var PRESETS = {
-  s2: {
-    customer: CUSTOMERS[0],
-    store: 'SHEIN',
-    items: [{
-      desc: 'SHEIN summer dress',
-      brand: 'SHEIN',
-      qty: '2',
-      weight: '0.8',
-      unitPrice: '18.00',
-      hs: '6204420000'
-    }],
-    cartons: [{
-      weight: '',
-      dimL: '',
-      dimW: '',
-      dimH: ''
-    }]
-  },
-  s2m: {
-    customer: CUSTOMERS[0],
-    store: 'Amazon',
-    items: [{
-      desc: 'SHEIN summer dress',
-      brand: 'SHEIN',
-      qty: '2',
-      weight: '0.8',
-      unitPrice: '18.00',
-      hs: '6204420000'
-    }, {
-      desc: 'Nike Air Max sneakers',
-      brand: 'Nike',
-      qty: '1',
-      weight: '0.9',
-      unitPrice: '95.00',
-      hs: '6402910000'
-    }, {
-      desc: 'Skincare serum set',
-      brand: 'The Ordinary',
-      qty: '3',
-      weight: '0.5',
-      unitPrice: '22.50',
-      hs: '3304990000'
-    }],
-    cartons: [{
-      weight: '',
-      dimL: '',
-      dimW: '',
-      dimH: ''
-    }]
-  },
-  s2nohs: {
-    customer: CUSTOMERS[0],
-    store: 'Razer Store',
-    items: [{
-      desc: 'Gaming mouse RGB',
-      brand: 'Razer',
-      qty: '1',
-      weight: '0.3',
-      unitPrice: '49.99',
-      hs: null
-    }],
-    cartons: [{
-      weight: '',
-      dimL: '',
-      dimW: '',
-      dimH: ''
-    }]
-  },
-  s3: {
-    customer: CUSTOMERS[0],
-    store: 'SHEIN',
-    items: [{
-      desc: 'SHEIN summer dress',
-      brand: 'SHEIN',
-      qty: '2',
-      weight: '0.8',
-      unitPrice: '18.00',
-      hs: '6204420000'
-    }],
-    cartons: [{
-      weight: '1.60',
-      dimL: '40',
-      dimW: '35',
-      dimH: '20'
-    }]
-  },
-  s3m: {
-    customer: CUSTOMERS[0],
-    store: 'Amazon',
-    items: [{
-      desc: 'SHEIN summer dress',
-      brand: 'SHEIN',
-      qty: '2',
-      weight: '0.8',
-      unitPrice: '18.00',
-      hs: '6204420000'
-    }, {
-      desc: 'Nike Air Max',
-      brand: 'Nike',
-      qty: '1',
-      weight: '0.9',
-      unitPrice: '95.00',
-      hs: '6402910000'
-    }],
-    cartons: [{
-      weight: '0.90',
-      dimL: '35',
-      dimW: '25',
-      dimH: '15'
-    }, {
-      weight: '0.80',
-      dimL: '33',
-      dimW: '20',
-      dimH: '12'
-    }]
-  },
-  s4: {
-    customer: CUSTOMERS[0],
-    store: 'SHEIN',
-    items: [{
-      desc: 'SHEIN summer dress',
-      brand: 'SHEIN',
-      qty: '2',
-      weight: '0.8',
-      unitPrice: '18.00',
-      hs: '6204420000'
-    }],
-    cartons: [{
-      weight: '1.60',
-      dimL: '40',
-      dimW: '35',
-      dimH: '20'
-    }]
-  },
-  done: {
-    customer: CUSTOMERS[0],
-    store: 'SHEIN',
-    items: [{
-      desc: 'SHEIN summer dress',
-      brand: 'SHEIN',
-      qty: '2',
-      weight: '0.8',
-      unitPrice: '18.00',
-      hs: '6204420000'
-    }],
-    cartons: [{
-      weight: '0.90',
-      dimL: '35',
-      dimW: '25',
-      dimH: '15'
-    }, {
-      weight: '0.70',
-      dimL: '30',
-      dimW: '20',
-      dimH: '12'
-    }]
-  }
-};
-function go(s) {
+
+// ══ INIT PRESETS ══════════════════════════════════════════════
+function go(s){
+
+ if(s==='done')declareConsolidated();  /* declared once the work is finished */
+
   sim = s;
   document.querySelectorAll('.sl-sim-btn').forEach(function (b) {
     return b.classList.remove('on');
@@ -4436,319 +3962,118 @@ function go(s) {
   document.querySelectorAll('.sl-sim-btn').forEach(function (b) {
     if (b.getAttribute('onclick') === "go('" + s + "')") b.classList.add('on');
   });
-  // reset state
-  searchQ = '';
-  searchR = [];
-  store = '';
-  condition = 'ok';
+  // Presets
+  scanVal = '';
+  scanStatus = null;
   repack = 'no';
-  mode = 'air';
-  if (s === 's1' || s === 's1r' || s === 's1nf' || s === 's1x' || s === 's1exp') {
-    customer = null;
-    liveItems = [{
-      desc: '',
-      brand: '',
-      qty: '',
-      weight: '',
-      unitPrice: '',
-      hs: null
+  loadType = 'partial';
+  if (s === 's1') {
+    selected = ['SL-9489', 'SL-9502'];
+  } else if (s === 's1-none') {
+    selected = [];
+  } else if (s === 's1-scan-ok') {
+    selected = ['SL-9489', 'SL-9502'];
+    scanVal = 'SL-9420';
+    scanStatus = 'ok';
+  } else if (s === 's1-scan-err') {
+    selected = ['SL-9489'];
+    scanVal = 'SL-9999';
+    scanStatus = 'err';
+  } else if (s === 's2' || s === 's3') {
+    selected = ['SL-9489', 'SL-9502', 'SL-9420'];
+    repack = 'no';
+  } else if (s === 's2-repack') {
+    selected = ['SL-9489', 'SL-9502', 'SL-9420'];
+    repack = 'yes';
+    repackCartons = [{
+      weight: '3.10',
+      dimL: '55',
+      dimW: '40',
+      dimH: '30'
     }];
-    liveCartons = [{
-      weight: '',
-      dimL: '',
-      dimW: '',
-      dimH: ''
-    }];
-    if (s === 's1r') {
-      searchQ = 'Layla';
-      searchR = CUSTOMERS.filter(function (c) {
-        return c.name.toLowerCase().includes('layla');
-      });
-    }
-    if (s === 's1x') {
-      customer = CUSTOMERS[0];
-    }
-    if (s === 's1nf') {
-      searchQ = 'Mohammed Z';
-      searchR = [];
-    }
-    if (s === 's1exp') {
-      customer = CUSTOMERS[2];
-    } // Omar — expired
-  } else if (PRESETS[s]) {
-    var p = PRESETS[s];
-    customer = p.customer;
-    store = p.store;
-    liveItems = p.items.map(function (i) {
-      return _objectSpread({}, i);
-    });
-    liveCartons = p.cartons.map(function (c) {
-      return _objectSpread({}, c);
-    });
-    if (s === 'done') generatedId = 'SL-' + (9500 + Math.floor(Math.random() * 100));
+  } else if (s === 'done') {
+    selected = ['SL-9489', 'SL-9502', 'SL-9420'];
+    repack = 'no';
   }
   render();
 }
 
-// ══ SEARCH ══════════════════════════════════════════════════
-function doSearch(val) {
-  searchQ = val.trim();
-  // Only show results after 7 characters
-  if (searchQ.length < 7) {
-    searchR = [];
-    updateResultsBox();
-    return;
-  }
-  var q = searchQ.toLowerCase();
-  searchR = CUSTOMERS.filter(function (c) {
-    return c.name.toLowerCase().includes(q) || c.phone.replace(/\D/g, '').includes(q.replace(/\D/g, ''));
-  });
-  updateResultsBox();
-}
-function updateResultsBox() {
-  var box = document.getElementById('sr-box');
-  if (!box) return;
-  box.innerHTML = renderResultsInner();
-}
-function renderResultsInner() {
-  if (searchQ.length < 7) return '';
-  if (!searchR.length) return "<div class=\"sr-hint\">No customer found for \"<strong>".concat(esc(searchQ), "</strong>\"<br><span style=\"font-size:10px;\">Check spelling or try phone number</span></div>");
-  return searchR.map(function (c) {
-    return "\n  <div class=\"sr-item\" role=\"option\" tabindex=\"0\"\n    onclick=\"pick('".concat(c.id, "')\" onkeydown=\"if(event.key==='Enter')pick('").concat(c.id, "')\">\n    <div class=\"sr-av\">").concat(c.name[0], "</div>\n    <div style=\"flex:1;min-width:0;\">\n      <div class=\"sr-name\">").concat(hlite(c.name, searchQ), "</div>\n      <div class=\"sr-meta\">").concat(c.phone, "</div>\n    </div>\n    <div class=\"sr-pill\">").concat(c.ships, " shipments</div>\n  </div>");
-  }).join('');
-}
-function pick(id) {
-  customer = CUSTOMERS.find(function (c) {
-    return c.id === id;
-  }) || null;
-  searchQ = '';
-  searchR = [];
-  render();
-}
-function clearCust() {
-  customer = null;
-  searchQ = '';
-  searchR = [];
-  render();
-}
-function esc(s) {
-  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-}
-function hlite(text, q) {
-  var i = text.toLowerCase().indexOf(q.toLowerCase());
-  if (i < 0) return esc(text);
-  return esc(text.slice(0, i)) + '<mark style="background:rgba(10,132,255,.15);border-radius:2px;">' + esc(text.slice(i, i + q.length)) + '</mark>' + esc(text.slice(i + q.length));
-}
-
-// ══ ADDR STATUS ══════════════════════════════════════════════
-function addrBlock(cust) {
-  if (!cust) return '';
-  if (cust.addrStatus === 'active') return "<div class=\"addr-ok\"><div class=\"addr-icon\">&#10003;</div><div><div class=\"addr-title\">Forwarding address active</div><div class=\"addr-sub\">Destination auto-assigned</div></div></div>";
-  if (cust.addrStatus === 'expired') return "<div class=\"addr-warn\"><div class=\"addr-icon\">!</div><div><div class=\"addr-title\">Forwarding address expired</div><div class=\"addr-sub\">Parcel will be held \u2014 customer must renew</div></div></div>";
-  return "<div class=\"addr-bad\"><div class=\"addr-icon\">!</div><div><div class=\"addr-title\">No forwarding address</div><div class=\"addr-sub\">Will be marked unmatched \u2014 manual matching required</div></div></div>";
-}
-
-// ══ STORE ════════════════════════════════════════════════════
-function pickStore(btn, name) {
-  store = name;
-  var inp = document.getElementById('store-inp');
-  if (inp) inp.value = name;
-  document.querySelectorAll('.store-chip').forEach(function (c) {
-    c.classList.toggle('on', c === btn);
+// ══ HELPERS ══════════════════════════════════════════════════
+var esc = function esc(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+};
+function selectedShips() {
+  return queue().filter(function (s) {
+    return selected.includes(s.id);
   });
 }
-function filterStore(val) {
-  store = val;
-  var box = document.getElementById('store-results');
-  if (!box) return;
-  if (!val || val.length < 2) {
-    box.innerHTML = '';
-    box.style.display = 'none';
-    return;
-  }
-  var q = val.toLowerCase();
-  var matches = storeHistory.filter(function (s) {
-    return s.toLowerCase().includes(q);
-  }).slice(0, 7);
-  if (!matches.length) {
-    box.style.display = 'none';
-    return;
-  }
-  box.style.display = 'block';
-  box.innerHTML = matches.map(function (s) {
-    var idx = s.toLowerCase().indexOf(q);
-    var hi = idx >= 0 ? s.slice(0, idx) + '<mark>' + s.slice(idx, idx + val.length) + '</mark>' + s.slice(idx + val.length) : s;
-    return '<div class="store-ac-item" onmousedown="selectStore(\'' + s.replace(/'/g, "\\'") + '\')">' + hi + '</div>';
-  }).join('');
-}
-function selectStore(name) {
-  store = name;
-  var inp = document.getElementById('store-inp');
-  if (inp) inp.value = name;
-  var box = document.getElementById('store-results');
-  if (box) {
-    box.innerHTML = '';
-    box.style.display = 'none';
-  }
-  if (!storeHistory.includes(name)) storeHistory.unshift(name);
-}
-
-// ══ ITEMS ════════════════════════════════════════════════════
-function addItem() {
-  liveItems.push({
-    desc: '',
-    brand: '',
-    qty: '',
-    weight: '',
-    unitPrice: '',
-    hs: null
-  });
-  render();
-  setTimeout(function () {
-    var f = document.querySelectorAll('[id^="desc-"]');
-    if (f.length) f[f.length - 1].focus();
-  }, 50);
-}
-function removeItem(idx) {
-  if (liveItems.length <= 1) return;
-  liveItems.splice(idx, 1);
-  render();
-}
-function updateDesc(idx, val) {
-  liveItems[idx].desc = val;
-  liveItems[idx].hs = detectHS(val);
-  var wrap = document.getElementById('hs-' + idx);
-  if (wrap) wrap.innerHTML = hsBlock(liveItems[idx], idx);
-}
-function clearHS(idx) {
-  liveItems[idx].hs = null;
-  var w = document.getElementById('hs-' + idx);
-  if (w) w.innerHTML = hsBlock(liveItems[idx], idx);
-}
-function setHS(idx, val) {
-  liveItems[idx].hs = val.replace(/\D/g, '').slice(0, 10) || null;
-  var w = document.getElementById('hs-' + idx);
-  if (w) w.innerHTML = hsBlock(liveItems[idx], idx);
-}
-function hsBlock(item, idx) {
-  var d = item.hs ? HS_DB[item.hs] : null;
-  if (d) return "<div class=\"hs-auto\"><span class=\"hs-tag\">Auto</span><span class=\"hs-code\">".concat(item.hs, "</span><span class=\"hs-desc\">").concat(d.desc, "</span><button class=\"hs-change\" onclick=\"clearHS(").concat(idx, ")\">").concat(t('Change'), "</button></div>");
-  return "<div class=\"hs-needed\"><span class=\"hs-needed-tag\">Needed</span><span class=\"hs-needed-msg\">Not detected</span></div>\n  <input class=\"field mono err\" type=\"text\" inputmode=\"numeric\" placeholder=\"Enter HS code e.g. 8471600000\"\n    aria-label=\"HS code required\" style=\"margin-top:5px;\"\n    onchange=\"setHS(".concat(idx, ",this.value)\">");
-}
-
-// ══ CARTONS ══════════════════════════════════════════════════
-function addCarton() {
-  liveCartons.push({
-    weight: '',
-    dimL: '',
-    dimW: '',
-    dimH: ''
-  });
-  render();
-  setTimeout(function () {
-    var f = document.querySelectorAll('[id^="cw-"]');
-    if (f.length) f[f.length - 1].focus();
-  }, 50);
-}
-function removeCarton(idx) {
-  if (liveCartons.length <= 1) return;
-  liveCartons.splice(idx, 1);
-  render();
-}
-function volWeight(c) {
-  var l = parseFloat(c.dimL) || 0,
-    w = parseFloat(c.dimW) || 0,
-    h = parseFloat(c.dimH) || 0;
-  if (!l || !w || !h) return null;
-  return l * w * h / 5000;
-}
-/* the same three dimensions, read as a volume rather than as a volumetric
-   weight: cm × cm × cm ÷ 1,000,000 = cubic metres. A lane sold per cbm is
-   measured, not converted from kilos. */
-function cartonCbm(c) {
-  var l = parseFloat(c.dimL) || 0, w = parseFloat(c.dimW) || 0, h = parseFloat(c.dimH) || 0;
-  if (!l || !w || !h) return 0;
-  return l * w * h / 1000000;
-}
-function totalCbm() {
-  return liveCartons.reduce(function (s2, c) { return s2 + cartonCbm(c); }, 0);
-}
-function chargeableWeight(c) {
-  var act = parseFloat(c.weight) || 0,
-    vol = volWeight(c) || 0;
-  return Math.max(act, vol);
-}
-function totalActual() {
-  return liveCartons.reduce(function (s, c) {
-    return s + (parseFloat(c.weight) || 0);
+function totalWeight() {
+  return selectedShips().reduce(function (s, sh) {
+    return s + sh.weight;
   }, 0);
 }
-function totalChargeable() {
-  return liveCartons.reduce(function (s, c) {
-    return s + chargeableWeight(c);
+function totalCartons() {
+  return selectedShips().reduce(function (s, sh) {
+    return s + sh.cartons;
   }, 0);
 }
-function updateCartonLive(idx, field, val) {
-  liveCartons[idx][field] = val;
-  var hint = document.getElementById('vhint-' + idx);
-  if (hint) {
-    var vol = volWeight(liveCartons[idx]);
-    var act = parseFloat(liveCartons[idx].weight) || 0;
-    if (vol !== null) {
-      var ch = Math.max(act, vol);
-      hint.className = 'vol-hint chargeable';
-      hint.textContent = "Vol: ".concat(vol.toFixed(2), " kg  |  Chargeable: ").concat(ch.toFixed(2), " kg");
-    } else {
-      hint.className = 'vol-hint';
-      hint.textContent = 'Enter L × W × H to compute volumetric weight';
-    }
+function toggleShip(id) {
+  if (selected.includes(id)) selected = selected.filter(function (x) {
+    return x !== id;
+  });else selected = [].concat(_toConsumableArray(selected), [id]);
+  render();
+}
+function doScan(val) {
+  scanVal = val.trim();
+  if (!scanVal) {
+    scanStatus = null;
+    render();
+    return;
   }
-  var tot = document.getElementById('carton-tot');
-  if (tot) tot.textContent = totalActual().toFixed(2) + ' kg';
-}
-function initModeButtons() {
-  document.querySelectorAll('.mode-btn').forEach(function (b) {
-    b.classList.toggle('on', b.dataset.mode === mode);
+  var ship = queue().find(function (s) {
+    return s.id === scanVal.toUpperCase();
   });
+  if (!ship) {
+    scanStatus = 'err';
+  } else if (selected.includes(ship.id)) {
+    scanStatus = 'dup';
+  } else if (ship.held) {
+    scanStatus = 'held';
+  } else {
+    scanStatus = 'ok';
+  }
+  render();
 }
-function setMode(val) {
-  mode = val;
-  document.querySelectorAll('.mode-btn').forEach(function (b) {
-    b.classList.toggle('on', b.dataset.mode === val);
-    b.setAttribute('aria-pressed', b.dataset.mode === val ? 'true' : 'false');
+function addScanned() {
+  var id = scanVal.trim().toUpperCase();
+  var ship = queue().find(function (s) {
+    return s.id === id;
   });
+  if (ship && !selected.includes(id) && !ship.held) {
+    selected = [].concat(_toConsumableArray(selected), [id]);
+    scanVal = '';
+    scanStatus = null;
+    render();
+    setTimeout(function () {
+      var el = document.getElementById('scan-input');
+      if (el) el.focus();
+    }, 50);
+  }
 }
 function setRepack(val) {
   repack = val;
   document.querySelectorAll('.repack-btn').forEach(function (b) {
-    b.classList.toggle('on', b.dataset.repack === val);
+    return b.classList.toggle('on', b.dataset.r === val);
   });
 }
-function setCondition(val) {
-  condition = val;
-  var ok = document.getElementById('cond-ok');
-  var dmg = document.getElementById('cond-dmg');
-  if (ok) ok.classList.toggle('on', val === 'ok');
-  if (dmg) dmg.classList.toggle('on', val === 'damaged');
-  var note = document.getElementById('dmg-note');
-  if (note) note.style.display = val === 'damaged' ? 'block' : 'none';
-}
-function handlePhotos(input) {
-  var box = document.getElementById('photo-box');
-  if (!box || !input.files.length) return;
-  Array.from(input.files).forEach(function (file) {
-    var r = new FileReader();
-    r.onload = function (e) {
-      var d = document.createElement('div');
-      d.className = 'photo-thumb';
-      d.innerHTML = "<img src=\"".concat(e.target.result, "\" alt=\"\"><button class=\"photo-del\" onclick=\"this.parentNode.remove()\">x</button>");
-      box.insertBefore(d, box.querySelector('.photo-add'));
-    };
-    r.readAsDataURL(file);
+function setLoad(val) {
+  loadType = val;
+  document.querySelectorAll('.load-btn').forEach(function (b) {
+    return b.classList.toggle('on', b.dataset.l === val);
   });
 }
 
-// ══ RENDER ═══════════════════════════════════════════════════
+// ══ RENDER ════════════════════════════════════════════════════
 /* ── paging ──────────────────────────────────────────────────────────
    A cap with a "show all" is fine for an alert list, where the tail is noise.
    A catalogue is different: every card is a real product someone may need to
@@ -4802,294 +4127,6 @@ function pager(key,total,label){
 }
 function pgSlice(key,list){var PG=pgOf(key);pgClamp(list.length,PG);return list.slice(PG.page*PG.size,(PG.page+1)*PG.size);}
 
-function render() {
-  var el = document.getElementById('shell');
-  if (sim === 'done') {
-    el.innerHTML = renderDone();
-    setTimeout(initBarcodes, 80);
-    return;
-  }
-  var step = {
-    s1: 1,
-    s1r: 1,
-    s1x: 1,
-    s1nf: 1,
-    s1exp: 1,
-    s2: 2,
-    s2m: 2,
-    s2nohs: 2,
-    s3: 3,
-    s3m: 3,
-    s4: 4
-  }[sim] || 1;
-  el.innerHTML = renderHead() + "<div class=\"body\">".concat(renderSteps(step)).concat(step === 1 ? renderS1() : step === 2 ? renderS2() : step === 3 ? renderS3() : renderS4(), "</div>") + renderFooter(step);
-  if (step === 3) setTimeout(initModeButtons, 0);
-}
-function renderHead() {
-  return "<div class=\"ph\"><div class=\"ph-row\">\n    <button class=\"ph-back\"><svg viewBox=\"0 0 16 16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\"><path d=\"M10 3L5 8l5 5\"/></svg>Shipments</button>\n    <div class=\"ph-sep\"></div>\n    <div class=\"ph-title\">Receive parcel</div>\n  </div></div>";
-}
-function renderSteps(active) {
-  var list = [t('Customer'), t('Items'), t('Packing'), t('Review')];
-  return "<div class=\"steps\" role=\"list\" aria-label=\"Step ".concat(active, " of ").concat(list.length, "\">\n    ").concat(list.map(function (lbl, i) {
-    var n = i + 1,
-      s = n < active ? 'done' : n === active ? 'cur' : 'up';
-    return "<div style=\"display:flex;align-items:flex-start;flex:".concat(n < list.length ? 1 : 0, "\">\n        <div class=\"sc\"><div class=\"si si-").concat(s, "\">").concat(s === 'done' ? '&#10003;' : n, "</div><div class=\"sl sl-").concat(s, "\">").concat(lbl, "</div></div>\n        ").concat(n < list.length ? "<div class=\"sline".concat(s === 'done' ? ' sline-done' : '', "\"></div>") : '', "\n      </div>");
-  }).join(''), "\n  </div>");
-}
-
-// ── STEP 1: Customer ─────────────────────────────────────────
-function renderS1() {
-  var notFound = searchQ.length >= 7 && searchR.length === 0 && !customer;
-  var hasResults = searchR.length > 0;
-  var selected = !!customer;
-  return expectedPanel() + "\n  <div class=\"sec\">\n    <div class=\"sec-hd\"><div class=\"sec-title\">".concat(t('Customer'), "</div></div>\n    <div class=\"sec-bd\">\n      ").concat(!selected ? "\n      <div class=\"fg\">\n        <div class=\"fl\"><label class=\"fl-label\" for=\"search\">Name or phone <span class=\"fl-req\">*</span></label></div>\n        <div class=\"search-wrap\">\n          <span class=\"s-icon\">&#9906;</span>\n          <input id=\"search\" class=\"field ".concat(notFound ? 'err' : '', "\" type=\"search\"\n            value=\"").concat(esc(searchQ), "\" placeholder=\"" + t('Min. 7 characters to search') + "\"\n            autocomplete=\"off\" spellcheck=\"false\"\n            aria-label=\"" + t('Search by full name or phone number') + "\"\n            aria-required=\"true\"\n            oninput=\"doSearch(this.value)\"\n            onkeydown=\"if(event.key==='Escape'){searchQ='';searchR=[];updateResultsBox();}\"\n          >\n          ").concat(searchQ ? "<button class=\"s-clear\" onclick=\"searchQ='';searchR=[];document.getElementById('search').value='';updateResultsBox()\">x</button>" : '', "\n        </div>\n        ").concat(searchQ.length > 0 && searchQ.length < 7 ? "<div class=\"hint\">".concat(7 - searchQ.length, " more character").concat(7 - searchQ.length === 1 ? '' : 's', " to search</div>") : '<div class="hint">Enter the customer\'s full name or +963… phone number</div>', "\n      </div>\n      ").concat(hasResults || notFound ? "<div class=\"sr-box\" id=\"sr-box\" role=\"listbox\">".concat(renderResultsInner(), "</div>") : "<div id=\"sr-box\"></div>", "\n      ") : "\n      <div class=\"cust-card\">\n        <div class=\"cust-av\">".concat(customer.name[0], "</div>\n        <div style=\"flex:1;min-width:0;\">\n          <div class=\"cust-name\">").concat(esc(customer.name), "</div>\n          <div class=\"cust-meta\">").concat(customer.phone, " \xB7 ").concat(customer.ships, " shipments</div>\n        </div>\n        <span class=\"cust-badge\">Verified</span>\n        <button class=\"cust-change\" onclick=\"clearCust()\">").concat(t('Change'), "</button>\n      </div>\n      <div class=\"ok-msg\">Customer confirmed</div>\n      ").concat(addrBlock(customer), "\n      "), "\n    </div>\n  </div>\n\n  ").concat(selected ? routeSection() : '', "\n\n  ").concat(selected ? "\n  <div class=\"sec\">\n    <div class=\"sec-hd\"><div class=\"sec-title\">Name on parcel label <span class=\"fl-req\">*</span></div></div>\n    <div class=\"sec-bd\">\n      <input class=\"field ok\" type=\"text\" value=\"".concat(esc(customer.name), "\"\n        placeholder=\"" + t('Exact name on parcel label') + "\"\n        aria-label=\"" + t('Recipient name as on parcel label') + "\">\n      <div class=\"hint\">Registered shipping name: <strong>").concat(esc(customer.name), "</strong></div>\n    </div>\n  </div>") : '');
-}
-
-// ── STEP 2: Store + Items ────────────────────────────────────
-function renderS2() {
-  var noHs = liveItems.some(function (i) {
-    return !i.hs;
-  });
-  return "\n  <!-- Store \u2014 free text, autocomplete from saved history -->\n  <div class=\"sec\">\n    <div class=\"sec-hd\"><div class=\"sec-title\">Store / shop <span class=\"fl-req\">*</span></div></div>\n    <div class=\"sec-bd\">\n      <div style=\"position:relative;\">\n        <input id=\"store-inp\" class=\"field\" type=\"text\" value=\"".concat(esc(store), "\"\n          placeholder=\"Type store name \u2014 e.g. Amazon, SHEIN\u2026\"\n          aria-label=\"" + t('Store or shop name') + "\" aria-required=\"true\"\n          autocomplete=\"off\"\n          oninput=\"filterStore(this.value)\"\n          onblur=\"setTimeout(()=>{const b=document.getElementById('store-results');if(b)b.style.display='none';},150)\">\n        <div id=\"store-results\" class=\"store-ac-box\" style=\"display:none;\"></div>\n      </div>\n      <div class=\"hint\">Every new store name is saved automatically for future reference</div>\n    </div>\n  </div>\n\n  <!-- Condition + Photos -->\n  <div class=\"sec\">\n    <div class=\"sec-hd\"><div class=\"sec-title\">Condition on arrival <span class=\"fl-req\">*</span></div></div>\n    <div class=\"sec-bd\">\n      <div class=\"cond-row\">\n        <button class=\"cond-btn").concat(condition === 'ok' ? ' on' : '', "\" id=\"cond-ok\" type=\"button\" onclick=\"setCondition('ok')\">\n          <div class=\"cond-label\">OK</div>\n          <div class=\"cond-sub\">No visible damage</div>\n        </button>\n        <button class=\"cond-btn").concat(condition === 'damaged' ? ' on' : '', "\" id=\"cond-dmg\" type=\"button\" onclick=\"setCondition('damaged')\">\n          <div class=\"cond-label\">").concat(t('Damaged'), "</div>\n          <div class=\"cond-sub\">Visible damage</div>\n        </button>\n      </div>\n      <div id=\"dmg-note\" style=\"display:").concat(condition === 'damaged' ? 'block' : 'none', ";margin-top:8px;\">\n        <textarea class=\"field\" rows=\"2\" placeholder=\"Describe the damage\u2026\" style=\"resize:none;\" aria-label=\"" + t('Damage description') + "\"></textarea>\n      </div>\n      <div class=\"photo-row\" id=\"photo-box\">\n        <label class=\"photo-add\" tabindex=\"0\">\n          <input type=\"file\" accept=\"image/*\" multiple onchange=\"handlePhotos(this)\">\n          <span class=\"photo-add-icon\">+</span>\n          <span class=\"photo-add-label\">Photo</span>\n        </label>\n      </div>\n    </div>\n  </div>\n\n  <!-- Items -->\n  <div class=\"sec\">\n    <div class=\"sec-hd\"><div class=\"sec-title\">Items <span class=\"fl-req\">*</span></div></div>\n    <div class=\"sec-bd\">\n      <div id=\"items-list\">\n        ").concat(liveItems.map(function (item, idx) {
-    return renderItemCard(item, idx);
-  }).join(''), "\n      </div>\n      <button class=\"add-item\" onclick=\"addItem()\">+ Add item</button>\n    </div>\n  </div>\n\n  ").concat(noHs ? "<div style=\"background:var(--warn-bg);border-radius:var(--rm);padding:9px 11px;font-size:12px;color:var(--warn-ink);\">One or more items need an HS code before continuing.</div>" : '');
-}
-function renderItemCard(item, idx) {
-  var n = idx + 1;
-  return "\n  <div class=\"item-card\">\n    <div class=\"item-hd\">\n      <div class=\"item-num\">".concat(n, "</div>\n      <div class=\"item-hd-label\">").concat(item.desc ? item.desc.slice(0, 24) + (item.desc.length > 24 ? '…' : '') : 'Item ' + n, "</div>\n      ").concat(liveItems.length > 1 ? "<button class=\"item-del\" onclick=\"removeItem(".concat(idx, ")\">x</button>") : '', "\n    </div>\n    <div class=\"item-bd\">\n      <!-- Description -->\n      <div>\n        <div class=\"fl\"><label class=\"fl-label\" for=\"desc-").concat(idx, "\">Description <span class=\"fl-req\">*</span></label></div>\n        <input id=\"desc-").concat(idx, "\" class=\"field\" type=\"text\" value=\"").concat(esc(item.desc), "\"\n          placeholder=\"e.g. Women's cotton dress, Nike sneakers\u2026\"\n          aria-required=\"true\" oninput=\"liveItems[").concat(idx, "].desc=this.value;updateDesc(").concat(idx, ",this.value)\">\n      </div>\n      <!-- Brand / Qty / Weight / Price -->\n      <div class=\"g3\">\n        <div>\n          <div class=\"fl\"><label class=\"fl-label\" for=\"brand-").concat(idx, "\">Brand <span class=\"fl-opt\">opt</span></label></div>\n          <input id=\"brand-").concat(idx, "\" class=\"field\" type=\"text\" value=\"").concat(esc(item.brand || ''), "\"\n            placeholder=\"Nike, SHEIN\u2026\" oninput=\"liveItems[").concat(idx, "].brand=this.value\">\n        </div>\n        <div>\n          <div class=\"fl\"><label class=\"fl-label\" for=\"qty-").concat(idx, "\">Qty <span class=\"fl-req\">*</span></label></div>\n          <input id=\"qty-").concat(idx, "\" class=\"field mono\" type=\"number\" value=\"").concat(item.qty, "\"\n            min=\"1\" max=\"999\" placeholder=\"1\" aria-required=\"true\"\n            oninput=\"liveItems[").concat(idx, "].qty=this.value\">\n        </div>\n        <div>\n          <div class=\"fl\"><label class=\"fl-label\" for=\"wt-").concat(idx, "\">Weight kg <span class=\"fl-req\">*</span></label></div>\n          <input id=\"wt-").concat(idx, "\" class=\"field mono\" type=\"number\" value=\"").concat(item.weight, "\"\n            min=\"0.01\" step=\"0.01\" placeholder=\"0.0\" aria-required=\"true\"\n            oninput=\"liveItems[").concat(idx, "].weight=this.value\">\n        </div>\n      </div>\n      <!-- Declared value -->\n      <div>\n        <div class=\"fl\"><label class=\"fl-label\" for=\"price-").concat(idx, "\">Declared value / unit <span class=\"fl-req\">*</span></label></div>\n        <div class=\"price-wrap\">\n          <input id=\"price-").concat(idx, "\" class=\"field mono\" type=\"number\" value=\"").concat(item.unitPrice || '', "\"\n            min=\"0\" step=\"0.01\" placeholder=\"0.00\" aria-required=\"true\"\n            oninput=\"liveItems[").concat(idx, "].unitPrice=this.value\">\n          <span class=\"price-sfx\">USD</span>\n        </div>\n      </div>\n      <!-- HS Code -->\n      <div>\n        <div class=\"fl\" style=\"margin-bottom:5px;\">\n          <label class=\"fl-label\">HS Code <span class=\"fl-req\">*</span></label>\n          ").concat(item.hs ? '<span style="font-size:10px;font-weight:600;color:var(--pri);">' + t('Auto-detected') + '</span>' : '', "</span>':''}\n        </div>\n        <div id=\"hs-").concat(idx, "\">").concat(hsBlock(item, idx), "</div>\n      </div>\n    </div>\n  </div>");
-}
-
-// ── STEP 3: Packing (cartons + dims + repack) ────────────────
-function renderS3() {
-  var tot = totalActual();
-  var totCh = totalChargeable();
-  return "\n  <div class=\"sec\">\n    <div class=\"sec-hd\"><div class=\"sec-title\">Cartons · عدد الطرود <span class=\"fl-req\">*</span></div></div>\n    <div class=\"sec-bd\">\n      <div class=\"carton-list\">\n        ".concat(liveCartons.map(function (c, i) {
-    return renderCartonRow(c, i);
-  }).join(''), "\n      </div>\n      <div class=\"carton-footer\">\n        <button class=\"add-carton\" onclick=\"addCarton()\">+ Add carton</button>\n        <div class=\"carton-total\" id=\"carton-tot\">").concat(tot > 0 ? tot.toFixed(2) + ' kg' : '—', "</div>\n      </div>\n      ").concat(liveCartons.length > 1 ? "\n      <div class=\"breakdown\" style=\"margin-top:10px;\">\n        ".concat(liveCartons.map(function (c, i) {
-    return "\n        <div class=\"bd-row\">\n          <span class=\"bd-l\">Carton ".concat(i + 1, "</span>\n          <span class=\"bd-v\">").concat(parseFloat(c.weight) > 0 ? parseFloat(c.weight).toFixed(2) + ' kg' : '—', " ").concat(chargeableWeight(c) > parseFloat(c.weight || 0) + .005 ? "<span style=\"color:var(--pri);font-size:10px;\">(ch: ".concat(chargeableWeight(c).toFixed(2), ")</span>") : '', "</span>\n        </div>");
-  }).join(''), "\n        <div class=\"bd-row total\">\n          <span class=\"bd-l\">Total chargeable</span>\n          <span class=\"bd-v\">").concat(totCh.toFixed(2), " kg</span>\n        </div>\n      </div>") : '', "\n    </div>\n  </div>\n\n  <!-- Shipping mode -->\n  <div class=\"sec\">\n    <div class=\"sec-hd\"><div class=\"sec-title\">Shipping mode <span class=\"fl-req\">*</span></div></div>\n    <div class=\"sec-bd\">\n      <div class=\"mode-row\" role=\"group\">\n        <button class=\"mode-btn\" data-mode=\"air\" type=\"button\" onclick=\"setMode('air')\">\n          <div class=\"mode-label\">Air</div><div class=\"mode-sub\">Issues AWB</div>\n        </button>\n        <button class=\"mode-btn\" data-mode=\"land\" type=\"button\" onclick=\"setMode('land')\">\n          <div class=\"mode-label\">Land</div><div class=\"mode-sub\">Issues CMR</div>\n        </button>\n        <button class=\"mode-btn\" data-mode=\"sea\" type=\"button\" onclick=\"setMode('sea')\">\n          <div class=\"mode-label\">Sea</div><div class=\"mode-sub\">Issues B/L</div>\n        </button>\n      </div>\n    </div>\n  </div>\n\n  <div class=\"sec\">\n    <div class=\"sec-hd\"><div class=\"sec-title\">Repacking <span class=\"fl-opt\" style=\"font-size:11px;font-weight:500;\">optional</span></div></div>\n    <div class=\"sec-bd\">\n      <div class=\"repack-row\">\n        <button class=\"repack-btn").concat(repack === 'no' ? ' on' : '', "\" data-repack=\"no\" type=\"button\" onclick=\"setRepack('no')\">\n          <div class=\"repack-label\">As received</div>\n          <div class=\"repack-sub\">Original packaging</div>\n        </button>\n        <button class=\"repack-btn").concat(repack === 'yes' ? ' on' : '', "\" data-repack=\"yes\" type=\"button\" onclick=\"setRepack('yes')\">\n          <div class=\"repack-label\">Repacked</div>\n          <div class=\"repack-sub\">Items consolidated</div>\n        </button>\n      </div>\n    </div>\n  </div>");
-}
-function renderCartonRow(c, i) {
-  var vol = volWeight(c);
-  var act = parseFloat(c.weight) || 0;
-  var ch = vol !== null ? Math.max(act, vol) : null;
-  var hint = vol !== null ? "Vol: ".concat(vol.toFixed(2), " kg  |  Chargeable: ").concat(ch.toFixed(2), " kg") : 'Enter L × W × H for volumetric weight';
-  var hintCls = vol !== null ? 'vol-hint chargeable' : 'vol-hint';
-  return "\n  <div class=\"carton-row\">\n    <div class=\"carton-num-badge\">".concat(i + 1, "</div>\n    <div class=\"carton-fields\">\n      <div>\n        <div class=\"fl-label\" style=\"font-size:10px;margin-bottom:4px;\">Weight kg <span class=\"fl-req\">*</span></div>\n        <input id=\"cw-").concat(i, "\" class=\"field mono").concat(c.weight && parseFloat(c.weight) > 0 ? ' ok' : '', "\" type=\"number\"\n          min=\"0.1\" step=\"0.1\" value=\"").concat(c.weight, "\" placeholder=\"0.00\"\n          aria-required=\"true\" aria-label=\"Weight of carton ").concat(i + 1, "\"\n          oninput=\"liveCartons[").concat(i, "].weight=this.value;updateCartonLive(").concat(i, ",'weight',this.value)\">\n      </div>\n      <div>\n        <div class=\"fl-label\" style=\"font-size:10px;margin-bottom:4px;\">L cm <span class=\"fl-req\">*</span></div>\n        <input class=\"field mono\" type=\"number\" min=\"1\" value=\"").concat(c.dimL, "\" placeholder=\"0\"\n          aria-label=\"Length of carton ").concat(i + 1, "\"\n          oninput=\"liveCartons[").concat(i, "].dimL=this.value;updateCartonLive(").concat(i, ",'dimL',this.value)\">\n      </div>\n      <div>\n        <div class=\"fl-label\" style=\"font-size:10px;margin-bottom:4px;\">W cm <span class=\"fl-req\">*</span></div>\n        <input class=\"field mono\" type=\"number\" min=\"1\" value=\"").concat(c.dimW, "\" placeholder=\"0\"\n          aria-label=\"Width of carton ").concat(i + 1, "\"\n          oninput=\"liveCartons[").concat(i, "].dimW=this.value;updateCartonLive(").concat(i, ",'dimW',this.value)\">\n      </div>\n      <div>\n        <div class=\"fl-label\" style=\"font-size:10px;margin-bottom:4px;\">H cm <span class=\"fl-req\">*</span></div>\n        <input class=\"field mono\" type=\"number\" min=\"1\" value=\"").concat(c.dimH, "\" placeholder=\"0\"\n          aria-label=\"Height of carton ").concat(i + 1, "\"\n          oninput=\"liveCartons[").concat(i, "].dimH=this.value;updateCartonLive(").concat(i, ",'dimH',this.value)\">\n      </div>\n    </div>\n    ").concat(liveCartons.length > 1 ? "<button class=\"carton-del\" onclick=\"removeCarton(".concat(i, ")\" aria-label=\"Remove carton ").concat(i + 1, "\">x</button>") : '<div style="width:26px;"></div>', "\n  </div>\n  <div id=\"vhint-").concat(i, "\" class=\"").concat(hintCls, "\" style=\"margin-left:30px;margin-top:-4px;margin-bottom:2px;\">").concat(hint, "</div>");
-}
-
-// ── STEP 4: Review ───────────────────────────────────────────
-function renderS4() {
-  var cust = customer || CUSTOMERS[0];
-  var totCh = totalChargeable();
-  var totalDeclared = liveItems.reduce(function (s, i) {
-    var q = parseInt(i.qty) || 1,
-      p = parseFloat(i.unitPrice) || 0;
-    return variancePanel() + s + q * p;
-  }, 0);
-  return "\n  <div class=\"sec\">\n    <div class=\"sec-hd\"><div class=\"sec-title\">".concat(t('Customer'), "</div></div>\n    <div class=\"sec-bd\">\n      <div class=\"cust-card\" style=\"margin-top:0;\">\n        <div class=\"cust-av\">").concat(cust.name[0], "</div>\n        <div><div class=\"cust-name\">").concat(esc(cust.name), "</div><div class=\"cust-meta\">").concat(cust.phone, "</div></div>\n      </div>\n    </div>\n  </div>\n  <div class=\"sec\">\n    <div class=\"sec-hd\"><div class=\"sec-title\">Shipment</div></div>\n    <div class=\"sec-bd\">\n      <div class=\"sum-row\"><span class=\"sum-l\">Store</span><span class=\"sum-v\">").concat(esc(store || '—'), "</span></div>\n      <div class=\"sum-row\"><span class=\"sum-l\">").concat(t('Condition'), "</span><span class=\"sum-v\">").concat(condition === 'ok' ? 'OK' : t('Damaged'), "</span></div>\n      <div class=\"sum-row\"><span class=\"sum-l\">").concat(t('Cartons · عدد الطرود'), "</span><span class=\"sum-v\">").concat(liveCartons.length, " \xB7 ").concat(totCh.toFixed(2), " kg chargeable</span></div>\n      <div class=\"sum-row\"><span class=\"sum-l\">Mode</span><span class=\"sum-v\">").concat(mode === 'air' ? 'Air (AWB)' : mode === 'sea' ? 'Sea (B/L)' : 'Land (CMR)', "</span></div>\n      <div class=\"sum-row\"><span class=\"sum-l\">Repacking</span><span class=\"sum-v\">").concat(repack === 'yes' ? t('Yes — repacked') : 'No', "</span></div>\n      <div class=\"sum-row\"><span class=\"sum-l\">Declared value</span><span class=\"sum-v mono\">$").concat(totalDeclared.toFixed(2), "</span></div>\n    </div>\n  </div>\n  <div class=\"sec\">\n    <div class=\"sec-hd\"><div class=\"sec-title\">").concat(t('Items'), "</div></div>\n    <div class=\"sec-bd\">\n      ").concat(liveItems.map(function (item, i) {
-    return "\n      <div class=\"item-sum\">\n        <div class=\"item-sum-title\">".concat(i + 1, ". ").concat(esc(item.desc) || '—', "</div>\n        <div class=\"item-sum-chips\">\n          ").concat(item.brand ? "<span class=\"item-sum-chip\">".concat(esc(item.brand), "</span>") : '', "\n          <span class=\"item-sum-chip\">x").concat(item.qty || 1, "</span>\n          <span class=\"item-sum-chip mono\">").concat(item.weight || 0, " kg</span>\n          ").concat(item.unitPrice ? "<span class=\"item-sum-chip mono\">$".concat(parseFloat(item.unitPrice).toFixed(2), "</span>") : '', "\n          ").concat(item.hs ? "<span class=\"item-sum-hs\">".concat(item.hs, "</span>") : "<span style=\"font-size:10px;color:var(--danger);font-weight:600;\">No HS code</span>", "\n        </div>\n      </div>");
-  }).join(''), "\n    </div>\n  </div>\n  <div class=\"sec\">\n    <div class=\"sec-hd\"><div class=\"sec-title\">What happens next</div></div>\n    <div class=\"sec-bd\" style=\"display:flex;flex-direction:column;gap:9px;\">\n      ").concat([[t('Stage 0 — Received'), t('Shipment created immediately')], [t('AWB + labels printed'), 'One label per carton (' + liveCartons.length + ' total)'], [t('Customer notified'), t('Push + WhatsApp sent automatically')], [t('Invoice created'), t('Accounting team calculates shipping fee')]].map(function (_ref) {
-    var _ref2 = _slicedToArray(_ref, 2),
-      t = _ref2[0],
-      s = _ref2[1];
-    return "<div style=\"display:flex;gap:10px;align-items:flex-start;\">\n        <div style=\"width:4px;height:4px;border-radius:50%;background:var(--pri);margin-top:7px;flex-shrink:0;\"></div>\n        <div><div style=\"font-size:13px;font-weight:600;\">".concat(t, "</div><div style=\"font-size:11px;color:var(--mute);\">").concat(s, "</div></div>\n      </div>");
-  }).join(''), "\n    </div>\n  </div>");
-}
-
-// ── Done + AWB ───────────────────────────────────────────────
-function renderDone() {
-  var cust = customer || CUSTOMERS[0];
-  return "".concat(renderHead().replace('Receive parcel', t('Parcel received')), "\n  <div class=\"body\">\n    <div class=\"done-wrap\">\n      <div class=\"done-check\">&#10003;</div>\n      <div class=\"done-title\">").concat(t('Parcel received'), "</div>\n      <div class=\"done-sub\">").concat(esc(cust.name), " \xB7 ").concat(liveCartons.length, " carton").concat(liveCartons.length > 1 ? 's' : '', "</div>\n      <div class=\"done-id\">").concat(generatedId, "</div>\n    </div>\n    <div class=\"done-awb-bar\">\n      <div><span class=\"done-awb-label\">AWB stickers</span><span class=\"done-count\">").concat(liveCartons.length, " to print</span></div>\n      <button class=\"print-btn\" onclick=\"printAllStickers()\">\n        <svg width=\"13\" height=\"13\" viewBox=\"0 0 16 16\" fill=\"none\"><rect x=\"2\" y=\"5\" width=\"12\" height=\"8\" rx=\"1.5\" stroke=\"currentColor\" stroke-width=\"1.5\"/><path d=\"M5 5V3a1 1 0 011-1h4a1 1 0 011 1v2\" stroke=\"currentColor\" stroke-width=\"1.5\"/><rect x=\"5\" y=\"9\" width=\"6\" height=\"1.5\" rx=\".75\" fill=\"currentColor\"/><rect x=\"5\" y=\"11.5\" width=\"4\" height=\"1.5\" rx=\".75\" fill=\"currentColor\"/></svg>\n        Print ").concat(liveCartons.length, " sticker").concat(liveCartons.length > 1 ? 's' : '', "\n      </button>\n    </div>\n    <div class=\"stickers-grid\" id=\"stickers-grid\">\n      ").concat(getAllStickersHTML(), "\n    ").concat(liveCartons.length > 1 ? "<div style=\"background:var(--bg);border-radius:var(--rm);padding:10px 14px;font-size:12px;color:var(--mute);text-align:center;width:100%;max-width:400px;\">\n      + ".concat(liveCartons.length - 1, " more sticker").concat(liveCartons.length > 2 ? 's' : '', " will print automatically (").concat(liveCartons.length, " total)\n    </div>") : '', "\n    </div>\n    <div class=\"foot\">\n      <button class=\"btn-sec\" onclick=\"go('s1')\">").concat(t('Receive another'), "</button>\n      \n    </div>\n  </div>");
-}
-
-/* ── shipments already agreed and waiting ────────────────────────────
-   A confirmed quotation announced this cargo: the client, the route, the goods
-   and how many cartons were promised. Searching for a customer who is already
-   known — and retyping cartons that were already counted — is the third time
-   the same facts get keyed. Pick the shipment and receiving starts from it.
-   Best effort: with no bus the search still works exactly as before. */
-function expectedShipments(){
-  var out=[], done={};
-  try{
-    var evs=slEvRead();
-    evs.forEach(function(e){ if(e.type==='parcel.received'&&e.ship)done[e.ship]=1; });
-    evs.forEach(function(e){
-      if(e.type!=='shipment.expected'||!e.ship||done[e.ship])return;
-      out.push({ship:e.ship,client:e.client||'',at:e.at,p:e.payload||{}});
-    });
-  }catch(err){}
-  return out;
-}
-function expectedPanel(){
-  var list=expectedShipments();
-  if(!list.length)return '';
-  return '<div class="card" style="margin-bottom:14px;border:1.5px solid rgba(14,165,233,.45);background:#F4FBFF">'
-   +'<div style="font-size:12px;font-weight:800;color:#0A4A6B;margin-bottom:8px">'
-   +'Expected — agreed and not yet received <span style="font-family:var(--mono)">' + list.length + '</span></div>'
-   + list.slice(0,6).map(function(x){
-      var d=x.p||{};
-      return '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:7px 0;border-bottom:1px solid rgba(11,42,59,.06)">'
-       +'<b style="min-width:110px;font-family:var(--mono);font-size:12px">'+x.ship+'</b>'
-       +'<span style="flex:1;min-width:130px">'+x.client
-       +'<span style="display:block;font-size:11px;color:#62707A">'
-       +[d.from,d.to].filter(Boolean).join(' → ')
-       +(d.cartons?' · '+d.cartons+' cartons':'')
-       +(d.weight?' · '+d.weight+' kg':'')
-       +'</span></span>'
-       +'<button onclick="startExpected(\''+x.ship+'\')" style="cursor:pointer;font-family:var(--body);font-size:12px;font-weight:800;padding:0 14px;height:34px;border-radius:8px;border:none;background:#0B6E9B;color:#fff">Receive this</button>'
-       +'</div>';
-     }).join('')
-   +(list.length>6?'<div style="font-size:11px;color:#62707A;margin-top:6px">showing 6 of '+list.length+'</div>':'')
-   +'</div>';
-}
-function startExpected(ship){
-  var hit=null;
-  expectedShipments().forEach(function(x){ if(x.ship===ship)hit=x; });
-  if(!hit)return;
-  var d=hit.p||{};
-  EXPECTED=hit;                       /* what was agreed, kept for the review step */
-  go('s2');                           /* go() clears the form, so fill it AFTER */
-  customer={id:'',name:hit.client,phone:'',fromQuote:true};
-  if(d.mode)mode=d.mode;
-  generatedId=ship;                   /* the sticker carries the agreed shipment id */
-  render();
-}
-var EXPECTED=null;
-
-
-/* What was promised against what turned up. A quotation priced 40 cartons at
-   1,250 kg; if 38 arrive at 1,180 the difference is not a rounding error — it is
-   either a short shipment or a repriced one, and the person at the bench is the
-   only one who can see it. Saying nothing here means it surfaces at the invoice,
-   weeks later, as an argument. */
-function expectedVariance(){
-  if(!EXPECTED)return null;
-  var d=EXPECTED.p||{};
-  var gotC=liveCartons.length;
-  var gotW=0;
-  liveCartons.forEach(function(c){ gotW += (parseFloat(c.weight)||0); });
-  gotW=Math.round(gotW*100)/100;
-  var pc=Number(d.cartons)||0, pw=Number(d.weight)||0;
-  if(!pc&&!pw)return null;
-  return {promisedC:pc,gotC:gotC,promisedW:pw,gotW:gotW,
-          dC:gotC-pc, dW:Math.round((gotW-pw)*100)/100,
-          off:(pc&&gotC!==pc)||(pw&&Math.abs(gotW-pw)>0.5)};
-}
-function variancePanel(){
-  var v=expectedVariance();
-  if(!v)return '';
-  var line=function(lbl,p2,g,dd,unit){
-    var bad=Math.abs(dd)>(unit==='kg'?0.5:0);
-    return '<div style="display:flex;gap:10px;padding:5px 0;font-size:12px">'
-     +'<span style="flex:1;color:#62707A">'+lbl+'</span>'
-     +'<span style="font-family:var(--mono)">'+p2+(unit?' '+unit:'')+'</span>'
-     +'<span style="color:#62707A">\u2192</span>'
-     +'<span style="font-family:var(--mono);font-weight:800">'+g+(unit?' '+unit:'')+'</span>'
-     +'<span style="font-family:var(--mono);min-width:64px;text-align:right;color:'+(bad?'#B23429':'#0A7250')+'">'
-     +(dd>0?'+':'')+dd+(unit?' '+unit:'')+'</span></div>';
-  };
-  return '<div class="card" style="margin-bottom:12px;border:1.5px solid '+(v.off?'rgba(225,72,59,.45)':'rgba(16,185,129,.45)')+';background:'+(v.off?'#FDF1F0':'#F1FAF5')+'">'
-   +'<div style="font-size:12px;font-weight:800;margin-bottom:7px;color:'+(v.off?'#B23429':'#065F46')+'">'
-   +(v.off?'Different from what was agreed':'Matches what was agreed')+'</div>'
-   +(v.promisedC?line('Cartons',v.promisedC,v.gotC,v.dC,''):'')
-   +(v.promisedW?line('Weight',v.promisedW,v.gotW,v.dW,'kg'):'')
-   +(v.off?'<div style="font-size:11px;color:#62707A;margin-top:6px">the invoice follows what arrived, not what was quoted \u2014 tell the client before it is issued</div>':'')
-   +'</div>';
-}
-
-function renderAWB(i) {
-  var c = liveCartons[i];
-  var cust = customer || CUSTOMERS[0];
-  var totWt = totalActual();
-  var totCh = totalChargeable();
-  var cwt = parseFloat(c.weight) || 0;
-  var cvol = volWeight(c);
-  var cch = chargeableWeight(c);
-  var today = slDateStr();
-  var modeLabel = {
-    air: 'AIR',
-    land: 'LAND',
-    sea: 'SEA'
-  }[mode] || 'AIR';
-  var docLabel = {
-    air: 'AWB',
-    land: 'CMR',
-    sea: 'B/L'
-  }[mode] || 'AWB';
-  var destCity = cust.city || t('Damascus');
-  var hsLine = _toConsumableArray(new Set(liveItems.filter(function (it) {
-    return it.hs;
-  }).map(function (it) {
-    return it.hs;
-  }))).join(' / ');
-  var totalDeclared = liveItems.reduce(function (s, it) {
-    return s + (parseInt(it.qty) || 1) * (parseFloat(it.unitPrice) || 0);
-  }, 0);
-  var contents = liveItems.map(function (it) {
-    return "<div class=\"awb-item-line\"><span>x".concat(it.qty || 1, "</span> ").concat(esc(it.desc)).concat(it.brand ? ' · ' + esc(it.brand) : '').concat(it.hs ? " <span style=\"color:#0A84FF;font-family:monospace;font-size:8px;\">[".concat(it.hs, "]</span>") : '', "</div>");
-  }).join('');
-  return "\n  <div class=\"awb\" role=\"article\" aria-label=\"AWB carton ".concat(i + 1, " of ").concat(liveCartons.length, "\">\n    <div class=\"awb-hd\">\n      <div class=\"awb-brand\">").concat(slLockupImg(15), "</div>\n      <div style=\"display:flex;align-items:center;gap:5px;\">\n        <div class=\"awb-mode-tag\">").concat(modeLabel, "</div>\n        <div class=\"awb-ctag\">CARTON ").concat(i + 1, "/").concat(liveCartons.length, "</div>\n      </div>\n    </div>\n    <div class=\"awb-bc\">\n      <div style=\"display:flex;align-items:flex-start;gap:8px;justify-content:center;\">\n        <div style=\"flex:1;\">\n          <div class=\"awb-id\">").concat(generatedId, "</div>\n          <svg id=\"bc-").concat(i, "\" style=\"width:100%;max-width:220px;height:36px;\"></svg>\n          <div style=\"font-size:8px;color:#8E8E93;margin-top:1px;font-family:var(--mono);\">").concat(generatedId, "-").concat(i + 1, " \xB7 ").concat(docLabel, "</div>\n        </div>\n        <div>\n          <div id=\"qr-").concat(i, "\" style=\"width:52px;height:52px;flex-shrink:0;\"></div>\n          <div style=\"font-size:7px;color:#8E8E93;text-align:center;margin-top:1px;\">Scan</div>\n        </div>\n      </div>\n    </div>\n    <div style=\"display:grid;grid-template-columns:1fr 1fr;border-bottom:1px dashed #D8D8D8;flex-shrink:0;\">\n      <div style=\"padding:5px 8px 5px 11px;border-right:1px solid #EEEEEE;\">\n        <div class=\"awb-zone-title\">Shipper / Store · المرسِل / المتجر</div>\n        <div class=\"awb-zone-val fw\">").concat(esc(store || '—'), "</div>\n      </div>\n      <div style=\"padding:5px 11px 5px 8px;\">\n        <div class=\"awb-zone-title\">Consignee · المرسَل إليه</div>\n        <div class=\"awb-zone-val\" style=\"font-weight:800;font-size:12px;\">").concat(esc(cust.name), "</div>\n        <div class=\"awb-zone-val mn\">").concat(cust.phone, "</div>\n        <div class=\"awb-zone-val\">").concat(destCity, " \xB7 Syria</div>\n      </div>\n    </div>\n    <div class=\"awb-info\" style=\"flex:none;\">\n      <div class=\"awb-row\"><div class=\"awb-k\">Date · التاريخ</div><div class=\"awb-v mn\">").concat(today, "</div></div>\n      <div class=\"awb-row\"><div class=\"awb-k\">HS codes · البنود الجمركية</div><div class=\"awb-v\" style=\"font-family:var(--mono);font-size:9px;color:#0A84FF;\">").concat(hsLine || '—', "</div></div>\n      <div class=\"awb-row\"><div class=\"awb-k\">Declared · القيمة المصرَّحة</div><div class=\"awb-v mn\">USD ").concat(totalDeclared.toFixed(2), "</div></div>\n    </div>\n    <div class=\"awb-wt\">\n      <div>\n        <div class=\"awb-wt-lbl\">").concat(t('Total weight · الوزن الإجمالي'), "</div>\n        <div><span class=\"awb-wt-val\">").concat(totWt.toFixed(2), "</span><span class=\"awb-wt-unit\"> kg</span></div>\n      </div>\n      <div style=\"border-left:1px solid #E5E5EA;padding-left:10px;\">\n        <div class=\"awb-wt-lbl\">").concat(t('Chargeable · الوزن المحتسَب'), "</div>\n        <div style=\"font-family:var(--mono);font-size:14px;font-weight:800;color:#0A84FF;\">").concat(totCh.toFixed(2), " kg</div>\n      </div>\n      <div style=\"border-left:1px solid #E5E5EA;padding-left:10px;\">\n        <div class=\"awb-wt-lbl\">").concat(t('Cartons'), "</div>\n        <div style=\"font-family:var(--mono);font-size:14px;font-weight:800;color:#1D1D1F;\">").concat(liveCartons.length, "</div>\n      </div>\n    </div>\n    <div class=\"awb-items\">\n      <div class=\"awb-items-lbl\">Contents (").concat(liveItems.length, " type").concat(liveItems.length > 1 ? 's' : '', ")</div>\n      ").concat(contents, "\n    </div>\n    <div class=\"awb-ft\">\n      <span class=\"awb-ft-txt\">").concat(today, " \xB7 ").concat(modeLabel, "</span>\n      ").concat(slMark(10, 'dark'), "\n    </div>\n  </div>");
-}
-function initBarcodes() {
-  // Every carton gets its own barcode. The old comment claimed the rest were drawn
-  // at print time — they were not, so carton 2 onward printed a blank strip where
-  // its code should be, and a box nobody can scan is a box that goes missing.
-  for (var bi = 0; bi < liveCartons.length; bi++) {
-    var bel = document.getElementById('bc-' + bi);
-    if (bel && typeof JsBarcode !== 'undefined') {
-      JsBarcode(bel, generatedId + '-' + (bi + 1), {
-        format: 'CODE128', width: 2, height: 36, displayValue: false,
-        margin: 0, background: 'transparent', lineColor: '#1D1D1F'
-      });
-    }
-  }
-  var el = document.getElementById('bc-0');
-  if (false && el && typeof JsBarcode !== 'undefined') {
-    JsBarcode(el, generatedId + '-1', {
-      format: 'CODE128',
-      width: 2,
-      height: 36,
-      displayValue: false,
-      margin: 0,
-      background: 'transparent',
-      lineColor: '#1D1D1F'
-    });
-  }
-  var qrEl = document.getElementById('qr-0');
-  if (qrEl && typeof QRCode !== 'undefined') {
-    qrEl.innerHTML = '';
-    var cust = customer || CUSTOMERS[0];
-    new QRCode(qrEl, {
-      text: JSON.stringify({
-        id: generatedId,
-        carton: '1/' + liveCartons.length,
-        customer: cust.name,
-        phone: cust.phone,
-        store: store || ''
-      }),
-      width: 52,
-      height: 52,
-      colorDark: '#1D1D1F',
-      colorLight: '#ffffff',
-      correctLevel: QRCode.CorrectLevel.M
-    });
-  }
-}
-
-// Generate ALL stickers for printing (called by window.print prep)
-function getAllStickersHTML() {
-  return liveCartons.map(function (_, i) {
-    return renderAWB(i);
-  }).join('');
-}
-
-// Print all stickers
-function printAllStickers() {
-  window.print();
-}
-// ══ SL EVENT BUS — modules DECLARE what happened; the control dashboard DERIVES what must be done.
-//    Append-only, replayable, best-effort: if storage is blocked every module still works alone. ══
 var SL_EV_KEY='SL_EVENTS_V1';
 function slEvAvailable(){try{if(!window.localStorage)return false;window.localStorage.setItem('__e','1');window.localStorage.removeItem('__e');return true;}catch(e){return false;}}
 function slEvRead(){try{var r=window.localStorage.getItem(SL_EV_KEY);if(!r)return [];var a=JSON.parse(r);return (a&&a.length)?a:[];}catch(e){return [];}}
@@ -5124,15 +4161,28 @@ function slEmit(type,o){
  return ev;
 }
 function slEvOf(type){return slEvRead().filter(function(e){return e.type===type;});}
-function slEvClear(){slEvWrite([]);}   // test helper only
 
-// ── B1 declares one fact: a parcel was received. It does not decide what must happen next —
-//    the control dashboard derives that, so the rules live in one place. ──
-var SL_DECLARED=false;
+var SL_CH_DONE=false;
+function declareConsolidated(){
+ if(!actorMay('b2_con'))return refuse('b2_con');
+ if(SL_CH_DONE)return false; SL_CH_DONE=true;
+ try{
+  var picked=[];
+  if(typeof selected!=='undefined'&&selected){
+   if(selected.length)picked=selected;
+   else{var k;for(k in selected)if(selected[k])picked.push({id:k});}
+  }
+  if(!picked.length)return true;   /* nothing consolidated: nothing to declare */
+  slEmit('parcel.consolidated',{ship:(picked[0]&&(picked[0].id||picked[0].ship))||'',
+   actor:(typeof actorName==='function'?actorName():''),
+   payload:{count:picked.length,parcels:picked.map(function(p){return p.id||p.ship||'';})}});
+ }catch(e){}
+ return true;
+}
 function actorMay(perm){
  var reg=(typeof slStaffRead2==='function')?slStaffRead2():null;
- if(!reg)return true;
- if(!ACTOR_ID)return true;
+ if(!reg)return true;              /* no registry: as before, never blocking */
+ if(!ACTOR_ID)return true;         /* nobody signed in: a demo file must open */
  var hit=null; reg.forEach(function(x){if(x.id===ACTOR_ID)hit=x;});
  if(!hit)return true;
  return (hit.perms||[]).indexOf(perm)>-1;
@@ -5143,281 +4193,121 @@ function refuse(perm){
  catch(e){ try{alert(msg+' — '+perm);}catch(e2){} }
  return false;
 }
-/* ── a parcel is priced the moment it is received ─────────────────────
-   Receipt used to declare `to:'Damascus', mode:'land'` — written into the source,
-   the same two words for every parcel in the world. And nothing was priced, so
-   the customer app kept a little rate table of its own and invented figures.
-   Two rules, both from the trade:
-     · you cannot take a parcel in without knowing whose it is and where it goes;
-     · a parcel is priced at receipt, by destination and by method, from the
-       approved tariff. A price nobody can look up is a price somebody makes up.
-   The tariff belongs to C-Pricing and is published on SL_TARIFF_V1. This module
-   reads it and never writes it. The figure it produces is the tariff price of
-   the day; billing may reprice for the client later — that is B9's business, and
-   the invoice, not this event, is what the client finally owes. */
-var SL_REG_TARIFF='SL_TARIFF_V1';
-var METHODS=['air','sea','land'];
-function slTariffRead(){
- try{var r=window.localStorage.getItem(SL_REG_TARIFF);if(!r)return null;
-  var o=JSON.parse(r);return (o&&o.lanes&&o.lanes.length)?o:null;}catch(e){return null;}
-}
-function tariffCity(tf,city){
- var hit=null;
- (tf.cities||[]).forEach(function(c){if(c.city===city)hit=c;});
- return hit;
-}
-/* ── where an individual's goods may land ─────────────────────────────
-   Business cargo goes wherever the company sells a lane to. A forwarding
-   address is a different thing: the person bought it because he is in Syria,
-   and his parcels come to him. So the destinations offered to an individual are
-   the Syrian ones, and the receipt refuses any other — at the act, because a
-   parcel routed abroad for a man sitting in Damascus is not a typo anybody
-   catches at the border. */
-function destsFor(tf,kind){
- var out=[],svc={};
- if(!tf)return out;
- (tf.countries||[]).forEach(function(c){svc[c.country]=c.service||'';});
- (tf.cities||[]).forEach(function(c){
-  /* an individual bought a forwarding address to receive his goods at his own
-     door, and his door is in Syria. Port-level service is not a thing he can
-     use — nobody sends a person to clear his own carton at a port. */
-  if(kind==='ind'&&(c.country!=='Syria'||svc[c.country]!=='door'))return;
-  if(out.indexOf(c.city)===-1)out.push(c.city);
- });
- return out;
-}
-function destAllowed(city,kind){
- var tf=slTariffRead();
- if(!tf)return true;                    /* nothing published: nothing to judge by */
- return destsFor(tf,kind).indexOf(city)>-1;
-}
-/* the key the tariff is written in: one lane, one method, one basis */
-/* a country may be served at its hub alone: the cargo is handed over there and
-   nobody drives it further, which the person taking the parcel in must know
-   before he promises a door. */
-/* how far we carry to this city: 'door' (a warehouse of ours), 'hub' (onward
-   carriage from our hub) or 'port' (handed over at the arrival port — no local
-   pickup, no local delivery, and business cargo only). */
-function serviceAt(city){
- var tf=slTariffRead(); if(!tf)return '';
- var cx=tariffCity(tf,city); if(!cx)return '';
- var hit=null;
- (tf.countries||[]).forEach(function(c){if(c.country===cx.country)hit=c;});
- return hit?(hit.service||''):'';
-}
-function localAt(city){
- var sv=serviceAt(city);
- return sv===''||sv==='door';        /* nothing published: say nothing */
-}
-/* ── the key is the owner's shape, not a format copied across ─────────
-   This built the key by hand in the same format Pricing happens to use today.
-   The day a separator changes there, every parcel here would price at nothing
-   and be refused, with no message anybody could act on. The shape travels on
-   the tariff; this reads it, and falls back to today's format only when the
-   channel carries none. */
-function laneKey(from,city,method,basis){
- var tf=slTariffRead(), k=(tf&&tf.keyShape)||null;
- var sep=k?k.sep:'\u2192', dot=k?k.dot:' \u00B7 ';
- return from+sep+city+dot+method+dot+basis;
-}
-function basesFor(tf,from,city,method,kind,clientName){
- /* the picker was built from the general list while the price was worked out
-    from the client's own lines, so a basis he could actually be sold on never
-    appeared as a button. One answer, used by both. */
- var bases=laneBases(tf,from,city,method,kind);
- var rec=((tf&&tf.clients)||{})[String(clientName||'')]||null;
- if(rec&&rec.keys)['perkg','percbm','per truck','per container'].forEach(function(b){
-  if(bases.indexOf(b)===-1&&rec.keys[laneKey(from,city,method,b)])bases.push(b);
- });
- return bases;
-}
-function laneBases(tf,from,city,method,kind){
- /* which bases the company actually sells on this lane — a parcel is per kg,
-    a container is not, and the tariff says which exists rather than this file */
- var cx=tariffCity(tf,city); if(!cx)return [];
- var hub=(tf.hubs||{})[cx.country]||city, out=[];
- (tf.lanes||[]).forEach(function(l){
-  if(l.kind!==kind||l.method!==method||l.to!==hub)return;
-  if(from&&l.from!==from)return;
-  if(out.indexOf(l.basis)===-1)out.push(l.basis);
- });
- return out;
-}
-/* ── two price sources, and the rule that chooses between them ────────
-   A parcel going to a REGISTERED client is priced on his own category — his
-   agreed price if one was struck, otherwise the base with the better of his
-   category and personal discount. C-Pricing resolves all of that and publishes
-   the resulting unit; this module never re-implements that order, because a
-   second implementation of one rule drifts the first time the rule changes.
-   A parcel for an account we do not yet hold is priced on the approved list:
-   by lane, destination, method and weight. Nothing is ever unpriced. */
-function priceParcel(from,city,method,kind,kg,cbm,clientName,want){
- var tf=slTariffRead();
- if(!tf)return {ok:false,why:'tariff-unpublished'};
- var bases=basesFor(tf,from,city,method,kind,clientName);
- if(!bases.length)return {ok:false,why:'no-lane'};
- /* a lane may be sold BY WEIGHT or BY VOLUME. Where the company sells both, the
-    basis is chosen for the parcel — a light bulky pallet and a dense small crate
-    are not the same sale — and the chosen one is tried first. It is a choice,
-    not a default buried in the order the rows happen to sit in. */
- var rec0=(tf.clients||{})[String(clientName||'')]||null;
- if(want&&bases.indexOf(want)>-1)bases=[want].concat(bases.filter(function(b){return b!==want;}));
- var rec=rec0;
- var i,basis,key,src,unit=null,cur='USD',from2=from,agreed=false,applied='';
- for(i=0;i<bases.length;i++){
-  basis=bases[i]; key=laneKey(from,city,method,basis);
-  if(rec&&rec.keys&&rec.keys[key]){
-   unit=rec.keys[key].unit;cur=rec.keys[key].cur;agreed=!!rec.keys[key].agreed;
-   applied=rec.keys[key].applied||'';src='client';break;
+function render() {
+  var el = document.getElementById('shell');
+  if (sim === 'done') {
+    el.innerHTML = renderDone();
+    return;
   }
- }
- if(unit===null)for(i=0;i<bases.length;i++){
-  basis=bases[i]; key=laneKey(from,city,method,basis);
-  var b=((tf.base||{})[kind]||{})[key];
-  if(b){unit=b.unit;cur=b.cur;src='list';break;}
- }
- if(unit===null)return {ok:false,why:'no-price'};
- var qty=(basis==='perkg')?(Number(kg)||0):(basis==='percbm')?(Number(cbm)||0):1;
- if(basis!=='perkg'&&basis!=='percbm')qty=1;
- var amt=(basis==='perkg'||basis==='percbm')?unit*qty:unit;
- if(!(amt>0))return {ok:false,why:'zero'};
- return {ok:true,amount:Math.round(amt*100)/100,cur:cur,basis:basis,unit:unit,
-         lane:key,method:method,city:city,source:src,agreed:agreed,applied:applied,
-         client:rec?rec.name:'',cat:rec?rec.cat:''};
+  var step = {
+    s1: 1,
+    's1-none': 1,
+    's1-scan-ok': 1,
+    's1-scan-err': 1,
+    s2: 2,
+    's2-repack': 2,
+    s3: 3
+  }[sim] || 1;
+  el.innerHTML = renderHead() + "<div class=\"body\">".concat(renderSteps(step)).concat(step === 1 ? renderS1() : step === 2 ? renderS2() : renderS3(), "</div>") + renderFooter(step);
 }
-/* what stops a receipt from being declared at all */
-function receiptBlocks(){
- var out=[];
- if(!customer)out.push('customer');
- if(!destCity)out.push('destination');
- else if(!destAllowed(destCity,(customer&&customer.type==='business')?'biz':'ind'))out.push('destination-abroad');
- if(!mode)out.push('method');
- if(!(typeof totalChargeable==='function'&&totalChargeable()>0))out.push('weight');
- if(!out.length&&!parcelPrice().ok)out.push('price');
- return out;
+function renderHead() {
+  return "<div class=\"ph\"><div class=\"ph-row\">\n    <button class=\"ph-back\"><svg viewBox=\"0 0 16 16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\"><path d=\"M10 3L5 8l5 5\"/></svg>".concat(t('Shipments'), "</button>\n    <div class=\"ph-sep\"></div>\n    <div class=\"ph-title\">").concat(t('Consolidation'), "</div>\n  </div></div>");
 }
-function parcelPrice(){
- var kg=(typeof totalChargeable==='function')?totalChargeable():0;
- var cbm=(typeof totalCbm==='function')?totalCbm():0;
- var kind=(customer&&customer.type==='business')?'biz':'ind';
- return priceParcel(arrivedAt,destCity,mode,kind,kg,cbm,customer?customer.name:'',chargeBasis);
+function renderSteps(active) {
+  var list = ['Select', 'Packing', 'Review'];
+  return "<div class=\"steps\" role=\"list\" aria-label=\"Step ".concat(active, " of ").concat(list.length, "\">\n    ").concat(list.map(function (lbl, i) {
+    var n = i + 1,
+      s = n < active ? 'done' : n === active ? 'cur' : 'up';
+    return "<div style=\"display:flex;align-items:flex-start;flex:".concat(n < list.length ? 1 : 0, "\">\n        <div class=\"sc\"><div class=\"si si-").concat(s, "\">").concat(s === 'done' ? '&#10003;' : n, "</div><div class=\"sl sl-").concat(s, "\">").concat(lbl, "</div></div>\n        ").concat(n < list.length ? "<div class=\"sline".concat(s === 'done' ? ' sline-done' : '', "\"></div>") : '', "\n      </div>");
+  }).join(''), "\n  </div>");
 }
-function setDest(c){destCity=c;render();}
-function setMethod(m){mode=m;chargeBasis='';render();}
-function setBasis(b){chargeBasis=b;render();}
-function setOrigin(o){arrivedAt=o;render();}
 
-/* ── the route, stated before the parcel is taken in ──────────────────
-   Origin, destination and method decide the price, and the price decides whether
-   the parcel may be received at all. The lists come from the published tariff:
-   a clerk can only choose a route the company actually sells, and nobody types
-   a city name that drifts from the one in the tariff. */
-function routeSection(){
- var tf=slTariffRead();
- var froms=[],cities=[],seen={},cseen={};
- var kind0=(customer&&customer.type==='business')?'biz':'ind';
- if(tf){
-  (tf.lanes||[]).forEach(function(l){if(!seen[l.from]){seen[l.from]=1;froms.push(l.from);}});
-  destsFor(tf,kind0).forEach(function(c){if(!cseen[c]){cseen[c]=1;cities.push(c);}});
- }
- if(!tf) return '<div class="sec"><div class="sec-hd"><div class="sec-title">'+t('Route')+'</div></div>'
-   +'<div class="sec-bd"><div class="addr-bad"><div class="addr-icon">!</div><div>'
-   +'<div class="addr-title">'+t('The tariff is not published here')+'</div>'
-   +'<div class="addr-sub">'+t('a parcel cannot be received unpriced — open Pricing once, then return')+'</div></div></div></div></div>';
- var chip=function(v,cur,fn,lbl){
-  return '<button onclick="'+fn+'(\''+v+'\')" style="cursor:pointer;min-height:44px;padding:0 14px;margin:0 6px 6px 0;'
-   +'border-radius:9px;font-family:var(--body);font-size:13px;font-weight:'+(cur===v?'800':'600')+';'
-   +'border:1.5px solid '+(cur===v?'var(--pri)':'var(--line,#D7DEE3)')+';'
-   +'background:'+(cur===v?'rgba(14,165,233,.10)':'#FFFFFF')+';color:var(--ink)">'+(lbl||v)+'</button>';
- };
- var cur={origin:arrivedAt,dest:destCity,method:mode,basis:chargeBasis};
- var p=parcelPrice();
- var h='<div class="sec"><div class="sec-hd"><div class="sec-title">'+t('Route')+' <span class="fl-req">*</span></div></div><div class="sec-bd">';
- h+='<div class="fl"><label class="fl-label">'+t('Arrived at')+'</label></div><div>'+froms.map(function(f){return chip(f,cur.origin,'setOrigin');}).join('')+'</div>';
- h+='<div class="fl" style="margin-top:10px"><label class="fl-label">'+t('Destination')+'</label></div><div>'+cities.map(function(c){return chip(c,cur.dest,'setDest');}).join('')
-  +(cur.dest&&serviceAt(cur.dest)==='port'?'<div class="hint">'+t('port to port — handed over at the arrival port, no local delivery')+'</div>':'')
-  +(cur.dest&&serviceAt(cur.dest)==='hub'?'<div class="hint">'+t('carried on from our hub there — no door delivery yet')+'</div>':'')
-  +(kind0==='ind'?'<div class="hint">'+t('a forwarding address delivers into Syria — the person who bought it is here')+'</div>':'')+'</div>';
- h+='<div class="fl" style="margin-top:10px"><label class="fl-label">'+t('Method')+'</label></div><div>'+METHODS.map(function(m){return chip(m,cur.method,'setMethod',t(m));}).join('')+'</div>';
- /* the basis is only a question where the company actually sells both ways —
-    a choice with one option is not a choice, and drawing it teaches nothing */
- var tf2=slTariffRead(), kind2=(customer&&customer.type==='business')?'biz':'ind';
- var bs=(tf2&&cur.origin&&cur.dest&&cur.method)?basesFor(tf2,cur.origin,cur.dest,cur.method,kind2,customer?customer.name:''):[];
- if(bs.length>1){
-  h+='<div class="fl" style="margin-top:10px"><label class="fl-label">'+t('Charged by')+'</label></div><div>'
-   +bs.map(function(b){return chip(b,cur.basis||p.basis,'setBasis',t(b));}).join('')
-   +'<div class="hint">'+t('this lane is sold both ways — weight for dense cargo, volume for bulky')
-   +' · <span class="machine">'+totalChargeable().toFixed(2)+' kg</span> · <span class="machine">'+totalCbm().toFixed(3)+' cbm</span></div></div>';
- }
- /* the figure is shown as it is computed, not saved for a surprise on the last step */
- if(p.ok)
-  h+='<div class="addr-ok" style="margin-top:12px"><div class="addr-icon">&#10003;</div><div>'
-   +'<div class="addr-title">'+t('Priced at')+' <span class="machine">'+p.amount.toFixed(2)+' '+p.cur+'</span></div>'
-   +'<div class="addr-sub"><span class="machine">'+p.lane+'</span> · <span class="machine">'+p.unit.toFixed(2)+'</span> '+t(p.basis)+'</div>'
-   /* which price was used is never left to be assumed: a clerk who cannot see
-      that the client's own rate applied cannot notice the day it stops applying */
-   +'<div class="addr-sub">'+(p.source==='client'
-      ?(p.agreed?t('the price agreed with this client')
-        :(p.applied?t('his price category')+' · '+t(p.applied==='category'?'category discount':'personal discount')
-                   :t('his price category')))
-      :t('the approved list — this account is not registered'))+'</div></div></div>';
- else if(cur.origin&&cur.dest&&cur.method)
-  h+='<div class="addr-bad" style="margin-top:12px"><div class="addr-icon">!</div><div>'
-   +'<div class="addr-title">'+t('No approved price for this route')+'</div>'
-   +'<div class="addr-sub">'+t('the parcel cannot be received until the tariff covers it')+'</div></div></div>';
- return h+'</div></div>';
+// ── STEP 1: Select shipments ──────────────────────────────────
+function renderS1() {
+  var _QUEUE$find;
+  var available = queue().filter(function (s) {
+    return !s.held;
+  });
+  var held = queue().filter(function (s) {
+    return s.held;
+  });
+  var tot = totalWeight();
+  var totC = totalCartons();
+  return "\n  <!-- Summary bar (visible when any selected) -->\n  ".concat(selected.length > 0 ? "\n  <div class=\"summary-bar\" role=\"status\" aria-live=\"polite\">\n    <div>\n      <div class=\"sum-bar-num\">".concat(selected.length, "</div>\n      <div class=\"sum-bar-label\">").concat(t('Shipments selected'), "</div>\n    </div>\n    <div class=\"sum-bar-div\"></div>\n    <div>\n      <div class=\"sum-bar-val\">").concat(tot.toFixed(2), " kg</div>\n      <div class=\"sum-bar-label\">").concat(t('Total weight'), "</div>\n    </div>\n    <div class=\"sum-bar-div\"></div>\n    <div>\n      <div class=\"sum-bar-val\">").concat(totC, "</div>\n      <div class=\"sum-bar-label\">").concat(t('Cartons'), "</div>\n    </div>\n  </div>") : '', "\n\n  <!-- Scan by ID -->\n  <div class=\"sec\">\n    <div class=\"sec-hd\">\n      <div class=\"sec-title\">").concat(t('Scan or enter shipment ID'), "</div>\n      <div class=\"sec-sub\">Use a barcode scanner or type the ID manually</div>\n    </div>\n    <div class=\"sec-bd\">\n      <div class=\"fg\">\n        <div class=\"scan-wrap\">\n          <input id=\"scan-input\" class=\"field mono ").concat(scanStatus === 'err' || scanStatus === 'dup' || scanStatus === 'held' ? 'err' : scanStatus === 'ok' ? 'ok' : '', "\"\n            type=\"text\" value=\"").concat(esc(scanVal), "\"\n            placeholder=\"SL-XXXX\"\n            aria-label=\"" + t('Scan or enter shipment ID') + "\"\n            autocomplete=\"off\" autocorrect=\"off\" autocapitalize=\"characters\"\n            oninput=\"doScan(this.value)\"\n            onkeydown=\"if(event.key==='Enter')addScanned()\">\n          <button class=\"scan-btn\" onclick=\"addScanned()\" ").concat(scanStatus !== 'ok' ? 'disabled' : '', ">Add</button>\n        </div>\n        ").concat(scanStatus === 'ok' ? "<div class=\"ok-msg\">&#10003; ".concat(esc(scanVal.toUpperCase()), " \u2014 ").concat(esc(((_QUEUE$find = queue().find(function (s) {
+    return s.id === scanVal.toUpperCase();
+  })) === null || _QUEUE$find === void 0 ? void 0 : _QUEUE$find.customer) || ''), " \u2014 press Enter or tap Add</div>") : '', "\n        ").concat(scanStatus === 'err' ? "<div class=\"err-msg\">&#9888; Shipment not found. Check the ID and try again.</div>" : '', "\n        ").concat(scanStatus === 'dup' ? "<div class=\"err-msg\">".concat(t('Already added to this consolidation.'), "</div>") : '', "\n        ").concat(scanStatus === 'held' ? "<div class=\"err-msg\">&#9888; This shipment is held \u2014 cannot consolidate until resolved.</div>" : '', "\n      </div>\n    </div>\n  </div>\n\n  <!-- Available shipments list -->\n  <div class=\"sec\">\n    <div class=\"sec-hd\">\n      <div class=\"sec-title\">Ready to consolidate <span style=\"font-size:11px;font-weight:500;color:var(--mute);\">(").concat(available.length, ")</span></div>\n      <div class=\"sec-sub\">").concat(t('Tap to select shipments that ship together'), "</div>\n    </div>\n    <div class=\"sec-bd\">\n      ").concat(available.length === 0 ? "\n      <div style=\"text-align:center;padding:20px 0;color:var(--mute);font-size:13px;\">\n        No received shipments waiting in queue\n      </div>" : available.map(function (s) {
+    return "\n      <div class=\"ship-row".concat(selected.includes(s.id) ? ' selected' : '', "\"\n        role=\"checkbox\" aria-checked=\"").concat(selected.includes(s.id), "\"\n        tabindex=\"0\"\n        onclick=\"toggleShip('").concat(s.id, "')\"\n        onkeydown=\"if(event.key===' '||event.key==='Enter')toggleShip('").concat(s.id, "')\">\n        <div class=\"ship-check\">").concat(selected.includes(s.id) ? '&#10003;' : '', "</div>\n        <div class=\"ship-info\">\n          <div class=\"ship-name\">").concat(esc(s.customer), "</div>\n          <div class=\"ship-meta\">").concat(esc(s.store), " \xB7 ").concat(s.cartons, " carton").concat(s.cartons > 1 ? 's' : '', "</div>\n        </div>\n        <div class=\"ship-right\">\n          <div class=\"ship-id\">").concat(esc(s.id), "</div>\n          <div class=\"ship-weight\">").concat(s.weight.toFixed(2), " kg</div>\n        </div>\n      </div>");
+  }).join(''), "\n    </div>\n  </div>\n\n  <!-- Held shipments (info only) -->\n  ").concat(held.length > 0 ? "\n  <div class=\"sec\">\n    <div class=\"sec-hd\">\n      <div class=\"sec-title\">".concat(t('Held — cannot consolidate'), "</div>\n      <div class=\"sec-sub\">").concat(t('Forwarding address expired or unmatched'), "</div>\n    </div>\n    <div class=\"sec-bd\">\n      ").concat(held.map(function (s) {
+    return "\n      <div class=\"ship-row held\">\n        <div class=\"ship-info\">\n          <div class=\"ship-name\">".concat(esc(s.customer), "</div>\n          <div class=\"ship-meta\">").concat(esc(s.store), " \xB7 ").concat(s.cartons, " carton").concat(s.cartons > 1 ? 's' : '', "</div>\n        </div>\n        <div class=\"ship-right\">\n          <div class=\"ship-id\">").concat(esc(s.id), "</div>\n          <div style=\"font-size:10px;font-weight:700;color:var(--warn-ink);background:var(--warn-bg);padding:2px 7px;border-radius:999px;\">Held</div>\n        </div>\n      </div>");
+  }).join(''), "\n    </div>\n  </div>") : '');
 }
-function slDeclareReceived(){
- /* b1_ind and b1_biz are separate grants: some clerks handle only walk-ins */
- var need=(customer&&customer.type==='business')?'b1_biz':'b1_ind';
- if(!actorMay(need))return refuse(need);
- if(SL_DECLARED)return null;
- /* refused at the ACT: a parcel with no owner, no destination, no method or no
-    price does not enter the system, whatever the button on the last step says */
- var blocks=receiptBlocks();
- if(blocks.length)return refuse('receipt needs: '+blocks.join(', '));
- SL_DECLARED=true;
- var w=0,l=0,wd=0,h=0;
- try{
-  liveCartons.forEach(function(c){w+=Number(c.weight)||0;});
-  if(liveCartons[0]){l=Number(liveCartons[0].dimL)||0;wd=Number(liveCartons[0].dimW)||0;h=Number(liveCartons[0].dimH)||0;}
- }catch(e){}
- var ship=(typeof st!=='undefined'&&st.shipmentId)?st.shipmentId:('SL-'+Math.floor(9000+Math.random()*999));
- /* `st` never existed in this module: the client was read from it and came out
-    EMPTY on every receipt ever declared. Read from the record the clerk chose. */
- return slEmit('parcel.received',{ship:ship,client:customer?(customer.name||''):'',actor:actorName(),
-   payload:{customer:customer?customer.name:'',
-     from:arrivedAt,to:destCity,mode:mode,
-     price:(function(){var p=parcelPrice();return p.ok?{amount:p.amount,cur:p.cur,basis:p.basis,unit:p.unit,lane:p.lane,source:p.source,agreed:p.agreed,applied:p.applied}:null;})(),
-     cartons:(typeof liveCartons!=='undefined')?liveCartons.length:0,weight:w,dimL:l,dimW:wd,dimH:h}});
+
+// ── STEP 2: Packing (repack + load type) ─────────────────────
+function renderS2() {
+  var ships = selectedShips();
+  var tot = totalWeight();
+  var totC = totalCartons();
+  return "\n  <!-- Selected summary -->\n  <div class=\"summary-bar\">\n    <div>\n      <div class=\"sum-bar-num\">".concat(ships.length, "</div>\n      <div class=\"sum-bar-label\">").concat(t('Shipments'), "</div>\n    </div>\n    <div class=\"sum-bar-div\"></div>\n    <div>\n      <div class=\"sum-bar-val\">").concat(tot.toFixed(2), " kg</div>\n      <div class=\"sum-bar-label\">").concat(t('Total weight'), "</div>\n    </div>\n    <div class=\"sum-bar-div\"></div>\n    <div>\n      <div class=\"sum-bar-val\">").concat(totC, "</div>\n      <div class=\"sum-bar-label\">").concat(t('Cartons'), "</div>\n    </div>\n  </div>\n\n  <!-- Load type -->\n  <div class=\"sec\">\n    <div class=\"sec-hd\">\n      <div class=\"sec-title\">Load type <span style=\"color:var(--danger);\">*</span></div>\n      <div class=\"sec-sub\">").concat(t('How these shipments share the vehicle space'), "</div>\n    </div>\n    <div class=\"sec-bd\">\n      <div class=\"load-row\">\n        <button class=\"load-btn").concat(loadType === 'partial' ? ' on' : '', "\" data-l=\"partial\" type=\"button\" onclick=\"setLoad('partial')\">\n          <div class=\"load-label\">").concat(t('Partial'), "</div>\n          <div class=\"load-sub\">").concat(t('LCL / part truck — billed per kg'), "</div>\n        </button>\n        <button class=\"load-btn").concat(loadType === 'full' ? ' on' : '', "\" data-l=\"full\" type=\"button\" onclick=\"setLoad('full')\">\n          <div class=\"load-label\">").concat(t('Full load'), "</div>\n          <div class=\"load-sub\">").concat(t('FCL / full truck — billed per unit'), "</div>\n        </button>\n      </div>\n    </div>\n  </div>\n\n  <!-- Repacking -->\n  <div class=\"sec\">\n    <div class=\"sec-hd\">\n      <div class=\"sec-title\">Repacking <span style=\"font-size:11px;font-weight:500;color:var(--mute);\">optional \xB7 billable fee</span></div>\n      <div class=\"sec-sub\">Were shipments consolidated into fewer cartons?</div>\n    </div>\n    <div class=\"sec-bd\">\n      <div class=\"repack-row\">\n        <button class=\"repack-btn").concat(repack === 'no' ? ' on' : '', "\" data-r=\"no\" type=\"button\" onclick=\"setRepack('no')\">\n          <div class=\"repack-label\">").concat(t('As received'), "</div>\n          <div class=\"repack-sub\">").concat(t('Original cartons, no changes'), "</div>\n        </button>\n        <button class=\"repack-btn").concat(repack === 'yes' ? ' on' : '', "\" data-r=\"yes\" type=\"button\" onclick=\"setRepack('yes')\">\n          <div class=\"repack-label\">").concat(t('Repacked'), "</div>\n          <div class=\"repack-sub\">").concat(t('Items consolidated — add repacking fee'), "</div>\n        </button>\n      </div>\n\n      ").concat(repack === 'yes' ? "\n      <div style=\"margin-top:12px;\">\n        <div class=\"fl-label\" style=\"font-size:11px;margin-bottom:8px;\">".concat(t('New carton dimensions after repacking'), "</div>\n        ").concat(repackCartons.map(function (c, i) {
+    return "\n        <div style=\"display:flex;align-items:flex-end;gap:7px;margin-bottom:8px;\">\n          <div style=\"width:18px;height:18px;border-radius:50%;background:var(--pri);color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-bottom:3px;\">".concat(i + 1, "</div>\n          <div style=\"flex:1;display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;gap:5px;\">\n            <div>\n              <div style=\"font-size:9px;font-weight:600;color:var(--mute);text-transform:uppercase;margin-bottom:4px;\">").concat(t('Pallet #'), "</div>\n              <input class=\"field mono\" type=\"text\" value=\"").concat(c.palletNo || '', "\" placeholder=\"P-\"\n                oninput=\"repackCartons[").concat(i, "].palletNo=this.value\"\n                style=\"font-size:12px;padding:8px 6px;text-align:center;\">\n            </div>\n            <div><div style=\"font-size:9px;font-weight:600;color:var(--mute);text-transform:uppercase;margin-bottom:4px;\">Weight kg</div>\n              <input class=\"field mono\" type=\"number\" value=\"").concat(c.weight, "\" placeholder=\"0.0\" min=\"0.1\" step=\"0.1\"\n                oninput=\"repackCartons[").concat(i, "].weight=this.value\" style=\"font-size:12px;padding:8px 6px;text-align:center;\"></div>\n            <div><div style=\"font-size:9px;font-weight:600;color:var(--mute);text-transform:uppercase;margin-bottom:4px;\">L cm</div>\n              <input class=\"field mono\" type=\"number\" value=\"").concat(c.dimL, "\" placeholder=\"0\" min=\"1\"\n                oninput=\"repackCartons[").concat(i, "].dimL=this.value\" style=\"font-size:12px;padding:8px 6px;text-align:center;\"></div>\n            <div><div style=\"font-size:9px;font-weight:600;color:var(--mute);text-transform:uppercase;margin-bottom:4px;\">W cm</div>\n              <input class=\"field mono\" type=\"number\" value=\"").concat(c.dimW, "\" placeholder=\"0\" min=\"1\"\n                oninput=\"repackCartons[").concat(i, "].dimW=this.value\" style=\"font-size:12px;padding:8px 6px;text-align:center;\"></div>\n            <div><div style=\"font-size:9px;font-weight:600;color:var(--mute);text-transform:uppercase;margin-bottom:4px;\">H cm</div>\n              <input class=\"field mono\" type=\"number\" value=\"").concat(c.dimH, "\" placeholder=\"0\" min=\"1\"\n                oninput=\"repackCartons[").concat(i, "].dimH=this.value\" style=\"font-size:12px;padding:8px 6px;text-align:center;\"></div>\n          </div>\n          ").concat(repackCartons.length > 1 ? "<button style=\"width:24px;height:24px;border-radius:50%;background:var(--bad-bg);border:none;color:var(--danger);font-size:11px;cursor:pointer;flex-shrink:0;margin-bottom:3px;\" onclick=\"repackCartons.splice(".concat(i, ",1);render()\">x</button>") : '<div style="width:24px;"></div>', "\n        </div>");
+  }).join(''), "\n        <button style=\"display:flex;align-items:center;gap:5px;background:none;border:1.5px dashed var(--rule);border-radius:var(--rm);padding:7px 12px;font-size:12px;font-weight:600;color:var(--pri);cursor:pointer;margin-top:2px;\"\n          onclick=\"repackCartons.push({weight:'',dimL:'',dimW:'',dimH:''});render()\">+ Add repacked carton</button>\n      </div>") : '', "\n    </div>\n  </div>\n\n  <div class=\"alert alert-info\">\n    <span>&#8505;</span>\n    <span>Once confirmed, all selected shipments move to <strong>consolidated</strong> status. Customers are notified via WhatsApp with a packing list.</span>\n  </div>");
 }
+
+// ── STEP 3: Review ────────────────────────────────────────────
+function renderS3() {
+  var ships = selectedShips();
+  var tot = totalWeight();
+  var totC = totalCartons();
+  var today = slDateStr();
+  return "\n  <div class=\"sec\">\n    <div class=\"sec-hd\"><div class=\"sec-title\">".concat(t('Consolidation summary'), "</div></div>\n    <div class=\"sec-bd\">\n      <div class=\"sum-row\"><span class=\"sum-l\">").concat(t('Shipments'), "</span><span class=\"sum-v\">").concat(ships.length, "</span></div>\n      <div class=\"sum-row\"><span class=\"sum-l\">").concat(t('Total cartons'), "</span><span class=\"sum-v mono\">").concat(totC, "</span></div>\n      <div class=\"sum-row\"><span class=\"sum-l\">").concat(t('Total weight'), "</span><span class=\"sum-v mono\">").concat(tot.toFixed(2), " kg</span></div>\n      <div class=\"sum-row\"><span class=\"sum-l\">").concat(t('Load type'), "</span><span class=\"sum-v\">").concat(loadType === 'full' ? 'Full load (FCL/truck)' : 'Partial (LCL/part truck)', "</span></div>\n      <div class=\"sum-row\"><span class=\"sum-l\">").concat(t('Repacking'), "</span><span class=\"sum-v\">").concat(repack === 'yes' ? "Yes \u2014 ".concat(repackCartons.length, " repacked carton").concat(repackCartons.length > 1 ? 's' : '', "  (fee applies)") : 'No', "</span></div>\n      <div class=\"sum-row\"><span class=\"sum-l\">Date</span><span class=\"sum-v mono\">").concat(today, "</span></div>\n    </div>\n  </div>\n\n  <div class=\"sec\">\n    <div class=\"sec-hd\"><div class=\"sec-title\">").concat(t('Shipments in this batch'), "</div></div>\n    <div class=\"sec-bd\">\n      ").concat(ships.map(function (s) {
+    return "\n      <div class=\"ship-sum\">\n        <div class=\"ship-sum-id\">".concat(esc(s.id), "</div>\n        <div class=\"ship-sum-name\">").concat(esc(s.customer), "</div>\n        <div style=\"font-size:10px;color:var(--mute);\">").concat(s.cartons, " ctn</div>\n        <div class=\"ship-sum-wt\">").concat(s.weight.toFixed(2), " kg</div>\n      </div>");
+  }).join(''), "\n    </div>\n  </div>\n\n  <div class=\"sec\">\n    <div class=\"sec-hd\"><div class=\"sec-title\">What happens next</div></div>\n    <div class=\"sec-bd\" style=\"display:flex;flex-direction:column;gap:9px;\">\n      ").concat([['All cartons → consolidated', 'Status updated immediately for all ${ships.length} shipments'], ['Packing list generated', 'PDF created and stored with the consolidation record'], ['WhatsApp sent to each customer', 'Notification + packing list attachment sent automatically'], ['Ready for trip assignment', 'Shipments appear in B3 Create Trip queue']].map(function (_ref) {
+    var _ref2 = _slicedToArray(_ref, 2),
+      t = _ref2[0],
+      s = _ref2[1];
+    return "<div style=\"display:flex;gap:10px;align-items:flex-start;\">\n        <div style=\"width:4px;height:4px;border-radius:50%;background:var(--pri);margin-top:7px;flex-shrink:0;\"></div>\n        <div><div style=\"font-size:13px;font-weight:600;\">".concat(t, "</div><div style=\"font-size:11px;color:var(--mute);\">").concat(s.replace('${ships.length}', ships.length), "</div></div>\n      </div>");
+  }).join(''), "\n    </div>\n  </div>");
+}
+
+// ── Done ──────────────────────────────────────────────────────
+function renderDone() {
+  var ships = selectedShips();
+  var tot = totalWeight();
+  var totC = totalCartons();
+  var today = slDateStr();
+  var consolId = 'CON-' + (100 + Math.floor(Math.random() * 900));
+  return "".concat(renderHead().replace(t('Consolidation'), t('Consolidated')), "\n  <div class=\"body\">\n    <div class=\"done-wrap\">\n      <div class=\"done-check\">&#10003;</div>\n      <div class=\"done-title\">").concat(t('Consolidated'), "</div>\n      <div class=\"done-sub\">").concat(ships.length, " shipments \xB7 ").concat(totC, " cartons \xB7 ").concat(tot.toFixed(2), " kg</div>\n    </div>\n\n    <div class=\"sec\">\n      <div class=\"sec-hd\"><div class=\"sec-title\">").concat(t('Consolidation record'), "</div></div>\n      <div class=\"sec-bd\">\n        <div class=\"sum-row\"><span class=\"sum-l\">").concat(t('Reference'), "</span><span class=\"sum-v mono\" style=\"color:var(--pri);\">").concat(consolId, "</span></div>\n        <div class=\"sum-row\"><span class=\"sum-l\">Date</span><span class=\"sum-v mono\">").concat(today, "</span></div>\n        <div class=\"sum-row\"><span class=\"sum-l\">").concat(t('Shipments'), "</span><span class=\"sum-v\">").concat(ships.length, "</span></div>\n        <div class=\"sum-row\"><span class=\"sum-l\">").concat(t('Cartons'), "</span><span class=\"sum-v mono\">").concat(totC, "</span></div>\n        <div class=\"sum-row\"><span class=\"sum-l\">").concat(t('Total weight'), "</span><span class=\"sum-v mono\">").concat(tot.toFixed(2), " kg</span></div>\n        <div class=\"sum-row\"><span class=\"sum-l\">").concat(t('Load type'), "</span><span class=\"sum-v\">").concat(loadType === 'full' ? t('Full load') : t('Partial'), "</span></div>\n        ").concat(repack === 'yes' ? "<div class=\"sum-row\"><span class=\"sum-l\">".concat(t('Repacked cartons'), "</span><span class=\"sum-v mono\">").concat(repackCartons.length, " pallet").concat(repackCartons.length > 1 ? 's' : '', "</span></div>") : '', "\n        <div class=\"sum-row\"><span class=\"sum-l\">").concat(t('AWB / House B/L'), "</span>\n          <span class=\"sum-v mono\" style=\"color:var(--pri);\">AWB-").concat(consolId.replace('CON-', ''), "-").concat(today.replace(/ /g, ''), "</span></div>\n      </div>\n    </div>\n\n    <div class=\"sec\">\n      <div class=\"sec-hd\"><div class=\"sec-title\">").concat(t('Labels generated'), "</div></div>\n      <div class=\"sec-bd\">\n        <div class=\"alert alert-ok\">\n          <span>&#10003;</span>\n          <span><strong>").concat(totC, " carton label").concat(totC > 1 ? 's' : '', "</strong> generated and ready to print.\n          AWB printed on each label.</span>\n        </div>\n        <button class=\"btn-sec\" style=\"margin-top:8px;width:100%;display:flex;align-items:center;justify-content:center;gap:7px;\">\n          <svg width=\"15\" height=\"15\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\"><polyline points=\"6 9 12 15 18 9\"/><path d=\"M12 3v12M5 20h14\"/></svg>\n          Print all carton labels (").concat(totC, ")\n        </button>\n      </div>\n    </div>\n\n    <div class=\"sec\">\n      <div class=\"sec-hd\">\n        <div class=\"pl-header\">\n          <div class=\"pl-title\">").concat(t('Packing list'), "</div>\n          <button class=\"pl-dl\">").concat(t('Download PDF'), "</button>\n        </div>\n      </div>\n      <div class=\"sec-bd\">\n        ").concat(ships.map(function (s) {
+    return "\n        <div class=\"ship-sum\">\n          <div class=\"ship-sum-id\">".concat(esc(s.id), "</div>\n          <div class=\"ship-sum-name\">").concat(esc(s.customer), "</div>\n          <div style=\"font-size:10px;color:var(--mute);\">").concat(s.cartons, " ctn</div>\n          <div class=\"ship-sum-wt\">").concat(s.weight.toFixed(2), " kg</div>\n        </div>");
+  }).join(''), "\n        <div class=\"alert alert-ok\" style=\"margin-top:8px;\">\n          <span>&#10003;</span>\n          <span>WhatsApp notification + packing list sent to all ").concat(ships.length, " customers.</span>\n        </div>\n      </div>\n    </div>\n\n    <div class=\"foot\"><button class=\"btn-sec\" onclick=\"go('s1')\">").concat(t('New consolidation'), "</button><button class=\"btn-primary\" style=\"margin-left:auto\">\u2192 Create Trip (B3)</button></div>\n  </div>");
+}
+
+// ── Footer ────────────────────────────────────────────────────
 function renderFooter(step) {
-  var labels = {
-    1: t('Customer'),
-    2: t('Items & condition'),
-    3: t('Packing'),
-    4: t('Review')
-  };
   var next = {
     1: "go('s2')",
     2: "go('s3')",
-    3: "go('s4')",
-    4: "slDeclareReceived();go('done')"
+    3: "go('done')"
   };
   var prev = {
-    2: "go('s1x')",
-    3: "go('s2')",
-    4: "go('s3')"
+    2: "go('s1')",
+    3: "go('s2')"
   };
-  var noHs = liveItems.some(function (i) {
-    return !i.hs;
-  });
-  var noCartons = liveCartons.some(function (c) {
-    return !c.weight || parseFloat(c.weight) <= 0 || !c.dimL || !c.dimW || !c.dimH;
-  });
-  var disabled = step === 1 && !customer || step === 2 && (noHs || !store) || step === 3 && (noCartons || !mode);
-  return "<div class=\"footer\">\n    <div class=\"foot\">\n      ".concat(step > 1 ? "<button class=\"btn-sec\" onclick=\"".concat(prev[step], "\">").concat(t('Back'), "</button>") : '', "\n      <div class=\"foot-info\">\n        <div class=\"foot-label\">Step ").concat(step, " of 4 \u2014 ").concat(labels[step], "</div>\n        <div class=\"foot-sub\">").concat(step === 1 ? t('Find customer') : step === 2 ? t('Add items — HS code required for each') : step === 3 ? t('Enter carton weights and dimensions') : t('Confirm and create shipment'), "</div>\n      </div>\n      <button class=\"btn-primary\" onclick=\"").concat(next[step], "\" ").concat(disabled ? 'disabled' : '', ">\n        ").concat(step === 4 ? t('Create shipment') : t('Continue'), "\n      </button>\n    </div>\n  </div>");
+  var labels = {
+    1: 'Step 1 of 3 — Select shipments',
+    2: 'Step 2 of 3 — Packing',
+    3: 'Step 3 of 3 — Review'
+  };
+  var subs = {
+    1: 'Select 2+ shipments to consolidate',
+    2: 'Set load type and repacking details',
+    3: 'Confirm and mark consolidated'
+  };
+  var disabled = step === 1 && selected.length < 1 || step === 3 && false; // always allow confirm on review
+
+  return "<div class=\"footer\">\n    <div class=\"foot\">\n      ".concat(step > 1 ? "<button class=\"btn-sec\" onclick=\"".concat(prev[step], "\">").concat(t('Back'), "</button>") : '', "\n      <div class=\"foot-info\">\n        <div class=\"foot-label\">").concat(labels[step], "</div>\n        <div class=\"foot-sub\">").concat(subs[step], "</div>\n      </div>\n      <button class=\"btn-primary\" onclick=\"").concat(next[step], "\" ").concat(disabled ? 'disabled' : '', ">\n        ").concat(step === 3 ? 'Confirm consolidation' : t('Continue'), "\n      </button>\n    </div>\n  </div>");
 }
+
+// ══ INIT ══════════════════════════════════════════════════════
+go('s1');
 document.getElementById('sl-logo').innerHTML = slLockup(16, 'white');
 document.getElementById('sl-date').textContent = slDateStr();
 document.querySelector('.sl-menu').onclick = function () {

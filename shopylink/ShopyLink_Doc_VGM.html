@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VGM — Verified Gross Mass · ShopyLink</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Manrope:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+@page{size:A4;margin:0}
+:root{
+  --cream:#F7F4EC;--paper:#FFFFFF;--ink:#0B2A3B;--n3:#DDD8CD;--n5:#95A1A9;--n6:#62707A;
+  --sky:#0EA5E9;--sky-deep:#0B6E9B;--red:#E1483B;--amber-tint:#FDF0D5;--amber-deep:#8A5A06;
+  --disp:'Bricolage Grotesque',sans-serif;--body:'Manrope',sans-serif;
+  --mono:'JetBrains Mono',monospace;--ar:'Tajawal',system-ui,sans-serif;
+  --rule:rgba(11,42,59,.14);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--cream);font-family:var(--body);color:var(--ink);font-size:13px}
+html[dir=rtl] body{font-family:var(--ar)}
+.sheet{width:210mm;min-height:297mm;margin:14px auto;background:var(--paper);padding:16mm 15mm;
+       box-shadow:0 2px 14px rgba(11,42,59,.10)}
+.top{display:flex;justify-content:space-between;align-items:flex-start;
+     border-bottom:2px solid var(--ink);padding-bottom:10px;margin-bottom:14px}
+h1{font-family:var(--disp);font-size:20px;margin:0;letter-spacing:-.02em}
+.sub{font-size:11px;color:var(--n6);margin-top:3px}
+.ref{font-family:var(--mono);font-size:12px;text-align:right;direction:ltr}
+html[dir=rtl] .ref{text-align:left}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:0 18px;margin-bottom:12px}
+.f{padding:7px 0;border-bottom:1px solid var(--rule)}
+.k{font-size:9.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--n6)}
+.v{font-size:13.5px;margin-top:2px;min-height:17px}
+.v.machine{font-family:var(--mono);direction:ltr}
+.v.big{font-family:var(--mono);font-size:22px;font-weight:600}
+.miss{color:var(--red);font-weight:700}
+table{width:100%;border-collapse:collapse;font-size:12px;margin:10px 0 14px}
+th{text-align:left;font-size:9.5px;text-transform:uppercase;letter-spacing:.09em;color:var(--n6);
+   border-bottom:1px solid var(--ink);padding:5px 6px 5px 0;font-weight:800}
+html[dir=rtl] th{text-align:right;padding:5px 0 5px 6px}
+td{padding:6px 6px 6px 0;border-bottom:1px solid var(--rule)}
+html[dir=rtl] td{padding:6px 0 6px 6px}
+tfoot td{font-family:var(--mono);font-weight:700;border-bottom:0;border-top:2px solid var(--ink)}
+.note{background:var(--amber-tint);color:var(--amber-deep);border-radius:8px;padding:9px 12px;
+      font-size:11.5px;font-weight:600;margin:10px 0}
+.sign{margin-top:26px;display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.line{border-top:1px solid var(--ink);padding-top:6px;font-size:11px;color:var(--n6)}
+.line b{display:block;color:var(--ink);font-size:12.5px;margin-bottom:1px}
+.blank{height:34px}
+.bar{max-width:210mm;margin:12px auto 0;display:flex;gap:8px;justify-content:flex-end}
+button{min-height:44px;padding:0 16px;border-radius:10px;border:1.5px solid var(--rule);
+       background:var(--paper);font-family:inherit;font-weight:700;font-size:13px;cursor:pointer}
+button.go{background:var(--sky);color:#fff;border-color:var(--sky)}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible{outline:2px solid var(--sky);outline-offset:2px}
+.hint{max-width:210mm;margin:8px auto 20px;font-size:12px;color:var(--n6)}
+@media print{body{background:#fff}.sheet{margin:0;box-shadow:none;width:auto;min-height:auto}
+             .bar,.hint{display:none}}
+@media (max-width:230mm){.sheet{width:auto;padding:12mm 8mm}}
+</style>
+</head>
+<body>
+<div class="bar">
+  <button onclick="flip()" id="lang">العربية</button>
+  <button onclick="window.print()">Print</button>
+  <button class="go" id="declare" onclick="declareVGM()">Declare it sent</button>
+</div>
+<div class="hint" id="hint"></div>
+<div class="sheet" id="sheet"></div>
+
+<script>
+/* ══ VGM — Verified Gross Mass ══════════════════════════════════════════
+   SOLAS will not let a container be loaded without a certified gross mass, and
+   the system knew that: the document gate asks for a VGM on every sea trip, and
+   the control board carries a work item — "VGM to carrier", with an owner and a
+   hard cut-off eight hours out. Nothing could produce the paper.
+   This produces it, and invents nothing. Every figure is read:
+     · the trip, its container and its route from SL_TRIPS_V1
+     · the cargo and each shipment's weight from SL_SHIPMENTS_V1
+     · the tare from SL_TRUCKS_V1 — the real one. The trip module used to
+       assume 8,500 kg for a lorry that weighs 15,200, and a VGM built on that
+       would have been a certified false weight.
+     · the port from SL_STOPS_V1
+   The owner weighs actually, so the method is stated as WEIGHED, which SOLAS
+   requires to be declared. And the signature is left BLANK for the pen: the
+   paper is signed after it is printed, so nobody's name is put under a figure
+   he has not seen. */
+
+function readCh(key,prop){
+  try{
+    var raw=window.localStorage.getItem(key); if(!raw)return null;
+    var o=JSON.parse(raw);
+    return prop?((o&&o[prop]&&o[prop].length)?o[prop]:null):o;
+  }catch(e){return null;}
+}
+function trips(){return readCh('SL_TRIPS_V1','trips')||[];}
+function ships(){return readCh('SL_SHIPMENTS_V1','shipments')||[];}
+function trucks(){return readCh('SL_TRUCKS_V1','trucks')||[];}
+function stops(){return readCh('SL_STOPS_V1','stops')||[];}
+
+var TRIP=null;
+function seaTrips(){
+  return trips().filter(function(t){return t.mode==='sea'&&t.open;});
+}
+function pickTrip(){
+  var list=seaTrips();
+  if(!list.length)list=trips().filter(function(t){return t.open;});
+  return TRIP||list[0]||null;
+}
+function truckOf(t){
+  var hit=null;
+  trucks().forEach(function(k){if(t&&(k.plate===t.truck||k.id===t.truck))hit=k;});
+  return hit;
+}
+function cargoOf(t){
+  if(!t)return [];
+  var by={}; ships().forEach(function(s){by[s.ship]=s;});
+  return (t.ships||[]).map(function(id){return by[id]||{ship:id};});
+}
+
+/* ── the weight, and what it is made of ── */
+function weights(){
+  var t=pickTrip(), k=truckOf(t), cargo=cargoOf(t);
+  var goods=0, weighed=true, unknown=[];
+  cargo.forEach(function(s){
+    var w=Number(s.weight)||0;
+    if(!w){weighed=false;unknown.push(s.ship);}
+    goods+=w;
+  });
+  var tare=k?(Number(k.tare)||0):0;
+  return {trip:t,truck:k,cargo:cargo,goods:goods,tare:tare,
+          total:(tare&&goods)?(tare+goods):0,
+          complete:!!(t&&k&&tare&&goods&&weighed),
+          unknown:unknown};
+}
+function kg(n){
+  if(!n)return '';
+  var s=String(Math.round(Number(n)));
+  return s.replace(/\B(?=(\d{3})+(?!\d))/g,',')+' kg';
+}
+
+var LANG='en';
+function t(en,ar){return LANG==='ar'?ar:en;}
+function flip(){
+  LANG=(LANG==='ar')?'en':'ar';
+  document.documentElement.setAttribute('dir',LANG==='ar'?'rtl':'ltr');
+  document.documentElement.setAttribute('lang',LANG);
+  document.getElementById('lang').textContent=LANG==='ar'?'English':'العربية';
+  render();
+}
+
+function field(k,v,cls){
+  return '<div class="f"><div class="k">'+k+'</div><div class="v '+(cls||'')+'">'
+    +(v||'<span class="miss">'+t('not on the record','غير مسجَّل')+'</span>')+'</div></div>';
+}
+function render(){
+  var w=weights(), t2=w.trip, k=w.truck;
+  var port=null;
+  stops().forEach(function(s){if(!port&&t2&&s.kind==='port'&&(s.name===t2.to||s.id===t2.to))port=s;});
+
+  var h='<div class="top"><div><h1>'+t('Verified Gross Mass','الوزن الإجمالي المصدَّق')+'</h1>'
+    +'<div class="sub">'+t('SOLAS VI/2 — declared by the shipper before loading',
+                           'سولاس VI/2 — يُقرّه الشاحن قبل التحميل')+'</div></div>'
+    +'<div class="ref">'+(t2?t2.no:'—')+'<br>'+t('issued','صدرت')+' '
+    +new Date().toISOString().slice(0,10)+'</div></div>';
+
+  h+='<div class="grid">'
+    + field(t('Shipper','الشاحن'),'ShopyLink')
+    + field(t('Trip','الرحلة'),t2?t2.no:'','machine')
+    + field(t('Vehicle / container','المركبة أو الحاوية'),k?(k.plate+' · '+(k.model||k.type||'')):'','machine')
+    + field(t('Route','المسار'),t2?((t2.from||'?')+' → '+(t2.to||'?')):'','machine')
+    + field(t('Port of loading','ميناء التحميل'),port?port.name:(t2?t2.from:''))
+    + field(t('Method of determination','طريقة التحديد'),
+            t('Method 1 — the packed unit was WEIGHED','الطريقة 1 — وُزنت الوحدة المعبّأة فعليًّا'))
+    + '</div>';
+
+  h+='<table><thead><tr><th>'+t('Shipment','الشحنة')+'</th><th>'+t('Client','العميل')+'</th>'
+    +'<th style="text-align:right">'+t('Weight','الوزن')+'</th></tr></thead><tbody>';
+  if(!w.cargo.length){
+    h+='<tr><td colspan="3" style="color:var(--n6);padding:14px 0">'
+      +t('this trip carries nothing the register knows',
+         'هذه الرحلة لا تحمل ما يعرفه السجل')+'</td></tr>';
+  }
+  w.cargo.forEach(function(s){
+    h+='<tr><td class="machine" style="font-family:var(--mono)">'+s.ship+'</td>'
+      +'<td>'+(s.client||'—')+'</td>'
+      +'<td style="text-align:right;font-family:var(--mono)">'
+      +(Number(s.weight)?kg(s.weight):'<span class="miss">'+t('not weighed','لم تُوزن')+'</span>')
+      +'</td></tr>';
+  });
+  h+='</tbody><tfoot>'
+    +'<tr><td colspan="2">'+t('Cargo','البضاعة')+'</td><td style="text-align:right">'+(kg(w.goods)||'—')+'</td></tr>'
+    +'<tr><td colspan="2">'+t('Tare of the vehicle','الوزن الفارغ للمركبة')+'</td><td style="text-align:right">'+(kg(w.tare)||'—')+'</td></tr>'
+    +'</tfoot></table>';
+
+  h+='<div class="grid"><div class="f" style="grid-column:1/-1;border-bottom:0">'
+    +'<div class="k">'+t('VERIFIED GROSS MASS','الوزن الإجمالي المصدَّق')+'</div>'
+    +'<div class="v big">'+(w.total?kg(w.total):'<span class="miss">'+t('cannot be certified','لا يمكن تصديقه')+'</span>')+'</div></div></div>';
+
+  if(!w.complete){
+    var why=[];
+    if(!t2)why.push(t('no trip','لا رحلة'));
+    if(t2&&!k)why.push(t('the vehicle is not on the fleet register','المركبة ليست في سجل الأسطول'));
+    if(w.unknown.length)why.push(t('not weighed: ','لم تُوزن: ')+w.unknown.join(', '));
+    h+='<div class="note">'+t('This cannot be signed as it stands — ','لا يجوز توقيع هذه كما هي — ')
+      +why.join(' · ')+'</div>';
+  }
+
+  /* the signature is left for the pen: the owner signs after printing, so
+     nobody's name is printed under a figure he has not read */
+  h+='<div class="sign">'
+    +'<div><div class="blank"></div><div class="line"><b>'+t('Signed for the shipper','توقيع الشاحن')+'</b>'
+    +t('name, position and date','الاسم والمنصب والتاريخ')+'</div></div>'
+    +'<div><div class="blank"></div><div class="line"><b>'+t('Weighbridge / weighing party','الميزان الجسري أو جهة الوزن')+'</b>'
+    +t('certificate reference','مرجع شهادة الوزن')+'</div></div></div>';
+
+  document.getElementById('sheet').innerHTML=h;
+
+  var btn=document.getElementById('declare');
+  btn.disabled=!w.complete;
+  btn.textContent=t('Declare it sent','أعلن إرسالها');
+  document.getElementById('hint').textContent = w.complete
+    ? t('Print it, sign it, send it to the carrier — then declare it, and the document gate closes itself.',
+        'اطبعها ووقّعها وأرسلها إلى الناقل، ثم أعلن ذلك فتُغلق بوّابة المستندات من نفسها.')
+    : t('Every figure here is read from the registers. Nothing is typed in, so nothing can be certified that was not weighed.',
+        'كل رقم هنا مقروء من السجلات. لا شيء يُكتب هنا، فلا يُصدَّق ما لم يُوزن.');
+}
+
+/* ── declaring it ── */
+function evRead(){
+  try{var r=window.localStorage.getItem('SL_EVENTS_V1');if(!r)return [];
+   var l=JSON.parse(r);return l&&l.length?l:[];}catch(e){return [];}
+}
+function declareVGM(){
+  var w=weights();
+  /* refused at the act, not by the button: a certified weight that nobody
+     weighed is worse than a missing document */
+  if(!w.complete)return {ok:false,why:'the mass cannot be certified from what is recorded'};
+  var l=evRead();
+  var already=false;
+  l.forEach(function(e){if(e.type==='vgm.submitted'&&e.ship===w.trip.no)already=true;});
+  if(already)return {ok:false,why:'this trip has already declared its VGM'};
+  l.push({id:'EV-'+(l.length+1)+'-'+(new Date()).getTime(),at:(new Date()).getTime(),
+          type:'vgm.submitted',ship:w.trip.no,client:null,actor:'',
+          payload:{trip:w.trip.no,ships:(w.trip.ships||[]).slice(),
+                   vgm:w.total,tare:w.tare,cargo:w.goods,cur:'kg',
+                   method:'weighed'}});
+  try{window.localStorage.setItem('SL_EVENTS_V1',JSON.stringify(l));}catch(e){}
+  render();
+  return {ok:true,vgm:w.total};
+}
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ShopyLink — Shopping Addresses (states-first)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&family=Tajawal:wght@400;500;700;800&family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0B2A3B; --pri:#0EA5E9; --sky:#0EA5E9; --acc:#38BDF8; --pale:#E0F2FE; --cream:#F7F4EC;
+  --paper:#FFFFFF; --mute:rgba(11,42,59,0.55); --rule:rgba(11,42,59,0.12);
+  --warm:#FBBF24; --green:#10B981; --danger:#E1483B;
+  --disp:'Bricolage Grotesque',sans-serif; --body:'Manrope',sans-serif;
+  --mono:'JetBrains Mono',monospace; --ar:'Tajawal','Cairo',sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:#E9EEF2;color:var(--ink);font-family:var(--body);
+  background-image:radial-gradient(118% 88% at 8% -14%, #F4FAFE 0, transparent 50%),radial-gradient(86% 64% at 104% -8%, #FDF5E2 0, transparent 42%),radial-gradient(circle at 50% 122%, #E1E9EF 0, #EAF0F4 58%);min-height:100%}
+.wrap{max-width:1180px;margin:0 auto;padding:24px 22px 64px}
+.top{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:4px}
+.brand{display:flex;align-items:center;gap:0;font-family:var(--disp);font-weight:800;font-size:21px;letter-spacing:-0.04em;line-height:1}
+.brand .s1{color:var(--ink)} .brand .s2{color:var(--sky)} .brand svg{display:block;margin:0 -1px}
+.tag{font-size:12px;color:var(--mute);align-self:center}
+.controls{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.seg{display:inline-flex;background:#fff;border:1px solid var(--rule);border-radius:99px;padding:3px}
+.seg button{border:0;background:transparent;font-family:var(--body);font-size:13px;font-weight:600;color:var(--mute);padding:6px 13px;border-radius:99px;cursor:pointer;transition:.15s}
+.seg button.on{background:var(--ink);color:#fff}
+.hint{font-size:12.5px;color:var(--mute);margin:12px 0 24px;max-width:720px;line-height:1.55}
+.stage{display:flex;justify-content:center}
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(244px,1fr));gap:32px 22px;align-items:start}
+.gcell{display:flex;flex-direction:column;align-items:center;gap:11px}
+.gcell .scaler{width:242px;height:486px;overflow:hidden;border-radius:34px;box-shadow:0 22px 44px -26px rgba(11,42,59,.5)}
+.gcell .scaler .phone{transform:scale(.6204);transform-origin:top left}
+.glabel{font-size:12px;font-weight:700;text-align:center;color:var(--ink)}
+.glabel small{display:block;color:var(--mute);font-weight:500;font-size:11px;margin-top:2px}
+
+.phone{width:390px;height:783px;background:var(--cream);position:relative;display:flex;flex-direction:column;overflow:hidden}
+.framewrap{border-radius:42px;padding:11px;background:linear-gradient(160deg,#13354a,#0B2A3B);
+  box-shadow:0 34px 70px -24px rgba(11,42,59,.55),0 8px 20px -10px rgba(11,42,59,.34)}
+.framewrap .phone{border-radius:32px}
+.sb{height:46px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 24px 6px;font-size:13px;font-weight:700;color:var(--ink);flex-shrink:0}
+.offline{background:var(--ink);color:#fff;font-size:12px;font-weight:600;text-align:center;padding:7px 12px;display:flex;align-items:center;justify-content:center;gap:7px;flex-shrink:0}
+.scr{flex:1;display:flex;flex-direction:column;padding:8px 24px 0;overflow-y:auto}
+.scr::-webkit-scrollbar{width:0}
+.scr>*{flex-shrink:0}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--sky);margin-bottom:10px}
+h1.disp{font-family:var(--disp);font-weight:700;font-size:28px;line-height:1.08;letter-spacing:-0.02em;margin:0 0 8px;text-wrap:balance}
+.sub{font-size:13.5px;color:var(--mute);line-height:1.55;margin:0 0 18px;text-wrap:pretty}
+.backchip{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--mute);background:transparent;border:0;cursor:pointer;padding:4px 0;margin-bottom:6px}
+.backchip:hover{color:var(--ink)}
+.toplink{margin-inline-start:auto;font-size:12.5px;font-weight:700;color:var(--sky);background:transparent;border:0;cursor:pointer}
+.toprow{display:flex;align-items:center;margin-bottom:6px}
+.foot{padding:14px 24px 28px;flex-shrink:0;background:linear-gradient(to top,var(--cream) 70%,transparent)}
+.btn{width:100%;border:0;border-radius:14px;background:var(--ink);color:#fff;font-family:var(--body);font-weight:700;font-size:15px;padding:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;transition:.15s}
+.btn:hover{background:#0e3a52}
+.btn:active{transform:translateY(1px)}
+.btn:disabled{opacity:.45;cursor:default;transform:none}
+.btn.load{color:transparent;position:relative}
+.btn.load::after{content:"";position:absolute;width:18px;height:18px;border:2.5px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+.btn.ghost{background:#fff;color:var(--ink);border:1.5px solid var(--rule)}
+.btn.ghost:hover{background:#fff;border-color:var(--sky);box-shadow:0 0 0 4px var(--pale)}
+.footrow{display:flex;gap:10px}.footrow .btn{flex:1}
+@keyframes spin{to{transform:rotate(360deg)}}
+.err{color:var(--danger);font-size:12.5px;font-weight:600;margin-top:9px;line-height:1.45;display:flex;gap:6px;align-items:flex-start}
+.err svg{flex-shrink:0;margin-top:1px}
+.seclabel{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-weight:500;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);margin:20px 0 12px}
+.seclabel::after{content:"";flex:1;height:1px;background:var(--rule)}
+.banner{border-radius:13px;padding:12px 13px;font-size:12.5px;font-weight:600;line-height:1.45;display:flex;gap:9px;margin-bottom:14px}
+.banner svg{flex-shrink:0;margin-top:1px}
+.banner.bad{background:rgba(225,72,59,.08);color:var(--danger)}
+.banner.warn{background:rgba(251,191,36,.16);color:#8a5e06;box-shadow:inset 0 0 0 1px rgba(251,191,36,.32)}
+.banner.info{background:var(--pale);color:#0a6aa1}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ctile{border:1.5px solid var(--rule);background:#fff;border-radius:18px;padding:16px 15px;cursor:pointer;display:flex;flex-direction:column;gap:5px;position:relative;transition:.16s}
+.ctile:hover{border-color:var(--sky);box-shadow:0 0 0 4px var(--pale);transform:translateY(-2px)}
+.ctile:active{transform:translateY(0)}
+.ctile .fl{font-size:30px;line-height:1.05}
+.ctile .cn{font-family:var(--disp);font-weight:800;font-size:16px;color:var(--ink)}
+.ctile .ex{font-size:11px;color:var(--mute);line-height:1.35}
+.ctile .ab{position:absolute;top:11px;inset-inline-end:11px;font-family:var(--mono);font-size:8.5px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;background:rgba(16,185,129,.15);color:#0a7a55;border-radius:6px;padding:3px 6px;display:inline-flex;align-items:center;gap:4px}
+.ctile .ab::before{content:"";width:5px;height:5px;border-radius:50%;background:currentColor}
+/* plan option */
+.planopt{display:flex;align-items:flex-start;gap:12px;border:1.5px solid var(--rule);background:#fff;border-radius:15px;padding:14px;cursor:pointer;margin-bottom:10px;transition:.16s}
+.planopt:hover{border-color:var(--sky)}
+.planopt.on{border-color:var(--sky);background:var(--pale);box-shadow:0 0 0 3px rgba(14,165,233,.12)}
+.planopt .rad{width:20px;height:20px;border-radius:50%;border:2px solid var(--rule);flex-shrink:0;margin-top:2px;transition:.15s}
+.planopt.on .rad{border-color:var(--sky);background:radial-gradient(circle,var(--sky) 0 6px,#fff 6px)}
+.planopt .pmain{flex:1;min-width:0}
+.planopt .pt{font-family:var(--disp);font-weight:800;font-size:15px;color:var(--ink)}
+.planopt .pnote{font-size:11.5px;color:var(--mute);margin-top:3px;line-height:1.38}
+.planopt .pprice{text-align:end;font-family:var(--disp);font-weight:800;font-size:15px;color:var(--ink);white-space:nowrap}
+.planopt .pper{display:block;font-family:var(--body);font-size:10px;font-weight:600;color:var(--mute);margin-top:1px}
+.badge2{display:inline-block;font-family:var(--mono);font-size:8.5px;letter-spacing:.08em;text-transform:uppercase;background:var(--warm);color:#3a2c00;border-radius:6px;padding:3px 7px;margin-top:7px;font-weight:700}
+/* address card */
+.addrcard{border:1.5px solid var(--rule);background:#fff;border-radius:18px;padding:16px;position:relative}
+.adiv{height:1px;background:var(--rule);margin:15px 0}
+.alines-label{font-family:var(--mono);font-size:9.5px;font-weight:500;color:var(--mute);text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px}
+.addrcard.lift{box-shadow:0 18px 34px -20px rgba(11,42,59,.42)}
+.addrcard .albl{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--sky);margin-bottom:9px;display:flex;align-items:center;gap:6px}
+.addrcard .aname{font-family:var(--disp);font-weight:800;font-size:18px;color:var(--ink);letter-spacing:-0.01em}
+.addrcard .ahint{font-size:11px;color:var(--mute);margin:4px 0 12px;line-height:1.45}
+.addrcard .aline{font-size:13px;color:var(--ink);line-height:1.62}
+.addrcard .acopy{margin-top:14px;display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--sky);background:var(--pale);border:0;border-radius:10px;padding:9px 13px;cursor:pointer;transition:.15s}
+.addrcard .acopy:hover{background:#cfeafd}
+/* status chip */
+.schip{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;border-radius:99px;padding:5px 11px}
+.schip.ok{background:rgba(16,185,129,.15);color:#0a7a55}
+.schip.warn{background:rgba(251,191,36,.18);color:#8a5e06}
+.schip.bad{background:rgba(225,72,59,.11);color:var(--danger)}
+.schip.neu{background:var(--pale);color:#0a6aa1}
+.dotc{width:7px;height:7px;border-radius:50%;background:currentColor;display:inline-block}
+.nlabel{font-size:12px;font-weight:700;color:var(--ink);margin-bottom:7px}
+.nameinput{width:100%;border:1.5px solid var(--rule);border-radius:12px;padding:13px 14px;font-family:var(--disp);font-weight:800;font-size:17px;color:var(--ink);outline:0;margin-bottom:2px;transition:.15s}
+.nameinput.bad{border-color:var(--danger);background:rgba(225,72,59,.05);color:var(--danger)}
+.nameinput.bad:focus{box-shadow:0 0 0 4px rgba(225,72,59,.1)}
+.nameinput:focus{border-color:var(--sky);box-shadow:0 0 0 4px var(--pale)}
+.suggestchip{margin-top:9px;display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--sky);background:var(--pale);border:0;border-radius:10px;padding:8px 12px;cursor:pointer;transition:.15s}
+.suggestchip:hover{background:#cfeafd}
+/* order summary */
+.sumrow{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:13.5px;padding:12px 0;border-bottom:1px solid var(--rule)}
+.sumrow .k{color:var(--mute)}.sumrow .v{font-weight:700;text-align:end;white-space:nowrap}
+.sumtot{display:flex;align-items:center;justify-content:space-between;padding:14px 0 4px}
+.sumtot .k{font-weight:700}.sumtot .v{font-family:var(--disp);font-weight:800;font-size:21px}
+.pmethod{display:flex;align-items:center;gap:12px;border:1.5px solid var(--rule);background:#fff;border-radius:14px;padding:13px;margin-bottom:10px;cursor:pointer;transition:.16s}
+.pmethod:hover{border-color:var(--sky)}
+.pmethod.on{border-color:var(--sky);background:var(--pale)}
+.pmethod .ico{width:36px;height:36px;border-radius:10px;background:var(--pale);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--sky);font-size:14px;flex-shrink:0}
+.pmethod.on .ico{background:#fff}
+.pmethod .nm{flex:1;font-size:14px;font-weight:600;color:var(--ink)}
+.pmethod .rad{width:20px;height:20px;border-radius:50%;border:2px solid var(--rule);flex-shrink:0}
+.pmethod.on .rad{border-color:var(--sky);background:radial-gradient(circle,var(--sky) 0 6px,#fff 6px)}
+/* manage rows */
+.mgrow{display:flex;align-items:center;gap:12px;border:1.5px solid var(--rule);background:#fff;border-radius:15px;padding:13px;margin-bottom:10px;transition:.15s}
+.mgrow:hover{border-color:var(--sky)}
+.mgrow .fl{font-size:26px;line-height:1}
+.mgrow .mmid{flex:1;min-width:0}
+.mgrow .mc{font-family:var(--disp);font-weight:800;font-size:15px;color:var(--ink)}
+.mgrow .ms{margin-top:6px}
+.mgrow .renew{font-size:12px;font-weight:700;color:#fff;background:var(--ink);border:0;border-radius:10px;padding:9px 14px;cursor:pointer;white-space:nowrap;transition:.15s}
+.mgrow .renew:hover{background:#0e3a52}
+.mgrow .renew.ghost{color:var(--sky);background:var(--pale)}
+.mgrow .renew.ghost:hover{background:#cfeafd}
+.empty{text-align:center;color:var(--mute);padding:42px 18px;font-size:13.5px;line-height:1.5;display:flex;flex-direction:column;align-items:center}
+.empty .big{font-size:38px;margin-bottom:14px;width:84px;height:84px;border-radius:50%;background:var(--pale);display:flex;align-items:center;justify-content:center}
+.center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 24px}
+.check{width:80px;height:80px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;margin-bottom:18px;box-shadow:0 16px 34px -10px rgba(16,185,129,.55);position:relative}
+.check::after{content:"";position:absolute;inset:-8px;border-radius:50%;border:2px solid rgba(16,185,129,.25)}
+.spinbig{width:54px;height:54px;border:4px solid var(--rule);border-top-color:var(--sky);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:20px}
+.h2{font-family:var(--disp);font-weight:800;font-size:23px;line-height:1.1;letter-spacing:-0.01em;margin:0 0 8px}
+.ptext{font-size:13.5px;color:var(--mute);line-height:1.55;margin:0 0 4px;text-wrap:pretty}
+.phone.rtl{direction:rtl;font-family:var(--ar)}
+.phone.rtl h1.disp,.phone.rtl .h2,.phone.rtl .aname,.phone.rtl .planopt .pt,.phone.rtl .mgrow .mc{font-family:var(--ar);font-weight:800}
+.phone.rtl .eyebrow,.phone.rtl .albl,.phone.rtl .seclabel,.phone.rtl .alines-label{font-family:var(--mono)}
+.simrow{display:flex;gap:7px;flex-wrap:wrap;margin-top:16px;justify-content:center}
+.simrow button{font-size:12px;font-weight:600;border:1px solid var(--rule);background:#fff;color:var(--mute);border-radius:99px;padding:6px 12px;cursor:pointer;transition:.15s}
+.simrow button:hover{color:var(--ink)}
+.simrow button.on{background:var(--pale);color:var(--ink);border-color:var(--sky)}
+.note{font-size:12px;color:var(--mute);text-align:center;margin-top:16px}
+
+/* ── control geometry ──────────────────────────────────────────────
+   A control styled with padding but no height takes the browser's default,
+   which differs per control type — that is why a select used to sit proud of
+   the input beside it, and why the native arrow was jammed against the edge.
+   The arrow is drawn here, so the room for it is reserved here.            */
+select{
+  height:var(--ctl-h,42px);
+  -webkit-appearance:none;-moz-appearance:none;appearance:none;
+  padding-right:32px;padding-left:12px;
+  background-image:url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 L6 6.5 L11 1.5' fill='none' stroke='%2362707A' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;
+  font-size:var(--fs-body,14px);color:var(--ink,#0B2A3B);line-height:normal;
+}
+select::-ms-expand{display:none}
+[dir="rtl"] select{padding-right:12px;padding-left:32px;background-position:left 12px center}
+input[type="text"],input[type="number"],input[type="tel"],input[type="email"],input[type="date"]{
+  height:var(--ctl-h,42px);font-size:var(--fs-body,14px);line-height:normal;
+}
+textarea{font-size:var(--fs-body,14px);line-height:1.6}
+
+/* ── the screen switcher is NAVIGATION, not debug chrome ───────────
+   It was 10px white at 40% on the dark bar: 3.35:1, below AA and unreadable,
+   which is why its destinations could not be found. Now 11.5px at 72% (7.18:1)
+   with a solid active pill, so it reads as what it is.                      */
+.sl-sim-btn{font-size:11.5px !important;font-weight:700 !important;padding:5px 13px !important;
+  color:rgba(255,255,255,.72) !important;background:rgba(255,255,255,.09) !important;
+  min-height:26px;white-space:nowrap}
+.sl-sim-btn:hover{background:rgba(255,255,255,.18) !important;color:#FFFFFF !important}
+.sl-sim-btn.on{background:#FFFFFF !important;color:#0B2A3B !important}
+.sl-sim-lbl{font-size:10px !important;color:rgba(255,255,255,.60) !important}
+
+/* ── mobile: every screen must be usable and complete on a phone ───
+   Nothing is hidden to make it fit. Rows wrap, tables scroll inside their own
+   box rather than pushing the page sideways, and touch targets keep their size. */
+@media (max-width:767px){
+  /* A control pushed past the edge is a control that does not exist.
+     Inline flex rows wrap, and auto-margin spacers stop shoving the last item
+     off-screen — which is what hid "simulate issue" on a narrow window. */
+  [style*="display:flex"]{flex-wrap:wrap !important}
+  [style*="margin-left:auto"]{margin-left:0 !important}
+  [dir="rtl"] [style*="margin-right:auto"]{margin-right:0 !important}
+  .sl-modal{width:auto !important;max-width:calc(100vw - 20px)}
+
+  /* the sidebar is handled by this module's own 767px rules — not duplicated here */
+  .sl-main,.sl-scroll{padding-left:12px !important;padding-right:12px !important}
+  .sl-sim{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:nowrap}
+  .card{border-radius:11px}
+  select,input[type="text"],input[type="number"],input[type="tel"],input[type="email"]{
+    min-height:44px;font-size:16px}          /* 16px stops iOS zooming on focus */
+  button{min-height:40px}
+}
+@media (max-width:560px){
+  .sl-scroll,.sl-main{padding-left:10px !important;padding-right:10px !important}
+  .figure{font-size:22px !important}
+}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <div class="top">
+    <span class="brand"><span class="s1">shopy</span><span id="brandchain"></span><span class="s2">link</span></span>
+    <span class="tag">Shopping addresses · subscribe → ship to your door · world · to · door</span>
+    <div class="controls">
+      <div class="seg" id="lang"><button data-l="en" class="on">EN</button><button data-l="ar">عربي</button></div>
+      <div class="seg" id="mode"><button data-m="walk" class="on">Walkthrough</button><button data-m="gallery">All states</button></div>
+    </div>
+  </div>
+  <div class="hint" id="hint"></div>
+  <div id="view"></div>
+</div>
+
+<script>
+function slNum(n,dec){
+ // No Intl: the legacy engine may not have it, and toLocaleString drops trailing zeros.
+ var v=Number(n); if(!isFinite(v))v=0;
+ var neg=v<0; v=Math.abs(v);
+ var s2=dec?(Math.round(v*100)/100).toFixed(2):String(Math.round(v));
+ var p=s2.split('.'), whole=p[0], out='', i, c=0;
+ for(i=whole.length-1;i>=0;i--){out=whole.charAt(i)+out;c++;if(c%3===0&&i>0)out=','+out;}
+ return (neg?'-':'')+out+(dec?'.'+p[1]:'');
+}
+
+/* ── ShopyLink icons ────────────────────────────────────────────────
+   One family, one 1.7 stroke, 16px, outline, currentColor. Drawn here because
+   an emoji is rendered by the device, not by us — the same character is a
+   different picture on Android, Windows and iOS, which is how the wrong flag
+   reached a customer. These do not move between machines.                */
+/* ── option sets that grow ──────────────────────────────────────────
+   A row of pressable chips reads well at five and becomes a wall at twenty.
+   slPicker() paints chips while the set is small and switches to a searchable
+   list once it is not — the same control, the same handler, one decision made
+   by the data rather than by the day it was written.                        */
+var SL_CHIP_MAX=7;                 /* above this, chips stop being scannable */
+var SL_PICK_Q={};                  /* the search box per picker, by id */
+function slPickQ(id,v){SL_PICK_Q[id]=v;render();}
+function slPicker(id,items,current,onpick,opts){
+  opts=opts||{};
+  var all=items||[], i, h='';
+  var lbl=function(x){return opts.label?opts.label(x):(x.name||x.label||x.id||String(x));};
+  var val=function(x){return opts.value?opts.value(x):(x.id!==undefined?x.id:String(x));};
+  /* A choice is made from a dropdown, never from the whole set laid out on the page.
+     Five options or five hundred, the control is the same size and the page does not
+     change shape as the business grows. The native select carries its own search on
+     every platform, and our control-geometry rule already gives it a height and an arrow. */
+  h+='<select onchange="if(this.value){'+onpick.replace('{v}',"'+this.value+'")+'}" '
+   +'style="min-width:'+(opts.width||'220px')+';max-width:100%;border:1.5px solid rgba(11,42,59,.15);'
+   +'border-radius:10px;font-family:var(--body);background:#FFFFFF">';
+  if(opts.blank)h+='<option value="">'+opts.blank+'</option>';
+  for(i=0;i<all.length;i++){
+    var v=val(all[i]);
+    h+='<option value="'+String(v).replace(/"/g,'&quot;')+'"'+(v===current?' selected':'')+'>'
+      +String(lbl(all[i])).replace(/<[^>]*>/g,'')+'</option>';
+  }
+  h+='</select>';
+  if(opts.add)h+=' <button onclick="'+opts.add+'" style="cursor:pointer;font-family:var(--body);font-size:var(--fs-hint);font-weight:800;padding:0 14px;height:var(--ctl-h);border-radius:10px;border:1.5px dashed rgba(14,165,233,.55);background:#F4FBFF;color:#0A4A6B">+ '+(opts.addLabel||t('add'))+'</button>';
+  if(opts.count===true)h+=' <span class="hint machine" style="margin-'+(currentLang==='ar'?'right':'left')+':8px">'+all.length+'</span>';
+  return h;
+}
+function slMultiPicker(id,items,isOn,onToggle,opts){
+  opts=opts||{};
+  var all=items||[], q=String(SL_PICK_Q[id]||'').toLowerCase(), i, h='';
+  var lbl=function(x){return opts.label?opts.label(x):(x.name||x.label||String(x));};
+  var val=function(x){return opts.value?opts.value(x):(x.id!==undefined?x.id:String(x));};
+  var chosen=[]; for(i=0;i<all.length;i++){if(isOn(all[i]))chosen.push(all[i]);}
+  var chip=function(x,on){
+    return '<button onclick="'+onToggle.replace('{v}',val(x))+'" style="cursor:pointer;font-family:var(--body);font-size:var(--fs-hint);font-weight:800;'
+     +'padding:7px 13px;border-radius:999px;border:1.5px solid '+(on?'#0A7250':'rgba(11,42,59,.14)')+';'
+     +'background:'+(on?'#DCF5E9':'#FFFFFF')+';color:'+(on?'#0A7250':'#0B2A3B')+'">'+(on?'&#10003; ':'')+lbl(x)+'</button>';
+  };
+  if(all.length<=SL_CHIP_MAX&&!q){
+    h+='<div style="display:flex;gap:6px;flex-wrap:wrap">';
+    for(i=0;i<all.length;i++)h+=chip(all[i],isOn(all[i]));
+    return h+'</div>';
+  }
+  var hits=[]; for(i=0;i<all.length;i++){if(!q||String(lbl(all[i])).toLowerCase().indexOf(q)>-1)hits.push(all[i]);}
+  var shown=hits.slice(0,SL_CHIP_MAX);
+  h+='<div>';
+  if(chosen.length){
+    h+='<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:7px">';
+    for(i=0;i<Math.min(chosen.length,SL_CHIP_MAX);i++)h+=chip(chosen[i],true);
+    if(chosen.length>SL_CHIP_MAX)h+='<span class="hint" style="align-self:center">+'+(chosen.length-SL_CHIP_MAX)+'</span>';
+    h+='</div>';
+  }
+  h+='<input type="text" value="'+String(SL_PICK_Q[id]||'').replace(/"/g,'&quot;')+'" oninput="slPickQ(\''+id+'\',this.value)" '
+   +'placeholder="'+(opts.placeholder||t('search'))+'" style="width:100%;max-width:280px;border:1.5px solid rgba(11,42,59,.15);'
+   +'border-radius:9px;padding:0 11px;font-family:var(--body);font-size:var(--fs-body);background:#FFFFFF">'
+   +'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:7px">';
+  for(i=0;i<shown.length;i++)h+=chip(shown[i],isOn(shown[i]));
+  h+='</div><div class="hint" style="margin-top:5px">'
+   +t('chosen')+' <span class="machine">'+chosen.length+'</span> '+t('of')+' <span class="machine">'+all.length+'</span>'
+   +(hits.length>shown.length?' · '+t('keep typing to narrow it'):'')+'</div></div>';
+  return h;
+}
+
+var SL_ICONS={
+ hub:'<path d="M3 20h18M5 20V9l7-5 7 5v11M9 20v-5h6v5"/>',
+ city:'<path d="M3 21V9l5-3v4l5-3v14"/><path d="M13 21V11l6-3v13"/><path d="M6 12h1M6 15h1M6 18h1M16 12h1M16 15h1M16 18h1"/>',
+ blocked:'<circle cx="12" cy="12" r="8.5"/><path d="M6 6l12 12"/>',
+
+ idcard:'<rect x="2.5" y="5" width="19" height="14" rx="2.4"/><circle cx="8.5" cy="11" r="2.2"/><path d="M5 16.2a3.8 3.8 0 0 1 7 0M14 10h4M14 13.5h4"/>',
+ key:'<circle cx="8" cy="12" r="4"/><path d="M12 12h9M17.5 12v3M20.5 12v2.2"/>',
+ shield:'<path d="M12 3 5 6v6c0 4 3 6.7 7 8 4-1.3 7-4 7-8V6z"/><path d="M9 12l2 2 4-4"/>',
+
+ compass:'<circle cx="12" cy="12" r="9"/><path d="M15.5 8.5 13.5 13.5 8.5 15.5 10.5 10.5z"/>',
+ ruler:'<path d="M3.5 14.5 14.5 3.5l6 6-11 11z"/><path d="M7 11l2 2M10 8l2 2M13 5l2 2"/>',
+ depart:'<path d="M3 20h18"/><path d="M4 14.5 6.5 15 10 11 5.5 5.5l2.5-.5 6 4.5 4.5-1a2 2 0 1 1 .8 3.4L6.5 17z"/>',
+ abacus:'<rect x="3.5" y="3.5" width="17" height="17" rx="2"/><path d="M3.5 9h17M3.5 14.5h17M9 3.5v17M15 3.5v17"/>',
+ folders:'<path d="M3 8h6l2 2h10v9H3z"/><path d="M6 8V5h5l2 2"/>',
+ scroll:'<path d="M6 4h11v14a2.5 2.5 0 0 0 2.5 2.5H8A2.5 2.5 0 0 1 5.5 18V6"/><path d="M9 8h5M9 12h5"/>',
+ tag:'<path d="M11 3H4.5v6.5L14 19l6.5-6.5z"/><circle cx="8" cy="7" r="1.4"/>',
+ people:'<circle cx="9" cy="8" r="3.2"/><path d="M2.5 19a6.5 6.5 0 0 1 13 0"/><path d="M16 5.5a3.2 3.2 0 0 1 0 6M17.5 19a6 6 0 0 0-2-4.4"/>',
+ tools:'<path d="M14.5 6.5a3.5 3.5 0 1 0 4 4L21 13l-8 8-2.5-2.5"/><path d="M9 4 4 9l3.5 3.5L12.5 7.5z"/>',
+ bank:'<path d="M3 9.5 12 4l9 5.5"/><path d="M5 9.5V19M9.5 9.5V19M14.5 9.5V19M19 9.5V19M3 19h18"/>',
+ clipboard:'<rect x="5" y="4.5" width="14" height="16" rx="2"/><path d="M9 4.5V3h6v1.5"/><path d="M9 10h6M9 14h6"/>',
+ export:'<path d="M12 3v11M8 7l4-4 4 4"/><path d="M4 15v4h16v-4"/>',
+ gift:'<rect x="3" y="9" width="18" height="11" rx="1.6"/><path d="M3 13h18M12 9v11"/><path d="M12 9C10 5.5 6 6 6 8.2 6 9.4 8 9 12 9zM12 9c2-3.5 6-3 6-.8 0 1.2-2 .8-6 .8z"/>',
+ home:'<path d="M3.5 11 12 4l8.5 7"/><path d="M6 10.5V20h12v-9.5"/><path d="M10 20v-5h4v5"/>',
+ flask:'<path d="M10 3v6L4.5 18.5A2 2 0 0 0 6.3 21.5h11.4a2 2 0 0 0 1.8-3L14 9V3"/><path d="M9 3h6M7.5 15h9"/>',
+ trophy:'<path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4.5v1.5A3 3 0 0 0 7 10.4M17 6h2.5v1.5A3 3 0 0 1 17 10.4"/><path d="M12 14v3M8.5 20h7"/>',
+
+ plane:'<path d="M2.5 13.5 21 5l-4 9 4 9-18.5-8.5" /><path d="M8 11.6 8 6"/>',
+ ship:'<path d="M3 17.5c1.6 1 3.2 1 4.8 0s3.2-1 4.8 0 3.2 1 4.8 0 3.2-1 4.8 0"/><path d="M5 14l1.4-5h11.2L19 14"/><path d="M12 4v5"/>',
+ truck:'<path d="M2 16V6h11v10"/><path d="M13 9h4l4 4v3h-8"/><circle cx="6.5" cy="17.5" r="1.8"/><circle cx="17.5" cy="17.5" r="1.8"/>',
+ box:'<path d="M12 3 3 7.5V17l9 4.5 9-4.5V7.5z"/><path d="M3 7.5 12 12l9-4.5M12 12v9.5"/>',
+ pin:'<path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.6"/>',
+ person:'<circle cx="12" cy="8" r="3.6"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/>',
+ handshake:'<path d="M3 12.5 7 8.5l3 2.5 3-2.5 4 4"/><path d="M10 15.5 12 17.5l2-2 2 2"/><path d="M2 9.5 5.5 6M22 9.5 18.5 6"/>',
+ lock:'<rect x="4.5" y="10.5" width="15" height="9.5" rx="2.2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/>',
+ search:'<circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/>',
+ card:'<rect x="2.5" y="5" width="19" height="14" rx="2.6"/><path d="M2.5 10h19"/>',
+ camera:'<rect x="2.5" y="7" width="19" height="13" rx="2.4"/><circle cx="12" cy="13.5" r="4"/><path d="M8.5 7l1.5-3h4l1.5 3"/>',
+ globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.2 3 14.8 0 18M12 3c-3 3.2-3 14.8 0 18"/>',
+ bolt:'<path d="M13.5 2 5 13.5h6L10.5 22 19 10.5h-6z"/>',
+ scale:'<path d="M12 4v16M6 20h12M12 6 4 10M12 6l8 4"/><path d="M1.5 10.5a2.5 2.5 0 0 0 5 0M17.5 10.5a2.5 2.5 0 0 0 5 0"/>',
+ customs:'<rect x="3" y="9" width="18" height="11" rx="1.8"/><path d="M3 13h18M8 9V5h8v4"/>',
+ factory:'<path d="M3 20V11l5 3V11l5 3V6h8v14z"/><path d="M17 11v3M20 11v3"/>',
+ map:'<path d="M9 4 3 6.5v13L9 17l6 2.5 6-2.5v-13L15 6.5z"/><path d="M9 4v13M15 6.5v13"/>',
+ bell:'<path d="M6 9a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6z"/><path d="M10 19.5a2.2 2.2 0 0 0 4 0"/>',
+ clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5.4l3.4 2"/>',
+ doc:'<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/>',
+ chat:'<path d="M4 5h16v11H9l-5 4z"/>',
+ gear:'<circle cx="12" cy="12" r="3.2"/><path d="M12 3v2.4M12 18.6V21M3 12h2.4M18.6 12H21M5.6 5.6l1.7 1.7M16.7 16.7l1.7 1.7M18.4 5.6l-1.7 1.7M7.3 16.7l-1.7 1.7"/>',
+ palm:'<path d="M12 21V11"/><path d="M12 11c-3-3-6-2.5-8-1 1.5-4 5.5-5 8-2 2.5-3 6.5-2 8 2-2-1.5-5-2-8 1z"/>',
+ flag:'<path d="M6 21V4M6 4h11l-2.2 3.5L17 11H6"/>',
+ printer:'<path d="M7 9V3h10v6"/><rect x="3.5" y="9" width="17" height="7" rx="1.8"/><path d="M7 14h10v7H7z"/>'
+};
+function slIcon(name,size,stroke){
+ var p=SL_ICONS[name];
+ if(!p)return '';
+ var s=size||16;
+ return '<svg viewBox="0 0 24 24" width="'+s+'" height="'+s+'" fill="none" stroke="currentColor" '
+  +'stroke-width="'+(stroke||1.7)+'" stroke-linecap="round" stroke-linejoin="round" '
+  +'style="vertical-align:-0.18em;flex-shrink:0" aria-hidden="true">'+p+'</svg>';
+}
+
+if(!Array.prototype.find){Array.prototype.find=function(fn,th){for(var i=0;i<this.length;i++){if(fn.call(th,this[i],i,this))return this[i];}return undefined;};}
+if(!Array.prototype.findIndex){Array.prototype.findIndex=function(fn,th){for(var i=0;i<this.length;i++){if(fn.call(th,this[i],i,this))return i;}return -1;};}
+function _slicedToArray(r, e) { return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest(); }
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(r, a) { if (r) { if ("string" == typeof r) return _arrayLikeToArray(r, a); var t = {}.toString.call(r).slice(8, -1); return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0; } }
+function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length); for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e]; return n; }
+function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t.return && (u = t.return(), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
+function _arrayWithHoles(r) { if (Array.isArray(r)) return r; }
+var fmt = function fmt(n) {
+  return slNum(n,0);
+};
+/* ── Brand chain mark (interlocking rings) ── */
+var _wm = 0;
+function chain(size, a, b) {
+  var id = 'c' + _wm++;
+  var w = size * 1.55;
+  return "<svg width=\"".concat(w, "\" height=\"").concat(size, "\" viewBox=\"0 0 124 80\" aria-hidden=\"true\">\n    <defs><clipPath id=\"").concat(id, "\"><rect x=\"50\" y=\"44\" width=\"24\" height=\"22\"/></clipPath></defs>\n    <rect x=\"6\" y=\"20\" rx=\"20\" ry=\"20\" width=\"68\" height=\"40\" fill=\"none\" stroke=\"").concat(a, "\" stroke-width=\"9\"/>\n    <rect x=\"50\" y=\"20\" rx=\"20\" ry=\"20\" width=\"68\" height=\"40\" fill=\"none\" stroke=\"").concat(b, "\" stroke-width=\"9\"/>\n    <g clip-path=\"url(#").concat(id, ")\"><rect x=\"6\" y=\"20\" rx=\"20\" ry=\"20\" width=\"68\" height=\"40\" fill=\"none\" stroke=\"").concat(a, "\" stroke-width=\"9\"/></g>\n  </svg>");
+}
+// Forwarding origins we sell addresses in. price = ADDRESS FEE only (SYP). Shipping billed per shipment, separately.
+/* ── the centres are published now; this screen reads them ────────────
+   These four records — the address a customer is given, and what he pays to own
+   it — lived here and were shown to him from here, while the panel that manages
+   them lives in C7. Two copies of one fact: the first fee changed in the panel
+   and this screen would have gone on quoting the old one to the customer whose
+   money it is. The panel owns them; this reads.
+   The rows below stay as the fallback for the gallery when nothing is published. */
+function slCentres() {
+  try {
+    var r = window.localStorage.getItem('SL_CENTRES_V1');
+    if (!r) return null;
+    var o = JSON.parse(r);
+    var l = (o && o.centres) || [];
+    l = l.filter(function (c) { return c.retail && c.status !== 'closed'; });
+    return l.length ? l : null;
+  } catch (e) { return null; }
+}
+var ISO2CODE = { 'US': 'USA', 'AE': 'UAE', 'TR': 'Turkey', 'CN': 'China', 'JO': 'Jordan' };
+var ISO2AR = { 'US': 'أمريكا', 'AE': 'الإمارات', 'TR': 'تركيا', 'CN': 'الصين', 'JO': 'الأردن' };
+var ISO2FLAG = { 'US': '🇺🇸', 'AE': '🇦🇪', 'TR': '🇹🇷', 'CN': '🇨🇳', 'JO': '🇯🇴' };
+function liveCountries() {
+  var cs = slCentres();
+  if (!cs) return COUNTRIES_SEED;
+  return cs.map(function (c) {
+    var code = ISO2CODE[c.country] || c.country, seed = null;
+    COUNTRIES_SEED.forEach(function (x) { if (x.code === code) seed = x; });
+    return {
+      code: code, rate: seed ? seed.rate : 0,
+      flag: ISO2FLAG[c.country] || (seed ? seed.flag : ''),
+      ar: ISO2AR[c.country] || (seed ? seed.ar : code),
+      lines: c.lines.slice(), plans: c.plans.slice(), centre: c.id
+    };
+  });
+}
+function livePlans() {
+  /* the fee comes from the centre the customer is buying his address in, and
+     every centre may price its own — where they agree this reads as before, and
+     where they differ it is no longer a lie. */
+  var cs = slCentres();
+  if (!cs) return PLANS_SEED;
+  var code = (typeof st !== 'undefined' && st.country) ? st.country : null, hit = null;
+  cs.forEach(function (c) { if (!hit && (ISO2CODE[c.country] || c.country) === code) hit = c; });
+  if (!hit) hit = cs[0];
+  return (hit && hit.plans && hit.plans.length) ? hit.plans : PLANS_SEED;
+}
+var COUNTRIES_SEED = [{
+  code: 'USA',
+  rate: 95,
+  flag: '🇺🇸',
+  ar: 'أمريكا',
+  lines: ['ShopyLink Fulfillment — Suite SL', '1208 Cross Beam Drive', 'Charlotte, NC 28217', 'United States']
+}, {
+  code: 'UAE',
+  rate: 70,
+  flag: '🇦🇪',
+  ar: 'الإمارات',
+  lines: ['ShopyLink Logistics — Bay SL', 'Warehouse 7, Al Quoz Ind. 3', 'Dubai', 'United Arab Emirates']
+}, {
+  code: 'Turkey',
+  rate: 55,
+  flag: '🇹🇷',
+  ar: 'تركيا',
+  lines: ['ShopyLink Lojistik — Depo SL', 'Merkez Mah. 1428. Sk No:5', 'Bağcılar, İstanbul', 'Türkiye']
+}, {
+  code: 'China',
+  rate: 60,
+  flag: '🇨🇳',
+  ar: 'الصين',
+  lines: ['ShopyLink Warehouse — Unit SL', 'Bldg 3, Bao’an District', 'Shenzhen, Guangdong', 'China']
+}];
+// address-fee plans (SYP). per_shipment = one shipment then renew; monthly/annual = unlimited shipments in the period.
+var PLANS_SEED = [{
+  id: 'per_shipment',
+  price: 75000
+}, {
+  id: 'monthly',
+  price: 250000
+}, {
+  id: 'annual',
+  price: 2400000
+}];
+/* ── pricing model v3 (mirrored from the Pricing dashboard) ──
+   the plan price is the MAIN-HUB price plus the customer's governorate extra;
+   door-to-door is inside it, and shipping stays billed by weight, separately. */
+var GOVX = {
+  'Damascus': 0,
+  'Rural Damascus': 6000,
+  'Aleppo': 15000,
+  'Homs': 9000,
+  'Hama': 12000,
+  'Latakia': 16000,
+  'Tartus': 16000,
+  'Daraa': 11000,
+  'Deir ez-Zor': 34000,
+  'Idlib': 21000
+};
+var MY_GOV = 'Aleppo'; // captured at registration (name · phone · governorate)
+function govExtra() {
+  return GOVX[MY_GOV] || 0;
+}
+function planTotal(p) {
+  if (!p) return 0;
+  return p.id === 'annual' ? p.price + govExtra() * 10 : p.price + govExtra();
+}
+function planById(id) {
+  return livePlans().find(function (p) {
+    return p.id === id;
+  });
+}
+function planTotalById(id) {
+  return planTotal(planById(id));
+}
+function govLine(lang) {
+  var x = govExtra();
+  if (!x) return lang === 'ar' ? 'التوصيل من الباب إلى الباب إلى ' + MY_GOV + ' مشمول — وهي المركز الرئيسي، بلا زيادة.' : 'Door-to-door to ' + MY_GOV + ' is included — the main hub, no extra.';
+  return lang === 'ar' ? 'يشمل ' + slNum(x,0) + ' ل.س فرق التوصيل إلى ' + MY_GOV + ' عن دمشق · والتوصيل نفسه مشمول.' : 'includes ' + slNum(x,0) + ' SYP for delivery to ' + MY_GOV + ' over Damascus · the delivery itself is included.';
+}
+var RECIPIENT = 'Layla Al-Rifai'; // = the customer's full name from registration (match key)
+// mock existing subscriptions for the "my addresses" + "already active" states
+var MINE = {
+  USA: {
+    type: 'annual',
+    until: '16 Jun 2027',
+    status: 'active'
+  },
+  UAE: {
+    type: 'per_shipment',
+    ended: '02 May 2026',
+    status: 'expired'
+  },
+  Turkey: {
+    type: 'monthly',
+    ended: '10 Jun 2026',
+    status: 'expired'
+  }
+};
+var T = {
+  en: {
+    tag: 'Shopping addresses',
+    c_h: 'Shop the world, like a local',
+    c_s: 'Pick a country and we’ll hand you a real local address. Your parcels land there — then we whisk them to your door in Syria.',
+    chooseCountry: 'Pick your shopping country',
+    mine: 'My addresses',
+    activeBadge: 'Yours',
+    offline: "You're offline — we'll reconnect the second you're back.",
+    yourAddr: 'Your shopping address',
+    useName: 'Shop with this exact name — it’s how every parcel finds its way to you.',
+    copy: 'Copy address',
+    copied: 'Copied!',
+    nameTaken: 'Someone beat you to that name! Pop a middle name in, or a letter between your first and last.',
+    addYourName: 'Add your name here',
+    parcelsAt: "We'll catch your parcels here",
+    nameIdentity: 'This name is your identity in every country — yours alone. Shop with it exactly so every parcel finds you.',
+    editName: 'Ship-to name',
+    nameInvalid: 'We need your full name — first and last, letters only please.',
+    namePh: 'e.g. Layla Hadi Al-Rifai',
+    feeOnly: function feeOnly(r) {
+      return "Your parcels ship home at ".concat(r, " SYP / kg \u2014 added automatically per shipment. The address fee below is separate.");
+    },
+    previewShip: function previewShip(c, r) {
+      return "Parcels arriving here are forwarded to your door in Syria automatically \u2014 shipping is just ".concat(r, " SYP / kg, billed per shipment.");
+    },
+    choosePlan: 'Pick your plan',
+    plan: {
+      per_shipment: {
+        t: 'Per shipment',
+        n: 'One trip home, then renew.',
+        per: '/ shipment'
+      },
+      monthly: {
+        t: 'Monthly',
+        n: 'Ship as much as you like for 30 days.',
+        per: '/ month'
+      },
+      annual: {
+        t: 'Annual',
+        n: 'Unlimited shipping, all year long.',
+        per: '/ year',
+        badge: 'Best value'
+      }
+    },
+    haveActive: function haveActive(c) {
+      return "Good news \u2014 your ".concat(c, " address is already yours! \uD83C\uDF89");
+    },
+    manage: 'Manage',
+    subscribe: 'Get my address',
+    pay_h: 'Confirm & pay',
+    summary: 'Summary',
+    addressFee: 'Address fee',
+    total: 'Total',
+    method: 'Pay with',
+    m_sham: 'ShamCash',
+    m_pay: 'Paymera',
+    m_bank: 'Bank transfer',
+    payNow: function payNow(s) {
+      return "Pay ".concat(s, " SYP");
+    },
+    declined: "That payment didn't go through. Give it another go, or try a different method.",
+    failed: "We couldn't confirm that one — and you weren't charged. Mind trying again?",
+    processing: 'Confirming your payment…',
+    processingSub: 'Hang tight — just a few seconds.',
+    ready_h: function ready_h(c) {
+      return "Your ".concat(c, " address is live! \uD83C\uDF89");
+    },
+    ready_s: 'Use it at checkout wherever you shop there. We’ll catch your parcels and ping you the moment they land.',
+    next: 'Shipping home to Syria is billed per parcel — separate from your address fee.',
+    st_active: function st_active(d) {
+      return "Active until ".concat(d);
+    },
+    st_oneship: 'Active · 1 shipment',
+    st_used: 'Used up · renew to receive again',
+    st_suspended: 'Suspended · renew',
+    st_expired: function st_expired(d) {
+      return "Ended ".concat(d, " \xB7 buy again");
+    },
+    endedOn: function endedOn(d) {
+      return "Your subscription ended on ".concat(d, ". Pick a plan below to start a new one.");
+    },
+    choosePlanRenew: 'Choose a plan to reactivate',
+    renewNow: 'Renew now',
+    done: 'Done',
+    myAddr: 'My addresses',
+    mine_h: 'My addresses',
+    mine_s: 'Every address you’ve claimed, and how each one’s doing.',
+    renew: 'Renew',
+    view: 'View',
+    empty: 'No addresses yet',
+    emptySub: 'Pick a country above and your first shopping address is moments away.',
+    back: 'Back'
+  },
+  ar: {
+    tag: 'عناوين التسوّق',
+    c_h: 'تسوق من كل العالم كأنك في كل مكان',
+    c_s: 'اختر دولة ونعطيك عنوانًا محليًا حقيقيًا. تصل طرودك إليه — ثم نوصلها إلى باب بيتك في سوريا.',
+    chooseCountry: 'اختر دولة التسوق',
+    mine: 'عناويني',
+    activeBadge: 'مملوك',
+    offline: 'أنت غير متصل — سنعود للاتصال فور رجوعك.',
+    yourAddr: 'عنوان تسوّقك',
+    useName: 'تسوّق بهذا الاسم تمامًا — به يجد كل طرد طريقه إليك.',
+    copy: 'نسخ العنوان',
+    copied: 'تم النسخ!',
+    nameTaken: 'سبقك أحدهم إلى هذا الاسم! أضف اسمًا أوسط، أو حرفًا بين اسمك الأول والأخير.',
+    addYourName: 'أضف اسمك هنا',
+    parcelsAt: 'تسوق من اي مكان و أضف الأسم و العنوان التالي عند الشراء<br>إجعله عنوانك الإفتراضي',
+    nameIdentity: 'هذا الاسم هو هويّتك — استخدم الأسم كما هو حرفيا كي يجدك كل طرد.',
+    editName: 'اسم المستلم',
+    nameInvalid: 'نحتاج اسمك الكامل — الاسم الأول والأخير، أحرف فقط من فضلك.',
+    namePh: 'مثال: ليلى هادي الرفاعي',
+    feeOnly: function feeOnly(r) {
+      return "\u062A\u064F\u0634\u062D\u0646 \u0637\u0631\u0648\u062F\u0643 \u0625\u0644\u0649 \u0627\u0644\u0628\u064A\u062A \u0628\u0633\u0639\u0631 ".concat(r, " \u0644.\u0633/\u0643\u063A \u2014 \u064A\u064F\u0636\u0627\u0641 \u062A\u0644\u0642\u0627\u0626\u064A\u064B\u0651\u0627 \u0644\u0643\u0644 \u0634\u062D\u0646\u0629\u060C \u0648\u0631\u0633\u0645 \u0627\u0644\u0639\u0646\u0648\u0627\u0646 \u0623\u062F\u0646\u0627\u0647 \u0645\u0646\u0641\u0635\u0644.");
+    },
+    previewShip: function previewShip(c, r) {
+      return "\u0627\u0644\u0637\u0631\u0648\u062F \u0627\u0644\u062A\u064A \u062A\u0635\u0644 \u0647\u0646\u0627 \u062A\u064F\u0639\u0627\u062F \u062A\u0644\u0642\u0627\u0626\u064A\u064B\u0651\u0627 \u0625\u0644\u0649 \u0628\u0627\u0628\u0643 \u0641\u064A \u0633\u0648\u0631\u064A\u0627 \u2014 \u0627\u0644\u0634\u062D\u0646 ".concat(r, " \u0644.\u0633/\u0643\u063A \u0641\u0642\u0637\u060C \u064A\u064F\u062D\u062A\u0633\u0628 \u0644\u0643\u0644 \u0634\u062D\u0646\u0629.");
+    },
+    choosePlan: 'اختر خطتك',
+    plan: {
+      per_shipment: {
+        t: 'لكل شحنة',
+        n: 'رحلة واحدة إلى البيت، ثم يُجدَّد.',
+        per: '/ شحنة'
+      },
+      monthly: {
+        t: 'شهري',
+        n: 'اشحن كما تشاء لمدة ٣٠ يومًا.',
+        per: '/ شهر'
+      },
+      annual: {
+        t: 'سنوي',
+        n: 'شحن غير محدود طوال السنة.',
+        per: '/ سنة',
+        badge: 'الأوفر'
+      }
+    },
+    haveActive: function haveActive(c) {
+      return "\u0628\u0634\u0631\u0649 \u0633\u0627\u0631\u0651\u0629 \u2014 \u0639\u0646\u0648\u0627\u0646 ".concat(c, " \u0627\u0644\u062A\u0633\u0648\u0642 \u0647\u0646\u0627 \u0641\u0639\u0627\u0644! \uD83C\uDF89");
+    },
+    manage: 'إدارة',
+    subscribe: 'احصل على عنواني',
+    pay_h: 'التأكيد والدفع',
+    summary: 'الملخّص',
+    addressFee: 'رسم العنوان',
+    total: 'الإجمالي',
+    method: 'ادفع عبر',
+    m_sham: 'شام كاش',
+    m_pay: 'Paymera',
+    m_bank: 'تحويل بنكي',
+    payNow: function payNow(s) {
+      return "\u0627\u062F\u0641\u0639 ".concat(s, " \u0644.\u0633");
+    },
+    declined: 'لم تنجح هذه الدفعة. جرّب مرة أخرى، أو استخدم طريقة مختلفة.',
+    failed: 'تعذّر تأكيد هذه الدفعة — ولم يُخصم منك شيء. هلّا حاولت مجددًا؟',
+    processing: 'جارٍ تأكيد دفعتك…',
+    processingSub: 'لحظة من فضلك — ثوانٍ قليلة.',
+    ready_h: function ready_h(c) {
+      return "\u0639\u0646\u0648\u0627\u0646 ".concat(c, " \u0635\u0627\u0631 \u062C\u0627\u0647\u0632\u064B\u0627! \uD83C\uDF89");
+    },
+    ready_s: 'استخدمه عند الدفع أينما تسوّقت هناك. سنستقبل طرودك ونُعلمك فور وصولها.',
+    next: 'الشحن إلى البيت في سوريا يُحتسب لكل طرد — منفصلًا عن رسم العنوان.',
+    st_active: function st_active(d) {
+      return "\u0641\u0639\u0651\u0627\u0644 \u062D\u062A\u0649 ".concat(d);
+    },
+    st_oneship: 'فعّال · شحنة واحدة',
+    st_used: 'استُخدِم · جدّد للاستقبال مجددًا',
+    st_suspended: 'مُعلّق · جدّد',
+    st_expired: function st_expired(d) {
+      return "\u0627\u0646\u062A\u0647\u0649 \u0641\u064A ".concat(d, " \xB7 \u0627\u0634\u062A\u0631\u0650 \u0645\u0646 \u062C\u062F\u064A\u062F");
+    },
+    endedOn: function endedOn(d) {
+      return "\u0627\u0646\u062A\u0647\u0649 \u0627\u0634\u062A\u0631\u0627\u0643\u0643 \u0641\u064A ".concat(d, ". \u0627\u062E\u062A\u0631 \u0628\u0627\u0642\u0629 \u0628\u0627\u0644\u0623\u0633\u0641\u0644 \u0644\u0628\u062F\u0621 \u0627\u0634\u062A\u0631\u0627\u0643 \u062C\u062F\u064A\u062F.");
+    },
+    choosePlanRenew: 'اختر باقة لإعادة التفعيل',
+    renewNow: 'جدِّد الآن',
+    done: 'تم',
+    myAddr: 'عناويني',
+    mine_h: 'عناويني',
+    mine_s: 'كل عنوان حصلت عليه، وحالة كلٍّ منها.',
+    renew: 'تجديد',
+    view: 'عرض',
+    empty: 'لا عناوين بعد',
+    emptySub: 'اختر دولة بالأعلى وعنوان تسوّقك الأول على بُعد لحظات.',
+    back: 'رجوع'
+  }
+};
+var st = {
+  lang: 'en',
+  mode: 'walk',
+  step: 1,
+  variant: 'default',
+  country: null,
+  plan: null,
+  method: 0,
+  from: null
+};
+var ic = {
+  back: '<svg width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M6 1L1 6l5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  backR: '<svg width="7" height="12" viewBox="0 0 7 12" fill="none"><path d="M1 1l5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  warn: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 9v4M12 17h.01M10.3 3.9 2.4 18a2 2 0 001.7 3h15.8a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  pin: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M12 21s7-5.6 7-11a7 7 0 10-14 0c0 5.4 7 11 7 11z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="10" r="2.4" stroke="currentColor" stroke-width="2"/></svg>',
+  copy: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="9" y="9" width="11" height="11" rx="2" stroke="currentColor" stroke-width="2"/><path d="M5 15V5a2 2 0 012-2h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+  check: '<svg width="36" height="36" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  off: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M1 1l22 22M16.7 11.1a6 6 0 00-2-1.4M5 12.5A10 10 0 018 11M8.5 16a5 5 0 015-1M12 20h.01" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>'
+};
+function sb() {
+  return "<div class=\"sb\"><span>9:41</span><span>\u25CF\u25CF\u25CF \u25AE</span></div>";
+}
+function backBtn(t) {
+  return "<button class=\"backchip\">".concat(st.lang === 'ar' ? ic.backR : ic.back).concat(t.back, "</button>");
+}
+function planPrice(id) {
+  return planTotalById(id);
+} /* legacy name → now the governorate-aware total */
+
+function addrCardHTML(co, lang, lift, opts) {
+  opts = opts || {};
+  var t = T[lang];
+  var lines = co.lines.map(function (l) {
+    return "<div class=\"aline\">".concat(l, "</div>");
+  }).join('');
+  var label = lang === 'ar' ? 'عنوان التسوّق' : 'your shopping address';
+  if (opts.editable) {
+    return "<div class=\"addrcard ".concat(lift ? 'lift' : '', "\">\n      <div class=\"albl\">").concat(ic.pin).concat(label, "</div>\n      <div class=\"nlabel\">").concat(t.addYourName, "</div>\n      <input class=\"nameinput ").concat(opts.conflict || opts.error ? 'bad' : '', "\" id=\"shipname\" value=\"").concat(opts.nameValue || RECIPIENT, "\" placeholder=\"").concat(t.addYourName, "\">\n      ").concat(opts.conflict ? "<div class=\"err\">".concat(ic.warn).concat(t.nameTaken, "</div>") : '', "\n      ").concat(opts.error ? "<div class=\"err\">".concat(ic.warn).concat(opts.error, "</div>") : '', "\n      ").concat(opts.suggestion && (opts.conflict || opts.error) ? "<button class=\"suggestchip\" data-name=\"".concat(opts.suggestion, "\">").concat(lang === 'ar' ? 'استخدم: ' : 'Use: ').concat(opts.suggestion, "</button>") : '', "\n      <div class=\"ahint\">").concat(t.nameIdentity, "</div>\n      <div class=\"adiv\"></div>\n      <div class=\"alines-label\">").concat(t.parcelsAt, "</div>\n      ").concat(lines, "\n    </div>");
+  }
+  return "<div class=\"addrcard ".concat(lift ? 'lift' : '', "\">\n    <div class=\"albl\">").concat(ic.pin).concat(label, "</div>\n    <div class=\"aname\">").concat(RECIPIENT, "</div>\n    <div class=\"ahint\">").concat(t.useName, "</div>\n    ").concat(lines, "\n    ").concat(opts.noCopy ? '' : "<button class=\"acopy\">".concat(ic.copy).concat(t.copy, "</button>"), "\n  </div>");
+}
+function statusChip(lang, info) {
+  var t = T[lang];
+  if (info.status === 'expired') return "<span class=\"schip bad\"><span class=\"dotc\"></span>".concat(t.st_expired(info.ended || '—'), "</span>");
+  if (info.type === 'per_shipment' && (info.status === 'new' || info.status === 'active')) return "<span class=\"schip ok\"><span class=\"dotc\"></span>".concat(t.st_oneship, "</span>");
+  return "<span class=\"schip ok\"><span class=\"dotc\"></span>".concat(t.st_active(info.until || '—'), "</span>");
+}
+function body(step, variant, lang) {
+  var t = T[lang],
+    off = variant === 'offline';
+  var offBar = off ? "<div class=\"offline\">".concat(ic.off).concat(t.offline, "</div>") : '';
+  var co = liveCountries().find(function (c) {
+    return c.code === st.country;
+  }) || liveCountries()[0];
+  var cName = lang === 'ar' ? co.ar : st.country;
+  var inner = '',
+    foot = '';
+  if (step === 1) {
+    // choose country
+    var anyMine = Object.keys(MINE).length > 0;
+    var tiles = liveCountries().map(function (c) {
+      var badge = MINE[c.code] && MINE[c.code].status === 'active' ? "<div class=\"ab\">".concat(t.activeBadge, "</div>") : '';
+      return "<div class=\"ctile\" data-c=\"".concat(c.code, "\">").concat(badge, "<div class=\"fl\">").concat(c.flag, "</div><div class=\"cn\">").concat(lang === 'ar' ? c.ar : c.code, "</div><div class=\"ex\">").concat(lang === 'ar' ? 'عنوان محلي + شحن لسوريا' : 'Local address + shipping to Syria', "</div></div>");
+    }).join('');
+    inner = "<div class=\"toprow\">".concat(backBtn(t)).concat(anyMine ? "<button class=\"toplink\" data-go=\"mine\">".concat(t.mine, " \u203A</button>") : '', "</div>\n      <div class=\"eyebrow\">").concat(t.tag, "</div><h1 class=\"disp\">").concat(t.c_h, "</h1><p class=\"sub\">").concat(t.c_s, "</p>\n      <div class=\"seclabel\">").concat(t.chooseCountry, "</div>\n      <div class=\"grid2\">").concat(tiles, "</div>");
+    foot = '';
+  } else if (step === 2) {
+    // address + subscription plans
+    var sel = variant === 'selected' ? 'annual' : st.plan;
+    var opts = livePlans().map(function (p) {
+      var pl = t.plan[p.id];
+      return "<div class=\"planopt ".concat(sel === p.id ? 'on' : '', "\" data-p=\"").concat(p.id, "\">\n        <div class=\"rad\"></div>\n        <div class=\"pmain\"><div class=\"pt\">").concat(pl.t, "</div><div class=\"pnote\">").concat(pl.n, "</div>").concat(pl.badge ? "<span class=\"badge2\">".concat(pl.badge, "</span>") : '', "</div>\n        <div class=\"pprice\">").concat(fmt(planTotal(p)), " SYP<span class=\"pper\">").concat(pl.per, "</span></div>\n      </div>");
+    }).join('') + "<div style=\"margin-top:8px;font-size:11.5px;color:#62707A;font-weight:600\">\uD83D\uDCE6 " + govLine(lang) + "</div>";
+    {
+      var taken = variant === 'nametaken';
+      var invalid = variant === 'invalidname';
+      var expired = variant === 'expired';
+      var _m = MINE[st.country] || {};
+      inner = "".concat(backBtn(t), "<div class=\"eyebrow\">").concat(cName, "</div><h1 class=\"disp\">").concat(cName, "</h1>\n        ").concat(expired ? "<div class=\"banner warn\">".concat(ic.warn).concat(t.endedOn(_m.ended || '10 Jun 2026'), "</div>") : '', "\n        <div class=\"seclabel\">").concat(t.yourAddr, "</div>\n        ").concat(expired ? addrCardHTML(co, lang, true, {
+        noCopy: true
+      }) : addrCardHTML(co, lang, false, {
+        editable: true,
+        conflict: taken,
+        error: invalid ? t.nameInvalid : '',
+        nameValue: taken ? 'Layla Al-Rifai' : invalid ? 'Layla 99' : RECIPIENT,
+        suggestion: taken ? 'Layla H. Al-Rifai' : 'Layla Hadi Al-Rifai',
+        noCopy: true
+      }), "\n        <div class=\"seclabel\">").concat(expired ? t.choosePlanRenew : t.choosePlan, "</div>\n        ").concat(opts, "\n        <div class=\"banner warn\">").concat(ic.warn).concat(t.feeOnly(co.rate), "</div>");
+      foot = "<button class=\"btn ".concat(variant === 'load' ? 'load' : '', "\" ").concat((expired ? sel : sel && !taken && !invalid) ? '' : 'disabled', " data-go=\"pay\">").concat(expired ? t.renewNow : t.subscribe, "</button>");
+    }
+  } else if (step === 3) {
+    // pay
+    var _sel = st.plan || 'annual';
+    var price = planPrice(_sel);
+    var pl = t.plan[_sel];
+    var methods = [t.m_sham, t.m_pay, t.m_bank];
+    var bad = variant === 'declined',
+      fail = variant === 'failed';
+    var pm = methods.map(function (m, i) {
+      return "<div class=\"pmethod ".concat(i === st.method ? 'on' : '', "\" data-m=\"").concat(i, "\"><div class=\"ico\">").concat(m[0], "</div><div class=\"nm\">").concat(m, "</div><div class=\"rad\"></div></div>");
+    }).join('');
+    inner = "".concat(backBtn(t), "<div class=\"eyebrow\">").concat(t.pay_h, "</div><h1 class=\"disp\">").concat(t.pay_h, "</h1>\n      ").concat(bad ? "<div class=\"banner bad\">".concat(ic.warn).concat(t.declined, "</div>") : '').concat(fail ? "<div class=\"banner bad\">".concat(ic.warn).concat(t.failed, "</div>") : '', "\n      <div class=\"sumrow\"><span class=\"k\">").concat(cName, " \xB7 ").concat(pl.t, " \u2014 ").concat(t.addressFee, "</span><span class=\"v\">").concat(fmt(price), " SYP</span></div>\n      <div class=\"sumtot\"><span class=\"k\">").concat(t.total, "</span><span class=\"v\">").concat(fmt(price), " SYP</span></div>\n      <div class=\"banner warn\" style=\"margin-top:12px\">").concat(ic.warn).concat(t.feeOnly(co.rate), "</div>\n      <div class=\"seclabel\">").concat(t.method, "</div>").concat(pm);
+    foot = "<button class=\"btn ".concat(variant === 'load' ? 'load' : '', "\" data-go=\"ready\">").concat(t.payNow(fmt(price)), "</button>");
+  } else if (step === 4) {
+    // ready (post-purchase) OR view (from my addresses)
+    if (variant === 'processing') {
+      inner = "<div class=\"center\"><div class=\"spinbig\"></div><div class=\"h2\">".concat(t.processing, "</div><p class=\"ptext\">").concat(t.processingSub, "</p></div>");
+      foot = '';
+      return {
+        offBar: offBar,
+        inner: inner,
+        foot: foot
+      };
+    }
+    var isView = variant === 'view';
+    var _sel2 = variant === 'pershipment' ? 'per_shipment' : st.plan || 'annual';
+    var info = isView ? MINE[st.country] || {
+      type: _sel2,
+      status: 'active',
+      until: '16 Jun 2027'
+    } : _sel2 === 'per_shipment' ? {
+      type: 'per_shipment',
+      status: 'new'
+    } : {
+      type: _sel2,
+      status: 'active',
+      until: _sel2 === 'annual' ? '16 Jun 2027' : '16 Jul 2026'
+    };
+    if (isView) {
+      var head = lang === 'ar' ? "\u0639\u0646\u0648\u0627\u0646 ".concat(cName) : "".concat(cName, " address");
+      inner = "".concat(backBtn(t), "<div class=\"eyebrow\">").concat(t.myAddr, "</div><h1 class=\"disp\">").concat(head, "</h1>\n        <div style=\"margin:2px 0 14px\">").concat(statusChip(lang, info), "</div>\n        ").concat(addrCardHTML(co, lang, true), "\n        <div class=\"banner info\" style=\"margin-top:14px\">").concat(ic.pin).concat(t.next, "</div>\n        <div class=\"banner warn\" style=\"margin-top:10px\">").concat(ic.warn).concat(t.previewShip(cName, co.rate), "</div>");
+      foot = "<button class=\"btn\" data-go=\"mine\">".concat(t.myAddr, "</button>");
+    } else {
+      inner = "<div style=\"display:flex;flex-direction:column;align-items:center;text-align:center;padding-top:6px\">\n          <div class=\"check\">".concat(ic.check, "</div>\n          <div class=\"h2\">").concat(t.ready_h(cName), "</div><p class=\"ptext\" style=\"max-width:280px\">").concat(t.ready_s, "</p>\n          <div style=\"margin:6px 0 14px\">").concat(statusChip(lang, info), "</div></div>\n        ").concat(addrCardHTML(co, lang, true), "\n        <div class=\"banner info\" style=\"margin-top:14px\">").concat(ic.pin).concat(t.next, "</div>");
+      foot = "<div class=\"footrow\"><button class=\"btn ghost\" data-go=\"mine\">".concat(t.myAddr, "</button><button class=\"btn\" data-go=\"done\">").concat(t.done, "</button></div>");
+    }
+  } else if (step === 5) {
+    // my addresses
+    if (variant === 'empty') {
+      inner = "".concat(backBtn(t), "<div class=\"eyebrow\">").concat(t.mine_h, "</div><h1 class=\"disp\">").concat(t.mine_h, "</h1>\n        <div class=\"empty\"><div class=\"big\">\uD83D\uDCED</div><div style=\"font-weight:700;color:var(--ink);margin-bottom:4px\">").concat(t.empty, "</div>").concat(t.emptySub, "</div>");
+      foot = '';
+    } else {
+      var rows = liveCountries().filter(function (c) {
+        return MINE[c.code];
+      }).map(function (c) {
+        var info = MINE[c.code];
+        var needsRenew = info.status === 'expired';
+        return "<div class=\"mgrow\"><span class=\"fl\">".concat(c.flag, "</span>\n          <div class=\"mmid\"><div class=\"mc\">").concat(lang === 'ar' ? c.ar : c.code, "</div><div class=\"ms\">").concat(statusChip(lang, info), "</div></div>\n          <button class=\"renew ").concat(needsRenew ? '' : 'ghost', "\" data-c=\"").concat(c.code, "\">").concat(needsRenew ? t.renew : t.view, "</button></div>");
+      }).join('');
+      inner = "".concat(backBtn(t), "<div class=\"eyebrow\">").concat(t.mine_h, "</div><h1 class=\"disp\">").concat(t.mine_h, "</h1><p class=\"sub\">").concat(t.mine_s, "</p>").concat(rows);
+      foot = '';
+    }
+  }
+  return {
+    offBar: offBar,
+    inner: inner,
+    foot: foot
+  };
+}
+function phoneHTML(step, variant, lang, framed) {
+  var b = body(step, variant, lang);
+  var rtl = lang === 'ar' ? 'rtl' : '';
+  var ph = "<div class=\"phone ".concat(rtl, "\">").concat(sb()).concat(b.offBar, "<div class=\"scr\">").concat(b.inner, "</div>").concat(b.foot ? "<div class=\"foot\">".concat(b.foot, "</div>") : '', "</div>");
+  return framed ? "<div class=\"framewrap\">".concat(ph, "</div>") : ph;
+}
+function go(target) {
+  if (target === 'pay') {
+    if (st.variant === 'load') return;
+    st.step = 3;
+    st.variant = 'default';
+  } else if (target === 'ready') {
+    st.step = 4;
+    st.variant = 'default';
+  } else if (target === 'mine') {
+    st.from = st.step;
+    st.step = 5;
+    st.variant = 'default';
+  } else if (target === 'renewview') {
+    st.step = 3;
+    st.variant = 'default';
+  } else if (target === 'done') {
+    st.step = 1;
+    st.variant = 'default';
+    st.country = null;
+    st.plan = null;
+  }
+  render();
+}
+function bind(host) {
+  var Q = function Q(s) {
+      return host.querySelector(s);
+    },
+    QA = function QA(s) {
+      return host.querySelectorAll(s);
+    };
+  QA('.ctile').forEach(function (b) {
+    return b.onclick = function () {
+      var c = b.dataset.c;
+      var m = MINE[c];
+      st.country = c;
+      if (m && m.status === 'active') {
+        st.plan = m.type;
+        st.from = 1;
+        st.variant = 'view';
+        st.step = 4;
+      } else if (m) {
+        st.plan = null;
+        st.from = 1;
+        st.variant = 'expired';
+        st.step = 2;
+      } else {
+        st.plan = null;
+        st.variant = 'default';
+        st.step = 2;
+      }
+      render();
+    };
+  });
+  QA('[data-name]').forEach(function (b) {
+    return b.onclick = function () {
+      st.suggestedName = b.getAttribute('data-name');
+      st.variant = 'selected';
+      render();
+    };
+  });
+  QA('.planopt').forEach(function (b) {
+    return b.onclick = function () {
+      st.plan = b.dataset.p;
+      if (st.variant !== 'expired') st.variant = 'default';
+      render();
+    };
+  });
+  QA('.suggestchip').forEach(function (b) {
+    return b.onclick = function () {
+      st.variant = 'default';
+      render();
+    };
+  });
+  QA('.pmethod').forEach(function (b) {
+    return b.onclick = function () {
+      st.method = +b.dataset.m;
+      render();
+    };
+  });
+  QA('[data-go]').forEach(function (b) {
+    return b.onclick = function () {
+      return go(b.dataset.go);
+    };
+  });
+  QA('.mgrow .renew').forEach(function (b) {
+    return b.onclick = function () {
+      var c = b.dataset.c,
+        info = MINE[c] || {};
+      st.country = c;
+      if (info.status === 'expired') {
+        st.plan = null;
+        st.from = 5;
+        st.variant = 'expired';
+        st.step = 2;
+      } else {
+        st.plan = info.type || 'annual';
+        st.from = 5;
+        st.variant = 'view';
+        st.step = 4;
+      }
+      render();
+    };
+  });
+  var bc = Q('.backchip');
+  if (bc) bc.onclick = function () {
+    if (st.step === 4 && st.variant === 'view') {
+      st.step = st.from || 5;
+      st.variant = 'default';
+      render();
+    } else if (st.step === 2 && st.variant === 'expired') {
+      st.step = st.from || 1;
+      st.variant = 'default';
+      render();
+    } else if (st.step === 5) {
+      st.step = st.from || 1;
+      st.variant = 'default';
+      render();
+    } else if (st.step > 1) {
+      st.step--;
+      st.variant = 'default';
+      render();
+    }
+  };
+}
+function renderWalk() {
+  document.getElementById('hint').innerHTML = "Choose a country, see the local ship-to address and pick a subscription (per shipment / monthly / annual — address fee only, shipping is separate), pay, then your address is ready to use. Chips below preview each state.";
+  var variants = {
+    1: [['default', 'choose country'], ['offline', 'offline']],
+    2: [['default', 'address + plans'], ['selected', 'plan selected'], ['nametaken', 'name taken — change it'], ['invalidname', 'invalid name format'], ['expired', 'expired — buy again'], ['load', 'subscribing']],
+    3: [['default', 'summary + methods'], ['load', 'processing'], ['declined', 'declined'], ['failed', 'failed']],
+    4: [['default', 'annual ready'], ['pershipment', 'per-shipment ready'], ['view', 'view active address'], ['processing', 'confirming']],
+    5: [['default', 'my addresses'], ['empty', 'no addresses']]
+  }[st.step];
+  var sims = variants.map(function (_ref) {
+    var _ref2 = _slicedToArray(_ref, 2),
+      v = _ref2[0],
+      lab = _ref2[1];
+    return "<button class=\"".concat(st.variant === v ? 'on' : '', "\" data-v=\"").concat(v, "\">").concat(lab, "</button>");
+  }).join('');
+  document.getElementById('view').innerHTML = "<div class=\"stage\">".concat(phoneHTML(st.step, st.variant, st.lang, true), "</div>\n     <div class=\"simrow\">").concat(sims, "</div>\n     <div class=\"note\">screen ").concat(st.step, " of 5</div>");
+  var host = document.querySelector('#view');
+  bind(host);
+  document.querySelectorAll('#view .simrow button').forEach(function (b) {
+    return b.onclick = function () {
+      st.variant = b.dataset.v;
+      render();
+    };
+  });
+}
+function renderGallery() {
+  st.country = st.country || 'USA';
+  st.plan = st.plan || 'annual';
+  document.getElementById('hint').innerHTML = "Every state as its own frame — the states-first baseline for the address-subscription flow (choose country, address + plans, pay, ready, my addresses) including already-active, declined, failed, per-shipment vs annual, expired buy-again, empty, and Arabic RTL.";
+  var L = st.lang;
+  var set = [[1, 'default', L, 'Country', 'choose country'], [1, 'offline', L, 'Country', 'offline'], [2, 'default', L, 'Plans', 'address + subscriptions'], [2, 'selected', L, 'Plans', 'plan selected'], [2, 'nametaken', L, 'Plans', 'name taken — change it'], [2, 'invalidname', L, 'Plans', 'invalid name format'], [2, 'expired', L, 'Plans', 'expired — buy again'], [2, 'load', L, 'Plans', 'subscribing'], [3, 'default', L, 'Pay', 'summary + methods'], [3, 'load', L, 'Pay', 'processing'], [3, 'declined', L, 'Pay', 'declined'], [3, 'failed', L, 'Pay', 'failed'], [4, 'default', L, 'Ready', 'annual address ready'], [4, 'pershipment', L, 'Ready', 'per-shipment ready'], [4, 'view', L, 'View', 'active address detail'], [4, 'processing', L, 'Ready', 'confirming'], [5, 'default', L, 'My addresses', 'mixed statuses'], [5, 'empty', L, 'My addresses', 'empty'], [1, 'default', L === 'en' ? 'ar' : 'en', 'Country', L === 'en' ? 'Arabic RTL' : 'English LTR'], [2, 'default', L === 'en' ? 'ar' : 'en', 'Plans', L === 'en' ? 'Arabic RTL' : 'English LTR'], [4, 'default', L === 'en' ? 'ar' : 'en', 'Ready', L === 'en' ? 'Arabic RTL' : 'English LTR']];
+  document.getElementById('view').innerHTML = "<div class=\"gallery\">" + set.map(function (_ref3) {
+    var _ref4 = _slicedToArray(_ref3, 5),
+      s = _ref4[0],
+      v = _ref4[1],
+      lang = _ref4[2],
+      title = _ref4[3],
+      subt = _ref4[4];
+    return "<div class=\"gcell\"><div class=\"scaler\">".concat(phoneHTML(s, v, lang, false), "</div><div class=\"glabel\">").concat(title, "<small>").concat(subt, "</small></div></div>");
+  }).join('') + "</div>";
+}
+/* ── paging ──────────────────────────────────────────────────────────
+   A cap with a "show all" is fine for an alert list, where the tail is noise.
+   A catalogue is different: every card is a real product someone may need to
+   reach, so the tail must be reachable in steps rather than in one lump that
+   freezes the page. Page size is the reader's choice — 20, 50 or 100 — and the
+   page number survives a filter change only if the page still exists. */
+var PAGE_SIZES=[20,50,100];
+var PGS={};                              /* one page state per list, by name */
+function pgOf(k){if(!PGS[k])PGS[k]={size:(k==='sups'?10:20),page:0};return PGS[k];}
+var PG=pgOf('cards');
+function pgUse(k){PG=pgOf(k);}
+function pgSet(k,n){var p=pgOf(k);p.size=Number(n);p.page=0;render();}
+function pgGo(k,p){pgOf(k).page=p;render();}
+function pgClamp(total){
+ var PG=arguments[1]||window.PG;
+ var last=Math.max(0,Math.ceil(total/PG.size)-1);
+ if(PG.page>last)PG.page=last;        // a filter that shortens the list must not strand you
+ return last;
+}
+function pager(key,total,label){
+ var PG=pgOf(key);
+ var last=pgClamp(total,PG);
+ if(!total)return '';
+ var from=PG.page*PG.size+1, to=Math.min(total,(PG.page+1)*PG.size);
+ var btn=function(p,txt,on,dis){
+  return '<button '+(dis?'disabled':'onclick="pgGo(\''+key+'\','+p+')"')+' style="cursor:'+(dis?'not-allowed':'pointer')
+   +';font-family:var(--body);font-size:var(--fs-sm);font-weight:800;min-width:34px;height:32px;padding:0 10px;border-radius:8px;'
+   +'border:1.5px solid '+(on?'#0EA5E9':'rgba(11,42,59,.14)')+';background:'+(on?'#E6F4FE':'#FFFFFF')
+   +';color:'+(dis?'rgba(11,42,59,.35)':(on?'#0A4A6B':'#0B2A3B'))+'">'+txt+'</button>';
+ };
+ var nums='', start=Math.max(0,Math.min(PG.page-2,last-4)), end=Math.min(last,start+4), i;
+ for(i=start;i<=end;i++)nums+=btn(i,String(i+1),i===PG.page,false);
+ return '<div class="pager" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:10px 0">'
+  +'<span class="hint machine">'+from+'–'+to+' '+t('of')+' '+total+(label?' '+t(label):'')+'</span>'
+  +'<span style="margin-inline-start:auto;display:flex;gap:5px;align-items:center">'
+  +'<span class="hint">'+t('per page')+'</span>'
+  +PAGE_SIZES.map(function(n){
+     var on=PG.size===n;
+     return '<button onclick="pgSet(\''+key+'\','+n+')" style="cursor:pointer;font-family:var(--body);font-size:var(--fs-sm);font-weight:800;padding:0 11px;height:32px;border-radius:8px;border:1.5px solid '+(on?'#0EA5E9':'rgba(11,42,59,.14)')+';background:'+(on?'#E6F4FE':'#FFFFFF')+';color:'+(on?'#0A4A6B':'#0B2A3B')+'">'+n+'</button>';
+   }).join('')
+  +'</span>'
+  /* Previous and Next are always drawn, disabled at the ends. Hiding them on a
+     single page means the reader cannot tell whether the list is complete or the
+     control is simply missing — and they were reported missing for exactly that. */
+  +'<span style="display:flex;gap:5px;width:100%;margin-top:4px;align-items:center">'
+     +btn(PG.page-1,'\u2039 '+t('Previous'),false,PG.page===0)
+     +(last>0?nums:'<span class="hint machine" style="padding:0 8px">'+t('page')+' 1 / 1</span>')
+     +btn(PG.page+1,t('Next')+' \u203A',false,PG.page===last)
+   +'</span>'
+  +'</div>';
+}
+function pgSlice(key,list){var PG=pgOf(key);pgClamp(list.length,PG);return list.slice(PG.page*PG.size,(PG.page+1)*PG.size);}
+
+function render() {
+  st.mode === 'walk' ? renderWalk() : renderGallery();
+}
+document.getElementById('brandchain').innerHTML = chain(15, '#0B2A3B', '#0EA5E9');
+document.querySelectorAll('#lang button').forEach(function (b) {
+  return b.onclick = function () {
+    st.lang = b.dataset.l;
+    document.querySelectorAll('#lang button').forEach(function (x) {
+      return x.classList.toggle('on', x === b);
+    });
+    render();
+  };
+});
+document.querySelectorAll('#mode button').forEach(function (b) {
+  return b.onclick = function () {
+    st.mode = b.dataset.m;
+    document.querySelectorAll('#mode button').forEach(function (x) {
+      return x.classList.toggle('on', x === b);
+    });
+    st.step = 1;
+    st.variant = 'default';
+    st.country = null;
+    st.plan = null;
+    render();
+  };
+});
+render();
+</script>
+
+</body></html>
