@@ -42,9 +42,16 @@ export type GlobeConfig = {
   parcelSize: number;
   parcelsPerRoute: number;
   parcelSpeed: number;
+  streetColor: string;
+  storeColor: string;
+  awningColor: string;
+  districtSpread: number;
+  storeyHeight: number;
+  cityDistance: number;
+  cityMinDistance: number;
+  cityMaxDistance: number;
   dioramaColor: string;
   dioramaEdge: string;
-  dioramaHeight: number;
   dioramaSpread: number;
   dioramaBlocks: number;
   globeRadius: number;
@@ -92,9 +99,16 @@ export const CONFIG: GlobeConfig = {
   parcelsPerRoute: 3,
   parcelSpeed: 0.085,
 
+  streetColor: "#e6e2d6",
+  storeColor: "#ffffff",
+  awningColor: "#0ea5e9",
+  districtSpread: 1.8,
+  storeyHeight: 0.020,
+  cityDistance: 0.42,
+  cityMinDistance: 0.20,
+  cityMaxDistance: 0.78,
   dioramaColor: "#f4fbff",
   dioramaEdge: "#0ea5e9",
-  dioramaHeight: 0.23,
   dioramaSpread: 0.06,
   dioramaBlocks: 14,
 
@@ -213,6 +227,12 @@ const arcCurve = (a0: Marker, b0: Marker, r: number, lift: number) => {
 export type GlobeHandle = {
   /** the one clock — 0 at the world view, 1 at the last city */
   setProgress: (p: number) => void;
+  /** drop into a city's district; index is the city's station minus one */
+  enterCity: (index: number) => void;
+  exitCity: () => void;
+  /** hand the scene the store-label elements to drive; it writes their
+   *  transforms directly, because a per-frame setState would re-render the tree */
+  bindStoreLabels: (elements: (HTMLElement | null)[]) => void;
   resize: () => void;
   applyConfig: () => void;
   dispose: () => void;
@@ -382,6 +402,7 @@ export const createGlobeScene = ({
 
   /* ── beacons under slow radar pings ── */
   const pings: THREE.Mesh<THREE.RingGeometry, THREE.MeshBasicMaterial>[] = [];
+  const beacons: THREE.Mesh[] = [];
   const beaconMaterial = new THREE.MeshBasicMaterial({ color: new THREE.Color(CONFIG.beaconColor) });
   const pingMaterial = new THREE.MeshBasicMaterial({
     color: new THREE.Color(CONFIG.pingColor),
@@ -395,6 +416,7 @@ export const createGlobeScene = ({
     const dot = new THREE.Mesh(new THREE.SphereGeometry(CONFIG.beaconSize, 16, 16), beaconMaterial);
     dot.position.copy(p);
     globe.add(dot);
+    beacons.push(dot);
 
     const ring = new THREE.Mesh(new THREE.RingGeometry(0.6, 1, 40), pingMaterial.clone());
     ring.position.copy(p);
@@ -404,63 +426,118 @@ export const createGlobeScene = ({
     pings.push(ring);
   });
 
-  /* ── a miniature skyline that rises where the camera is looking ── */
+  /* ── the miniature district you can walk into ── */
+  const CITY_LIST = [...CITIES].sort((a, b) => a.station - b.station);
   const dioramas: THREE.Group[] = [];
-  const blockCount = Math.max(3, Math.floor(CONFIG.dioramaBlocks));
-  CITY_MARKERS.forEach((m, ci) => {
+  /** one entry per city, one inner entry per store: the label's local anchor */
+  const storeAnchors: THREE.Vector3[][] = [];
+
+  const districtMat = (color: string, roughness: number) =>
+    new THREE.MeshStandardMaterial({
+      color: new THREE.Color(color),
+      roughness,
+      metalness: 0,
+    });
+
+  CITY_LIST.forEach((city, ci) => {
     const group = new THREE.Group();
-    const anchor = latLonToVec3(m.lat, m.lon, R);
+    const anchor = latLonToVec3(city.lat, city.lon, R);
     group.position.copy(anchor);
     group.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), anchor.clone().normalize());
+
+    const U = CONFIG.dioramaSpread;
+    const D = U * CONFIG.districtSpread;
+
+    // ground plate — what makes a cluster of boxes read as a model, not debris
+    const plinth = new THREE.Mesh(
+      new THREE.CylinderGeometry(U * 1.75, U * 1.75, 0.006, 56),
+      districtMat(CONFIG.dioramaColor, 0.85),
+    );
+    plinth.position.y = 0.003;
+    group.add(plinth);
+
+    // two crossing streets. They are why the blocks read as a city rather than
+    // a pile: the eye needs somewhere to walk before it believes the buildings.
+    const streetMat = districtMat(CONFIG.streetColor, 0.95);
+    for (const rot of [0, Math.PI / 2]) {
+      const street = new THREE.Mesh(
+        new THREE.BoxGeometry(U * 0.34, 0.004, U * 3.3),
+        streetMat,
+      );
+      street.position.y = 0.0075;
+      street.rotation.y = rot;
+      group.add(street);
+    }
 
     // deterministic per city, so a skyline never re-rolls between frames
     let seed = ci * 977 + 13;
     const rnd = () => ((seed = (seed * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff);
 
-    for (let i = 0; i < blockCount; i++) {
-      const h = CONFIG.dioramaHeight * (0.34 + rnd());
-      const w = CONFIG.dioramaSpread * (0.22 + rnd() * 0.26);
-      const box = new THREE.Mesh(
+    const anchors: THREE.Vector3[] = [];
+
+    // the four stores: authored positions, authored heights
+    city.stores.forEach((store) => {
+      const h = CONFIG.storeyHeight * store.height;
+      const w = U * 0.46;
+      const building = new THREE.Mesh(
         new THREE.BoxGeometry(w, h, w),
-        new THREE.MeshStandardMaterial({
-          color: new THREE.Color(CONFIG.dioramaColor),
-          roughness: 0.55,
-          metalness: 0,
-        }),
+        districtMat(CONFIG.storeColor, 0.5),
       );
-      const a = rnd() * Math.PI * 2;
-      const rr = Math.sqrt(rnd()) * CONFIG.dioramaSpread;
-      box.position.set(Math.cos(a) * rr, h / 2, Math.sin(a) * rr);
-      box.rotation.y = rnd() * Math.PI;
-      box.add(
+      building.position.set(store.x * D, h / 2 + 0.006, store.z * D);
+      group.add(building);
+
+      building.add(
         new THREE.LineSegments(
-          new THREE.EdgesGeometry(box.geometry),
+          new THREE.EdgesGeometry(building.geometry),
           new THREE.LineBasicMaterial({
             color: new THREE.Color(CONFIG.dioramaEdge),
             transparent: true,
-            opacity: 0.92,
+            opacity: 0.9,
           }),
         ),
       );
-      group.add(box);
-    }
 
-    // the plinth is what makes a cluster of boxes read as a model, not debris
-    const plinth = new THREE.Mesh(
-      new THREE.CylinderGeometry(CONFIG.dioramaSpread * 1.55, CONFIG.dioramaSpread * 1.55, 0.006, 48),
-      new THREE.MeshStandardMaterial({
-        color: new THREE.Color(CONFIG.dioramaColor),
-        roughness: 0.85,
-        metalness: 0,
-      }),
-    );
-    plinth.position.y = 0.003;
-    group.add(plinth);
+      // an accent awning at street level — the one thing that says "a shop"
+      const awning = new THREE.Mesh(
+        new THREE.BoxGeometry(w * 1.08, CONFIG.storeyHeight * 0.1, w * 1.08),
+        new THREE.MeshStandardMaterial({
+          color: new THREE.Color(CONFIG.awningColor),
+          roughness: 0.6,
+          metalness: 0,
+        }),
+      );
+      awning.position.y = -h / 2 + CONFIG.storeyHeight * 0.16;
+      building.add(awning);
+
+      anchors.push(new THREE.Vector3(store.x * D, h + 0.02, store.z * D));
+    });
+
+    // filler blocks fill the rest of the grid, but never the streets and never
+    // a store's cell — the stores must stay findable from above.
+    const taken = city.stores.map((st) => ({ x: st.x, z: st.z }));
+    for (let gx = -2; gx <= 2; gx++) {
+      for (let gz = -2; gz <= 2; gz++) {
+        const nx = gx * 0.42;
+        const nz = gz * 0.42;
+        if (Math.abs(nx) < 0.2 || Math.abs(nz) < 0.2) continue; // the streets
+        if (taken.some((t) => Math.hypot(t.x - nx, t.z - nz) < 0.3)) continue;
+        const h = CONFIG.storeyHeight * (0.45 + rnd() * 1.15);
+        const w = U * (0.24 + rnd() * 0.14);
+        const block = new THREE.Mesh(
+          new THREE.BoxGeometry(w, h, w),
+          districtMat(CONFIG.dioramaColor, 0.65),
+        );
+        block.position.set(nx * D, h / 2 + 0.006, nz * D);
+        block.rotation.y = rnd() * 0.4 - 0.2;
+        group.add(block);
+      }
+    }
 
     group.scale.set(1, 0.001, 1);
     group.visible = false;
     globe.add(group);
     dioramas.push(group);
+    storeAnchors.push(anchors);
   });
 
   /* ── stations: the world view, then one per city ── */
@@ -496,6 +573,71 @@ export const createGlobeScene = ({
   let smoothed = 0;
   let ready = false;
   let visible = true;
+
+  // ── city mode ──
+  let activeCity = -1;
+  let lastCity = 0;
+  let cityBlend = 0;
+  let orbitAz = 0.6;
+  let orbitEl = 0.55;
+  let orbitDist = CONFIG.cityDistance;
+  let labelEls: (HTMLElement | null)[] = [];
+  let dragging = false;
+  let lastX = 0;
+  let lastY = 0;
+
+  const worldUp = new THREE.Vector3(0, 1, 0).applyQuaternion(tiltGroup.quaternion);
+  const anchorWorld = new THREE.Vector3();
+  const upVec = new THREE.Vector3();
+  const eastVec = new THREE.Vector3();
+  const northVec = new THREE.Vector3();
+  const cityPos = new THREE.Vector3();
+  const cityLook = new THREE.Vector3();
+  const projected = new THREE.Vector3();
+  const blendPos = new THREE.Vector3();
+  const blendLook = new THREE.Vector3();
+  // camera.lookAt resolves roll against camera.up. Left at world Y, a district
+  // standing on the side of a sphere comes out rotated on the screen — its
+  // streets read as a vertical ellipse. The up vector has to travel with us.
+  const blendUp = new THREE.Vector3(0, 1, 0);
+  const worldY = new THREE.Vector3(0, 1, 0);
+
+  const onPointerDown = (e: PointerEvent) => {
+    if (activeCity < 0) return;
+    dragging = true;
+    lastX = e.clientX;
+    lastY = e.clientY;
+    canvas.setPointerCapture(e.pointerId);
+    canvas.style.cursor = "grabbing";
+  };
+  const onPointerMove = (e: PointerEvent) => {
+    if (!dragging || activeCity < 0) return;
+    orbitAz -= (e.clientX - lastX) * 0.006;
+    // elevation is clamped well short of either pole: at the top the district
+    // flattens into a floor plan, at the bottom the camera sinks into the globe
+    orbitEl = Math.min(1.25, Math.max(0.12, orbitEl + (e.clientY - lastY) * 0.005));
+    lastX = e.clientX;
+    lastY = e.clientY;
+  };
+  const onPointerUp = (e: PointerEvent) => {
+    dragging = false;
+    if (canvas.hasPointerCapture(e.pointerId)) canvas.releasePointerCapture(e.pointerId);
+    if (activeCity >= 0) canvas.style.cursor = "grab";
+  };
+  const onWheel = (e: WheelEvent) => {
+    if (activeCity < 0) return;
+    e.preventDefault();
+    orbitDist = Math.min(
+      CONFIG.cityMaxDistance,
+      Math.max(CONFIG.cityMinDistance, orbitDist + e.deltaY * 0.0006),
+    );
+  };
+
+  canvas.addEventListener("pointerdown", onPointerDown);
+  canvas.addEventListener("pointermove", onPointerMove);
+  canvas.addEventListener("pointerup", onPointerUp);
+  canvas.addEventListener("pointercancel", onPointerUp);
+  canvas.addEventListener("wheel", onWheel, { passive: false });
   let lastFrame = 0;
   const frameGap = maxFps > 0 ? 1 / maxFps : 0;
 
@@ -555,27 +697,107 @@ export const createGlobeScene = ({
       e,
     );
     const cityFramed = Math.min(1, legT);
+    blendPos.set(0, 0, dist);
+    blendLook.set(CONFIG.lookAtOffsetX, Math.sin(CONFIG.cityPitch) * 0.92 * cityFramed, 0);
+
+    // ── city mode rides the SAME damped camera, blended over the station framing ──
+    cityBlend +=
+      ((activeCity >= 0 ? 1 : 0) - cityBlend) *
+      (reducedMotion ? 1 : 1 - Math.exp(-3.6 * delta));
+    if (cityBlend > 0.001) {
+      const group = dioramas[activeCity >= 0 ? activeCity : lastCity];
+      group.getWorldPosition(anchorWorld);
+      upVec.copy(anchorWorld).normalize();
+      // A tangent frame on the sphere at the district. The orbit happens inside
+      // it, so the city's own "up" stays up however far the globe has turned.
+      eastVec.copy(worldUp).cross(upVec);
+      if (eastVec.lengthSq() < 1e-6) eastVec.set(1, 0, 0);
+      eastVec.normalize();
+      northVec.copy(upVec).cross(eastVec).normalize();
+
+      const ce = Math.cos(orbitEl);
+      const se = Math.sin(orbitEl);
+      cityPos
+        .copy(anchorWorld)
+        .addScaledVector(upVec, se * orbitDist)
+        .addScaledVector(eastVec, Math.cos(orbitAz) * ce * orbitDist)
+        .addScaledVector(northVec, Math.sin(orbitAz) * ce * orbitDist);
+      cityLook.copy(anchorWorld).addScaledVector(upVec, CONFIG.storeyHeight * 1.1);
+
+      const e2 = cityBlend * cityBlend * (3 - 2 * cityBlend);
+      blendPos.lerp(cityPos, e2);
+      blendLook.lerp(cityLook, e2);
+      blendUp.copy(worldY).lerp(upVec, e2).normalize();
+    } else {
+      blendUp.copy(worldY);
+    }
+
     const k = reducedMotion ? 1 : 1 - Math.exp(-CONFIG.cameraDamp * delta);
-    camPos.lerp(new THREE.Vector3(0, 0, dist), k);
+    camPos.lerp(blendPos, k);
     // damped as a separate vector, so the framing swings instead of pivoting
-    lookAt.lerp(
-      new THREE.Vector3(CONFIG.lookAtOffsetX, Math.sin(CONFIG.cityPitch) * 0.92 * cityFramed, 0),
-      k,
-    );
+    lookAt.lerp(blendLook, k);
     camera.position.copy(camPos);
+    camera.up.copy(blendUp);
     camera.lookAt(lookAt);
 
+    const framedCity = activeCity >= 0 ? activeCity : lastCity;
     dioramas.forEach((g, ci) => {
       const a = Math.max(0, 1 - Math.abs(legT - (ci + 1)));
-      const eased = a * a * (3 - 2 * a);
+      let eased = a * a * (3 - 2 * a);
+      // the district you are standing in stays up, whatever the scroll says
+      if (ci === framedCity) eased = Math.max(eased, cityBlend);
       g.visible = eased > 0.002;
       if (g.visible) g.scale.set(1, Math.max(0.001, eased), 1);
     });
+
+    // ── store labels: projected straight onto their DOM nodes, never through state ──
+    if (labelEls.length > 0) {
+      const group = dioramas[framedCity];
+      const anchors = storeAnchors[framedCity];
+      const halfW = window.innerWidth / 2;
+      const halfH = window.innerHeight / 2;
+      const show = cityBlend > 0.45;
+      labelEls.forEach((el, li) => {
+        if (!el) return;
+        const anchor = anchors[li];
+        if (!anchor || !show) {
+          el.style.opacity = "0";
+          el.style.pointerEvents = "none";
+          return;
+        }
+        projected.copy(anchor);
+        group.localToWorld(projected);
+        projected.project(camera);
+        const behind = projected.z > 1;
+        el.style.opacity = behind ? "0" : "1";
+        el.style.pointerEvents = behind ? "none" : "auto";
+        el.style.transform =
+          `translate3d(${(projected.x * halfW + halfW).toFixed(1)}px, ` +
+          `${(-projected.y * halfH + halfH).toFixed(1)}px, 0) translate(-50%, -100%)`;
+      });
+    }
+
+    // A size-attenuated point becomes a huge square at arm's length, so the
+    // surface dots have to shrink as the camera descends into a district —
+    // otherwise they stand beside the buildings as blue slabs.
+    const dotScale = 1 - 0.88 * cityBlend;
+    landDots.material.size = CONFIG.landDotSize * dotScale;
+    seaDots.material.size = CONFIG.seaDotSize * dotScale;
+
+    // Everything that marks a city FROM ORBIT is wrong once you are standing in
+    // it: the beacon becomes a boulder, the ping a lake, the atmosphere shell a
+    // wall across the street. They belong to the world view, so they leave with it.
+    const inCity = cityBlend > 0.6;
+    routeGroup.visible = !inCity;
+    parcels.visible = !inCity;
+    for (const beacon of beacons) beacon.visible = !inCity;
+    rim.material.uniforms.uStrength.value = CONFIG.rimStrength * (1 - cityBlend);
 
     // A canvas loop is NOT covered by an animation library's global skip flag —
     // turn the ambient motion off here, ourselves.
     if (!reducedMotion) {
       for (const ring of pings) {
+        ring.visible = !inCity;
         const phase = typeof ring.userData.phase === "number" ? ring.userData.phase : 0;
         const u = (t * CONFIG.pingSpeed + phase) % 1;
         const s = 0.12 + u * CONFIG.pingSize;
@@ -612,10 +834,42 @@ export const createGlobeScene = ({
     setProgress: (p: number) => {
       progress = Math.min(1, Math.max(0, p));
     },
+    enterCity: (index: number) => {
+      activeCity = index;
+      lastCity = index;
+      orbitAz = 0.6;
+      orbitEl = 0.55;
+      orbitDist = CONFIG.cityDistance;
+      canvas.style.pointerEvents = "auto";
+      canvas.style.cursor = "grab";
+      // without this a touch drag scrolls the page instead of orbiting the city
+      canvas.style.touchAction = "none";
+      // The canvas normally sits at -z-10, behind <main> — which means <main>
+      // swallows the pointer and the drag never reaches the scene. Inside a
+      // district the canvas has to come above the page content, but stay under
+      // the labels (z-30) and the chrome (z-40).
+      canvas.style.zIndex = "20";
+    },
+    exitCity: () => {
+      activeCity = -1;
+      dragging = false;
+      canvas.style.pointerEvents = "none";
+      canvas.style.cursor = "";
+      canvas.style.touchAction = "";
+      canvas.style.zIndex = "";
+    },
+    bindStoreLabels: (elements) => {
+      labelEls = elements;
+    },
     resize,
     applyConfig,
     legs,
     dispose: () => {
+      canvas.removeEventListener("pointerdown", onPointerDown);
+      canvas.removeEventListener("pointermove", onPointerMove);
+      canvas.removeEventListener("pointerup", onPointerUp);
+      canvas.removeEventListener("pointercancel", onPointerUp);
+      canvas.removeEventListener("wheel", onWheel);
       observer.disconnect();
       renderer.setAnimationLoop(null);
       scene.traverse((o) => {

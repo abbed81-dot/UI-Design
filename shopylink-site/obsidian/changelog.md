@@ -30,3 +30,17 @@
   physical `right`, and the switch knob with physical `left`; both now use logical
   inset. The knob's spring travel is negated under RTL, since a CSS transform is
   not flipped by `dir`.
+
+## ShopyLink — walkable city districts
+
+- **Changed** the city diorama from a cluster of random boxes into an authored
+  district: a plinth, two crossing streets, filler blocks, and one building per
+  store at the position and height written beside its name in `src/content/site.ts`.
+- **Added** city mode to `src/lib/scene/globe.ts` — `enterCity` / `exitCity` /
+  `bindStoreLabels`. The camera orbits inside a tangent frame built on the sphere
+  at the district, so the city's own "up" stays up however far the globe has
+  turned, and it rides the same damped camera as the scroll flight rather than a
+  second one.
+- **Added** `CityExplorer` — store labels as DOM buttons whose transforms the
+  scene writes each frame, a store card, and an exit that restores the scroll.
+- **Added** `stores` (four per city, bilingual) to the content module.

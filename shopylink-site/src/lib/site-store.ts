@@ -13,6 +13,12 @@ type SiteState = {
   /** quantised from the SAME clock the camera reads — 0 is the world view */
   station: number;
   setStation: (station: number) => void;
+  /** the city whose district the visitor is standing in, or null */
+  cityOpen: number | null;
+  setCityOpen: (city: number | null) => void;
+  /** the store whose card is showing */
+  activeStore: string | null;
+  setActiveStore: (id: string | null) => void;
 };
 
 export const useSite = create<SiteState>((set) => ({
@@ -24,4 +30,8 @@ export const useSite = create<SiteState>((set) => ({
   setSceneReady: (sceneReady) => set({ sceneReady }),
   station: 0,
   setStation: (station) => set({ station }),
+  cityOpen: null,
+  setCityOpen: (cityOpen) => set({ cityOpen, activeStore: null }),
+  activeStore: null,
+  setActiveStore: (activeStore) => set({ activeStore }),
 }));

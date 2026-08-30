@@ -18,6 +18,24 @@ export const DIRECTION: Record<Locale, "rtl" | "ltr"> = {
 export type CityKey = "dubai" | "guangzhou" | "istanbul" | "newyork";
 
 /**
+ * A shop you can actually walk up to inside the city model.
+ *
+ * `x` and `z` are district coordinates in the range -1..1; the scene scales them
+ * by the diorama's spread, so a store's position is authored here, next to its
+ * name, rather than buried in the geometry. `height` is a multiplier on the
+ * district's base storey height — it is what makes a mall read as a mall and a
+ * souk read as a souk when you get close.
+ */
+export type Store = {
+  id: string;
+  name: Record<Locale, string>;
+  kind: Record<Locale, string>;
+  x: number;
+  z: number;
+  height: number;
+};
+
+/**
  * Home — the door every route converges on, and the clock's reference.
  * Change this and both the scene's convergence point and the masthead clock
  * follow it; they read the same constant.
@@ -42,6 +60,8 @@ export type City = {
   country: Record<Locale, string>;
   /** what you actually shop there */
   markets: Record<Locale, readonly string[]>;
+  /** the four you can walk up to in the city model */
+  stores: readonly Store[];
   note: Record<Locale, string>;
 };
 
@@ -58,6 +78,20 @@ export const CITIES: readonly City[] = [
       ar: ["دبي مول", "ديرة", "دراغون مارت", "السوق الكبير"],
       en: ["Dubai Mall", "Deira", "Dragon Mart", "Gold Souk"],
     },
+    stores: [
+      { id: "dubai-mall", x: -0.42, z: -0.34, height: 2.5,
+        name: { ar: "دبي مول", en: "Dubai Mall" },
+        kind: { ar: "أزياء وإلكترونيات", en: "Fashion & electronics" } },
+      { id: "gold-souk", x: 0.46, z: -0.26, height: 0.9,
+        name: { ar: "سوق الذهب", en: "Gold Souk" },
+        kind: { ar: "ذهب ومجوهرات", en: "Gold & jewellery" } },
+      { id: "dragon-mart", x: -0.36, z: 0.44, height: 1.2,
+        name: { ar: "دراغون مارت", en: "Dragon Mart" },
+        kind: { ar: "جملة ومستلزمات", en: "Wholesale & homeware" } },
+      { id: "deira", x: 0.40, z: 0.40, height: 1.0,
+        name: { ar: "ديرة", en: "Deira" },
+        kind: { ar: "أقمشة وعطور", en: "Textiles & perfume" } },
+    ],
     note: {
       ar: "عنوانك في الخليج. نستلم اليوم، ونشحن في نفس الأسبوع.",
       en: "Your address in the Gulf. We receive today and ship the same week.",
@@ -75,6 +109,20 @@ export const CITIES: readonly City[] = [
       ar: ["بايون", "شاهه", "معرض كانتون", "شي سان هانغ"],
       en: ["Baiyun", "Shahe", "Canton Fair", "Shi San Hang"],
     },
+    stores: [
+      { id: "baiyun", x: -0.44, z: -0.30, height: 1.9,
+        name: { ar: "بايون للجلديات", en: "Baiyun Leather" },
+        kind: { ar: "حقائب وجلديات", en: "Bags & leather" } },
+      { id: "shahe", x: 0.42, z: -0.40, height: 2.2,
+        name: { ar: "سوق شاهه", en: "Shahe Market" },
+        kind: { ar: "ملابس بالجملة", en: "Clothing wholesale" } },
+      { id: "canton-fair", x: -0.30, z: 0.46, height: 1.4,
+        name: { ar: "معرض كانتون", en: "Canton Fair" },
+        kind: { ar: "كل الفئات", en: "Every category" } },
+      { id: "zhanxi", x: 0.44, z: 0.34, height: 1.7,
+        name: { ar: "جانشي", en: "Zhanxi" },
+        kind: { ar: "إكسسوارات وساعات", en: "Accessories & watches" } },
+    ],
     note: {
       ar: "اشترِ من عشرة موردين، ويصلك طرد واحد.",
       en: "Buy from ten suppliers. One parcel arrives.",
@@ -92,6 +140,20 @@ export const CITIES: readonly City[] = [
       ar: ["السوق المسقوف", "لاليلي", "عثمان بيه", "مرتر"],
       en: ["Grand Bazaar", "Laleli", "Osmanbey", "Merter"],
     },
+    stores: [
+      { id: "grand-bazaar", x: -0.40, z: -0.40, height: 1.1,
+        name: { ar: "السوق المسقوف", en: "Grand Bazaar" },
+        kind: { ar: "سجّاد وحرف", en: "Rugs & crafts" } },
+      { id: "laleli", x: 0.44, z: -0.28, height: 1.6,
+        name: { ar: "لاليلي", en: "Laleli" },
+        kind: { ar: "ملابس بالجملة", en: "Clothing wholesale" } },
+      { id: "osmanbey", x: -0.34, z: 0.42, height: 1.8,
+        name: { ar: "عثمان بيه", en: "Osmanbey" },
+        kind: { ar: "تريكو وأزياء", en: "Knitwear & fashion" } },
+      { id: "merter", x: 0.38, z: 0.44, height: 1.3,
+        name: { ar: "مرتر", en: "Merter" },
+        kind: { ar: "جلديات ومعاطف", en: "Leather & coats" } },
+    ],
     note: {
       ar: "الأقمشة والملابس والجلديات — مجمّعة قبل أن تغادر.",
       en: "Textiles, clothing, leather — consolidated before it leaves.",
@@ -109,6 +171,20 @@ export const CITIES: readonly City[] = [
       ar: ["الجادة الخامسة", "سوهو", "بروكلين", "المتاجر الإلكترونية"],
       en: ["Fifth Ave", "SoHo", "Brooklyn", "US online stores"],
     },
+    stores: [
+      { id: "fifth-ave", x: -0.46, z: -0.26, height: 3.0,
+        name: { ar: "الجادة الخامسة", en: "Fifth Avenue" },
+        kind: { ar: "علامات فاخرة", en: "Luxury labels" } },
+      { id: "soho", x: 0.40, z: -0.42, height: 1.5,
+        name: { ar: "سوهو", en: "SoHo" },
+        kind: { ar: "أزياء مستقلة", en: "Independent fashion" } },
+      { id: "herald-square", x: -0.30, z: 0.44, height: 2.4,
+        name: { ar: "هيرالد سكوير", en: "Herald Square" },
+        kind: { ar: "متاجر كبرى", en: "Department stores" } },
+      { id: "williamsburg", x: 0.44, z: 0.36, height: 1.0,
+        name: { ar: "ويليامسبرغ", en: "Williamsburg" },
+        kind: { ar: "تصميم ومستعمل مختار", en: "Design & vintage" } },
+    ],
     note: {
       ar: "متاجر لا تشحن خارج أمريكا — تشحن إلينا.",
       en: "Stores that will not ship abroad will ship to us.",
@@ -142,6 +218,11 @@ export const COPY = {
   behindYou: { ar: "متأخّرة", en: "behind" },
   sameTime: { ar: "نفس توقيتك", en: "same as you" },
   marketsLabel: { ar: "الأسواق", en: "Markets" },
+  enterCity: { ar: "تجوّل في المدينة", en: "Walk the city" },
+  exitCity: { ar: "عودة إلى العالم", en: "Back to the world" },
+  bestStores: { ar: "أفضل المتاجر", en: "Best stores" },
+  dragHint: { ar: "اسحب لتدور · عجلة للتقريب", en: "Drag to orbit · scroll to zoom" },
+  storePrompt: { ar: "اشترِ من هنا — والعنوان عنواننا", en: "Shop here — the address is ours" },
   stepsLabel: { ar: "كيف تعمل", en: "How it works" },
 
   steps: {

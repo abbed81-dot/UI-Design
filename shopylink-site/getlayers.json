@@ -95,6 +95,12 @@
       "section": "steps",
       "composition": "card-grid",
       "why": "Below the fold is plain viewport-entry, once, not gated on the loader — don't gate what nobody can see."
+    },
+    {
+      "section": "city-explorer",
+      "composition": "custom, edge-pinned over the scene",
+      "why": "The photoreal-imagery route was explored and rejected: the GetLayers background library is entirely abstract (top match on a logistics query was 1/10), and generated stills would have been a second visual language beside the WebGL. Extending the existing scene into walkable districts keeps ONE language and one canvas.",
+      "asset": "the same single scene — still no second canvas on the page"
     }
   ],
   "decisions": [
@@ -117,11 +123,16 @@
     "The scene's palette is pulled from the CSS design tokens at startup, so colour has one source of truth and re-skinning the site re-skins the globe.",
     "verify.sh's duration-fast check was a false positive — its pattern matched inside the very form its message prescribes. Fixed the pattern, not the code.",
     "The scene's city markers are now derived from the content module, so a city cannot drift between the copy and the globe.",
-    "The starter's cookie banner and preferences modal shipped their English strings in the markup, which hard rule #4 forbids; the copy is now a bilingual block in the content module and both surfaces read it. The banner was also pinned to the physical right and the switch knob to the physical left — both now use logical inset so they mirror with the document, and the knob's spring travel is negated in RTL because a CSS transform is never flipped by dir."
+    "The starter's cookie banner and preferences modal shipped their English strings in the markup, which hard rule #4 forbids; the copy is now a bilingual block in the content module and both surfaces read it. The banner was also pinned to the physical right and the switch knob to the physical left — both now use logical inset so they mirror with the document, and the knob's spring travel is negated in RTL because a CSS transform is never flipped by dir.",
+    "BUG FOUND IN QA: camera.up was left at world Y, so a district standing on the side of the sphere came out rolled 90° on screen — its circular plinth read as a vertical ellipse. The up vector now travels into the city's tangent frame.",
+    "BUG FOUND IN QA: the canvas sits at -z-10, so <main> swallowed every pointer and the orbit drag never reached the scene. In city mode the canvas rises above the page content but stays under the labels and chrome.",
+    "Proportions were wrong first time: a storey at 0.064 against a 0.028 building footprint made every block an obelisk. Storeys are now shorter than a building is wide.",
+    "Everything that marks a city from orbit — beacon, ping, routes, atmosphere shell — is wrong at street level, so it leaves with the world view. Surface dots shrink too: a size-attenuated point is a huge square at arm's length."
   ],
   "openItems": [
     "Its privacy-policy link 404s; that page does not exist yet.",
     "Locale is a client switch, not /ar and /en routes. Real routes would be better for SEO and hreflang.",
-    "HOME is now Damascus (Asia/Damascus) — both the routes' convergence point and the clock's reference read the same constant in src/content/site.ts."
+    "HOME is now Damascus (Asia/Damascus) — both the routes' convergence point and the clock's reference read the same constant in src/content/site.ts.",
+    "The standalone scenes/shopylink-globe.html is deliberately globe-only now; districts and city mode live in src/lib/scene/globe.ts. Recorded in tech-stack.md."
   ]
 }

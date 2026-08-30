@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { createGlobeScene, type GlobeHandle } from "@/lib/scene/globe";
+import { setGlobeHandle } from "@/lib/scene/handle-ref";
 import { useSite } from "@/lib/site-store";
 
 /** the element whose scroll range drives the one clock */
@@ -28,11 +29,14 @@ export const GlobeCanvas = () => {
       onReady: () => useSite.getState().setSceneReady(true),
     });
     handleRef.current = handle;
+    setGlobeHandle(handle);
 
     const runway = document.getElementById(RUNWAY_ID);
 
     const read = () => {
-      if (!runway) return;
+      // while the visitor is inside a district the page does not scroll, and the
+      // camera belongs to the city — do not fight it with a station update
+      if (!runway || useSite.getState().cityOpen !== null) return;
       const rect = runway.getBoundingClientRect();
       const total = rect.height - window.innerHeight;
       const p = total > 0 ? Math.min(1, Math.max(0, -rect.top / total)) : 0;
@@ -61,6 +65,7 @@ export const GlobeCanvas = () => {
       window.removeEventListener("scroll", read);
       window.removeEventListener("resize", onResize);
       handle.dispose();
+      setGlobeHandle(null);
       handleRef.current = null;
     };
   }, []);

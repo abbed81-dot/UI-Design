@@ -3,6 +3,8 @@
 import { animated, useSpring } from "@react-spring/web";
 import { CITIES, COPY, type City, type Locale } from "@/content/site";
 import { RUNWAY_ID } from "@/components/site/globe-canvas";
+import { getGlobeHandle } from "@/lib/scene/handle-ref";
+import { useScroll } from "@/hooks/smooth-scroll/use-scroll";
 import { useSite } from "@/lib/site-store";
 
 /**
@@ -24,15 +26,24 @@ const formatIndex = (n: number, locale: Locale) =>
 const CityPanel = ({ city }: { city: City }) => {
   const locale = useSite((s) => s.locale);
   const active = useSite((s) => s.station) === city.station;
+  const cityOpen = useSite((s) => s.cityOpen);
+  const setCityOpen = useSite((s) => s.setCityOpen);
 
-  // discrete state change, spring-driven — not a CSS keyframe
+  // the panel steps aside while you are inside the district
   const style = useSpring({
-    to: { opacity: active ? 1 : 0, y: active ? 0 : 26 },
+    to: { opacity: active && cityOpen === null ? 1 : 0, y: active ? 0 : 26 },
     config: { tension: 170, friction: 30 },
   });
 
+  const enter = () => {
+    // the scroll IS the camera's clock, so it must stop before the city takes it
+    useScroll.getState().stop();
+    getGlobeHandle()?.enterCity(city.station - 1);
+    setCityOpen(city.station);
+  };
+
   return (
-    <div className="sticky top-0 flex h-lvh flex-col justify-end p-5 md:p-7">
+    <div className="pointer-events-none sticky top-0 flex h-lvh flex-col justify-end p-5 md:p-7">
       <animated.div style={style} className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
         <div>
           <p className="font-mono text-[10px] uppercase tracking-label text-accent">
@@ -42,6 +53,14 @@ const CityPanel = ({ city }: { city: City }) => {
             {city.name[locale]}
           </h2>
           <p className="mt-3 max-w-[38ch] text-sm text-foreground-muted">{city.note[locale]}</p>
+          <button
+            type="button"
+            onClick={enter}
+            disabled={!active || cityOpen !== null}
+            className="pointer-events-auto mt-5 whitespace-nowrap rounded-pill bg-accent px-5 py-2.5 font-mono text-[11px] uppercase tracking-label text-accent-foreground transition-opacity duration-[var(--duration-fast)] ease-entrance hover:opacity-90 disabled:opacity-0"
+          >
+            {COPY.enterCity[locale]}
+          </button>
         </div>
 
         <div className="rounded-md bg-surface p-4 backdrop-blur-[10px] md:w-72">

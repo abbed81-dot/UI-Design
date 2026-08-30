@@ -145,3 +145,12 @@ Preview it with `yarn scene:preview` (it needs an HTTP origin — ES modules are
 blocked over `file://`), then open `http://127.0.0.1:8899/shopylink-globe.html`
 and press `P` for the config panel. `scenes/vendor/` is gitignored and rebuilt by
 `yarn scene:vendor`.
+
+> [!warning] The two are no longer identical, on purpose
+> `scenes/shopylink-globe.html` is a **colour-tuning harness for the globe layer
+> only** — sphere, dots, routes, beacons, and the scroll flight between cities.
+> The walkable districts and city mode (the authored street grid, the store
+> buildings, the tangent-frame orbit, the projected labels) live **only** in
+> `src/lib/scene/globe.ts`, which is the source of truth for them. Duplicating a
+> few hundred lines of interaction into a file nobody ships would rot within a
+> week. Tint in the harness; build in the module.

@@ -1,4 +1,5 @@
 import { Curtain } from "@/components/site/curtain";
+import { CityExplorer } from "@/components/site/city-explorer";
 import { CityRunway } from "@/components/site/city-runway";
 import { GlobeCanvas } from "@/components/site/globe-canvas";
 import { Hero } from "@/components/site/hero";
@@ -19,6 +20,7 @@ export const HomeView = () => {
   return (
     <>
       <GlobeCanvas />
+      <CityExplorer />
       <Curtain />
       <main className="relative">
         <Hero />
