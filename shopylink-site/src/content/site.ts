@@ -15,6 +15,8 @@ export const DIRECTION: Record<Locale, "rtl" | "ltr"> = {
   en: "ltr",
 };
 
+import type { LandmarkForm, StoreForm } from "@/lib/scene/architecture";
+
 export type CityKey = "dubai" | "guangzhou" | "istanbul" | "newyork";
 
 /**
@@ -22,9 +24,11 @@ export type CityKey = "dubai" | "guangzhou" | "istanbul" | "newyork";
  *
  * `x` and `z` are district coordinates in the range -1..1; the scene scales them
  * by the diorama's spread, so a store's position is authored here, next to its
- * name, rather than buried in the geometry. `height` is a multiplier on the
- * district's base storey height — it is what makes a mall read as a mall and a
- * souk read as a souk when you get close.
+ * name, rather than buried in the geometry.
+ *
+ * `form` picks the building type from the architecture kit. It is what makes a
+ * mall read as a mall and a souk read as a souk when you get close — the height
+ * is a consequence of the form, not a number set beside it.
  */
 export type Store = {
   id: string;
@@ -32,7 +36,7 @@ export type Store = {
   kind: Record<Locale, string>;
   x: number;
   z: number;
-  height: number;
+  form: StoreForm;
 };
 
 /**
@@ -62,6 +66,8 @@ export type City = {
   markets: Record<Locale, readonly string[]>;
   /** the four you can walk up to in the city model */
   stores: readonly Store[];
+  /** the one form on the central plaza that gives this skyline its identity */
+  landmark: LandmarkForm;
   note: Record<Locale, string>;
 };
 
@@ -78,17 +84,18 @@ export const CITIES: readonly City[] = [
       ar: ["دبي مول", "ديرة", "دراغون مارت", "السوق الكبير"],
       en: ["Dubai Mall", "Deira", "Dragon Mart", "Gold Souk"],
     },
+    landmark: "spire",
     stores: [
-      { id: "dubai-mall", x: -0.42, z: -0.34, height: 2.5,
+      { id: "dubai-mall", x: -0.42, z: -0.34, form: "podium",
         name: { ar: "دبي مول", en: "Dubai Mall" },
         kind: { ar: "أزياء وإلكترونيات", en: "Fashion & electronics" } },
-      { id: "gold-souk", x: 0.46, z: -0.26, height: 0.9,
+      { id: "gold-souk", x: 0.46, z: -0.26, form: "windTower",
         name: { ar: "سوق الذهب", en: "Gold Souk" },
         kind: { ar: "ذهب ومجوهرات", en: "Gold & jewellery" } },
-      { id: "dragon-mart", x: -0.36, z: 0.44, height: 1.2,
+      { id: "dragon-mart", x: -0.36, z: 0.44, form: "sawtoothShed",
         name: { ar: "دراغون مارت", en: "Dragon Mart" },
         kind: { ar: "جملة ومستلزمات", en: "Wholesale & homeware" } },
-      { id: "deira", x: 0.40, z: 0.40, height: 1.0,
+      { id: "deira", x: 0.40, z: 0.40, form: "terraceRow",
         name: { ar: "ديرة", en: "Deira" },
         kind: { ar: "أقمشة وعطور", en: "Textiles & perfume" } },
     ],
@@ -109,17 +116,18 @@ export const CITIES: readonly City[] = [
       ar: ["بايون", "شاهه", "معرض كانتون", "شي سان هانغ"],
       en: ["Baiyun", "Shahe", "Canton Fair", "Shi San Hang"],
     },
+    landmark: "latticeTower",
     stores: [
-      { id: "baiyun", x: -0.44, z: -0.30, height: 1.9,
+      { id: "baiyun", x: -0.44, z: -0.30, form: "sawtoothShed",
         name: { ar: "بايون للجلديات", en: "Baiyun Leather" },
         kind: { ar: "حقائب وجلديات", en: "Bags & leather" } },
-      { id: "shahe", x: 0.42, z: -0.40, height: 2.2,
+      { id: "shahe", x: 0.42, z: -0.40, form: "podium",
         name: { ar: "سوق شاهه", en: "Shahe Market" },
         kind: { ar: "ملابس بالجملة", en: "Clothing wholesale" } },
-      { id: "canton-fair", x: -0.30, z: 0.46, height: 1.4,
+      { id: "canton-fair", x: -0.30, z: 0.46, form: "vaultedHall",
         name: { ar: "معرض كانتون", en: "Canton Fair" },
         kind: { ar: "كل الفئات", en: "Every category" } },
-      { id: "zhanxi", x: 0.44, z: 0.34, height: 1.7,
+      { id: "zhanxi", x: 0.44, z: 0.34, form: "loftBlock",
         name: { ar: "جانشي", en: "Zhanxi" },
         kind: { ar: "إكسسوارات وساعات", en: "Accessories & watches" } },
     ],
@@ -140,17 +148,18 @@ export const CITIES: readonly City[] = [
       ar: ["السوق المسقوف", "لاليلي", "عثمان بيه", "مرتر"],
       en: ["Grand Bazaar", "Laleli", "Osmanbey", "Merter"],
     },
+    landmark: "domedMass",
     stores: [
-      { id: "grand-bazaar", x: -0.40, z: -0.40, height: 1.1,
+      { id: "grand-bazaar", x: -0.40, z: -0.40, form: "vaultedHall",
         name: { ar: "السوق المسقوف", en: "Grand Bazaar" },
         kind: { ar: "سجّاد وحرف", en: "Rugs & crafts" } },
-      { id: "laleli", x: 0.44, z: -0.28, height: 1.6,
+      { id: "laleli", x: 0.44, z: -0.28, form: "terraceRow",
         name: { ar: "لاليلي", en: "Laleli" },
         kind: { ar: "ملابس بالجملة", en: "Clothing wholesale" } },
-      { id: "osmanbey", x: -0.34, z: 0.42, height: 1.8,
+      { id: "osmanbey", x: -0.34, z: 0.42, form: "loftBlock",
         name: { ar: "عثمان بيه", en: "Osmanbey" },
         kind: { ar: "تريكو وأزياء", en: "Knitwear & fashion" } },
-      { id: "merter", x: 0.38, z: 0.44, height: 1.3,
+      { id: "merter", x: 0.38, z: 0.44, form: "sawtoothShed",
         name: { ar: "مرتر", en: "Merter" },
         kind: { ar: "جلديات ومعاطف", en: "Leather & coats" } },
     ],
@@ -171,17 +180,18 @@ export const CITIES: readonly City[] = [
       ar: ["الجادة الخامسة", "سوهو", "بروكلين", "المتاجر الإلكترونية"],
       en: ["Fifth Ave", "SoHo", "Brooklyn", "US online stores"],
     },
+    landmark: "decoTower",
     stores: [
-      { id: "fifth-ave", x: -0.46, z: -0.26, height: 3.0,
+      { id: "fifth-ave", x: -0.46, z: -0.26, form: "loftBlock",
         name: { ar: "الجادة الخامسة", en: "Fifth Avenue" },
         kind: { ar: "علامات فاخرة", en: "Luxury labels" } },
-      { id: "soho", x: 0.40, z: -0.42, height: 1.5,
+      { id: "soho", x: 0.40, z: -0.42, form: "terraceRow",
         name: { ar: "سوهو", en: "SoHo" },
         kind: { ar: "أزياء مستقلة", en: "Independent fashion" } },
-      { id: "herald-square", x: -0.30, z: 0.44, height: 2.4,
+      { id: "herald-square", x: -0.30, z: 0.44, form: "podium",
         name: { ar: "هيرالد سكوير", en: "Herald Square" },
         kind: { ar: "متاجر كبرى", en: "Department stores" } },
-      { id: "williamsburg", x: 0.44, z: 0.36, height: 1.0,
+      { id: "williamsburg", x: 0.44, z: 0.36, form: "sawtoothShed",
         name: { ar: "ويليامسبرغ", en: "Williamsburg" },
         kind: { ar: "تصميم ومستعمل مختار", en: "Design & vintage" } },
     ],

@@ -15,6 +15,12 @@
 import * as THREE from "three";
 
 import { CITIES, HOME } from "@/content/site";
+import {
+  buildLandmark,
+  buildStoreForm,
+  contactShadow,
+  type ArchPalette,
+} from "@/lib/scene/architecture";
 
 export type GlobeConfig = {
   bgColor: string;
@@ -43,6 +49,8 @@ export type GlobeConfig = {
   parcelsPerRoute: number;
   parcelSpeed: number;
   streetColor: string;
+  groundColor: string;
+  fillerColor: string;
   storeColor: string;
   awningColor: string;
   districtSpread: number;
@@ -100,6 +108,12 @@ export const CONFIG: GlobeConfig = {
   parcelSpeed: 0.085,
 
   streetColor: "#e6e2d6",
+  /* Three tonal steps, and they are the whole hierarchy: the ground is the
+     darkest, the background blocks sit between, the landmark and the four
+     stores are the only pure white. Without this everything is white on white
+     and nothing reads as important. */
+  groundColor: "#dfeefb",
+  fillerColor: "#eaf3fa",
   storeColor: "#ffffff",
   awningColor: "#0ea5e9",
   districtSpread: 1.8,
@@ -431,6 +445,11 @@ export const createGlobeScene = ({
   const dioramas: THREE.Group[] = [];
   /** one entry per city, one inner entry per store: the label's local anchor */
   const storeAnchors: THREE.Vector3[][] = [];
+  /** One framing per city. A fixed distance cannot serve both a district whose
+   *  landmark is a needle and one whose landmark is a dome — the first leaves
+   *  the frame, the second is lost in it. */
+  const cityFrameDist: number[] = [];
+  const cityFrameLook: number[] = [];
 
   const districtMat = (color: string, roughness: number) =>
     new THREE.MeshStandardMaterial({
@@ -447,11 +466,23 @@ export const createGlobeScene = ({
 
     const U = CONFIG.dioramaSpread;
     const D = U * CONFIG.districtSpread;
+    // ONE MODULE. Every dimension in the kit is a multiple of this.
+    const M = CONFIG.storeyHeight;
+    const palette: ArchPalette = {
+      body: CONFIG.storeColor,
+      cap: CONFIG.dioramaColor,
+      accent: CONFIG.awningColor,
+      shadow: CONFIG.parcelColor,
+    };
+
+    // deterministic per city, so a skyline never re-rolls between frames
+    let seed = ci * 977 + 13;
+    const rnd = () => ((seed = (seed * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff);
 
     // ground plate — what makes a cluster of boxes read as a model, not debris
     const plinth = new THREE.Mesh(
       new THREE.CylinderGeometry(U * 1.75, U * 1.75, 0.006, 56),
-      districtMat(CONFIG.dioramaColor, 0.85),
+      districtMat(CONFIG.groundColor, 0.9),
     );
     plinth.position.y = 0.003;
     group.add(plinth);
@@ -469,67 +500,80 @@ export const createGlobeScene = ({
       group.add(street);
     }
 
-    // deterministic per city, so a skyline never re-rolls between frames
-    let seed = ci * 977 + 13;
-    const rnd = () => ((seed = (seed * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff);
+    // the central plaza — the streets read as a roundabout around the landmark
+    // instead of running straight under it
+    const plaza = new THREE.Mesh(
+      new THREE.CylinderGeometry(U * 0.62, U * 0.62, 0.003, 40),
+      districtMat(CONFIG.groundColor, 0.82),
+    );
+    plaza.position.y = 0.0085;
+    group.add(plaza);
+
+    // the signature landmark. One per city, and it is the reason a district is
+    // recognisable at a glance rather than being four sets of the same boxes.
+    const landmark = buildLandmark(city.landmark, M, palette);
+    landmark.position.y = 0.01;
+
+    const bbox = new THREE.Box3();
+    bbox.setFromObject(landmark); // measured while unparented, so this is local
+    const landmarkTop = bbox.max.y;
+    group.add(landmark);
+
+    // The DISTANCE is set by the plate — it has to fit, and it is the same size
+    // in every city. What a tall landmark actually needs is not more distance but
+    // a higher look-at, so the tower is centred in the frame instead of leaving
+    // through the top. Pulling back for height shrinks the streets for no gain.
+    const districtRadius = U * 1.75;
+    cityFrameDist.push(
+      Math.min(
+        CONFIG.cityMaxDistance,
+        Math.max(CONFIG.cityMinDistance, Math.max(districtRadius * 3.3, landmarkTop * 2.4)),
+      ),
+    );
+    cityFrameLook.push(landmarkTop * 0.45);
 
     const anchors: THREE.Vector3[] = [];
 
-    // the four stores: authored positions, authored heights
     city.stores.forEach((store) => {
-      const h = CONFIG.storeyHeight * store.height;
-      const w = U * 0.46;
-      const building = new THREE.Mesh(
-        new THREE.BoxGeometry(w, h, w),
-        districtMat(CONFIG.storeColor, 0.5),
-      );
-      building.position.set(store.x * D, h / 2 + 0.006, store.z * D);
+      const building = buildStoreForm(store.form, M, palette);
+
+      // Measure it BEFORE it is parented: Box3.setFromObject works in world
+      // space, and once this group is sitting on the side of a rotating sphere
+      // a world-space max.y is meaningless as a local label height.
+      bbox.setFromObject(building);
+      const top = bbox.max.y;
+
+      building.position.set(store.x * D, 0.006, store.z * D);
+      // long forms run parallel to the street they sit beside
+      building.rotation.y = Math.abs(store.x) > Math.abs(store.z) ? Math.PI / 2 : 0;
       group.add(building);
 
-      building.add(
-        new THREE.LineSegments(
-          new THREE.EdgesGeometry(building.geometry),
-          new THREE.LineBasicMaterial({
-            color: new THREE.Color(CONFIG.dioramaEdge),
-            transparent: true,
-            opacity: 0.9,
-          }),
-        ),
-      );
-
-      // an accent awning at street level — the one thing that says "a shop"
-      const awning = new THREE.Mesh(
-        new THREE.BoxGeometry(w * 1.08, CONFIG.storeyHeight * 0.1, w * 1.08),
-        new THREE.MeshStandardMaterial({
-          color: new THREE.Color(CONFIG.awningColor),
-          roughness: 0.6,
-          metalness: 0,
-        }),
-      );
-      awning.position.y = -h / 2 + CONFIG.storeyHeight * 0.16;
-      building.add(awning);
-
-      anchors.push(new THREE.Vector3(store.x * D, h + 0.02, store.z * D));
+      // the label rides the form's real top, so it never floats or sinks
+      anchors.push(new THREE.Vector3(store.x * D, top + 0.006 + M * 0.5, store.z * D));
     });
 
-    // filler blocks fill the rest of the grid, but never the streets and never
-    // a store's cell — the stores must stay findable from above.
+    // Filler blocks give the district its background rhythm. They stay dumb on
+    // purpose: if every block competes, nothing reads as a landmark.
     const taken = city.stores.map((st) => ({ x: st.x, z: st.z }));
     for (let gx = -2; gx <= 2; gx++) {
       for (let gz = -2; gz <= 2; gz++) {
         const nx = gx * 0.42;
         const nz = gz * 0.42;
         if (Math.abs(nx) < 0.2 || Math.abs(nz) < 0.2) continue; // the streets
-        if (taken.some((t) => Math.hypot(t.x - nx, t.z - nz) < 0.3)) continue;
-        const h = CONFIG.storeyHeight * (0.45 + rnd() * 1.15);
-        const w = U * (0.24 + rnd() * 0.14);
+        if (Math.hypot(nx, nz) < 0.34) continue; // the plaza
+        if (taken.some((t) => Math.hypot(t.x - nx, t.z - nz) < 0.34)) continue;
+        const h = M * (0.42 + rnd() * 0.9);
+        const w = U * (0.2 + rnd() * 0.12);
         const block = new THREE.Mesh(
           new THREE.BoxGeometry(w, h, w),
-          districtMat(CONFIG.dioramaColor, 0.65),
+          districtMat(CONFIG.fillerColor, 0.72),
         );
         block.position.set(nx * D, h / 2 + 0.006, nz * D);
-        block.rotation.y = rnd() * 0.4 - 0.2;
+        block.rotation.y = rnd() * 0.3 - 0.15;
         group.add(block);
+        const blot = contactShadow(w * 1.5, palette, 0.16);
+        blot.position.set(nx * D, 0.0075, nz * D);
+        group.add(blot);
       }
     }
 
@@ -722,7 +766,9 @@ export const createGlobeScene = ({
         .addScaledVector(upVec, se * orbitDist)
         .addScaledVector(eastVec, Math.cos(orbitAz) * ce * orbitDist)
         .addScaledVector(northVec, Math.sin(orbitAz) * ce * orbitDist);
-      cityLook.copy(anchorWorld).addScaledVector(upVec, CONFIG.storeyHeight * 1.1);
+      cityLook
+        .copy(anchorWorld)
+        .addScaledVector(upVec, cityFrameLook[activeCity >= 0 ? activeCity : lastCity]);
 
       const e2 = cityBlend * cityBlend * (3 - 2 * cityBlend);
       blendPos.lerp(cityPos, e2);
@@ -839,7 +885,7 @@ export const createGlobeScene = ({
       lastCity = index;
       orbitAz = 0.6;
       orbitEl = 0.55;
-      orbitDist = CONFIG.cityDistance;
+      orbitDist = cityFrameDist[index] ?? CONFIG.cityDistance;
       canvas.style.pointerEvents = "auto";
       canvas.style.cursor = "grab";
       // without this a touch drag scrolls the page instead of orbiting the city

@@ -44,3 +44,20 @@
 - **Added** `CityExplorer` — store labels as DOM buttons whose transforms the
   scene writes each frame, a store card, and an exit that restores the scroll.
 - **Added** `stores` (four per city, bilingual) to the content module.
+
+## ShopyLink — the architecture kit
+
+- **Added** `src/lib/scene/architecture.ts` — the form vocabulary every building
+  is assembled from. Four signature landmarks (a spiralling tapered spire, a
+  twisted hyperboloid lattice, a domed mass with minarets, a stepped setback
+  tower with a crown) and six store forms (podium, vaulted hall, sawtooth shed,
+  wind tower, loft block, terrace row).
+- **Changed** `Store` to carry a `form` instead of a raw `height`, and `City` to
+  carry a `landmark`. Massing is now a consequence of the form, not a number set
+  beside the name.
+- **Added** a central plaza so the streets read as a roundabout around the
+  landmark rather than running under it, contact shadows under every mass, and a
+  three-step tonal hierarchy (ground → filler → landmark and stores).
+- **Changed** the city framing to be per-city: the distance is set by the plate,
+  which is the same in every district, and the look-at height by that city's
+  landmark.

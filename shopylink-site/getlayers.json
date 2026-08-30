@@ -127,12 +127,18 @@
     "BUG FOUND IN QA: camera.up was left at world Y, so a district standing on the side of the sphere came out rolled 90° on screen — its circular plinth read as a vertical ellipse. The up vector now travels into the city's tangent frame.",
     "BUG FOUND IN QA: the canvas sits at -z-10, so <main> swallowed every pointer and the orbit drag never reached the scene. In city mode the canvas rises above the page content but stays under the labels and chrome.",
     "Proportions were wrong first time: a storey at 0.064 against a 0.028 building footprint made every block an obelisk. Storeys are now shorter than a building is wide.",
-    "Everything that marks a city from orbit — beacon, ping, routes, atmosphere shell — is wrong at street level, so it leaves with the world view. Surface dots shrink too: a size-attenuated point is a huge square at arm's length."
+    "Everything that marks a city from orbit — beacon, ping, routes, atmosphere shell — is wrong at street level, so it leaves with the world view. Surface dots shrink too: a size-attenuated point is a huge square at arm's length.",
+    "The districts are assembled from an architecture kit rather than sculpted per city, which is what keeps four cities reading as one designed system. Its rules: one module, silhouette first, slenderness is earned, everything sits, one accent rationed.",
+    "The landmark forms are abstractions of a city's massing — a tapered spire, a domed mass with minarets, a stepped setback tower. They are deliberately not models of named buildings.",
+    "BUG FOUND IN QA: Box3.setFromObject works in WORLD space, so measuring a building after parenting it to a district on the side of a rotating sphere gave a meaningless label height. Forms are measured before they are parented.",
+    "First framing attempt pulled the camera back for tall landmarks, which shrank the streets for no gain. The distance is set by the plate (identical in every city); the look-at height is what varies with the landmark.",
+    "Everything was white on white until a three-step tonal hierarchy was introduced: the ground is darkest, background blocks sit between, and the landmark plus the four stores are the only pure white."
   ],
   "openItems": [
     "Its privacy-policy link 404s; that page does not exist yet.",
     "Locale is a client switch, not /ar and /en routes. Real routes would be better for SEO and hreflang.",
     "HOME is now Damascus (Asia/Damascus) — both the routes' convergence point and the clock's reference read the same constant in src/content/site.ts.",
-    "The standalone scenes/shopylink-globe.html is deliberately globe-only now; districts and city mode live in src/lib/scene/globe.ts. Recorded in tech-stack.md."
+    "The standalone scenes/shopylink-globe.html is deliberately globe-only now; districts and city mode live in src/lib/scene/globe.ts. Recorded in tech-stack.md.",
+    "The 12 cinematic stills generated during the photo detour were never added to the project; they cost ~49 of 825 Higgsfield credits and live only in that account."
   ]
 }
