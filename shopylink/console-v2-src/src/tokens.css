@@ -60,7 +60,16 @@
   --sb-w: 248px;
   --rail-w: 56px;
   --panel-w: 384px;
+  /* ── one band, one gutter ────────────────────────────────────────────
+     The top band is a single horizontal rule across the whole screen: the
+     sidebar's header and the page's topbar must be the SAME height or the rule
+     steps where they meet — it stepped 8px, which is what makes a sidebar look
+     "taller" than the page beside it. And the sidebar's own inset is stated
+     once here rather than three times in three places (the header had 12, the
+     nav 8, the topbar 24), so every column hangs on the same vertical line. */
   --top-h: 48px;
+  --gutter-sb: 14px;   /* the sidebar's inset: its own column is narrower */
+  --gutter-pg: var(--s6);  /* the page's inset */
 }
 
 html, body, #root { height: 100%; }

@@ -196,9 +196,9 @@ export default function App() {
         transition: 'width var(--t-panel) var(--ease)', overflow: 'hidden',
       }}>
         <div style={{
-          height: 56, display: 'flex', alignItems: 'center',
+          height: 'var(--top-h)', flex: '0 0 auto', display: 'flex', alignItems: 'center',
           justifyContent: rail ? 'center' : 'flex-start',
-          padding: rail ? 0 : '0 var(--s3)',
+          padding: rail ? 0 : '0 var(--gutter-sb)',
           borderBottom: '1px solid rgba(244,251,255,.08)',
         }}>
           {rail
@@ -216,7 +216,7 @@ export default function App() {
             )}
         </div>
 
-        <nav style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: 'var(--s3) var(--s2)' }}>
+        <nav style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: 'var(--s3) calc(var(--gutter-sb) - var(--s2))' }}>
           {pinnedItems.length > 0 && !rail && (
             <div style={{ marginBottom: 'var(--s4)' }}>
               <div style={{ fontSize: 'var(--fs-eyebrow)', letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--acc)', padding: 'var(--s1) var(--s2) var(--s2)', fontWeight: 800 }}>
@@ -301,7 +301,7 @@ export default function App() {
 
         <header style={{
           height: 'var(--top-h)', flex: '0 0 auto', display: 'flex', alignItems: 'center',
-          gap: 'var(--s3)', padding: '0 var(--s6)', background: 'var(--paper)',
+          gap: 'var(--s3)', padding: '0 var(--gutter-pg)', background: 'var(--paper)',
           borderBottom: '1px solid var(--n3)', boxShadow: 'var(--sh-1)', zIndex: 2,
         }}>
           <button onClick={() => setFinder(true)} style={{
@@ -342,7 +342,7 @@ export default function App() {
           </div>
         </header>
 
-        <main style={{ flex: 1, overflowY: 'auto', padding: 'var(--s6)' }}>
+        <main style={{ flex: 1, overflowY: 'auto', padding: 'var(--gutter-pg)' }}>
           {view.t === 'svc' ? (
             <ServiceView file={view.file} ar={ar} t={t}
               tasks={tasks.filter(x => x.open === view.file)}
@@ -1020,7 +1020,7 @@ function SideItem({ label, indent, pinned, onOpen, onTogglePin, ar }: {
       <button onClick={onTogglePin}
         title={pinned ? (ar ? 'فكّ التثبيت' : 'Unpin') : (ar ? 'ثبّت' : 'Pin')}
         aria-label={pinned ? (ar ? 'فكّ التثبيت' : 'Unpin') : (ar ? 'ثبّت' : 'Pin')}
-        style={{ display: 'flex', padding: 5, color: pinned ? 'var(--acc)' : 'var(--n6)', opacity: pinned || hover ? 1 : 0, transition: 'opacity var(--t-state) var(--ease)' }}>
+        style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 24, height: 24, flex: '0 0 auto', borderRadius: 'var(--radius-sm)', color: pinned ? 'var(--acc)' : 'var(--n4)', opacity: pinned || hover ? 1 : 0, transition: 'opacity var(--t-state) var(--ease)' }}>
         {pinned ? <PinOff size={12} /> : <Pin size={12} />}
       </button>
     </div>
