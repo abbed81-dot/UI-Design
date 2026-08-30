@@ -327,7 +327,6 @@ export default function App() {
               focus={view.focus && !done[view.focus.id] ? view.focus : undefined}
               onComplete={completeTask}
               onAct={goAct}
-              onOpen={task => setDrawer({ task, tab: 'info' })}
               onChat={task => setDrawer({ task, tab: 'chat' })}
               onRegister={view.file === 'ShopyLink_Action_01_ReceiveParcel.html' ? registerIntake : undefined}
               onBack={() => setView({ t: 'home' })}
@@ -450,7 +449,6 @@ export default function App() {
                         <TaskList tasks={g.items} ar={ar} t={t} limit={3}
                           onMore={() => setListDrawer({ title: ar ? meta.ar : meta.en, tasks: g.items })}
                           onAct={goAct}
-                          onOpen={task => setDrawer({ task, tab: 'info' })}
                           onChat={task => setDrawer({ task, tab: 'chat' })} />
                       )}
                     </div>
@@ -555,7 +553,6 @@ export default function App() {
                 ? <div style={{ padding: 'var(--s6)', color: 'var(--n6)', fontSize: 'var(--fs-hint)', textAlign: 'center' }}>{t('لا شيء هنا — وهذا هو المقصود.', 'Nothing here — which is the point.')}</div>
                 : <TaskList tasks={listDrawer.tasks} ar={ar} t={t}
                     onAct={goAct}
-                    onOpen={task => { setListDrawer(null); setDrawer({ task, tab: 'info' }); }}
                     onChat={task => { setListDrawer(null); setDrawer({ task, tab: 'chat' }); }} />}
             </div>
           </div>
@@ -635,9 +632,9 @@ function Panel({ icon, eyebrow, title, meta, children }: {
       "more" button — the home shows the shape of the day, the drawer holds the
       day itself. In the drawer it reveals progressively, 120 at a time, so the
       500-row state scrolls clean without a wall of nodes. ─────────────────── */
-function TaskList({ tasks, ar, t, onOpen, onChat, onAct, limit, onMore }: {
+function TaskList({ tasks, ar, t, onChat, onAct, limit, onMore }: {
   tasks: Task[]; ar: boolean; t: (a: string, e: string) => string;
-  onOpen: (x: Task) => void; onChat: (x: Task) => void; onAct: (x: Task) => void;
+  onChat: (x: Task) => void; onAct: (x: Task) => void;
   limit?: number; onMore?: () => void;
 }) {
   const [cap, setCap] = useState(120);
@@ -651,25 +648,27 @@ function TaskList({ tasks, ar, t, onOpen, onChat, onAct, limit, onMore }: {
         const late = lateLabel(task.lateMs, ar);
         const tone = TONES[late.tone];
         return (
-          <div key={task.id} style={{
-            position: 'relative', display: 'flex', alignItems: 'center', gap: 'var(--s3)',
-            height: 44, padding: '0 var(--s4)', borderBottom: '1px solid var(--n2)',
-          }}>
+          <div key={task.id} className="sl-row" role="button" tabIndex={0}
+            aria-label={(ar ? task.ar : task.en) + ' — ' + late.text}
+            onClick={() => onAct(task)}
+            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onAct(task); } }}
+            style={{
+              position: 'relative', display: 'flex', alignItems: 'center', gap: 'var(--s3)',
+              height: 44, padding: '0 var(--s4)', borderBottom: '1px solid var(--n2)', cursor: 'pointer',
+            }}>
             <span aria-hidden style={{ position: 'absolute', insetInlineStart: 0, top: 8, bottom: 8, width: 3, borderRadius: 'var(--radius-pill)', background: tone.dot }} />
-            <button onClick={() => onOpen(task)} style={{ flex: 1, minWidth: 0, textAlign: 'start', fontSize: 'var(--fs-hint)', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', paddingInlineStart: 'var(--s2)' }}>
+            <span style={{ flex: 1, minWidth: 0, fontSize: 'var(--fs-hint)', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', paddingInlineStart: 'var(--s2)' }}>
               {ar ? task.ar : task.en}
-            </button>
+            </span>
             <span className="machine" style={{ fontSize: 'var(--fs-eyebrow)', color: 'var(--n6)' }}>{task.ref}</span>
             <span style={{ fontSize: 'var(--fs-eyebrow)', fontWeight: 800, whiteSpace: 'nowrap', padding: '2px 8px', borderRadius: 'var(--radius-pill)', color: tone.fg, background: tone.bg }}>{late.text}</span>
-            <button onClick={() => onChat(task)} title={t('المحادثة', 'Thread')} aria-label={t('المحادثة', 'Thread')} style={{ color: 'var(--n5)', display: 'flex' }}>
+            <button onClick={e => { e.stopPropagation(); onChat(task); }} title={t('المحادثة', 'Thread')} aria-label={t('المحادثة', 'Thread')}
+              className="sl-row-chat" style={{ color: 'var(--n5)', display: 'flex', padding: 4, borderRadius: 'var(--radius-sm)' }}>
               <MessageSquare size={14} />
             </button>
-            <button onClick={() => onAct(task)}
-              title={t('نفّذ الآن', 'Act now')}
-              style={{
-              height: 24, padding: '0 var(--s3)', background: 'var(--sky)', color: 'var(--ink)',
-              borderRadius: 'var(--radius-sm)', fontSize: 'var(--fs-eyebrow)', fontWeight: 800,
-            }}>{ar ? task.verbAr : task.verbEn}</button>
+            <span aria-hidden className="sl-row-go" style={{ color: 'var(--n4)', display: 'flex', transition: 'color var(--t-state) var(--ease), transform var(--t-state) var(--ease)' }}>
+              {ar ? <ChevronLeft size={15} /> : <ChevronRight size={15} />}
+            </span>
           </div>
         );
       })}
@@ -1058,11 +1057,11 @@ function GroupLabel({ children }: { children: React.ReactNode }) {
       own live work (act, open, thread — the same rows as the home), and the
       intake service carries the registering form itself. The experience never
       changes language or leaves the page. ─────────────────────────────────── */
-function ServiceView({ file, ar, t, tasks, focus, onComplete, onAct, onOpen, onChat, onRegister, onBack, onOpenFile }: {
+function ServiceView({ file, ar, t, tasks, focus, onComplete, onAct, onChat, onRegister, onBack, onOpenFile }: {
   file: string; ar: boolean; t: (a: string, e: string) => string;
   tasks: Task[]; focus?: Task;
   onComplete: (x: Task, text: string) => void;
-  onAct: (x: Task) => void; onOpen: (x: Task) => void; onChat: (x: Task) => void;
+  onAct: (x: Task) => void; onChat: (x: Task) => void;
   onRegister?: (f: { client: string; from: string; to: string; mode: 'air' | 'land' | 'sea'; weight: number; cartons: number }) => string;
   onBack: () => void; onOpenFile?: (f: string) => void;
 }) {
@@ -1133,7 +1132,7 @@ function ServiceView({ file, ar, t, tasks, focus, onComplete, onAct, onOpen, onC
               </div>
             </div>
           )
-          : <TaskList tasks={tasks} ar={ar} t={t} onAct={onAct} onOpen={onOpen} onChat={onChat} />}
+          : <TaskList tasks={tasks} ar={ar} t={t} onAct={onAct} onChat={onChat} />}
       </Panel>
     </div>
   );

@@ -126,6 +126,17 @@ button:disabled { cursor: default; }
 @media (max-width: 900px) {
   .sl-demo-badge { display: none; }
 }
+/* ── the queue row is the door ─────────────────────────────────────────
+   The whole line navigates, so the line must SAY it does: a quiet clean-blue
+   wash on hover, and the chevron takes the state colour and leans one step
+   into the direction of travel — 150ms, functional, nothing else moves. */
+.sl-row { transition: background var(--t-state) var(--ease); }
+.sl-row:hover, .sl-row:focus-visible { background: var(--clean); }
+.sl-row:hover .sl-row-go, .sl-row:focus-visible .sl-row-go { color: var(--sky-deep); transform: translateX(2px); }
+[dir="rtl"] .sl-row:hover .sl-row-go, [dir="rtl"] .sl-row:focus-visible .sl-row-go { transform: translateX(-2px); }
+.sl-row-chat { transition: color var(--t-state) var(--ease), background var(--t-state) var(--ease); }
+.sl-row-chat:hover { color: var(--sky-deep); background: var(--sky-tint); }
+
 .sl-drawer {
   position: fixed;
   top: 0;

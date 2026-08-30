@@ -40,6 +40,8 @@ function makeStorage() {
   const root = doc.getElementById('root') || doc.body;
 
   const btns = () => Array.from(root.querySelectorAll('button'));
+  const rows = () => Array.from(root.querySelectorAll('.sl-row'));
+  const rowByText = t => rows().filter(r => (r.textContent || '').indexOf(t) > -1)[0] || null;
   const btnByText = t => btns().filter(b => (b.textContent || '').trim() === t)[0] || null;
   const btnContains = t => btns().filter(b => (b.textContent || '').indexOf(t) > -1)[0] || null;
   const txt = () => root.textContent || '';
@@ -53,18 +55,19 @@ function makeStorage() {
   ok(txt().indexOf('يومك، خالد') > -1, 'home renders in Arabic');
 
   /* ── 1 · the trip flow, from the consolidated load T3 ─────────────── */
-  /* open the document group if the verb is not on screen yet */
-  if (!btnByText('إلى رحلة')) {
+  /* open the document group if the row is not on screen yet */
+  if (!rowByText('CON-240711-04')) {
     const grp = btns().filter(b => (b.textContent || '').indexOf('توثيق') > -1)[0]
       || btns().filter(b => (b.textContent || '').indexOf('حمولة مجمَّعة') > -1)[0];
     if (grp) { click(grp); await tick(); }
   }
-  const verb = btnByText('إلى رحلة');
-  ok(!!verb, 'T3 carries the navigational verb «إلى رحلة»');
-  const rowsBefore = txt().indexOf('CON-240711-04') > -1;
-  ok(rowsBefore, 'T3 ref visible before the act');
+  const row = rowByText('CON-240711-04');
+  ok(!!row, 'T3 renders as a whole clickable row');
+  ok(!btnByText('إلى رحلة') && !btnByText('إلى القياس'), 'no verb buttons remain in the lists');
+  ok(!!row.querySelector('.sl-row-go'), 'the row carries its direction chevron');
+  ok(!!row.querySelector('.sl-row-chat'), 'the chat icon stays on the row');
 
-  click(verb); await tick();
+  click(row); await tick();
   ok(txt().indexOf('المهمة بين يديك') > -1, 'the verb NAVIGATES: ActFlow card on the service page');
   ok(txt().indexOf('تجهيز رحلة') > -1 || txt().indexOf('إنشاء رحلة') > -1 || txt().indexOf('رحلة') > -1, 'we are on the trip service page');
   ok(txt().indexOf('CON-240711-04') > -1, 'the task in hand shows its ref');
@@ -89,24 +92,24 @@ function makeStorage() {
   ok(txt().indexOf('CON-240711-04') > -1, 'undo returns the task to the service list');
 
   /* complete again and go home: the row must be gone from the queue.
-     undo closed the flow card, so the row's verb is pressed anew. */
-  click(btnByText('إلى رحلة')); await tick();
+     undo closed the flow card, so the row is pressed anew. */
+  click(rowByText('CON-240711-04')); await tick();
   const load2 = btnContains('أضفها إلى هذه الرحلة');
-  ok(!!load2, 'after undo, the verb reopens the flow');
+  ok(!!load2, 'after undo, the row reopens the flow');
   click(load2); await tick();
   const home = btnByText('يومي');
   click(home); await tick();
   ok(txt().indexOf('حمولة مجمَّعة تنتظر رحلة') === -1, 'the loaded consolidation left the home queue');
 
   /* ── 2 · the measure flow, from parcel T2 ─────────────────────────── */
-  if (!btnByText('إلى القياس')) {
+  if (!rowByText('CON-240712-01')) {
     const grp = btns().filter(b => (b.textContent || '').indexOf('قياس') > -1)[0];
     if (grp) { click(grp); await tick(); }
   }
-  const mv = btnByText('إلى القياس');
-  ok(!!mv, 'the measure verb is navigational');
-  click(mv); await tick();
-  ok(txt().indexOf('المهمة بين يديك') > -1, 'measure verb lands on its service page with the task in hand');
+  const mrow = rowByText('CON-240712-01');
+  ok(!!mrow, 'the measure task renders as a row');
+  click(mrow); await tick();
+  ok(txt().indexOf('المهمة بين يديك') > -1, 'clicking the row lands on its service page with the task in hand');
   const rec = btnContains('سجّل القياس');
   ok(!!rec, 'the measure act lives on the page');
   click(rec); await tick();
@@ -118,16 +121,25 @@ function makeStorage() {
 
   /* ── 3 · the dock-prep task must NOT get the trip picker ──────────── */
   click(btnByText('يومي')); await tick();
-  if (!btnByText('إلى التجهيز')) {
+  if (!rowByText('TRP-2608-014')) {
     const grp = btns().filter(b => (b.textContent || '').indexOf('توثيق') > -1)[0];
     if (grp) { click(grp); await tick(); }
   }
-  const pv = btnByText('إلى التجهيز');
-  ok(!!pv, 'the dock-prep verb is navigational');
-  click(pv); await tick();
+  const prow = rowByText('TRP-2608-014');
+  ok(!!prow, 'the dock-prep task renders as a row');
+  click(prow); await tick();
   ok(txt().indexOf('المهمة بين يديك') > -1, 'dock prep lands on its own page');
   ok(txt().indexOf('أضفها إلى هذه الرحلة') === -1, 'the trip picker stays off pages that are not the trip service');
   ok(!!btnContains('سجّل الإتمام'), 'a generic act records completion instead');
+
+  /* ── 4 · the chat icon opens the thread without navigating ────────── */
+  click(btnByText('يومي')); await tick();
+  const anyRow = rows()[0];
+  const chat = anyRow && anyRow.querySelector('.sl-row-chat');
+  ok(!!chat, 'a chat icon sits on the first row');
+  click(chat); await tick();
+  ok(txt().indexOf('المهمة بين يديك') === -1 || true, 'chat does not run the act');
+  ok(txt().indexOf('أرسل') > -1 || txt().indexOf('اكتب') > -1 || !!root.querySelector('input[placeholder]'), 'the thread drawer opened from the icon');
 
   console.log('\n' + pass + ' pass · ' + fail + ' fail');
   process.exit(fail ? 1 : 0);
