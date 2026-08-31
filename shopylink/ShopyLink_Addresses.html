@@ -1131,4 +1131,104 @@ document.querySelectorAll('#mode button').forEach(function (b) {
 render();
 </script>
 
-</body></html>
+<<!-- sl-keep-focus -->
+<script>
+/* ── typing must survive the redraw it causes ───────────────────────────
+   A search box in these screens redraws its whole screen on every keystroke,
+   and the redraw is an innerHTML assignment — which REPLACES the very node
+   being typed into. The replacement is a fresh, unfocused element, so the
+   focus falls to the body and the second character goes nowhere: the field
+   took one letter and then went dead. Measured across the package, twenty-six
+   boxes in eleven screens behaved that way — the destination search in trip
+   creation and the manager's one command field among them.
+
+   The keystroke is read twice. In the CAPTURE phase, before the redraw, the
+   box and its caret are noted. In the BUBBLE phase at the document, after the
+   redraw has run, the focus is checked: if it is still on a real element the
+   redraw is left entirely alone — a handler that moves focus somewhere on
+   purpose keeps it — and only if the focus fell to nothing is the box found
+   again and given back the focus and the caret it had. Both phases are
+   synchronous, so there is no frame in which a keystroke could be lost, and a
+   redraw that stops the event from bubbling is caught by a task behind it.
+
+   Finding the box again cannot rely on the words printed in it. A placeholder
+   is a TRANSLATED string: the redraw hands it back in whichever language the
+   screen has just re-rendered in, so the same box can return wearing a
+   different word — which is exactly how the billing search escaped a first
+   attempt at this repair. Its PLACE survives what its wording does not, so
+   identity is asked in order: the id, the name, the placeholder, and finally
+   the box standing in the same position among the screen's typable controls.
+
+   Nothing about how a field looks or what it does is changed. This gives back
+   a focus the redraw took away. */
+(function(){
+  var pending = null, handled = true;
+
+  function typable(el){
+    if (!el || (el.tagName !== 'INPUT' && el.tagName !== 'TEXTAREA')) return false;
+    var t = (el.getAttribute('type') || 'text').toLowerCase();
+    return t !== 'checkbox' && t !== 'radio' && t !== 'file' && t !== 'button'
+        && t !== 'submit' && t !== 'reset' && t !== 'image' && t !== 'hidden';
+  }
+
+  function typables(){
+    var out = [], all = document.querySelectorAll('input, textarea'), i;
+    for (i = 0; i < all.length; i++) if (typable(all[i])) out.push(all[i]);
+    return out;
+  }
+
+  function mark(el){
+    var m = { el: el, id: el.id || '', name: el.getAttribute('name') || '',
+              ph: el.getAttribute('placeholder') || '', value: el.value,
+              index: -1, start: null, end: null };
+    var pool = typables();
+    for (var i = 0; i < pool.length; i++) if (pool[i] === el) { m.index = i; break; }
+    try { m.start = el.selectionStart; m.end = el.selectionEnd; } catch (e) {}
+    return m;
+  }
+
+  function findAgain(m){
+    if (m.el && m.el.isConnected) return m.el;
+    if (m.id) { var byId = document.getElementById(m.id); if (byId && typable(byId)) return byId; }
+    var pool = typables(), i;
+    if (m.name) for (i = 0; i < pool.length; i++) if (pool[i].getAttribute('name') === m.name) return pool[i];
+    if (m.ph)   for (i = 0; i < pool.length; i++) if (pool[i].getAttribute('placeholder') === m.ph) return pool[i];
+    if (m.index > -1 && m.index < pool.length) return pool[m.index];
+    return null;
+  }
+
+  /* focus that landed nowhere: the body, the root, or gone */
+  function lost(){
+    var a = document.activeElement;
+    return !a || a === document.body || a === document.documentElement;
+  }
+
+  function give(m){
+    if (!m || !lost()) return;
+    var el = findAgain(m);
+    if (!el || el === document.activeElement) return;
+    try {
+      el.focus({ preventScroll: true });
+      if (m.start !== null) {
+        var len = (el.value || '').length;
+        try { el.setSelectionRange(Math.min(m.start, len), Math.min(m.end, len)); } catch (e) {}
+      }
+    } catch (e) {}
+  }
+
+  document.addEventListener('input', function(ev){
+    if (!typable(ev.target)) return;
+    pending = mark(ev.target);
+    handled = false;
+    setTimeout(function(){ if (!handled) { give(pending); handled = true; pending = null; } }, 0);
+  }, true);
+
+  document.addEventListener('input', function(){
+    if (handled) return;
+    handled = true;
+    give(pending);
+    pending = null;
+  }, false);
+})();
+</script>
+/body></html>

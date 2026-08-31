@@ -103,7 +103,11 @@ for (const f of files) {
   const p = join(W, f);
   let s = readFileSync(p, 'utf8');
   if (s.indexOf('SL Arabic sweep') > -1) {
-    s = s.replace(/\n<script>\n\/\* ── SL Arabic sweep[\s\S]*?<\/script>\n(?=<\/body>|$)/, '');
+    /* the sweep is no longer the last thing before </body> — the focus repair
+       sits there too — so the old block is found by its own boundaries, not by
+       what follows it. Anchoring on </body> silently left the old block in
+       place and added a second one. */
+    s = s.replace(/\n<script>\n\/\* ── SL Arabic sweep[\s\S]*?<\/script>\n/, '');
   }
   const dict = (s.match(/var\s+(T_[A-Za-z0-9_]+)\s*=\s*\{/) || [])[1] || '';
   const block = BLOCK(dict);
