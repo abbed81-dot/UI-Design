@@ -1161,36 +1161,36 @@ function ServiceView({ file, ar, t, tasks, focus, onAct, onChat, onBack, onOpenF
   if (!item || !cat) return null;
   return (
     <div style={{ maxWidth: 1240, marginInline: 'auto', display: 'flex', flexDirection: 'column', height: '100%' }}>
-      <nav aria-label={t('مسار', 'Breadcrumb')} style={{
-        display: 'flex', alignItems: 'center', gap: 'var(--s2)',
-        fontSize: 'var(--fs-hint)', color: 'var(--n6)', marginBottom: 'var(--s4)',
-      }}>
-        <button onClick={onBack} style={{ color: 'var(--sky-deep)', fontWeight: 700 }}>{t('يومي', 'My day')}</button>
-        {ar ? <ChevronLeft size={13} /> : <ChevronRight size={13} />}
-        <span>{ar ? cat.ar : cat.en}</span>
-        {ar ? <ChevronLeft size={13} /> : <ChevronRight size={13} />}
-        <b style={{ color: 'var(--ink)' }}>{ar ? item.ar : item.en}</b>
-      </nav>
-
+      {/* ONE chrome row above the module, not two. The breadcrumb sat on its
+          own line and the service bar on the next, two rows doing one job:
+          measured, they cost 174px of chrome above a module that had 25px
+          below it — a composition heavy at the top, which is what reads as
+          out of balance. Merged, the path, the name, the description and the
+          count share a single line and the module gains the difference. */}
       <section style={{
         display: 'flex', alignItems: 'center', gap: 'var(--s3)', flexWrap: 'wrap',
         background: 'var(--paper)', border: '1px solid var(--n3)',
-        borderRadius: 'var(--radius)', boxShadow: 'var(--sh-1)',
-        padding: 'var(--s2) var(--s4)', marginBottom: 'var(--s3)', flex: '0 0 auto',
+        borderRadius: 'var(--radius)', padding: 'var(--s2) var(--s4)',
+        marginBottom: 'var(--s3)', flex: '0 0 auto',
       }}>
         <span aria-hidden style={{
           width: 30, height: 30, borderRadius: 'var(--radius-sm)', background: 'var(--sky-tint)',
           color: 'var(--sky-deep)', display: 'flex', alignItems: 'center', justifyContent: 'center', flex: '0 0 auto',
         }}><Icon size={16} /></span>
-        <span style={{ minWidth: 0, lineHeight: 1.25 }}>
-          <span className="sl-nowrap" style={{ display: 'block', fontSize: 'var(--fs-eyebrow)', color: 'var(--n6)', fontWeight: 800, letterSpacing: '.08em', textTransform: 'uppercase' }}>
-            {ar ? cat.ar : cat.en}
+
+        <span style={{ minWidth: 0, lineHeight: 1.3 }}>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 'var(--s1)', fontSize: 'var(--fs-eyebrow)', color: 'var(--n6)' }}>
+            <button onClick={onBack} style={{ color: 'var(--sky-deep)', fontWeight: 800 }}>{t('يومي', 'My day')}</button>
+            {ar ? <ChevronLeft size={11} /> : <ChevronRight size={11} />}
+            <span className="sl-nowrap">{ar ? cat.ar : cat.en}</span>
           </span>
           <span style={{ display: 'block', fontSize: 'var(--fs-lead)', fontWeight: 800 }}>{ar ? item.ar : item.en}</span>
         </span>
-        <span style={{ flex: 1, minWidth: 120, fontSize: 'var(--fs-hint)', color: 'var(--n6)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+
+        <span style={{ flex: 1, minWidth: 100, fontSize: 'var(--fs-hint)', color: 'var(--n6)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {ar ? (item.descAr || '') : (item.descEn || '')}
         </span>
+
         <span className="machine" style={{ fontSize: 'var(--fs-eyebrow)', fontWeight: 800, color: 'var(--n6)', background: 'var(--n1)', padding: '3px 9px', borderRadius: 'var(--radius-pill)' }}>
           {tasks.length}
         </span>
