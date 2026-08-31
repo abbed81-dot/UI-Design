@@ -1,5 +1,25 @@
 # ShopyLink — handover
 
+## Two numbers, and what each one counts
+
+`console-v2` is the **source generation** — the folder this code lives in, the
+second console written for this package. It is a directory name and never a
+release number, which is why it appears in paths (`shopylink/console-v2-src/`)
+and nowhere else.
+
+`v5.3` is the **build number**, counting published builds of that source. It is
+declared in exactly two places, both of which ship:
+
+    src/App.tsx      const BUILD = '5.3'   -> rendered beside the demonstration
+                                              badge in the topbar
+    index.html       <meta name="sl-version" content="5.3">
+
+so `grep sl-version <file>.html` answers "which build is this" without running
+anything. Raise it in the same commit that changes what ships.
+
+    5.0  the design pass        5.2  every box on a line balanced
+    5.1  one chrome row         5.3  typing survives its redraw, Arabic finished
+
 ## What is in the zip
 
     ShopyLink_Console_v5.3.html      the console, one self-contained file — open it, nothing to install

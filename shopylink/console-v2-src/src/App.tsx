@@ -53,6 +53,19 @@ function lateLabel(ms: number, ar: boolean): { text: string; tone: 'red' | 'ambe
    than an honest sentence, so module-opening degrades to an explanation */
 const HAS_MODULES = typeof (window as { claude?: unknown }).claude === 'undefined';
 
+/* ── which build is this ────────────────────────────────────────────────
+   Two numbers were being used for two different things, and only one of them
+   existed anywhere: "console-v2" is the SOURCE GENERATION — the folder this
+   code lives in, the second console written for this package — while the
+   version below counts PUBLISHED BUILDS of it, and had reached 5.1 in the
+   commit log before two commits landed without a number. A build that does not
+   say what it is cannot be checked against a report about it, so it says so
+   here, on the screen, and in a meta tag a developer can grep without running
+   anything. Raise it in the same commit that changes what ships.
+     5.0  the design pass          5.2  every box on a line balanced
+     5.1  one chrome row           5.3  typing survives its redraw, Arabic done */
+const BUILD = '5.3';
+
 export default function App() {
   const saved = useMemo<SavedState>(() => readState(), []);
   const [lang, setLang] = useState<Lang>(saved.lang ?? 'ar');
@@ -321,6 +334,9 @@ export default function App() {
           }}>
             {t('بيانات تجريبية', 'DEMONSTRATION DATA')}
           </span>
+          {/* quiet enough to ignore, present enough to quote in a bug report */}
+          <span className="machine sl-nowrap" title={t('رقم البناء', 'Build')}
+            style={{ fontSize: 10, color: 'var(--n6)', flex: '0 0 auto' }}>v{BUILD}</span>
           <button onClick={() => setLang(ar ? 'en' : 'ar')} style={{
             height: 32, padding: '0 var(--s3)', border: '1.5px solid var(--n3)',
             borderRadius: 'var(--radius-sm)', fontSize: 'var(--fs-hint)', fontWeight: 800,
