@@ -1524,6 +1524,36 @@ textarea{font-size:var(--fs-body,14px);line-height:1.6}
   .sl-scroll,.sl-main{padding-left:10px !important;padding-right:10px !important}
   .figure{font-size:22px !important}
 }
+
+/* sl-box-balance */
+/* ── the boxes on a line must share a top edge and a height ────────────
+   Two defects made a field box sit lower or stand shorter than the box beside
+   it. Both are corrected here, in the shared form vocabulary, so the same
+   markup behaves the same wherever it is used.
+
+   1 · THE REQUIRED MARKER RESIZED THE ROW IT MARKED.
+       In RTL the label is set display:block, to right-align it. That makes the
+       asterisk next to it a block of its own on a second line — and .fl-req
+       carries no font-size, so that orphan line inherits the 16px body size and
+       stands 19px tall. The label row of a required field therefore grew from
+       13px to 32px, and its box dropped 19px below the box next to it: the
+       departure date sat under the line while the arrival date, which is not
+       required, stayed on it. The label is made inline-block so the marker
+       keeps its place beside the word in both directions, the marker takes the
+       label's own size, and .fl states the size its own line box is measured
+       from, so the row height no longer depends on what the row contains.
+
+   2 · THE PLAIN FIELD NEVER GOT THE CONTROL HEIGHT.
+       The rule that gives every control the 42px height names input types:
+       text, number, tel, email, date. A .field written as <input class="field">
+       declares no type at all, so it never matched and kept the 38px its
+       padding gave it — leaving a 38px text box beside a 42px select on the
+       same line. The height is stated on the class instead of the type.       */
+.fl { font-size: 11px; line-height: 1.2; }
+.fl-label { display: inline-block; }
+html[dir="rtl"] .fl-label { display: inline-block; }
+.fl-req { font-size: 11px; line-height: 1; }
+input.field { height: var(--ctl-h, 42px); }
 </style>
 </head>
 <body>
