@@ -19,6 +19,7 @@
   --ink:#25362C;
   --muted:#7B8A80;
   --line:#E2E8DC;
+  --road:#E3EAD6;
   --accent:#3E9B4F;
   --accent-ink:#FFFFFF;
   --accent-soft:#E3F2E3;
@@ -33,14 +34,14 @@
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --bg:#11181C; --surface:#182228; --soft:#1F2B31; --ink:#E6EEE7; --muted:#93A39A; --line:#26343B;
+    --bg:#11181C; --surface:#182228; --soft:#1F2B31; --ink:#E6EEE7; --muted:#93A39A; --line:#26343B; --road:#22313A;
     --accent:#5DBB6C; --accent-ink:#0E1A12; --accent-soft:#1E3326; --sun:#F5C451; --sun-soft:#3A3220;
     --bad:#F07470; --bad-soft:#3A2224; --focus:#6DB1EA; --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.18);
     color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
-  --bg:#11181C; --surface:#182228; --soft:#1F2B31; --ink:#E6EEE7; --muted:#93A39A; --line:#26343B;
+  --bg:#11181C; --surface:#182228; --soft:#1F2B31; --ink:#E6EEE7; --muted:#93A39A; --line:#26343B; --road:#22313A;
   --accent:#5DBB6C; --accent-ink:#0E1A12; --accent-soft:#1E3326; --sun:#F5C451; --sun-soft:#3A3220;
   --bad:#F07470; --bad-soft:#3A2224; --focus:#6DB1EA; --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.18);
   color-scheme:dark;
@@ -73,27 +74,41 @@ p{margin:0}
 .home-top{display:flex;align-items:center;justify-content:space-between}
 .star-count{display:inline-flex;align-items:center;gap:6px;font-family:var(--f-display);font-weight:700;color:var(--muted)}
 .star-count b{color:var(--sun)}
-.intro{padding:20px 0 22px;display:grid;gap:6px}
-.intro h1{font-size:clamp(1.8rem,6vw,2.3rem);font-weight:800}
-.intro p{color:var(--muted);max-width:36ch}
-.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
-.tile{position:relative;display:grid;justify-items:center;gap:2px;padding:16px 8px 12px;border-radius:20px;background:var(--surface);box-shadow:var(--shadow);transition:transform .15s}
-.tile:active{transform:scale(.97)}
-.tile .t-emoji{font-size:2.3rem;line-height:1.2}
-.tile .t-name{font-family:var(--f-display);font-weight:700;font-size:1.1rem}
-.tile .t-stars{font-size:.95rem;letter-spacing:2px;color:var(--line);line-height:1}
-.tile .t-stars .on{color:var(--sun)}
-.tile.locked{background:transparent;box-shadow:none;border:2px dashed var(--line)}
-.tile.locked .t-emoji{opacity:.35;filter:grayscale(1)}
-.tile.locked .t-name{color:var(--muted)}
-.tile.current{box-shadow:0 0 0 3px var(--accent),var(--shadow)}
-.tile.current::after{content:"ابدأ هنا";position:absolute;top:-11px;background:var(--accent);color:var(--accent-ink);font-size:.75rem;font-weight:700;padding:0 10px;border-radius:99px;line-height:1.8}
-.tile.champ{grid-column:1/-1;grid-template-columns:auto 1fr auto;justify-items:start;align-items:center;gap:14px;padding:14px 18px}
-.home-extra{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:22px}
-.quiet{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:16px;background:var(--soft);text-align:start}
-.quiet .qi{font-size:1.4rem}
-.quiet b{display:block;font-family:var(--f-display);font-size:1rem;line-height:1.2}
-.quiet small{display:block;color:var(--muted);font-size:.8rem;line-height:1.3}
+.intro{padding:14px 0 6px;display:grid;gap:12px}
+.intro h1{font-size:clamp(1.8rem,6vw,2.3rem);font-weight:800;color:var(--accent)}
+.hello{display:flex;align-items:flex-end;gap:10px}
+.hello-sheep{font-size:3rem;line-height:1;animation:hop 2.4s ease-in-out infinite;flex:none}
+.bubble{position:relative;background:var(--surface);box-shadow:var(--shadow);border-radius:18px 18px 18px 4px;padding:10px 14px;font-weight:700;max-width:30ch;line-height:1.45}
+.pills{display:flex;gap:8px;flex-wrap:wrap}
+.pill{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 14px;border-radius:99px;background:var(--soft);font-weight:700;font-size:.95rem}
+.pill:hover{background:var(--line)}
+@keyframes hop{0%,100%{transform:translateY(0)}40%{transform:translateY(-8px)}55%{transform:translateY(0)}}
+
+/* winding trail */
+.trail{--amp:min(84px,19vw);position:relative;display:flex;flex-direction:column;align-items:center;gap:40px;padding:34px 0 26px}
+.trail-svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+.road{fill:none;stroke:var(--road);stroke-width:30;stroke-linecap:round;stroke-linejoin:round}
+.road-line{fill:none;stroke:var(--surface);stroke-width:3;stroke-linecap:round;stroke-dasharray:1 14}
+.road-done{fill:none;stroke:var(--accent);stroke-width:8;stroke-linecap:round;opacity:.75}
+.deco{position:absolute;transform:translate(-50%,-50%);font-size:1.7rem;line-height:1;pointer-events:none;opacity:.9}
+.node{position:relative;display:grid;justify-items:center;gap:6px;transform:translateX(calc(var(--x) * var(--amp)))}
+.disc{position:relative;width:82px;height:82px;border-radius:50%;display:grid;place-items:center;font-size:2.4rem;background:var(--surface);box-shadow:0 0 0 4px var(--accent),0 7px 0 4px color-mix(in srgb,var(--accent) 45%,var(--bg));transition:transform .15s}
+.node:active .disc{transform:translateY(4px) scale(.97)}
+.node .badge{position:absolute;top:-6px;inset-inline-start:-6px;min-width:30px;height:30px;padding:0 5px;border-radius:99px;background:var(--accent);color:var(--accent-ink);font-family:var(--f-display);font-weight:800;font-size:1rem;display:grid;place-items:center;box-shadow:0 0 0 3px var(--bg)}
+.node .n-stars{font-size:1rem;letter-spacing:2px;line-height:1;color:var(--line)}
+.node .n-stars .on{color:var(--sun)}
+.node .n-label{font-family:var(--f-display);font-weight:700;font-size:.95rem;color:var(--muted)}
+.node.locked .disc{background:var(--soft);box-shadow:0 0 0 3px var(--line);font-size:2rem}
+.node.locked .disc>.em{opacity:.35;filter:grayscale(1)}
+.node.locked .badge{background:var(--line);color:var(--muted)}
+.node.current .disc{box-shadow:0 0 0 5px var(--sun),0 7px 0 5px color-mix(in srgb,var(--sun) 50%,var(--bg))}
+.node.current .badge{background:var(--sun);color:#3A2A00}
+.mascot{position:absolute;top:14px;font-size:2.1rem;line-height:1;animation:hop 1.4s ease-in-out infinite;pointer-events:none}
+.mascot.on-left{left:-50px}
+.mascot.on-right{right:-50px}
+.mascot::after{content:"هنا!";position:absolute;top:-16px;inset-inline-end:-6px;font-family:var(--f-display);font-size:.8rem;font-weight:800;background:var(--sun);color:#3A2A00;border-radius:99px;padding:0 7px;line-height:1.7;white-space:nowrap}
+.node.champ .disc{width:96px;height:96px;font-size:2.8rem}
+.goal-flag{text-align:center;color:var(--muted);font-size:.9rem;margin-top:-6px}
 
 /* ---------- sheet ---------- */
 .overlay{position:fixed;inset:0;background:rgba(12,22,16,.38);z-index:20;display:flex;align-items:flex-end;justify-content:center}
@@ -220,12 +235,9 @@ table.mg{border-collapse:separate;border-spacing:3px;margin:0 auto;font-family:v
 @keyframes fall{to{transform:translateY(110vh) rotate(400deg)}}
 
 @media (max-width:420px){
-  .tiles{grid-template-columns:1fr 1fr;gap:10px}
-  .tile:not(.champ){grid-template-columns:auto 1fr;grid-template-rows:auto auto;justify-items:start;column-gap:10px;row-gap:0;padding:10px 12px;border-radius:16px;text-align:start}
-  .tile:not(.champ) .t-emoji{grid-row:1/3;font-size:1.9rem;align-self:center}
-  .tile .t-name{font-size:1rem}
-  .tile.current::after{inset-inline-end:10px}
-  .home-extra{grid-template-columns:1fr}
+  .disc{width:74px;height:74px;font-size:2.1rem}
+  .node.champ .disc{width:86px;height:86px}
+  .trail{gap:36px}
   .skip{grid-template-columns:repeat(5,1fr)}
   .mg th{width:27px}
   .mg td button{width:28px;height:29px;font-size:.72rem;border-radius:7px}
@@ -247,13 +259,14 @@ table.mg{border-collapse:separate;border-spacing:3px;margin:0 auto;font-family:v
     </div>
     <div class="intro">
       <h1>مزرعة جدول الضرب</h1>
-      <p>اختر جدولًا. كلما أجبت أسرع، تجاوزت المرحلة بأسئلة أقل.</p>
+      <div class="hello"><span class="hello-sheep" aria-hidden="true">🐑</span><p class="bubble" id="bubble">مرحبًا! أنا صوفي.</p></div>
+      <div class="pills">
+        <button class="pill" id="reviewBtn">🧠 مراجعة ذكية</button>
+        <button class="pill" id="gridBtn">🗺️ خريطة الحفظ</button>
+      </div>
     </div>
-    <div class="tiles" id="tiles"></div>
-    <div class="home-extra">
-      <button class="quiet" id="reviewBtn"><span class="qi">🧠</span><span><b>مراجعة ذكية</b><small>الحقائق التي تخطئ فيها أكثر</small></span></button>
-      <button class="quiet" id="gridBtn"><span class="qi">🗺️</span><span><b>خريطة الحفظ</b><small>ماذا حفظت من الجدول كله</small></span></button>
-    </div>
+    <div class="trail" id="trail"></div>
+    <p class="goal-flag">أوصل صوفي إلى الكأس 🏆</p>
   </section>
 
   <!-- ================= LEARN ================= -->
@@ -482,28 +495,69 @@ async function countAlong(el, fast){
   if (run === countRun) el.classList.add('sums');
 }
 
-/* ================= home ================= */
+/* ================= home: winding trail ================= */
+const OFFS = [0, .9, 1.3, .9, 0, -.9, -1.3, -.9, 0, .9, 0];
+const DECOS = ['🌳', '🌼', '🍄', '🌷', '🌲', '🦋', '🌻', '🐞', '🌸', '🌾', '🎈'];
+let currentNode = 0;
 function renderMap(){
   $('starTotal').textContent = ar(Object.values(S.stars).reduce((x, y) => x + y, 0)) + ' من ' + ar(33);
   $('soundBtn').textContent = S.sound ? '🔊' : '🔇';
-  let current = 0;
-  for (let n = 1; n <= 11; n++) if (unlocked(n) && !stars(n)) { current = n; break; }
-  const tiles = $('tiles');
-  tiles.innerHTML = '';
+  currentNode = 0;
+  for (let n = 1; n <= 11; n++) if (unlocked(n) && !stars(n)) { currentNode = n; break; }
+  const total = Object.values(S.stars).reduce((x, y) => x + y, 0);
+  $('bubble').textContent = currentNode === 0 ? 'أنت بطل المزرعة! جرّب أن تجمع كل النجوم ⭐'
+    : currentNode === 11 ? 'وصلنا إلى الكأس! هل أنت جاهز لتحدي البطل؟ 🏆'
+    : total === 0 ? `مرحبًا! أنا صوفي 🐑 هيا نبدأ بجدول ${ar(currentNode)}. اضغط على الدائرة التي أقف عندها.`
+    : `أحسنت! هيا إلى جدول ${ar(currentNode)}. كلما أجبت أسرع وصلنا أسرع!`;
+  const trail = $('trail');
+  trail.innerHTML = '<svg class="trail-svg" aria-hidden="true"><path class="road" id="road"/><path class="road-line" id="roadLine"/><path class="road-done" id="roadDone"/></svg>';
   for (let n = 1; n <= 11; n++){
     const champ = n === 11, lock = !unlocked(n), st = stars(n);
     const name = champ ? 'تحدي البطل' : 'جدول ' + ar(n);
-    const starHtml = `<span class="t-stars" aria-hidden="true">${[1, 2, 3].map(i => `<span class="${i <= st ? 'on' : ''}">★</span>`).join('')}</span>`;
     const btn = document.createElement('button');
-    btn.className = 'tile' + (lock ? ' locked' : '') + (n === current ? ' current' : '') + (champ ? ' champ' : '');
-    btn.innerHTML = champ
-      ? `<span class="t-emoji">🏆</span><span><span class="t-name">${name}</span><br><small style="color:var(--muted)">${lock ? '🔒 يُفتح بعد الجداول العشرة' : 'أسئلة من كل الجداول'}</small></span>${starHtml}`
-      : `<span class="t-emoji">${theme(n).pe}</span><span class="t-name">${lock ? '🔒 ' : ''}${name}</span>${starHtml}`;
+    btn.className = 'node' + (lock ? ' locked' : '') + (n === currentNode ? ' current' : '') + (champ ? ' champ' : '');
+    btn.style.setProperty('--x', OFFS[n - 1]);
+    btn.innerHTML = `
+      <span class="disc"><span class="em">${champ ? '🏆' : theme(n).pe}</span>${champ ? '' : `<span class="badge num">${lock ? '🔒' : ar(n)}</span>`}${n === currentNode ? `<span class="mascot ${OFFS[n - 1] > 0 ? 'on-left' : 'on-right'}" aria-hidden="true">🐑</span>` : ''}</span>
+      ${champ ? `<span class="n-label">${name}</span>` : ''}
+      ${lock && !champ ? '' : `<span class="n-stars" aria-hidden="true">${[1, 2, 3].map(i => `<span class="${i <= st ? 'on' : ''}">★</span>`).join('')}</span>`}`;
     btn.setAttribute('aria-label', name + (lock ? '، مقفل' : '') + '، ' + ar(st) + ' من ٣ نجوم');
     btn.onclick = () => openSheet(n);
-    tiles.appendChild(btn);
+    trail.appendChild(btn);
   }
+  DECOS.forEach((d, i) => { const e = document.createElement('span'); e.className = 'deco'; e.dataset.i = i; e.textContent = d; trail.appendChild(e); });
+  requestAnimationFrame(() => {
+    drawTrail();
+    if (currentNode >= 4){
+      const el = trail.querySelectorAll('.node')[currentNode - 1];
+      el && el.scrollIntoView({block:'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'});
+    }
+  });
 }
+function drawTrail(){
+  const trail = $('trail'), road = $('road');
+  if (!road || $('screen-map').hidden) return;
+  const r0 = trail.getBoundingClientRect(), W = r0.width;
+  const pts = [...trail.querySelectorAll('.disc')].map(d => { const r = d.getBoundingClientRect(); return [r.left + r.width / 2 - r0.left, r.top + r.height / 2 - r0.top]; });
+  const curve = list => list.reduce((d, [x1, y1], i) => {
+    if (!i) return `M${x1},${y1}`;
+    const [x0, y0] = list[i - 1], m = (y1 - y0) / 2;
+    return d + ` C${x0},${y0 + m} ${x1},${y1 - m} ${x1},${y1}`;
+  }, '');
+  const full = curve(pts);
+  road.setAttribute('d', full); $('roadLine').setAttribute('d', full);
+  const reach = currentNode === 0 ? pts.length : currentNode;
+  $('roadDone').setAttribute('d', reach > 1 ? curve(pts.slice(0, reach)) : '');
+  // scenery on the open side of each bend
+  trail.querySelectorAll('.deco').forEach(e => {
+    const i = +e.dataset.i, [x, y] = pts[i];
+    const side = OFFS[i] > 0 ? -1 : OFFS[i] < 0 ? 1 : (i % 4 === 0 ? 1 : -1);
+    const gap = Math.min(130, W * .32);
+    e.style.left = Math.max(22, Math.min(W - 22, x + side * gap)) + 'px';
+    e.style.top = (y + (i % 2 ? 16 : -8)) + 'px';
+  });
+}
+addEventListener('resize', () => requestAnimationFrame(drawTrail));
 
 /* ================= sheet ================= */
 function openSheet(n){
@@ -865,6 +919,7 @@ function start(data){
   load();
   if (data && data.S) S = Object.assign(fresh(), data.S);
   show('map');
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => requestAnimationFrame(drawTrail));
 }
 window.claude?.hot?.snapshot?.(() => ({S}));
 window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
