@@ -4,30 +4,21 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <!--ARTIFACT-START-->
-<title>مزرعة جدول الضرب</title>
+<title>مزرعة الأرقام</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@500;700;800&family=Tajawal:wght@400;500;700&display=swap">
 <style>
-/* Layout: one calm column. Each screen shows one main thing (the table grid, the picture, the question),
-   with secondary actions as quiet text buttons. Flat surfaces, no heavy borders, one green accent. */
+/* Layout: one calm column (wider on tablets). Parent signs up once, picks a child, the child picks a "world"
+   (multiplication, addition, subtraction, place value, rounding); each world is a winding trail of levels.
+   Place values keep one colour everywhere: ones blue, tens green, hundreds orange, thousands purple,
+   ten-thousands pink, hundred-thousands teal. */
 :root{
-  --bg:#F5F7F2;
-  --surface:#FFFFFF;
-  --soft:#EDF1E8;
-  --ink:#25362C;
-  --muted:#7B8A80;
-  --line:#E2E8DC;
-  --road:#E3EAD6;
-  --accent:#3E9B4F;
-  --accent-ink:#FFFFFF;
-  --accent-soft:#E3F2E3;
-  --sun:#F2B630;
-  --sun-soft:#FDF1D3;
-  --bad:#D9534F;
-  --bad-soft:#FBE7E6;
-  --focus:#3A86C8;
+  --bg:#F5F7F2; --surface:#FFFFFF; --soft:#EDF1E8; --ink:#25362C; --muted:#7B8A80; --line:#E2E8DC; --road:#E3EAD6;
+  --accent:#3E9B4F; --accent-ink:#FFFFFF; --sun:#F2B630; --sun-soft:#FDF1D3; --bad:#D9534F; --bad-soft:#FBE7E6; --focus:#3A86C8;
+  --w-mult:#3E9B4F; --w-add:#2B7BD6; --w-sub:#C9771E; --w-place:#8A4FC2; --w-round:#12999A;
+  --p0:#2B7BD6; --p1:#2E9D57; --p2:#E07B1F; --p3:#8A4FC2; --p4:#D2457E; --p5:#12999A;
   --shadow:0 1px 2px rgba(37,54,44,.05),0 6px 20px rgba(37,54,44,.05);
   --f-display:"Baloo Bhaijaan 2","Tajawal","Segoe UI","Noto Sans Arabic",system-ui,sans-serif;
   --f-body:"Tajawal","Segoe UI","Noto Sans Arabic",system-ui,sans-serif;
@@ -35,15 +26,19 @@
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
     --bg:#11181C; --surface:#182228; --soft:#1F2B31; --ink:#E6EEE7; --muted:#93A39A; --line:#26343B; --road:#22313A;
-    --accent:#5DBB6C; --accent-ink:#0E1A12; --accent-soft:#1E3326; --sun:#F5C451; --sun-soft:#3A3220;
-    --bad:#F07470; --bad-soft:#3A2224; --focus:#6DB1EA; --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.18);
+    --accent:#5DBB6C; --accent-ink:#0E1A12; --sun:#F5C451; --sun-soft:#3A3220; --bad:#F07470; --bad-soft:#3A2224; --focus:#6DB1EA;
+    --w-mult:#5DBB6C; --w-add:#5FA8F5; --w-sub:#E9A04E; --w-place:#B98CF0; --w-round:#3FCFCB;
+    --p0:#6CB2FF; --p1:#62D08A; --p2:#FFA65A; --p3:#B98CF0; --p4:#FF7FB0; --p5:#4FD4D2;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.18);
     color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
   --bg:#11181C; --surface:#182228; --soft:#1F2B31; --ink:#E6EEE7; --muted:#93A39A; --line:#26343B; --road:#22313A;
-  --accent:#5DBB6C; --accent-ink:#0E1A12; --accent-soft:#1E3326; --sun:#F5C451; --sun-soft:#3A3220;
-  --bad:#F07470; --bad-soft:#3A2224; --focus:#6DB1EA; --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.18);
+  --accent:#5DBB6C; --accent-ink:#0E1A12; --sun:#F5C451; --sun-soft:#3A3220; --bad:#F07470; --bad-soft:#3A2224; --focus:#6DB1EA;
+  --w-mult:#5DBB6C; --w-add:#5FA8F5; --w-sub:#E9A04E; --w-place:#B98CF0; --w-round:#3FCFCB;
+  --p0:#6CB2FF; --p1:#62D08A; --p2:#FFA65A; --p3:#B98CF0; --p4:#FF7FB0; --p5:#4FD4D2;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.18);
   color-scheme:dark;
 }
 *{box-sizing:border-box}
@@ -51,16 +46,17 @@
 html,body{min-height:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:17px;line-height:1.6;-webkit-tap-highlight-color:transparent}
 button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
-button:focus-visible,summary:focus-visible{outline:3px solid var(--focus);outline-offset:3px;border-radius:14px}
-.app{max-width:640px;margin:0 auto;padding-block:16px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+button:focus-visible,summary:focus-visible,input:focus-visible{outline:3px solid var(--focus);outline-offset:3px;border-radius:14px}
+.app{max-width:680px;margin:0 auto;padding-block:16px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .num{font-family:var(--f-display);font-variant-numeric:tabular-nums}
 h1,h2,h3{font-family:var(--f-display);line-height:1.25;margin:0;text-wrap:balance;font-weight:700}
 p{margin:0}
+.pc0{color:var(--p0)}.pc1{color:var(--p1)}.pc2{color:var(--p2)}.pc3{color:var(--p3)}.pc4{color:var(--p4)}.pc5{color:var(--p5)}
 
 /* ---------- shared controls ---------- */
-.icon-btn{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;font-size:1.15rem;color:var(--muted);flex:none}
+.icon-btn{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:1.15rem;color:var(--muted);flex:none}
 .icon-btn:hover{background:var(--soft)}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:0 26px;border-radius:14px;font-family:var(--f-display);font-weight:700;font-size:1.12rem;background:var(--accent);color:var(--accent-ink)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:54px;padding:0 26px;border-radius:14px;font-family:var(--f-display);font-weight:700;font-size:1.15rem;background:var(--accent);color:var(--accent-ink)}
 .btn:active{transform:scale(.98)}
 .btn.block{width:100%}
 .link{min-height:44px;padding:0 14px;border-radius:12px;font-weight:700;color:var(--muted)}
@@ -69,38 +65,83 @@ p{margin:0}
 .row{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;align-items:center}
 .head{display:flex;align-items:center;gap:8px;min-height:44px;margin-bottom:8px}
 .head h2{font-size:1.15rem;flex:1;min-width:0;color:var(--muted);font-weight:500;font-family:var(--f-body)}
-
-/* ---------- home ---------- */
-.home-top{display:flex;align-items:center;justify-content:space-between}
-.star-count{display:inline-flex;align-items:center;gap:6px;font-family:var(--f-display);font-weight:700;color:var(--muted)}
-.star-count b{color:var(--sun)}
-.intro{padding:14px 0 6px;display:grid;gap:12px}
-.intro h1{font-size:clamp(1.8rem,6vw,2.3rem);font-weight:800;color:var(--accent)}
+.title-xl{font-size:clamp(1.8rem,6vw,2.4rem);font-weight:800}
 .hello{display:flex;align-items:flex-end;gap:10px}
 .hello-sheep{font-size:3rem;line-height:1;animation:hop 2.4s ease-in-out infinite;flex:none}
-.bubble{position:relative;background:var(--surface);box-shadow:var(--shadow);border-radius:18px 18px 18px 4px;padding:10px 14px;font-weight:700;max-width:30ch;line-height:1.45}
-.pills{display:flex;gap:8px;flex-wrap:wrap}
-.pill{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 14px;border-radius:99px;background:var(--soft);font-weight:700;font-size:.95rem}
-.pill:hover{background:var(--line)}
+.bubble{background:var(--surface);box-shadow:var(--shadow);border-radius:18px 18px 18px 4px;padding:10px 14px;font-weight:700;max-width:34ch;line-height:1.45}
 @keyframes hop{0%,100%{transform:translateY(0)}40%{transform:translateY(-8px)}55%{transform:translateY(0)}}
+.pills{display:flex;gap:8px;flex-wrap:wrap}
+.pill{display:inline-flex;align-items:center;gap:6px;min-height:42px;padding:0 14px;border-radius:99px;background:var(--soft);font-weight:700;font-size:.95rem}
+.pill:hover{background:var(--line)}
+.fine{color:var(--muted);font-size:.88rem;text-align:center}
 
-/* winding trail */
+/* ---------- forms ---------- */
+.form{display:grid;gap:16px;margin-top:18px}
+.card{background:var(--surface);border-radius:20px;padding:16px;box-shadow:var(--shadow);display:grid;gap:12px}
+.card h3{font-size:1.05rem;color:var(--muted);font-family:var(--f-body);font-weight:700}
+.field{display:grid;gap:4px;font-weight:700;font-size:.95rem}
+.field input{min-height:52px;border-radius:14px;border:2px solid var(--line);background:var(--bg);padding:0 14px;font:inherit;font-weight:500;color:var(--ink);width:100%}
+.field input:focus{border-color:var(--accent);outline:none}
+.field input[aria-invalid="true"]{border-color:var(--bad)}
+.err{color:var(--bad);font-weight:700;font-size:.92rem;min-height:1.2em}
+.avatars{display:flex;flex-wrap:wrap;gap:8px}
+.avatars button{width:52px;height:52px;border-radius:16px;font-size:1.8rem;background:var(--soft);display:grid;place-items:center}
+.avatars button[aria-pressed="true"]{background:var(--sun-soft);box-shadow:0 0 0 3px var(--sun)}
+
+/* ---------- profiles / parent ---------- */
+.kids{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-top:18px}
+.kid{display:grid;justify-items:center;gap:2px;padding:18px 10px 14px;border-radius:22px;background:var(--surface);box-shadow:var(--shadow)}
+.kid .av{font-size:3.2rem;line-height:1.1}
+.kid b{font-family:var(--f-display);font-size:1.2rem}
+.kid small{color:var(--muted)}
+.kid.add{background:transparent;box-shadow:none;border:2px dashed var(--line);color:var(--muted);align-content:center}
+.kid-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line);flex-wrap:wrap}
+.kid-row:first-of-type{border-top:0}
+.kid-row .av{font-size:2rem}
+.kid-row .info{flex:1;min-width:140px}
+.kid-row .info b{font-family:var(--f-display);font-size:1.1rem;display:block}
+.kid-row .info small{color:var(--muted);display:block}
+.kid-row .acts2{display:flex;gap:4px}
+.danger{color:var(--bad)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.ok-msg{color:var(--accent);font-weight:700;font-size:.92rem}
+
+/* ---------- worlds ---------- */
+.top{display:flex;align-items:center;gap:8px;justify-content:space-between}
+.who{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 12px 0 6px;border-radius:99px;background:var(--surface);box-shadow:var(--shadow);font-weight:700}
+.who .av{font-size:1.6rem}
+.star-count{display:inline-flex;align-items:center;gap:6px;font-family:var(--f-display);font-weight:700;color:var(--muted)}
+.star-count b{color:var(--sun)}
+.worlds{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}
+.world{--wc:var(--accent);position:relative;display:grid;gap:4px;justify-items:start;text-align:start;padding:16px;border-radius:24px;background:color-mix(in srgb,var(--wc) 13%,var(--surface));overflow:hidden;min-height:150px}
+.world:active{transform:scale(.98)}
+.world .w-emoji{font-size:2.6rem;line-height:1.1}
+.world b{font-family:var(--f-display);font-size:1.25rem;line-height:1.2}
+.world small{color:var(--muted);line-height:1.3}
+.world .w-bar{width:100%;height:8px;border-radius:99px;background:color-mix(in srgb,var(--wc) 18%,var(--surface));margin-top:auto}
+.world .w-bar i{display:block;height:100%;border-radius:99px;background:var(--wc)}
+.world .w-stars{font-family:var(--f-display);font-weight:700;color:var(--muted);font-size:.9rem}
+.world.wide{grid-column:1/-1}
+
+/* ---------- winding trail ---------- */
+.intro{padding:6px 0 4px;display:grid;gap:12px}
 .trail{--amp:min(84px,19vw);position:relative;display:flex;flex-direction:column;align-items:center;gap:40px;padding:34px 0 26px}
 .trail-svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
 .road{fill:none;stroke:var(--road);stroke-width:30;stroke-linecap:round;stroke-linejoin:round}
 .road-line{fill:none;stroke:var(--surface);stroke-width:3;stroke-linecap:round;stroke-dasharray:1 14}
-.road-done{fill:none;stroke:var(--accent);stroke-width:8;stroke-linecap:round;opacity:.75}
+.road-done{fill:none;stroke:var(--wc,var(--accent));stroke-width:8;stroke-linecap:round;opacity:.75}
 .deco{position:absolute;transform:translate(-50%,-50%);font-size:1.7rem;line-height:1;pointer-events:none;opacity:.9}
-.node{position:relative;display:grid;justify-items:center;gap:6px;transform:translateX(calc(var(--x) * var(--amp)))}
-.disc{position:relative;width:82px;height:82px;border-radius:50%;display:grid;place-items:center;font-size:2.4rem;background:var(--surface);box-shadow:0 0 0 4px var(--accent),0 7px 0 4px color-mix(in srgb,var(--accent) 45%,var(--bg));transition:transform .15s}
+.node{position:relative;display:grid;justify-items:center;gap:4px;transform:translateX(calc(var(--x) * var(--amp)))}
+.disc{position:relative;width:82px;height:82px;border-radius:50%;display:grid;place-items:center;font-size:2.4rem;background:var(--surface);box-shadow:0 0 0 4px var(--wc,var(--accent)),0 7px 0 4px color-mix(in srgb,var(--wc,var(--accent)) 45%,var(--bg));transition:transform .15s}
 .node:active .disc{transform:translateY(4px) scale(.97)}
-.node .badge{position:absolute;top:-6px;inset-inline-start:-6px;min-width:30px;height:30px;padding:0 5px;border-radius:99px;background:var(--accent);color:var(--accent-ink);font-family:var(--f-display);font-weight:800;font-size:1rem;display:grid;place-items:center;box-shadow:0 0 0 3px var(--bg)}
+.node .badge{position:absolute;top:-6px;inset-inline-start:-6px;min-width:30px;height:30px;padding:0 5px;border-radius:99px;background:var(--wc,var(--accent));color:#fff;font-family:var(--f-display);font-weight:800;font-size:1rem;display:grid;place-items:center;box-shadow:0 0 0 3px var(--bg)}
 .node .n-stars{font-size:1rem;letter-spacing:2px;line-height:1;color:var(--line)}
 .node .n-stars .on{color:var(--sun)}
-.node .n-label{font-family:var(--f-display);font-weight:700;font-size:.95rem;color:var(--muted)}
+.node .n-label{font-family:var(--f-display);font-weight:700;font-size:.95rem;background:var(--bg);padding:0 8px;border-radius:8px;margin-top:6px}
 .node.locked .disc{background:var(--soft);box-shadow:0 0 0 3px var(--line);font-size:2rem}
 .node.locked .disc>.em{opacity:.35;filter:grayscale(1)}
 .node.locked .badge{background:var(--line);color:var(--muted)}
+.node.locked .n-label{color:var(--muted)}
 .node.current .disc{box-shadow:0 0 0 5px var(--sun),0 7px 0 5px color-mix(in srgb,var(--sun) 50%,var(--bg))}
 .node.current .badge{background:var(--sun);color:#3A2A00}
 .mascot{position:absolute;top:14px;font-size:2.1rem;line-height:1;animation:hop 1.4s ease-in-out infinite;pointer-events:none}
@@ -108,19 +149,19 @@ p{margin:0}
 .mascot.on-right{right:-50px}
 .mascot::after{content:"هنا!";position:absolute;top:-16px;inset-inline-end:-6px;font-family:var(--f-display);font-size:.8rem;font-weight:800;background:var(--sun);color:#3A2A00;border-radius:99px;padding:0 7px;line-height:1.7;white-space:nowrap}
 .node.champ .disc{width:96px;height:96px;font-size:2.8rem}
-.goal-flag{text-align:center;color:var(--muted);font-size:.9rem;margin-top:-6px}
+.goal-flag{text-align:center;color:var(--muted);font-size:.9rem}
 
 /* ---------- sheet ---------- */
 .overlay{position:fixed;inset:0;background:rgba(12,22,16,.38);z-index:20;display:flex;align-items:flex-end;justify-content:center}
-.sheet{width:100%;max-width:520px;background:var(--bg);border-radius:24px 24px 0 0;padding:20px max(18px,env(safe-area-inset-right,0px)) calc(22px + env(safe-area-inset-bottom,0px)) max(18px,env(safe-area-inset-left,0px));max-height:92vh;overflow:auto;animation:up .22s ease-out}
+.sheet{width:100%;max-width:540px;background:var(--bg);border-radius:24px 24px 0 0;padding:20px max(18px,env(safe-area-inset-right,0px)) calc(22px + env(safe-area-inset-bottom,0px)) max(18px,env(safe-area-inset-left,0px));max-height:92vh;overflow:auto;animation:up .22s ease-out}
 @keyframes up{from{transform:translateY(30px);opacity:.5}}
-.s-head{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+.s-head{display:flex;align-items:center;gap:14px;margin-bottom:16px}
 .s-head .big{font-size:2.8rem;line-height:1}
-.s-head h2{font-size:1.5rem}
+.s-head h2{font-size:1.45rem}
 .s-head p{color:var(--muted);font-size:.95rem}
 .s-head .icon-btn{margin-inline-start:auto}
 .acts{display:grid;gap:8px}
-.act{display:flex;align-items:center;gap:14px;text-align:start;padding:12px 14px;border-radius:16px;background:var(--surface)}
+.act{display:flex;align-items:center;gap:14px;text-align:start;padding:12px 14px;border-radius:16px;background:var(--surface);min-height:64px}
 .act .ai{font-size:1.6rem}
 .act b{font-family:var(--f-display);font-size:1.12rem;display:block;line-height:1.25}
 .act small{color:var(--muted);display:block;line-height:1.35}
@@ -133,18 +174,23 @@ summary{cursor:pointer;font-weight:700;padding:6px 0;list-style:none}
 summary::-webkit-details-marker{display:none}
 summary::before{content:"‹ ";display:inline-block;transition:transform .2s}
 details[open] summary::before{transform:rotate(-90deg)}
-.rules{display:grid;grid-template-columns:1fr auto;gap:4px 16px;padding:6px 2px 2px;max-width:320px}
+.rules{display:grid;grid-template-columns:1fr auto;gap:4px 16px;padding:6px 2px 2px;max-width:340px}
 .rules b{color:var(--ink);text-align:end}
 
-/* ---------- equation ---------- */
-.eq{display:flex;justify-content:center;align-items:center;gap:.3em;font-family:var(--f-display);font-weight:800;font-size:clamp(2.6rem,11vw,3.4rem);line-height:1.15;font-variant-numeric:tabular-nums}
+/* ---------- equation & numbers ---------- */
+.eq{display:flex;justify-content:center;align-items:center;gap:.3em;font-family:var(--f-display);font-weight:800;font-size:clamp(2.4rem,10vw,3.4rem);line-height:1.15;font-variant-numeric:tabular-nums;flex-wrap:wrap}
 .eq .op{color:var(--muted);font-weight:500}
 .eq .ans{min-width:1.6em;text-align:center;border-bottom:4px solid var(--line);color:var(--muted)}
 .eq .ans.ok{color:var(--accent);border-color:transparent}
 .eq .ans.bad{color:var(--bad);border-color:transparent}
 .sentence{text-align:center;color:var(--muted);font-size:1rem}
+.qtext{text-align:center;font-weight:700;font-size:1.15rem}
+.bignum{text-align:center;font-family:var(--f-display);font-weight:800;font-size:clamp(2.4rem,11vw,3.6rem);line-height:1.2;font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.bignum .hl{color:var(--accent);text-decoration:underline;text-decoration-thickness:4px;text-underline-offset:8px}
+.words{text-align:center;font-family:var(--f-display);font-weight:700;font-size:clamp(1.3rem,5vw,1.7rem);line-height:1.5;max-width:28ch;margin:4px auto 0}
+.colorwords{font-family:var(--f-display);font-weight:700;font-size:1.35rem;line-height:1.6;text-align:center}
 
-/* ---------- picture: a groups of b ---------- */
+/* ---------- multiplication picture ---------- */
 .scene{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;padding:14px;background:var(--soft);border-radius:22px;margin:14px 0}
 .group{position:relative;display:grid;justify-items:center;gap:2px;padding:6px 6px 20px;border-radius:14px;background:var(--surface);animation:pop .3s both;animation-delay:var(--d,0ms);transition:background .2s,box-shadow .2s}
 @keyframes pop{from{transform:scale(.8);opacity:0}}
@@ -158,19 +204,67 @@ details[open] summary::before{transform:rotate(-90deg)}
 .scene.size-sm{font-size:.84rem;gap:6px;padding:10px}
 .scene.size-sm .group{padding:4px 4px 18px}
 
+/* ---------- small sums with pictures ---------- */
+.ea{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px;padding:14px;background:var(--soft);border-radius:22px;margin:14px 0}
+.ea-g{display:flex;flex-wrap:wrap;gap:2px;max-width:200px;justify-content:center;font-size:1.7rem;background:var(--surface);border-radius:14px;padding:6px 8px}
+.ea-op{font-family:var(--f-display);font-size:2rem;color:var(--muted)}
+.ea .gone{opacity:.22;position:relative}
+.ea .gone::after{content:"✕";position:absolute;inset:0;display:grid;place-items:center;color:var(--bad);font-size:1.3rem;font-weight:800}
+
+/* ---------- column arithmetic ---------- */
+.cg{display:grid;grid-template-columns:30px repeat(var(--n),minmax(30px,50px));direction:ltr;justify-content:center;gap:2px 4px;font-family:var(--f-display);font-weight:800;font-size:clamp(1.6rem,7vw,2.3rem);line-height:1.2;margin:6px auto;font-variant-numeric:tabular-nums}
+.cc{display:grid;place-items:center;border-radius:10px;min-height:1.3em}
+.cc.act{background:var(--sun-soft)}
+.ch{font-family:var(--f-body);font-size:.62rem;font-weight:700;line-height:1.15;text-align:center;min-height:2.4em}
+.cm{font-size:.9rem;color:var(--bad);min-height:1.2em}
+.cm s{color:var(--muted);margin-inline-end:2px}
+.csign{display:grid;place-items:center;color:var(--muted)}
+.cline{grid-column:1/-1;height:3px;border-radius:3px;background:var(--ink);margin:2px 0}
+.cbox{border:2px dashed var(--line);min-height:1.45em;color:var(--ink)}
+.cbox.cur{border-color:var(--accent);border-style:solid;background:color-mix(in srgb,var(--accent) 8%,transparent)}
+.cbox.ok{border-color:transparent;color:var(--accent)}
+.cbox.bad{border-color:transparent;color:var(--bad)}
+.step-msg{background:var(--surface);box-shadow:var(--shadow);border-radius:16px;padding:12px 16px;margin:10px 0;min-height:3.2em;line-height:1.55}
+
+/* ---------- place-value houses ---------- */
+.pv{display:flex;direction:ltr;justify-content:center;gap:6px;margin:12px 0}
+.pv-col{flex:1;max-width:96px;min-width:0;display:grid;justify-items:center;border-radius:14px;overflow:hidden;background:var(--surface);box-shadow:var(--shadow);transition:transform .2s}
+.pv-roof{width:100%;text-align:center;font-size:.66rem;font-weight:700;line-height:1.2;padding:6px 2px;color:#fff;min-height:3em;display:grid;place-items:center}
+.pv-dig{font-family:var(--f-display);font-weight:800;font-size:clamp(1.7rem,7vw,2.4rem);line-height:1.3}
+.pv-val{font-family:var(--f-display);font-size:.78rem;color:var(--muted);padding-bottom:6px;font-variant-numeric:tabular-nums}
+.pv-col.hi{transform:translateY(-6px);box-shadow:0 0 0 3px var(--sun),var(--shadow)}
+.pb0 .pv-roof{background:var(--p0)}.pb1 .pv-roof{background:var(--p1)}.pb2 .pv-roof{background:var(--p2)}
+.pb3 .pv-roof{background:var(--p3)}.pb4 .pv-roof{background:var(--p4)}.pb5 .pv-roof{background:var(--p5)}
+.expand{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;font-family:var(--f-display);font-weight:800;font-size:1.3rem}
+.expand .op{color:var(--muted);font-weight:500}
+
+/* ---------- number line ---------- */
+.nl{margin:18px 6px 8px;direction:ltr}
+.nl-track{position:relative;height:10px;border-radius:99px;background:linear-gradient(90deg,var(--soft),var(--line),var(--soft));margin:44px 14px 0}
+.nl-track::before,.nl-track::after{content:"";position:absolute;top:-8px;width:4px;height:26px;border-radius:4px;background:var(--ink)}
+.nl-track::before{left:-2px}.nl-track::after{right:-2px}
+.nl-mid{position:absolute;left:50%;top:-5px;width:2px;height:20px;background:var(--muted);transform:translateX(-50%)}
+.nl-dot{position:absolute;top:50%;width:14px;height:14px;border-radius:50%;background:var(--accent);transform:translate(-50%,-50%);box-shadow:0 0 0 3px var(--surface)}
+.nl-dot b{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);font-family:var(--f-display);font-size:1.05rem;white-space:nowrap;color:var(--accent)}
+.nl-goat{position:absolute;top:-44px;font-size:1.8rem;transform:translateX(-50%);transition:left 1s cubic-bezier(.4,1.4,.5,1)}
+.nl-labels{display:flex;justify-content:space-between;margin-top:14px;font-family:var(--f-display);font-weight:700;font-variant-numeric:tabular-nums}
+.nl-labels .mid{color:var(--muted);font-weight:500;font-size:.9rem}
+.nl-labels .win{color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,transparent);border-radius:8px;padding:0 6px}
+
 /* ---------- learn ---------- */
 .learn-eq{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:4px}
-.arrow{width:48px;height:48px;border-radius:50%;background:var(--surface);box-shadow:var(--shadow);font-size:1.3rem;display:grid;place-items:center}
+.arrow{width:50px;height:50px;border-radius:50%;background:var(--surface);box-shadow:var(--shadow);font-size:1.3rem;display:grid;place-items:center}
 .arrow:disabled{opacity:.25;box-shadow:none}
 .skip{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;margin:4px 0 6px}
-.skip button{min-height:40px;border-radius:10px;font-family:var(--f-display);font-weight:700;font-size:1rem;color:var(--muted)}
+.skip button{min-height:42px;border-radius:10px;font-family:var(--f-display);font-weight:700;font-size:1rem;color:var(--muted)}
 .skip button.on{background:var(--accent);color:var(--accent-ink)}
 .skip-label{text-align:center;color:var(--muted);font-size:.85rem}
 .tip{background:var(--sun-soft);border-radius:16px;padding:12px 16px;margin:8px 0;font-size:.98rem;display:grid;gap:6px}
-.learn-foot{margin-top:18px}
+.learn-foot{margin-top:18px;display:grid;gap:6px}
+.lesson{color:var(--muted);text-align:center;max-width:44ch;margin:0 auto 6px}
 
 /* ---------- quiz ---------- */
-.hud{display:flex;align-items:center;gap:12px;min-height:44px;margin-bottom:18px}
+.hud{display:flex;align-items:center;gap:12px;min-height:44px;margin-bottom:14px}
 .bar{flex:1;position:relative;height:10px;background:var(--soft);border-radius:99px}
 .bar .fill{position:absolute;inset-block:0;inset-inline-start:0;width:0;border-radius:99px;background:var(--accent);transition:width .45s cubic-bezier(.3,1.3,.5,1)}
 .bar .runner{position:absolute;top:50%;inset-inline-start:0;transform:translate(40%,-58%);font-size:1.3rem;transition:inset-inline-start .45s cubic-bezier(.3,1.3,.5,1)}
@@ -181,21 +275,23 @@ details[open] summary::before{transform:rotate(-90deg)}
 .timer circle{fill:none;stroke-width:7}
 .timer .bg{stroke:var(--soft)}
 .timer .fg{stroke:var(--accent);stroke-linecap:round;transition:stroke .2s}
-.stage{position:relative;padding-top:18px}
-.float{position:absolute;inset-inline:0;top:-8px;text-align:center;font-family:var(--f-display);font-weight:700;font-size:1.2rem;color:var(--accent);pointer-events:none;animation:rise 1s ease-out forwards}
+.stage{position:relative;padding-top:16px;display:grid;gap:4px}
+.float{position:absolute;inset-inline:0;top:-8px;text-align:center;font-family:var(--f-display);font-weight:700;font-size:1.2rem;color:var(--accent);pointer-events:none;animation:rise 1s ease-out forwards;z-index:2}
 .float.bad{color:var(--bad)}
 @keyframes rise{from{transform:translateY(8px);opacity:0}25%{opacity:1}to{transform:translateY(-22px);opacity:0}}
-.choices{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
-.choice{min-height:64px;border-radius:16px;background:var(--surface);box-shadow:var(--shadow);font-family:var(--f-display);font-weight:700;font-size:1.8rem}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.choices.wide{grid-template-columns:1fr}
+.choice{min-height:64px;border-radius:16px;background:var(--surface);box-shadow:var(--shadow);font-family:var(--f-display);font-weight:700;font-size:1.7rem;padding:6px 12px;line-height:1.3}
+.choices.wide .choice{font-size:1.15rem;min-height:58px}
 .choice.ok{background:var(--accent);color:var(--accent-ink)}
 .choice.bad{background:var(--bad-soft);color:var(--bad);animation:shake .3s}
 @keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
-.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:24px}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:18px}
 .pad button{min-height:58px;border-radius:14px;background:var(--surface);box-shadow:var(--shadow);font-family:var(--f-display);font-weight:700;font-size:1.6rem}
 .pad button:active{background:var(--soft)}
-.pad .del,.pad .hint{background:transparent;box-shadow:none;font-size:1.15rem;color:var(--muted)}
+.pad .del,.pad .hint{background:transparent;box-shadow:none;font-size:1.1rem;color:var(--muted)}
 .pad button:disabled{opacity:.35}
-.wrong-box{margin-top:16px;text-align:center}
+.wrong-box{margin-top:14px;display:grid;gap:4px;justify-items:center}
 
 .countdown{position:fixed;inset:0;display:grid;place-items:center;z-index:30;background:color-mix(in srgb,var(--bg) 82%,transparent);font-family:var(--f-display);font-weight:800;font-size:6rem;color:var(--accent)}
 .countdown span{animation:zoom .7s ease-out both}
@@ -208,10 +304,10 @@ details[open] summary::before{transform:rotate(-90deg)}
 .bigstars{display:flex;gap:8px;font-size:2.4rem;line-height:1;color:var(--line)}
 .bigstars .on{color:var(--sun);animation:starIn .45s both}
 @keyframes starIn{from{transform:scale(0)}70%{transform:scale(1.2)}}
-.result p{max-width:34ch;color:var(--muted)}
+.result p{max-width:36ch;color:var(--muted)}
 .r-stats{font-family:var(--f-display);font-weight:700;color:var(--ink);font-size:1.05rem}
 .r-stats span{color:var(--muted);font-weight:500;font-family:var(--f-body)}
-.r-actions{display:grid;gap:4px;width:100%;max-width:320px;margin-top:8px}
+.r-actions{display:grid;gap:4px;width:100%;max-width:340px;margin-top:8px}
 
 /* ---------- mastery grid ---------- */
 .grid-wrap{overflow-x:auto;margin:14px 0;padding-bottom:4px}
@@ -224,9 +320,7 @@ table.mg{border-collapse:separate;border-spacing:3px;margin:0 auto;font-family:v
 .mg .l3 button{background:var(--accent);color:var(--accent-ink)}
 .mg-legend{display:flex;flex-wrap:wrap;gap:6px 14px;justify-content:center;font-size:.85rem;color:var(--muted)}
 .mg-legend i{display:inline-block;width:12px;height:12px;border-radius:4px;vertical-align:-1px;margin-inline-end:5px;background:var(--soft)}
-.mg-legend .l1{background:var(--bad)}
-.mg-legend .l2{background:var(--sun)}
-.mg-legend .l3{background:var(--accent)}
+.mg-legend .l1{background:var(--bad)}.mg-legend .l2{background:var(--sun)}.mg-legend .l3{background:var(--accent)}
 .progress-line{height:8px;border-radius:99px;background:var(--soft);overflow:hidden;margin:14px 0 6px}
 .progress-line div{height:100%;background:var(--accent);border-radius:99px}
 
@@ -234,6 +328,7 @@ table.mg{border-collapse:separate;border-spacing:3px;margin:0 auto;font-family:v
 .confetti i{position:absolute;top:-30px;font-style:normal;font-size:1.4rem;animation:fall linear forwards}
 @keyframes fall{to{transform:translateY(110vh) rotate(400deg)}}
 
+/* ---------- phones ---------- */
 @media (max-width:420px){
   .disc{width:74px;height:74px;font-size:2.1rem}
   .node.champ .disc{width:86px;height:86px}
@@ -241,6 +336,38 @@ table.mg{border-collapse:separate;border-spacing:3px;margin:0 auto;font-family:v
   .skip{grid-template-columns:repeat(5,1fr)}
   .mg th{width:27px}
   .mg td button{width:28px;height:29px;font-size:.72rem;border-radius:7px}
+  .world{min-height:140px;padding:14px}
+  .world .w-emoji{font-size:2.2rem}
+  .world b{font-size:1.1rem}
+}
+/* ---------- tablets ---------- */
+@media (min-width:700px){
+  body{font-size:19px}
+  .app{max-width:860px;padding-block:24px 64px}
+  .worlds{grid-template-columns:repeat(3,1fr);gap:16px}
+  .world{min-height:190px;padding:20px}
+  .world .w-emoji{font-size:3.2rem}
+  .world.wide{grid-column:span 2}
+  .kids{grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}
+  .trail{--amp:110px;gap:48px}
+  .disc{width:96px;height:96px;font-size:2.8rem}
+  .node.champ .disc{width:110px;height:110px}
+  .form{grid-template-columns:1fr 1fr;align-items:start}
+  .form .full{grid-column:1/-1}
+  .pad button{min-height:68px;font-size:1.9rem}
+  .choice{min-height:76px}
+  .mg th{width:44px;height:34px}
+  .mg td button{width:44px;height:42px;font-size:1rem}
+  .pv-col{max-width:120px}
+  .pv-roof{font-size:.8rem}
+  .ch{font-size:.72rem}
+  .cg{grid-template-columns:36px repeat(var(--n),minmax(40px,60px))}
+}
+/* tablet landscape: question beside the keypad */
+@media (min-width:900px) and (orientation:landscape){
+  .stage.split{grid-template-columns:1.2fr 1fr;column-gap:32px;align-items:start}
+  .stage.split>.q-main{grid-column:1}
+  .stage.split>.q-input{grid-column:2;grid-row:1 / span 4;position:sticky;top:20px}
 }
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
@@ -251,66 +378,124 @@ table.mg{border-collapse:separate;border-spacing:3px;margin:0 auto;font-family:v
 
 <div class="app" id="app" dir="rtl" lang="ar">
 
-  <!-- ================= HOME ================= -->
-  <section id="screen-map">
-    <div class="home-top">
-      <span class="star-count" title="مجموع النجوم"><b>★</b> <span id="starTotal" class="num">٠</span></span>
-      <button class="icon-btn" id="soundBtn" aria-label="تشغيل أو إيقاف الصوت">🔊</button>
+  <!-- ================= REGISTER ================= -->
+  <section id="screen-register" hidden>
+    <h1 class="title-xl" style="color:var(--accent)">مزرعة الأرقام</h1>
+    <div class="hello" style="margin-top:12px"><span class="hello-sheep" aria-hidden="true">🐑</span><p class="bubble">أهلًا! أنا صوفي. سجّلوا مرة واحدة فقط، ثم نتعلّم الضرب والجمع والطرح والمنازل والتقريب ونحن نلعب.</p></div>
+    <form class="form" id="regForm" novalidate>
+      <div class="card">
+        <h3>👤 ولي الأمر</h3>
+        <label class="field">الاسم<input id="regParent" autocomplete="name" placeholder="مثال: أم سارة"></label>
+        <label class="field">رقم الهاتف<input id="regPhone" type="tel" inputmode="tel" autocomplete="tel" dir="ltr" placeholder="05xxxxxxxx"></label>
+      </div>
+      <div class="card">
+        <h3>🧒 الطفل</h3>
+        <label class="field">اسم الطفل<input id="regKid" autocomplete="off" placeholder="مثال: سارة"></label>
+        <div><p class="field" style="margin-bottom:6px">اختر صورة</p><div class="avatars" id="regAvatars"></div></div>
+      </div>
+      <div class="full" style="display:grid;gap:10px">
+        <p class="err" id="regErr" role="alert"></p>
+        <button class="btn block" type="submit">ابدأ اللعب</button>
+        <p class="fine">تُحفظ البيانات على هذا الجهاز فقط. يمكنك إضافة إخوة وأخوات لاحقًا من نفس الحساب.</p>
+      </div>
+    </form>
+  </section>
+
+  <!-- ================= PROFILES ================= -->
+  <section id="screen-profiles" hidden>
+    <div class="top">
+      <h1 class="title-xl">من يلعب الآن؟</h1>
+      <button class="pill" id="parentBtn">👤 ولي الأمر</button>
+    </div>
+    <div class="kids" id="kidList"></div>
+    <form class="card" id="addKidForm" style="margin-top:16px" hidden novalidate>
+      <h3>➕ طفل جديد</h3>
+      <label class="field">اسم الطفل<input id="newKidName" autocomplete="off"></label>
+      <div class="avatars" id="newKidAvatars"></div>
+      <p class="err" id="newKidErr" role="alert"></p>
+      <div class="row" style="justify-content:flex-start"><button class="btn" type="submit">إضافة</button><button class="link" type="button" id="cancelAddKid">إلغاء</button></div>
+    </form>
+  </section>
+
+  <!-- ================= PARENT ================= -->
+  <section id="screen-parent" hidden>
+    <div class="head">
+      <button class="icon-btn" id="parentBack" aria-label="رجوع">→</button>
+      <h2>حساب ولي الأمر</h2>
+    </div>
+    <form class="card" id="parentForm" novalidate>
+      <label class="field">الاسم<input id="pName" autocomplete="name"></label>
+      <label class="field">رقم الهاتف<input id="pPhone" type="tel" inputmode="tel" dir="ltr" autocomplete="tel"></label>
+      <p class="err" id="pErr" role="alert"></p>
+      <div class="row" style="justify-content:flex-start"><button class="btn" type="submit">حفظ</button><span class="ok-msg" id="pSaved" hidden>تم الحفظ ✓</span></div>
+    </form>
+    <div class="card" style="margin-top:16px">
+      <h3>الأطفال وتقدّمهم</h3>
+      <div id="parentKids"></div>
+      <button class="pill" id="parentAddKid" style="justify-self:start">➕ أضف طفلًا</button>
+    </div>
+    <div style="margin-top:20px;text-align:center"><button class="link danger" id="wipeBtn">حذف الحساب وكل البيانات من هذا الجهاز</button></div>
+  </section>
+
+  <!-- ================= WORLDS ================= -->
+  <section id="screen-worlds" hidden>
+    <div class="top">
+      <button class="who" id="whoBtn" aria-label="تغيير الطفل"><span class="av" id="whoAv">🦁</span><span id="whoName"></span></button>
+      <div class="row"><span class="star-count" title="مجموع النجوم"><b>★</b> <span id="starTotal" class="num">٠</span></span>
+      <button class="icon-btn" id="soundBtn" aria-label="تشغيل أو إيقاف الصوت">🔊</button></div>
+    </div>
+    <div class="hello" style="margin-top:16px"><span class="hello-sheep" aria-hidden="true">🐑</span><p class="bubble" id="worldsBubble"></p></div>
+    <div class="worlds" id="worldList"></div>
+  </section>
+
+  <!-- ================= MAP ================= -->
+  <section id="screen-map" hidden>
+    <div class="head">
+      <button class="icon-btn" id="mapBack" aria-label="العودة إلى العوالم">→</button>
+      <h2 id="mapTitle"></h2>
     </div>
     <div class="intro">
-      <h1>مزرعة جدول الضرب</h1>
-      <div class="hello"><span class="hello-sheep" aria-hidden="true">🐑</span><p class="bubble" id="bubble">مرحبًا! أنا صوفي.</p></div>
-      <div class="pills">
+      <div class="hello"><span class="hello-sheep" aria-hidden="true">🐑</span><p class="bubble" id="bubble"></p></div>
+      <div class="pills" id="multPills">
         <button class="pill" id="reviewBtn">🧠 مراجعة ذكية</button>
         <button class="pill" id="gridBtn">🗺️ خريطة الحفظ</button>
       </div>
     </div>
     <div class="trail" id="trail"></div>
-    <p class="goal-flag">أوصل صوفي إلى الكأس 🏆</p>
+    <p class="goal-flag" id="goalFlag"></p>
   </section>
 
   <!-- ================= LEARN ================= -->
   <section id="screen-learn" hidden>
     <div class="head">
-      <button class="icon-btn" data-home aria-label="العودة إلى المزرعة">→</button>
-      <h2 id="learnTitle">جدول</h2>
+      <button class="icon-btn" id="learnBack" aria-label="رجوع">→</button>
+      <h2 id="learnTitle"></h2>
       <button class="icon-btn" id="speakBtn" aria-label="اقرأ بصوت عالٍ">🔈</button>
     </div>
-    <div class="learn-eq">
-      <button class="arrow" id="prevBtn" aria-label="السابق">→</button>
-      <div class="eq" id="learnEq"></div>
-      <button class="arrow" id="nextBtn" aria-label="التالي">←</button>
-    </div>
-    <div class="scene" id="learnScene"></div>
-    <p class="sentence" id="learnSentence"></p>
-    <div class="row" style="margin:10px 0 18px">
-      <button class="link" id="countBtn">👆 عُدّ معي</button>
-      <button class="link" id="tipBtn" aria-expanded="false">💡 حيلة للحفظ</button>
-    </div>
-    <div class="tip" id="tipBox" hidden><p id="tipText"></p><p id="swapText"></p></div>
-    <p class="skip-label">نواتج الجدول</p>
-    <div class="skip" id="skipRow"></div>
-    <div class="learn-foot"><button class="btn block" id="learnToPractice">ابدأ التدريب</button></div>
+    <div id="learnBody"></div>
   </section>
 
   <!-- ================= QUIZ ================= -->
   <section id="screen-quiz" hidden>
     <div class="hud">
       <button class="icon-btn" id="quitBtn" aria-label="إنهاء والعودة">✕</button>
-      <div class="bar" id="energy"><div class="fill" id="energyFill"></div><span class="runner" id="runner" hidden>🐑</span><span class="barn" id="barn" hidden>🏡</span></div>
+      <div class="bar"><div class="fill" id="energyFill"></div><span class="runner" id="runner" hidden>🐑</span><span class="barn" id="barn" hidden>🏁</span></div>
       <span class="qcount" id="qcount"></span>
       <div class="timer" id="timer" hidden aria-hidden="true">
         <svg viewBox="0 0 40 40"><circle class="bg" cx="20" cy="20" r="16"/><circle class="fg" id="timerFg" cx="20" cy="20" r="16"/></svg>
       </div>
     </div>
     <div class="stage" id="quizCard">
-      <h2 id="quizTitle" hidden></h2>
-      <div class="eq" id="quizEq"></div>
-      <div class="scene" id="quizScene"></div>
-      <p class="sentence" id="quizSentence" hidden></p>
-      <div class="choices" id="choices" hidden></div>
-      <div class="pad" id="pad" hidden></div>
-      <div class="wrong-box" id="wrongBox" hidden><button class="btn" id="wrongNext">فهمت، التالي</button></div>
+      <div class="q-main">
+        <div id="qPrompt"></div>
+        <div id="qVisual" hidden></div>
+        <p class="sentence" id="qText" hidden></p>
+      </div>
+      <div class="q-input">
+        <div class="choices" id="choices" hidden></div>
+        <div class="pad" id="pad" hidden></div>
+        <div class="wrong-box" id="wrongBox" hidden><button class="btn" id="wrongNext">فهمت، التالي</button><button class="link" id="wrongExplain" hidden>اشرح لي خطوة بخطوة</button></div>
+      </div>
     </div>
   </section>
 
@@ -322,7 +507,7 @@ table.mg{border-collapse:separate;border-spacing:3px;margin:0 auto;font-family:v
   <!-- ================= MASTERY GRID ================= -->
   <section id="screen-grid" hidden>
     <div class="head">
-      <button class="icon-btn" data-home aria-label="العودة إلى المزرعة">→</button>
+      <button class="icon-btn" id="gridBack" aria-label="رجوع">→</button>
       <h2>خريطة الحفظ</h2>
     </div>
     <p class="num" id="mgPct" style="font-weight:700;font-size:1.2rem"></p>
@@ -337,17 +522,75 @@ table.mg{border-collapse:separate;border-spacing:3px;margin:0 auto;font-family:v
 
 <script>
 (() => {
-/* ================= data ================= */
+/* =====================================================================
+   helpers
+   ===================================================================== */
 const AR = '٠١٢٣٤٥٦٧٨٩';
 const ar = n => String(n).replace(/\d/g, d => AR[d]);
-// signed points kept in one left-to-right run so the sign stays next to its digits in RTL text
+const fmt = n => ar(Number(n).toLocaleString('en-US')).replace(/,/g, '٬');
 const sgn = n => '⁦' + (n < 0 ? '−' : '+') + ar(Math.abs(n)) + '⁩';
 const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const rnd = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+const pick = a => a[Math.floor(Math.random() * a.length)];
 const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const digit = (n, p) => Math.floor(n / 10 ** p) % 10;
+const len = n => String(n).length;
+const randD = d => d === 1 ? rnd(1, 9) : rnd(10 ** (d - 1), 10 ** d - 1);
+const toLatin = s => String(s).replace(/[٠-٩]/g, d => AR.indexOf(d)).replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
 document.documentElement.lang = 'ar'; document.documentElement.dir = 'rtl';
 
-// Each table n is drawn as n "parents", each holding k "children" (n × k).
-// [singular, dual, plural], gender (for "واحد/واحدة"), relation word.
+const PLACE = ['الآحاد', 'العشرات', 'المئات', 'الآلاف', 'عشرات الألوف', 'مئات الألوف', 'الملايين'];
+const PLACE_SHORT = ['آحاد', 'عشرات', 'مئات', 'آلاف', 'عشرات الألوف', 'مئات الألوف', 'ملايين'];
+const DIGITS = ['', 'خانة واحدة', 'خانتان', 'ثلاث خانات', 'أربع خانات', 'خمس خانات', 'ست خانات'];
+
+/* ---------- reading numbers in Arabic (0 – 999,999) ----------
+   Returned as phrases joined by "و"; each word carries the place it belongs to, so it can be coloured.
+   Arabic reads hundreds, then ones, then tens: ٣٤٥ = ثلاثمئة وخمسة وأربعون. */
+const ONES = ['', 'واحد', 'اثنان', 'ثلاثة', 'أربعة', 'خمسة', 'ستة', 'سبعة', 'ثمانية', 'تسعة'];
+const TEENS = ['عشرة', 'أحد عشر', 'اثنا عشر', 'ثلاثة عشر', 'أربعة عشر', 'خمسة عشر', 'ستة عشر', 'سبعة عشر', 'ثمانية عشر', 'تسعة عشر'];
+const TENS = ['', '', 'عشرون', 'ثلاثون', 'أربعون', 'خمسون', 'ستون', 'سبعون', 'ثمانون', 'تسعون'];
+const HUNDS = ['', 'مئة', 'مئتان', 'ثلاثمئة', 'أربعمئة', 'خمسمئة', 'ستمئة', 'سبعمئة', 'ثمانمئة', 'تسعمئة'];
+function under1000(n, base){
+  const ph = [], h = Math.floor(n / 100), r = n % 100;
+  if (h) ph.push([{t:HUNDS[h], p:base + 2}]);
+  if (r){
+    if (r < 10) ph.push([{t:ONES[r], p:base}]);
+    else if (r < 20) ph.push([{t:TEENS[r - 10], p:base + 1}]);
+    else { const u = r % 10; if (u) ph.push([{t:ONES[u], p:base}]); ph.push([{t:TENS[Math.floor(r / 10)], p:base + 1}]); }
+  }
+  return ph;
+}
+function readPhrases(n){
+  if (n === 0) return [[{t:'صفر', p:0}]];
+  const k = Math.floor(n / 1000), rest = n % 1000, U = t => ({t, p:3});
+  let ph = [];
+  if (k){
+    if (k === 1) ph = [[U('ألف')]];
+    else if (k === 2) ph = [[U('ألفان')]];
+    else if (k < 100){ ph = under1000(k, 3); ph[ph.length - 1].push(U(k <= 10 ? 'آلاف' : 'ألفًا')); }
+    else {
+      const h = Math.floor(k / 100), r2 = k % 100;
+      ph = [[{t: r2 === 0 && h === 2 ? 'مئتا' : HUNDS[h], p:5}]];
+      if (r2 === 0) ph[0].push(U('ألف'));
+      else if (r2 === 1) ph.push([U('ألف')]);
+      else if (r2 === 2) ph.push([U('ألفان')]);
+      else { const sub = under1000(r2, 3); sub[sub.length - 1].push(U(r2 <= 10 ? 'آلاف' : 'ألفًا')); ph = ph.concat(sub); }
+    }
+  }
+  return ph.concat(under1000(rest, 0));
+}
+const words = n => readPhrases(n).map(ph => ph.map(s => s.t).join(' ')).join(' و');
+const wordsHtml = n => readPhrases(n).map(ph => ph.map(s => `<span class="pc${s.p}">${s.t}</span>`).join(' ')).join(' و');
+const numHtml = (n, hiP = -1, colour = false) => {
+  const s = String(n), L = s.length;
+  return [...s].map((d, i) => { const p = L - 1 - i; const sep = p > 0 && p % 3 === 0 ? '٬' : '';
+    return `<span class="${p === hiP ? 'hl' : ''} ${colour ? 'pc' + p : ''}">${ar(d)}</span>${sep}`; }).join('');
+};
+
+/* =====================================================================
+   worlds & levels
+   ===================================================================== */
 const THEMES = {
   1:  {name:'التفاح',    pe:'🧺', ce:'🍎', p:['سلة','سلتان','سلال'],       pg:'f', rel:'في كل',  c:['تفاحة','تفاحتان','تفاحات'],               cg:'f'},
   2:  {name:'الكتاكيت',  pe:'🐔', ce:'🐤', p:['دجاجة','دجاجتان','دجاجات'],   pg:'f', rel:'مع كل',  c:['كتكوت','كتكوتان','كتاكيت'],              cg:'m'},
@@ -372,164 +615,304 @@ const TIPS = {
   9: 'رقما الناتج مجموعهما ٩، والعشرات أقل من العدد بواحد: ٩ × ٧ ← عشرات ٦ وآحاد ٣ = ٦٣.',
   10: 'أضف صفرًا في خانة الآحاد: ١٠ × ٧ = ٧٠.',
 };
-// The order tip always uses a fact from the table being studied (e.g. table 2 → ٢ × ٦ = ٦ × ٢).
 function swapTip(n){
   const k = n <= 5 ? n + 4 : n - 4;
   return `وتذكّر أن الترتيب لا يغيّر الناتج: ${ar(n)} × ${ar(k)} هو نفسه ${ar(k)} × ${ar(n)}، وكلاهما ${ar(n * k)}. كل حقيقة تحفظها تعطيك حقيقتين!`;
 }
+const ROUND_TO = ['', 'أقرب عشرة', 'أقرب مئة', 'أقرب ألف', 'أقرب عشرة آلاف', 'أقرب مئة ألف'];
+const LEVEL_NAMES = ['', 'الآحاد', 'العشرات', 'المئات', 'الآلاف', 'عشرات الألوف', 'مئات الألوف'];
 
-// Challenge rules: faster answers fill the energy bar faster, so a child who knows the table finishes in fewer questions.
+const WORLDS = {
+  mult:  {name:'حظيرة الضرب', emoji:'🐑', color:'--w-mult', runner:'🐑', sub:'جدول الضرب بالصور',
+          decos:['🌳','🌼','🍄','🌷','🌲','🦋','🌻','🐞','🌸','🌾','🎈'],
+          intro:'كل جدول حظيرة فيها حيوانات. عُدّها، ثم تحدَّ الوقت!',
+          levels:[...Array(10)].map((_, i) => ({title:'جدول ' + ar(i + 1), emoji:THEMES[i + 1].pe, badge:ar(i + 1), n:i + 1}))
+            .concat([{title:'تحدي البطل', emoji:'🏆', champ:true, label:'تحدي البطل'}])},
+  add:   {name:'جزيرة الجمع', emoji:'🏝️', color:'--w-add', runner:'🐢', sub:'من الآحاد إلى مئات الألوف',
+          decos:['🌴','🐚','⛵','🦀','🌊','🐠','☀️'],
+          intro:'في جزيرة الجمع نجمع منزلةً منزلة، ونبدأ دائمًا من الآحاد!',
+          levels:[1, 2, 3, 4, 5, 6].map((d, i) => ({d, title:'جمع ' + LEVEL_NAMES[d], label:LEVEL_NAMES[d], desc:`عددان من ${DIGITS[d]}`, emoji:['🐚','🦀','🐠','🐢','🐬','🐳'][i], badge:ar(i + 1)}))},
+  sub:   {name:'غابة الطرح', emoji:'🌲', color:'--w-sub', runner:'🦔', sub:'نطرح ونستلف من الجيران',
+          decos:['🌲','🍄','🦋','🌿','🐞','🌰','🍂'],
+          intro:'في غابة الطرح نبدأ من الآحاد، وإذا لم يكفِ الرقم نستلف من جاره!',
+          levels:[1, 2, 3, 4, 5, 6].map((d, i) => ({d, title:'طرح ' + LEVEL_NAMES[d], label:LEVEL_NAMES[d], desc:`أعداد من ${DIGITS[d]}`, emoji:['🐿️','🦔','🦉','🦊','🦌','🐻'][i], badge:ar(i + 1)}))},
+  place: {name:'قلعة المنازل', emoji:'🏰', color:'--w-place', runner:'🧱', sub:'الآحاد والعشرات والمئات… وكيف نقرأ الأعداد',
+          decos:['🚩','🧱','👑','🛡️','🗝️','⭐','🏳️'],
+          intro:'في قلعة المنازل لكل رقم بيت: آحاد، عشرات، مئات… ونتعلّم كيف نقرأ الأعداد بالعربية.',
+          levels:[2, 3, 4, 5, 6].map((d, i) => ({d, title: d === 2 ? 'الآحاد والعشرات' : LEVEL_NAMES[d], label: d === 2 ? 'آحاد وعشرات' : LEVEL_NAMES[d], desc:`أعداد من ${DIGITS[d]}`, emoji:['🛖','🏠','🏡','🏘️','🏰'][i], badge:ar(i + 1)}))},
+  round: {name:'جبل التقريب', emoji:'⛰️', color:'--w-round', runner:'🐐', sub:'من أقرب عشرة إلى أقرب مئة ألف',
+          decos:['☁️','🌲','🦅','❄️','⛅','🌿','🌤️'],
+          intro:'على جبل التقريب نسأل: هل العدد أقرب إلى الأسفل أم إلى الأعلى؟',
+          levels:[1, 2, 3, 4, 5].map((k, i) => ({k, title:'التقريب إلى ' + ROUND_TO[k], label:ROUND_TO[k], desc:`ننظر إلى رقم ${PLACE[k - 1]}`, emoji:['🌱','🌿','🌲','⛰️','🏔️'][i], badge:ar(i + 1)}))},
+};
+const WORLD_ORDER = ['mult', 'add', 'sub', 'place', 'round'];
+
 const SPEED = [
-  {max:3,  pts:20, label:'⚡ صاعقة!',  rule:'أقل من ٣ ثوانٍ'},
-  {max:5,  pts:15, label:'🚀 سريع!',   rule:'أقل من ٥ ثوانٍ'},
-  {max:8,  pts:10, label:'👍 صحيح',    rule:'أقل من ٨ ثوانٍ'},
-  {max:1e9,pts:6,  label:'🐢 صحيح',    rule:'أبطأ من ذلك'},
+  {max:3,  pts:20, label:'⚡ صاعقة!'},
+  {max:5,  pts:15, label:'🚀 سريع!'},
+  {max:8,  pts:10, label:'👍 صحيح'},
+  {max:1e9,pts:6,  label:'🐢 صحيح'},
 ];
 const WRONG_PENALTY = 8, HINT_PTS = 6;
-const LEVEL_CFG = n => n === 11
-  ? {goal:160, maxQ:26, s3:11, s2:15}
-  : {goal:100, maxQ:18, s3:7,  s2:10};
+const levelCfg = (w, i) => w === 'mult' && i === 10 ? {goal:160, maxQ:26, s3:11, s2:15} : {goal:100, maxQ:18, s3:7, s2:10};
+const levelTF = (w, lv) => w === 'add' || w === 'sub' ? (lv.d === 1 ? 1 : 1 + (lv.d - 1) * 1.1)
+  : w === 'place' ? 1.7 : w === 'round' ? 1.4 + lv.k * .2 : 1;
 
-/* ================= state ================= */
-const KEY = 'multiplication-farm-v1';
-const fresh = () => ({stars:{}, best:{}, facts:{}, sheep:0, sound:true});
-let S = fresh();
-function load(){ try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.facts) S = Object.assign(fresh(), s); } catch(e){} }
-function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} }
+/* =====================================================================
+   storage: one parent account, several children on this device
+   ===================================================================== */
+const KEY = 'numbers-farm-v2', OLD_KEY = 'multiplication-farm-v1';
+const AVATARS = ['🦁', '🐰', '🐼', '🦊', '🐸', '🐯', '🐨', '🐵', '🦄', '🐧'];
+const freshProg = () => ({stars:{}, best:{}, facts:{}, correct:0});
+let DB = {parent:null, kids:[], active:null, sound:true};
+function load(){ try { const d = JSON.parse(localStorage.getItem(KEY)); if (d && Array.isArray(d.kids)) DB = Object.assign({parent:null, kids:[], active:null, sound:true}, d); } catch(e){} }
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(DB)); } catch(e){} }
+const kid = () => DB.kids.find(k => k.id === DB.active);
+const P = () => kid().prog;
+const newId = () => 'k' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+function oldProgress(){ // progress saved by the first version of the game
+  try { const s = JSON.parse(localStorage.getItem(OLD_KEY)); if (!s || !s.facts) return null;
+    const pr = freshProg(), st = {}, be = {};
+    Object.entries(s.stars || {}).forEach(([n, v]) => st[n - 1] = v);
+    Object.entries(s.best || {}).forEach(([n, v]) => be[n - 1] = v);
+    pr.stars.mult = st; pr.best.mult = be; pr.facts = s.facts; pr.correct = s.sheep || 0; return pr;
+  } catch(e){ return null; }
+}
 
-const stars = n => S.stars[n] || 0;
-const unlocked = n => n === 1 || stars(n) > 0 || (n === 11 ? [...Array(10)].every((_, i) => stars(i + 1) > 0) : stars(n - 1) > 0);
+const stars = (w, i) => (P().stars[w] || {})[i] || 0;
+const worldStars = w => Object.values(P().stars[w] || {}).reduce((x, y) => x + y, 0);
+const kidStars = k => Object.values(k.prog.stars).reduce((t, o) => t + Object.values(o).reduce((x, y) => x + y, 0), 0);
+function unlocked(w, i){
+  if (i === 0 || stars(w, i) > 0) return true;
+  if (w === 'mult' && i === 10) return [...Array(10)].every((_, j) => stars('mult', j) > 0);
+  return stars(w, i - 1) > 0;
+}
 const theme = a => THEMES[a] || THEMES[8];
 
+/* multiplication fact memory (for smart review & mastery grid) */
 function record(a, b, ok, t){
-  const k = a + 'x' + b, f = S.facts[k] || (S.facts[k] = {c:0, w:0, s:0, t:[]});
-  if (ok){ f.c++; f.s++; f.t.push(Math.round(t * 10) / 10); if (f.t.length > 3) f.t.shift(); S.sheep++; }
+  const F = P().facts, k = a + 'x' + b, f = F[k] || (F[k] = {c:0, w:0, s:0, t:[]});
+  if (ok){ f.c++; f.s++; f.t.push(Math.round(t * 10) / 10); if (f.t.length > 3) f.t.shift(); }
   else { f.w++; f.s = 0; f.t = []; }
 }
 function level(a, b){
-  const f = S.facts[a + 'x' + b];
+  const f = P().facts[a + 'x' + b];
   if (!f) return 0;
   if (f.s === 0) return 1;
   const avg = f.t.reduce((x, y) => x + y, 0) / f.t.length;
   return f.s >= 3 && avg <= 5 ? 3 : 2;
 }
-function weakness(a, b){ // higher = needs more practice
-  const f = S.facts[a + 'x' + b];
+function weakness(a, b){
+  const f = P().facts[a + 'x' + b];
   if (!f) return 2.5;
   const avg = f.t.length ? f.t.reduce((x, y) => x + y, 0) / f.t.length : 9;
   return (f.s === 0 ? 4 : 0) + f.w / (f.c + f.w + 1) * 3 + Math.min(avg, 10) / 5 - Math.min(f.s, 4) * .5;
 }
 
-/* ================= language helpers ================= */
-function countPhrase(n, forms, g){
-  if (n === 1) return forms[0] + (g === 'f' ? ' واحدة' : ' واحد');
-  if (n === 2) return forms[1];
-  return ar(n) + ' ' + forms[2];
-}
-function sentence(a, b){
-  const th = theme(a);
-  return `${countPhrase(a, th.p, th.pg)}، ${th.rel} ${th.p[0]} ${countPhrase(b, th.c, th.cg)}`;
-}
-
-/* ================= sound ================= */
+/* =====================================================================
+   sound & speech
+   ===================================================================== */
 let AC = null;
-function beep(notes, type = 'triangle', len = .11){
-  if (!S.sound) return;
+function beep(notes, type = 'triangle', l = .11){
+  if (!DB.sound) return;
   try {
     AC = AC || new (window.AudioContext || window.webkitAudioContext)();
     const t0 = AC.currentTime;
     notes.forEach((f, i) => {
       const o = AC.createOscillator(), g = AC.createGain();
       o.type = type; o.frequency.value = f;
-      g.gain.setValueAtTime(.0001, t0 + i * len);
-      g.gain.exponentialRampToValueAtTime(.14, t0 + i * len + .02);
-      g.gain.exponentialRampToValueAtTime(.0001, t0 + i * len + len * 1.6);
-      o.connect(g).connect(AC.destination); o.start(t0 + i * len); o.stop(t0 + i * len + len * 1.8);
+      g.gain.setValueAtTime(.0001, t0 + i * l);
+      g.gain.exponentialRampToValueAtTime(.14, t0 + i * l + .02);
+      g.gain.exponentialRampToValueAtTime(.0001, t0 + i * l + l * 1.6);
+      o.connect(g).connect(AC.destination); o.start(t0 + i * l); o.stop(t0 + i * l + l * 1.8);
     });
   } catch(e){}
 }
 const SND = {
-  ok: () => beep([660, 880]),
-  zap: () => beep([660, 880, 1175], 'triangle', .07),
-  bad: () => beep([260, 220], 'sine', .14),
-  tick: () => beep([520], 'sine', .05),
+  ok: () => beep([660, 880]), zap: () => beep([660, 880, 1175], 'triangle', .07),
+  bad: () => beep([260, 220], 'sine', .14), tick: () => beep([520], 'sine', .05),
   win: () => beep([523, 659, 784, 1047], 'triangle', .13),
 };
+let speakText = '';
+function speak(text){
+  try {
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'ar-SA'; u.rate = .85;
+    const v = speechSynthesis.getVoices().find(v => v.lang && v.lang.startsWith('ar'));
+    if (v) u.voice = v;
+    speechSynthesis.cancel(); speechSynthesis.speak(u);
+  } catch(e){}
+}
+if (!('speechSynthesis' in window)) $('speakBtn').hidden = true;
+$('speakBtn').onclick = () => speakText && speak(speakText);
 
-/* ================= navigation ================= */
-const SCREENS = ['map', 'learn', 'quiz', 'result', 'grid'];
+/* =====================================================================
+   navigation
+   ===================================================================== */
+const SCREENS = ['register', 'profiles', 'parent', 'worlds', 'map', 'learn', 'quiz', 'result', 'grid'];
+let curWorld = 'mult';
 function show(name){
   SCREENS.forEach(s => $('screen-' + s).hidden = s !== name);
   window.scrollTo({top:0});
-  if (name === 'map') renderMap();
-}
-document.querySelectorAll('[data-home]').forEach(b => b.onclick = () => show('map'));
-
-/* ================= picture renderer ================= */
-function renderScene(el, a, b){
-  const th = theme(a), total = a * b;
-  el.hidden = false;
-  el.className = 'scene size-' + (total <= 20 ? 'lg' : total <= 50 ? 'md' : 'sm');
-  el.innerHTML = '';
-  const cols = Math.min(b, 5);
-  for (let i = 0; i < a; i++){
-    const g = document.createElement('div');
-    g.className = 'group';
-    g.style.setProperty('--d', Math.min(i * 40, 360) + 'ms');
-    g.innerHTML = `<div class="g-head">${th.pe}</div><div class="g-items" style="--cols:${cols}">${('<span>' + th.ce + '</span>').repeat(b)}</div><div class="g-sum">${ar(b * (i + 1))}</div>`;
-    el.appendChild(g);
-  }
-  el.setAttribute('aria-label', `${sentence(a, b)}، المجموع ${ar(total)}`);
-}
-let countRun = 0;
-async function countAlong(el, fast){
-  const run = ++countRun, groups = [...el.querySelectorAll('.group')];
-  el.classList.remove('sums');
-  groups.forEach(g => g.classList.remove('lit'));
-  const step = fast ? 160 : Math.max(260, 520 - groups.length * 20);
-  for (const g of groups){
-    if (run !== countRun) return;
-    g.classList.add('lit'); SND.tick();
-    await new Promise(r => setTimeout(r, step));
-  }
-  if (run === countRun) el.classList.add('sums');
+  if (name === 'profiles') renderProfiles();
+  if (name === 'parent') renderParent();
+  if (name === 'worlds') renderWorlds();
+  if (name === 'map') renderMap(curWorld);
 }
 
-/* ================= home: winding trail ================= */
-const OFFS = [0, .9, 1.3, .9, 0, -.9, -1.3, -.9, 0, .9, 0];
-const DECOS = ['🌳', '🌼', '🍄', '🌷', '🌲', '🦋', '🌻', '🐞', '🌸', '🌾', '🎈'];
-let currentNode = 0;
-function renderMap(){
-  $('starTotal').textContent = ar(Object.values(S.stars).reduce((x, y) => x + y, 0)) + ' من ' + ar(33);
-  $('soundBtn').textContent = S.sound ? '🔊' : '🔇';
-  currentNode = 0;
-  for (let n = 1; n <= 11; n++) if (unlocked(n) && !stars(n)) { currentNode = n; break; }
-  const total = Object.values(S.stars).reduce((x, y) => x + y, 0);
-  $('bubble').textContent = currentNode === 0 ? 'أنت بطل المزرعة! جرّب أن تجمع كل النجوم ⭐'
-    : currentNode === 11 ? 'وصلنا إلى الكأس! هل أنت جاهز لتحدي البطل؟ 🏆'
-    : total === 0 ? `مرحبًا! أنا صوفي 🐑 هيا نبدأ بجدول ${ar(currentNode)}. اضغط على الدائرة التي أقف عندها.`
-    : `أحسنت! هيا إلى جدول ${ar(currentNode)}. كلما أجبت أسرع وصلنا أسرع!`;
+/* =====================================================================
+   registration, children, parent account
+   ===================================================================== */
+function avatarPicker(el, current){
+  let sel = current || AVATARS[0];
+  el.innerHTML = AVATARS.map(a => `<button type="button" aria-pressed="${a === sel}" aria-label="صورة ${a}">${a}</button>`).join('');
+  el.querySelectorAll('button').forEach(b => b.onclick = () => { sel = b.textContent; el.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b)); });
+  return () => sel;
+}
+function validPhone(s){ const d = toLatin(s).replace(/[\s\-().]/g, ''); return /^\+?\d{8,15}$/.test(d) ? d : null; }
+function fieldError(input, errEl, msg){ input.setAttribute('aria-invalid', 'true'); errEl.textContent = msg; input.focus(); return false; }
+
+let regAvatar = avatarPicker($('regAvatars'));
+document.querySelectorAll('.field input').forEach(inp => inp.addEventListener('input', () => inp.removeAttribute('aria-invalid')));
+$('regForm').onsubmit = e => {
+  e.preventDefault();
+  ['regParent', 'regPhone', 'regKid'].forEach(id => $(id).removeAttribute('aria-invalid'));
+  const pn = $('regParent').value.trim(), ph = validPhone($('regPhone').value), kn = $('regKid').value.trim();
+  if (!pn) return fieldError($('regParent'), $('regErr'), 'اكتب اسم ولي الأمر.');
+  if (!ph) return fieldError($('regPhone'), $('regErr'), 'اكتب رقم هاتف صحيحًا (من ٨ إلى ١٥ رقمًا).');
+  if (!kn) return fieldError($('regKid'), $('regErr'), 'اكتب اسم الطفل.');
+  const k = {id:newId(), name:kn.slice(0, 30), avatar:regAvatar(), prog:oldProgress() || freshProg()};
+  DB.parent = {name:pn.slice(0, 40), phone:ph, created:Date.now()};
+  DB.kids = [k]; DB.active = k.id; save();
+  show('worlds');
+};
+
+function renderProfiles(){
+  $('kidList').innerHTML = DB.kids.map(k => `<button class="kid" data-id="${k.id}"><span class="av">${k.avatar}</span><b>${esc(k.name)}</b><small>★ ${ar(kidStars(k))}</small></button>`).join('')
+    + `<button class="kid add" id="addKidCard"><span class="av" style="font-size:2.4rem">➕</span><b>طفل جديد</b></button>`;
+  $('kidList').querySelectorAll('[data-id]').forEach(b => b.onclick = () => { DB.active = b.dataset.id; save(); show('worlds'); });
+  $('addKidCard').onclick = openAddKid;
+}
+let newKidAvatar = () => AVATARS[0];
+function openAddKid(){
+  $('addKidForm').hidden = false; $('newKidName').value = ''; $('newKidErr').textContent = '';
+  newKidAvatar = avatarPicker($('newKidAvatars'), AVATARS[DB.kids.length % AVATARS.length]);
+  $('newKidName').focus();
+}
+$('cancelAddKid').onclick = () => $('addKidForm').hidden = true;
+$('addKidForm').onsubmit = e => {
+  e.preventDefault();
+  const n = $('newKidName').value.trim();
+  if (!n) return fieldError($('newKidName'), $('newKidErr'), 'اكتب اسم الطفل.');
+  const k = {id:newId(), name:n.slice(0, 30), avatar:newKidAvatar(), prog:freshProg()};
+  DB.kids.push(k); save(); $('addKidForm').hidden = true; renderProfiles();
+};
+$('parentBtn').onclick = () => show('parent');
+$('whoBtn').onclick = () => show('profiles');
+$('parentBack').onclick = () => show('profiles');
+$('parentAddKid').onclick = () => { show('profiles'); openAddKid(); };
+
+function twoStep(btn, label, action){
+  if (btn.dataset.armed){ action(); return; }
+  btn.dataset.armed = '1'; const old = btn.textContent; btn.textContent = label;
+  setTimeout(() => { if (btn.isConnected){ delete btn.dataset.armed; btn.textContent = old; } }, 4000);
+}
+function renderParent(){
+  $('pName').value = DB.parent.name; $('pPhone').value = DB.parent.phone; $('pErr').textContent = ''; $('pSaved').hidden = true;
+  $('parentKids').innerHTML = DB.kids.map(k => `
+    <div class="kid-row" data-id="${k.id}">
+      <span class="av">${k.avatar}</span>
+      <div class="info"><b>${esc(k.name)}</b><small>${WORLD_ORDER.map(w => `${WORLDS[w].emoji} ${ar(Object.values(k.prog.stars[w] || {}).reduce((x, y) => x + y, 0))}`).join(' · ')}</small></div>
+      <div class="acts2"><button class="link" data-rename>تعديل الاسم</button><button class="link danger" data-del>حذف</button></div>
+    </div>`).join('');
+  $('parentKids').querySelectorAll('.kid-row').forEach(row => {
+    const k = DB.kids.find(x => x.id === row.dataset.id);
+    row.querySelector('[data-rename]').onclick = () => {
+      const info = row.querySelector('.info');
+      info.innerHTML = `<label class="field"><span class="sr">الاسم الجديد</span><input value="${esc(k.name)}" id="rn-${k.id}"></label>`;
+      const inp = info.querySelector('input'); inp.focus(); inp.select();
+      const done = () => { const v = inp.value.trim(); if (v){ k.name = v.slice(0, 30); save(); } renderParent(); };
+      inp.onkeydown = ev => { if (ev.key === 'Enter') done(); if (ev.key === 'Escape') renderParent(); };
+      inp.onblur = done;
+    };
+    row.querySelector('[data-del]').onclick = ev => twoStep(ev.currentTarget, 'اضغط مرة أخرى للتأكيد', () => {
+      DB.kids = DB.kids.filter(x => x.id !== k.id);
+      if (DB.active === k.id) DB.active = DB.kids[0]?.id || null;
+      save(); renderParent();
+    });
+  });
+}
+$('parentForm').onsubmit = e => {
+  e.preventDefault();
+  ['pName', 'pPhone'].forEach(id => $(id).removeAttribute('aria-invalid'));
+  const n = $('pName').value.trim(), ph = validPhone($('pPhone').value);
+  if (!n) return fieldError($('pName'), $('pErr'), 'اكتب اسم ولي الأمر.');
+  if (!ph) return fieldError($('pPhone'), $('pErr'), 'اكتب رقم هاتف صحيحًا (من ٨ إلى ١٥ رقمًا).');
+  DB.parent.name = n.slice(0, 40); DB.parent.phone = ph; save();
+  $('pErr').textContent = ''; $('pSaved').hidden = false;
+};
+$('wipeBtn').onclick = ev => twoStep(ev.currentTarget, 'متأكد؟ اضغط مرة أخرى لحذف كل شيء', () => {
+  DB = {parent:null, kids:[], active:null, sound:DB.sound}; save();
+  try { localStorage.removeItem(OLD_KEY); } catch(e){}
+  $('regForm').reset(); regAvatar = avatarPicker($('regAvatars')); show('register');
+});
+
+/* =====================================================================
+   worlds screen
+   ===================================================================== */
+function renderWorlds(){
+  const k = kid();
+  $('whoAv').textContent = k.avatar; $('whoName').textContent = k.name;
+  $('starTotal').textContent = ar(kidStars(k));
+  $('soundBtn').textContent = DB.sound ? '🔊' : '🔇';
+  $('worldsBubble').textContent = kidStars(k) === 0 ? `أهلًا يا ${k.name}! اختر عالمًا نلعب فيه. أنصحك أن تبدأ بقلعة المنازل أو جزيرة الجمع.` : `أهلًا يا ${k.name}! إلى أين نذهب اليوم؟`;
+  $('worldList').innerHTML = WORLD_ORDER.map((w, i) => {
+    const W = WORLDS[w], max = W.levels.length * 3, got = worldStars(w);
+    return `<button class="world ${i === 0 ? 'wide' : ''}" data-w="${w}" style="--wc:var(${W.color})">
+      <span class="w-emoji">${W.emoji}</span><b>${W.name}</b><small>${W.sub}</small>
+      <span class="w-stars">★ ${ar(got)} من ${ar(max)}</span><span class="w-bar"><i style="width:${got / max * 100}%"></i></span></button>`;
+  }).join('');
+  $('worldList').querySelectorAll('[data-w]').forEach(b => b.onclick = () => { curWorld = b.dataset.w; show('map'); });
+}
+$('soundBtn').onclick = () => { DB.sound = !DB.sound; save(); $('soundBtn').textContent = DB.sound ? '🔊' : '🔇'; if (DB.sound) SND.ok(); };
+
+/* =====================================================================
+   winding trail (one per world)
+   ===================================================================== */
+const OFFS = [0, .9, 1.3, .9, 0, -.9, -1.3, -.9];
+let currentNode = -1;
+function renderMap(w){
+  const W = WORLDS[w], L = W.levels;
+  $('screen-map').style.setProperty('--wc', `var(${W.color})`);
+  $('mapTitle').textContent = `${W.emoji} ${W.name}`;
+  $('multPills').hidden = w !== 'mult';
+  currentNode = -1;
+  for (let i = 0; i < L.length; i++) if (unlocked(w, i) && !stars(w, i)) { currentNode = i; break; }
+  const got = worldStars(w);
+  $('bubble').textContent = currentNode === -1 ? 'أنهيت كل مستويات هذا العالم! جرّب أن تجمع كل النجوم ⭐'
+    : got === 0 ? `${W.intro} هيا نبدأ بـ«${L[currentNode].title}». اضغط على الدائرة التي أقف عندها.`
+    : `أحسنت! هيا إلى «${L[currentNode].title}». كلما أجبت أسرع وصلنا أسرع!`;
+  $('goalFlag').textContent = w === 'mult' ? 'أوصل صوفي إلى الكأس 🏆' : `أوصل صوفي إلى نهاية ${W.name}`;
   const trail = $('trail');
   trail.innerHTML = '<svg class="trail-svg" aria-hidden="true"><path class="road" id="road"/><path class="road-line" id="roadLine"/><path class="road-done" id="roadDone"/></svg>';
-  for (let n = 1; n <= 11; n++){
-    const champ = n === 11, lock = !unlocked(n), st = stars(n);
-    const name = champ ? 'تحدي البطل' : 'جدول ' + ar(n);
+  L.forEach((lv, i) => {
+    const lock = !unlocked(w, i), st = stars(w, i), off = OFFS[i % OFFS.length];
     const btn = document.createElement('button');
-    btn.className = 'node' + (lock ? ' locked' : '') + (n === currentNode ? ' current' : '') + (champ ? ' champ' : '');
-    btn.style.setProperty('--x', OFFS[n - 1]);
+    btn.className = 'node' + (lock ? ' locked' : '') + (i === currentNode ? ' current' : '') + (lv.champ ? ' champ' : '');
+    btn.style.setProperty('--x', off);
     btn.innerHTML = `
-      <span class="disc"><span class="em">${champ ? '🏆' : theme(n).pe}</span>${champ ? '' : `<span class="badge num">${lock ? '🔒' : ar(n)}</span>`}${n === currentNode ? `<span class="mascot ${OFFS[n - 1] > 0 ? 'on-left' : 'on-right'}" aria-hidden="true">🐑</span>` : ''}</span>
-      ${champ ? `<span class="n-label">${name}</span>` : ''}
-      ${lock && !champ ? '' : `<span class="n-stars" aria-hidden="true">${[1, 2, 3].map(i => `<span class="${i <= st ? 'on' : ''}">★</span>`).join('')}</span>`}`;
-    btn.setAttribute('aria-label', name + (lock ? '، مقفل' : '') + '، ' + ar(st) + ' من ٣ نجوم');
-    btn.onclick = () => openSheet(n);
+      <span class="disc"><span class="em">${lv.emoji}</span>${lv.champ ? '' : `<span class="badge num">${lock ? '🔒' : lv.badge}</span>`}${i === currentNode ? `<span class="mascot ${off > 0 ? 'on-left' : 'on-right'}" aria-hidden="true">🐑</span>` : ''}</span>
+      ${lv.label ? `<span class="n-label">${lv.label}</span>` : ''}
+      ${lock ? '' : `<span class="n-stars" aria-hidden="true">${[1, 2, 3].map(s => `<span class="${s <= st ? 'on' : ''}">★</span>`).join('')}</span>`}`;
+    btn.setAttribute('aria-label', lv.title + (lock ? '، مقفل' : '') + '، ' + ar(st) + ' من ٣ نجوم');
+    btn.onclick = () => openSheet(w, i);
     trail.appendChild(btn);
-  }
-  DECOS.forEach((d, i) => { const e = document.createElement('span'); e.className = 'deco'; e.dataset.i = i; e.textContent = d; trail.appendChild(e); });
+  });
+  W.decos.forEach((d, i) => { if (i >= L.length) return; const e = document.createElement('span'); e.className = 'deco'; e.dataset.i = i; e.textContent = d; trail.appendChild(e); });
   requestAnimationFrame(() => {
     drawTrail();
-    if (currentNode >= 4){
-      const el = trail.querySelectorAll('.node')[currentNode - 1];
+    if (currentNode >= 3){
+      const el = trail.querySelectorAll('.node')[currentNode];
       el && el.scrollIntoView({block:'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'});
     }
   });
@@ -546,56 +929,53 @@ function drawTrail(){
   }, '');
   const full = curve(pts);
   road.setAttribute('d', full); $('roadLine').setAttribute('d', full);
-  const reach = currentNode === 0 ? pts.length : currentNode;
+  const reach = currentNode === -1 ? pts.length : currentNode + 1;
   $('roadDone').setAttribute('d', reach > 1 ? curve(pts.slice(0, reach)) : '');
-  // scenery on the open side of each bend
   trail.querySelectorAll('.deco').forEach(e => {
-    const i = +e.dataset.i, [x, y] = pts[i];
-    const side = OFFS[i] > 0 ? -1 : OFFS[i] < 0 ? 1 : (i % 4 === 0 ? 1 : -1);
-    const gap = Math.min(130, W * .32);
+    const i = +e.dataset.i, [x, y] = pts[i], off = OFFS[i % OFFS.length];
+    const side = off > 0 ? -1 : off < 0 ? 1 : (i % 4 === 0 ? 1 : -1);
+    const gap = Math.min(150, W * .32);
     e.style.left = Math.max(22, Math.min(W - 22, x + side * gap)) + 'px';
     e.style.top = (y + (i % 2 ? 16 : -8)) + 'px';
   });
 }
 addEventListener('resize', () => requestAnimationFrame(drawTrail));
+$('mapBack').onclick = () => show('worlds');
 
-/* ================= sheet ================= */
-function openSheet(n){
-  const champ = n === 11, lock = !unlocked(n), th = theme(n), best = S.best[n], cfg = LEVEL_CFG(n);
-  const starLine = stars(n) ? `<span style="color:var(--sun)">${'★'.repeat(stars(n))}</span>` + (best ? ` · أفضل رقم ${ar(best.q)} أسئلة` : '') : 'لم تبدأ بعد';
-  const head = champ
-    ? `<span class="big">🏆</span><div><h2>تحدي البطل</h2><p>${starLine}</p></div>`
-    : `<span class="big">${th.pe}</span><div><h2>جدول ${ar(n)}</h2><p>${starLine}</p></div>`;
+/* =====================================================================
+   level sheet
+   ===================================================================== */
+const ruleSec = (s, tf) => s > 100 ? 'أبطأ من ذلك' : `أقل من ${ar(Math.round(s * tf))} ثوانٍ`;
+function openSheet(w, i){
+  const W = WORLDS[w], lv = W.levels[i], lock = !unlocked(w, i), best = (P().best[w] || {})[i], cfg = levelCfg(w, i), tf = levelTF(w, lv);
+  const starLine = stars(w, i) ? `<span style="color:var(--sun)">${'★'.repeat(stars(w, i))}</span>` + (best ? ` · أفضل رقم ${ar(best.q)} أسئلة` : '') : (lv.desc || 'لم تبدأ بعد');
   let body = '';
   if (lock){
-    body += champ
+    body += lv.champ
       ? `<div class="locked-note">🔒 احصل على نجمة واحدة على الأقل في كل جدول ليُفتح هذا التحدي.</div>`
-      : `<div class="locked-note">🔒 أكمل جدول ${ar(n - 1)} أولًا. وإن كنت تحفظ هذا الجدول، اقفز إليه باختبار التحدي.</div>`;
+      : `<div class="locked-note">🔒 أكمل «${W.levels[i - 1].title}» أولًا. وإن كنت تعرف هذا المستوى، اقفز إليه باختبار التحدي.</div>`;
   }
   body += '<div class="acts">';
-  if (!champ){
-    body += `<button class="act" data-act="learn"><span class="ai">📖</span><span><b>تعلّم</b><small>الجدول بالصور</small></span></button>`;
-    body += `<button class="act" data-act="practice"><span class="ai">🎯</span><span><b>تدرّب</b><small>١٠ أسئلة مع الصور، بلا وقت</small></span></button>`;
+  if (!lv.champ){
+    body += `<button class="act" data-act="learn"><span class="ai">📖</span><span><b>تعلّم</b><small>${w === 'mult' ? 'الجدول بالصور' : 'شرح خطوة بخطوة'}</small></span></button>`;
+    body += `<button class="act" data-act="practice"><span class="ai">🎯</span><span><b>تدرّب</b><small>١٠ أسئلة بلا وقت، مع مساعدة</small></span></button>`;
   }
-  if (!(champ && lock)){
-    body += `<button class="act primary" data-act="challenge"><span class="ai">⚡</span><span><b>${lock ? 'اختبار القفز' : 'التحدي'}</b><small>أوصل الخروف إلى الحظيرة</small></span></button>`;
-  }
+  if (!(lv.champ && lock)) body += `<button class="act primary" data-act="challenge"><span class="ai">⚡</span><span><b>${lock ? 'اختبار القفز' : 'التحدي'}</b><small>املأ الشريط قبل أن تنتهي الأسئلة</small></span></button>`;
   body += '</div>';
   body += `<p class="note">في التحدي، الإجابة الأسرع تملأ الشريط أسرع، فتنهي المرحلة بأسئلة أقل.</p>
     <details><summary>كيف تُحسب النقاط والنجوم؟</summary>
-      <div class="rules">${SPEED.map(s => `<span>${s.rule}</span><b class="num">${sgn(s.pts)}</b>`).join('')}
-        <span>إجابة خاطئة</span><b class="num">${sgn(-WRONG_PENALTY)}</b>
-        <span>بمساعدة الصورة</span><b class="num">${sgn(HINT_PTS)}</b></div>
+      <div class="rules">${SPEED.map(s => `<span>${ruleSec(s.max, tf)}</span><b class="num">${sgn(s.pts)}</b>`).join('')}
+        <span>إجابة خاطئة</span><b class="num">${sgn(-WRONG_PENALTY)}</b><span>بمساعدة 💡</span><b class="num">${sgn(HINT_PTS)}</b></div>
       <p style="margin-top:8px">يكتمل الشريط عند ${ar(cfg.goal)} نقطة. ٣ نجوم: ${ar(cfg.s3)} أسئلة أو أقل بلا أخطاء. نجمتان: ${ar(cfg.s2)} أسئلة أو أقل.</p>
     </details>`;
-  $('sheet').innerHTML = `<div class="s-head">${head}<button class="icon-btn" data-close aria-label="إغلاق">✕</button></div>${body}`;
+  $('sheet').innerHTML = `<div class="s-head"><span class="big">${lv.emoji}</span><div><h2>${lv.title}</h2><p>${starLine}</p></div><button class="icon-btn" data-close aria-label="إغلاق">✕</button></div>${body}`;
   $('sheet').querySelector('[data-close]').onclick = closeSheet;
   $('sheet').querySelectorAll('[data-act]').forEach(b => b.onclick = () => {
     closeSheet();
     const a = b.dataset.act;
-    if (a === 'learn') openLearn(n, 1);
-    if (a === 'practice') startPractice(n);
-    if (a === 'challenge') startChallenge(n);
+    if (a === 'learn') openLearn(w, i);
+    if (a === 'practice') startQuizFor(w, i, 'practice');
+    if (a === 'challenge') startQuizFor(w, i, 'challenge');
   });
   $('overlay').hidden = false;
   $('sheet').querySelector('[data-act]')?.focus();
@@ -604,78 +984,391 @@ function closeSheet(){ $('overlay').hidden = true; }
 $('overlay').onclick = e => { if (e.target === $('overlay')) closeSheet(); };
 addEventListener('keydown', e => { if (e.key === 'Escape' && !$('overlay').hidden) closeSheet(); });
 
-/* ================= learn ================= */
-const L = {n:1, k:1};
-function openLearn(n, k){ L.n = n; L.k = k; $('tipBox').hidden = true; $('tipBtn').setAttribute('aria-expanded', 'false'); show('learn'); renderLearn(); }
-function renderLearn(){
-  const {n, k} = L, th = theme(n);
-  $('learnTitle').textContent = `جدول ${ar(n)} · ${th.name}`;
-  $('learnEq').innerHTML = `<span>${ar(n)}</span><span class="op">×</span><span>${ar(k)}</span><span class="op">=</span><span class="ans ok">${ar(n * k)}</span>`;
-  $('learnSentence').textContent = `${sentence(n, k)}، والمجموع ${ar(n * k)}`;
+/* =====================================================================
+   pictures & diagrams
+   ===================================================================== */
+function countPhrase(n, forms, g){
+  if (n === 1) return forms[0] + (g === 'f' ? ' واحدة' : ' واحد');
+  if (n === 2) return forms[1];
+  return ar(n) + ' ' + forms[2];
+}
+function sentence(a, b){ const th = theme(a); return `${countPhrase(a, th.p, th.pg)}، ${th.rel} ${th.p[0]} ${countPhrase(b, th.c, th.cg)}`; }
+function renderScene(el, a, b){
+  const th = theme(a), total = a * b;
+  el.hidden = false;
+  el.className = 'scene size-' + (total <= 20 ? 'lg' : total <= 50 ? 'md' : 'sm');
+  el.innerHTML = '';
+  const cols = Math.min(b, 5);
+  for (let i = 0; i < a; i++){
+    const g = document.createElement('div');
+    g.className = 'group'; g.style.setProperty('--d', Math.min(i * 40, 360) + 'ms');
+    g.innerHTML = `<div class="g-head">${th.pe}</div><div class="g-items" style="--cols:${cols}">${('<span>' + th.ce + '</span>').repeat(b)}</div><div class="g-sum">${ar(b * (i + 1))}</div>`;
+    el.appendChild(g);
+  }
+  el.setAttribute('aria-label', `${sentence(a, b)}، المجموع ${ar(total)}`);
+}
+let countRun = 0;
+async function countAlong(el, fast){
+  const run = ++countRun, groups = [...el.querySelectorAll('.group')];
+  el.classList.remove('sums'); groups.forEach(g => g.classList.remove('lit'));
+  const step = fast ? 160 : Math.max(260, 520 - groups.length * 20);
+  for (const g of groups){ if (run !== countRun) return; g.classList.add('lit'); SND.tick(); await new Promise(r => setTimeout(r, step)); }
+  if (run === countRun) el.classList.add('sums');
+}
+function emojiArith(a, b, op){
+  if (op === '+') return `<div class="ea"><div class="ea-g">${'<span>🍎</span>'.repeat(a)}</div><b class="ea-op">+</b><div class="ea-g">${'<span>🍏</span>'.repeat(b)}</div></div>`;
+  return `<div class="ea"><div class="ea-g" style="max-width:260px">${[...Array(a)].map((_, i) => `<span class="${i >= a - b ? 'gone' : ''}">🎈</span>`).join('')}</div></div>`;
+}
+const emojiSentence = (a, b, op) => op === '+'
+  ? `عندنا ${ar(a)} 🍎 و ${ar(b)} 🍏. نعدّها كلها معًا: ${ar(a + b)}`
+  : `عندنا ${ar(a)} 🎈 طار منها ${ar(b)}، فبقي ${ar(a - b)}`;
+
+/* column arithmetic grid (always laid out left-to-right like written digits) */
+function colGrid({a, b, op, n, ansLen, marks = [], out = [], active = -1}){
+  const ps = [...Array(n)].map((_, i) => n - 1 - i);
+  const c = (p, inner, cls = '', id = '') => `<span class="cc ${cls}${p === active ? ' act' : ''}"${id ? ` id="${id}"` : ''}>${inner}</span>`;
+  const dig = (x, p) => p < len(x) ? `<span class="pc${p}">${ar(digit(x, p))}</span>` : '';
+  let h = `<div class="cg" style="--n:${n}" role="img" aria-label="${fmt(a)} ${op === '+' ? 'زائد' : 'ناقص'} ${fmt(b)}">`;
+  h += '<span></span>' + ps.map(p => c(p, PLACE_SHORT[p], 'ch pc' + p)).join('');
+  h += '<span></span>' + ps.map(p => c(p, marks[p] || '', 'cm', 'mk' + p)).join('');
+  h += '<span></span>' + ps.map(p => c(p, dig(a, p))).join('');
+  h += `<span class="csign">${op === '+' ? '+' : '−'}</span>` + ps.map(p => c(p, dig(b, p))).join('');
+  h += '<span class="cline"></span>';
+  h += '<span></span>' + ps.map(p => p < ansLen ? c(p, out[p] || '', 'cbox', 'ac' + p) : c(p, '')).join('');
+  return h + '</div>';
+}
+/* step-by-step solution: carries for addition, borrowing for subtraction */
+function arithSteps(a, b, op){
+  const res = op === '+' ? a + b : a - b, n = Math.max(len(a), len(b), len(res)), steps = [];
+  const marks = Array(n).fill(''), out = Array(n).fill('');
+  let carry = 0;
+  for (let p = 0; p < n; p++){
+    const da = digit(a, p), db = digit(b, p);
+    let msg, w;
+    if (op === '+'){
+      if (p >= len(a) && p >= len(b)){ w = carry; msg = `ننزل المحمول ${ar(carry)} إلى منزلة ${PLACE[p]}.`; carry = 0; }
+      else {
+        const s = da + db + carry; w = s % 10;
+        msg = `منزلة ${PLACE[p]}: ${ar(da)} + ${ar(db)}${carry ? ` + ${ar(carry)} (المحمول)` : ''} = ${ar(s)}.` + (s >= 10 ? ` نكتب ${ar(w)} ونحمل ${ar(1)} إلى منزلة ${PLACE[p + 1]}.` : ` نكتب ${ar(w)}.`);
+        carry = s >= 10 ? 1 : 0;
+        if (carry) marks[p + 1] = ar(1);
+      }
+    } else {
+      const lent = carry; let top = da - lent, borrow = 0;
+      if (top < db){ top += 10; borrow = 1; }
+      w = top - db;
+      if (lent || borrow) marks[p] = `<s>${ar(da)}</s>${ar(top)}`;
+      msg = `منزلة ${PLACE[p]}: `
+        + (lent && borrow ? `أعطى ${ar(da)} واحدًا للمنزلة السابقة، ثم استلف من منزلة ${PLACE[p + 1]} فصار ${ar(top)}. `
+          : lent ? `أعطى ${ar(da)} واحدًا للمنزلة السابقة فصار ${ar(top)}. `
+          : borrow ? `${ar(da)} أصغر من ${ar(db)}، فنستلف ${ar(1)} من منزلة ${PLACE[p + 1]} فيصبح ${ar(top)}. ` : '')
+        + `${ar(top)} − ${ar(db)} = ${ar(w)}.` + (p >= len(res) && w === 0 ? ' وهو صفر في أول العدد فلا نكتبه.' : '');
+      carry = borrow;
+    }
+    out[p] = op === '-' && p >= len(res) ? '' : ar(w);
+    steps.push({p, msg, marks:marks.slice(), out:out.slice()});
+  }
+  return {res, n, steps};
+}
+/* place-value houses */
+function chartHtml(n, hiP = -1, blank = false){
+  const L = len(n);
+  return `<div class="pv">${[...Array(L)].map((_, i) => { const p = L - 1 - i, d = digit(n, p);
+    return `<div class="pv-col pb${p} ${p === hiP ? 'hi' : ''}"><span class="pv-roof">${PLACE[p]}</span><span class="pv-dig pc${p}">${blank ? '؟' : ar(d)}</span><span class="pv-val">${blank ? '' : fmt(d * 10 ** p)}</span></div>`; }).join('')}</div>`;
+}
+function expandHtml(n, colour = true){
+  const parts = [...Array(len(n))].map((_, i) => len(n) - 1 - i).filter(p => digit(n, p)).map(p => `<span class="${colour ? 'pc' + p : ''}">${fmt(digit(n, p) * 10 ** p)}</span>`);
+  return `<div class="expand">${parts.join('<span class="op">+</span>')}</div>`;
+}
+/* number line for rounding */
+function roundInfo(n, k){
+  const U = 10 ** k, lo = Math.floor(n / U) * U, hi = lo + U, d = digit(n, k - 1);
+  return {U, lo, hi, d, target: d >= 5 ? hi : lo};
+}
+function lineHtml(n, k){
+  const {U, lo, hi} = roundInfo(n, k), pos = (n - lo) / U * 100;
+  return `<div class="nl" data-pos="${pos}"><div class="nl-track"><span class="nl-mid"></span><span class="nl-dot" style="left:${pos}%"><b>${fmt(n)}</b></span><span class="nl-goat" style="left:${pos}%">🐐</span></div>
+    <div class="nl-labels"><span data-v="${lo}">${fmt(lo)}</span><span class="mid">${fmt(lo + U / 2)}</span><span data-v="${hi}">${fmt(hi)}</span></div></div>`;
+}
+function revealLine(el, target){
+  const nl = el.querySelector('.nl'); if (!nl) return;
+  nl.querySelectorAll('[data-v]').forEach(s => s.classList.toggle('win', +s.dataset.v === target));
+  const goat = nl.querySelector('.nl-goat'), isHi = +nl.querySelectorAll('[data-v]')[1].dataset.v === target;
+  requestAnimationFrame(() => requestAnimationFrame(() => goat.style.left = isHi ? '100%' : '0%'));
+}
+function roundExplain(n, k){
+  const {d, target} = roundInfo(n, k);
+  return `ننظر إلى رقم ${PLACE[k - 1]}: <b class="pc${k - 1}">${ar(d)}</b>. ${d >= 5 ? 'هو ٥ أو أكثر، فنقرّب إلى الأعلى' : 'هو أقل من ٥، فنقرّب إلى الأسفل'}: ${fmt(n)} ← <b>${fmt(target)}</b>`;
+}
+
+/* =====================================================================
+   learn screens
+   ===================================================================== */
+let learnCtx = null;
+function openLearn(w, i, extra = {}){
+  learnCtx = {w, i, ...extra};
+  $('learnTitle').textContent = `${WORLDS[w].emoji} ${WORLDS[w].levels[i].title}`;
+  show('learn');
+  ({mult:learnMult, add:learnArith, sub:learnArith, place:learnPlace, round:learnRound})[w]();
+}
+$('learnBack').onclick = () => show('map');
+const startPracticeBtn = () => `<button class="btn block" id="toPractice">ابدأ التدريب</button>`;
+function bindPractice(){ const b = $('toPractice'); if (b) b.onclick = () => startQuizFor(learnCtx.w, learnCtx.i, 'practice'); }
+
+function learnMult(){
+  const n = learnCtx.i + 1, k = learnCtx.k || 1, th = theme(n);
+  learnCtx.k = k;
+  $('learnBody').innerHTML = `
+    <div class="learn-eq"><button class="arrow" id="prevBtn" aria-label="السابق">→</button>
+      <div class="eq"><span>${ar(n)}</span><span class="op">×</span><span>${ar(k)}</span><span class="op">=</span><span class="ans ok">${ar(n * k)}</span></div>
+      <button class="arrow" id="nextBtn" aria-label="التالي">←</button></div>
+    <div class="scene" id="learnScene"></div>
+    <p class="sentence">${sentence(n, k)}، والمجموع ${ar(n * k)}</p>
+    <div class="row" style="margin:10px 0 14px"><button class="link" id="countBtn">👆 عُدّ معي</button><button class="link" id="tipBtn" aria-expanded="${!!learnCtx.tip}">💡 حيلة للحفظ</button></div>
+    <div class="tip" ${learnCtx.tip ? '' : 'hidden'} id="tipBox"><p>${TIPS[n]}</p><p>${swapTip(n)}</p></div>
+    <p class="skip-label">نواتج جدول ${ar(n)} · حظيرة ${th.name}</p>
+    <div class="skip" id="skipRow">${[...Array(10)].map((_, j) => `<button class="${j + 1 === k ? 'on' : ''}" data-k="${j + 1}" aria-label="${ar(n)} × ${ar(j + 1)} = ${ar(n * (j + 1))}">${ar(n * (j + 1))}</button>`).join('')}</div>
+    <div class="learn-foot">${startPracticeBtn()}</div>`;
   renderScene($('learnScene'), n, k);
-  $('skipRow').innerHTML = [...Array(10)].map((_, i) => `<button class="${i + 1 === k ? 'on' : ''}" data-k="${i + 1}" aria-label="${ar(n)} × ${ar(i + 1)} = ${ar(n * (i + 1))}">${ar(n * (i + 1))}</button>`).join('');
-  $('skipRow').querySelectorAll('button').forEach(b => b.onclick = () => { L.k = +b.dataset.k; renderLearn(); });
-  $('tipText').textContent = TIPS[n] || '';
-  $('swapText').textContent = swapTip(n);
-  $('prevBtn').disabled = k === 1;
-  $('nextBtn').disabled = k === 10;
+  speakText = `${n} في ${k} يساوي ${n * k}`;
+  $('prevBtn').disabled = k === 1; $('nextBtn').disabled = k === 10;
+  $('prevBtn').onclick = () => { learnCtx.k = k - 1; learnMult(); };
+  $('nextBtn').onclick = () => { learnCtx.k = k + 1; learnMult(); };
+  $('skipRow').querySelectorAll('button').forEach(b => b.onclick = () => { learnCtx.k = +b.dataset.k; learnMult(); });
+  $('countBtn').onclick = () => countAlong($('learnScene'));
+  $('tipBtn').onclick = () => { learnCtx.tip = !learnCtx.tip; $('tipBox').hidden = !learnCtx.tip; $('tipBtn').setAttribute('aria-expanded', learnCtx.tip); };
+  bindPractice();
 }
-$('prevBtn').onclick = () => { if (L.k > 1){ L.k--; renderLearn(); } };
-$('nextBtn').onclick = () => { if (L.k < 10){ L.k++; renderLearn(); } };
-$('countBtn').onclick = () => countAlong($('learnScene'));
-$('tipBtn').onclick = () => { const h = !$('tipBox').hidden; $('tipBox').hidden = h; $('tipBtn').setAttribute('aria-expanded', String(!h)); };
-$('learnToPractice').onclick = () => startPractice(L.n);
-if (!('speechSynthesis' in window)) $('speakBtn').hidden = true;
-$('speakBtn').onclick = () => {
-  try {
-    const u = new SpeechSynthesisUtterance(`${L.n} في ${L.k} يساوي ${L.n * L.k}`);
-    u.lang = 'ar-SA'; u.rate = .85;
-    const v = speechSynthesis.getVoices().find(v => v.lang && v.lang.startsWith('ar'));
-    if (v) u.voice = v;
-    speechSynthesis.cancel(); speechSynthesis.speak(u);
-  } catch(e){}
-};
 
-/* ================= quiz engine ================= */
+function newArith(op, d){
+  let a, b;
+  if (op === '+'){
+    if (d === 1){ a = rnd(1, 9); b = rnd(1, 9); }
+    else if (d === 6){ a = rnd(100000, 599999); b = rnd(100000, 999999 - a); }
+    else { a = randD(d); b = randD(d); }
+  } else {
+    if (d === 1){ a = rnd(2, 9); b = rnd(1, a); }
+    else { a = rnd(10 ** (d - 1) + 1, 10 ** d - 1); b = rnd(10 ** (d - 1), a - 1); }
+  }
+  return {a, b};
+}
+function learnArith(){
+  const {w} = learnCtx, op = w === 'add' ? '+' : '-', d = WORLDS[w].levels[learnCtx.i].d;
+  if (learnCtx.a == null){ const x = newArith(op, d); learnCtx.a = x.a; learnCtx.b = x.b; learnCtx.step = -1; }
+  const {a, b} = learnCtx, opS = op === '+' ? '+' : '−', res = op === '+' ? a + b : a - b;
+  const again = `<button class="link" id="newEx">🔄 مثال جديد</button>`;
+  if (d === 1){
+    $('learnBody').innerHTML = `
+      <p class="lesson">${op === '+' ? 'الجمع يعني أن نضع الأشياء معًا ثم نعدّها كلها.' : 'الطرح يعني أن نأخذ من الأشياء ثم نعدّ ما بقي.'}</p>
+      <div class="eq"><span>${ar(a)}</span><span class="op">${opS}</span><span>${ar(b)}</span><span class="op">=</span><span class="ans ok">${ar(res)}</span></div>
+      ${emojiArith(a, b, op)}<p class="sentence">${emojiSentence(a, b, op)}</p>
+      <div class="row" style="margin-top:8px">${again}</div><div class="learn-foot">${startPracticeBtn()}</div>`;
+    speakText = `${a} ${op === '+' ? 'زائد' : 'ناقص'} ${b} يساوي ${res}`;
+  } else {
+    const S = learnCtx.S || (learnCtx.S = arithSteps(a, b, op)), st = learnCtx.step, last = S.steps.length - 1;
+    const snap = st >= 0 ? S.steps[st] : {marks:[], out:[], p:-1};
+    const msg = st < 0
+      ? (op === '+' ? 'نكتب العددين فوق بعضهما، كل رقم تحت منزلته. ثم نجمع عمودًا عمودًا، ونبدأ من الآحاد على اليمين.'
+                    : 'نكتب العدد الأكبر فوق والأصغر تحته، كل رقم تحت منزلته. ثم نطرح عمودًا عمودًا، ونبدأ من الآحاد على اليمين.')
+      : S.steps[st].msg + (st === last ? ` <br><b>الناتج: ${fmt(res)} 🎉</b>` : '');
+    $('learnBody').innerHTML = `
+      ${colGrid({a, b, op, n:S.n, ansLen:len(res), marks:snap.marks, out:snap.out, active:snap.p})}
+      <div class="step-msg" aria-live="polite">${msg}</div>
+      <div class="learn-foot">${st < last ? `<button class="btn block" id="stepBtn">${st < 0 ? 'ابدأ الحل' : 'الخطوة التالية'}</button>` : startPracticeBtn()}
+      <div class="row">${again}</div></div>`;
+    if ($('stepBtn')) $('stepBtn').onclick = () => { learnCtx.step++; SND.tick(); learnArith(); };
+    speakText = st < 0 ? '' : S.steps[st].msg.replace(/<[^>]+>/g, '');
+  }
+  $('newEx').onclick = () => { learnCtx.a = null; learnCtx.S = null; learnArith(); };
+  bindPractice();
+}
+
+function learnPlace(){
+  const d = WORLDS.place.levels[learnCtx.i].d;
+  if (learnCtx.n == null) learnCtx.n = genNum(d, Math.random() < .3);
+  const n = learnCtx.n;
+  $('learnBody').innerHTML = `
+    <p class="lesson">لكل رقم في العدد بيت اسمه «منزلة». كل منزلة أكبر ١٠ مرات من المنزلة التي على يمينها.</p>
+    <div class="bignum">${numHtml(n, -1, true)}</div>
+    ${chartHtml(n)}
+    <p class="skip-label">نقرؤه هكذا</p>
+    <p class="colorwords">${wordsHtml(n)}</p>
+    <p class="skip-label" style="margin-top:10px">ونفكّه هكذا</p>
+    ${expandHtml(n)}
+    ${d >= 2 && n % 100 > 20 && n % 10 ? `<div class="tip" style="margin-top:12px"><p>في العربية نقرأ الآحاد قبل العشرات: «<span class="pc0">${ONES[n % 10]}</span> و<span class="pc1">${TENS[Math.floor(n % 100 / 10)]}</span>» وليس العكس.</p></div>` : ''}
+    <div class="row" style="margin-top:10px"><button class="link" id="sayBtn">🔈 اسمع العدد</button><button class="link" id="newEx">🔄 عدد جديد</button></div>
+    <div class="learn-foot">${startPracticeBtn()}</div>`;
+  speakText = words(n);
+  $('sayBtn').onclick = () => speak(words(n));
+  $('newEx').onclick = () => { learnCtx.n = null; learnPlace(); };
+  bindPractice();
+}
+
+function learnRound(){
+  const k = WORLDS.round.levels[learnCtx.i].k;
+  if (learnCtx.n == null) learnCtx.n = genRoundNum(k);
+  const n = learnCtx.n, {target} = roundInfo(n, k);
+  $('learnBody').innerHTML = `
+    <p class="lesson">التقريب يعني أن نختار أقرب عدد «مدوّر». نسأل: هل العدد أقرب إلى البداية أم إلى النهاية؟</p>
+    <p class="qtext">قرّب ${fmt(n)} إلى ${ROUND_TO[k]}</p>
+    <div class="bignum">${numHtml(n, k - 1)}</div>
+    <div id="learnLine">${lineHtml(n, k)}</div>
+    <div class="step-msg">${roundExplain(n, k)}</div>
+    <div class="tip"><p>القاعدة: انظر إلى الرقم في المنزلة الأصغر مباشرةً (${PLACE[k - 1]}). إذا كان ٥ أو أكثر نقرّب للأعلى، وإذا كان أقل من ٥ نقرّب للأسفل.</p></div>
+    <div class="row" style="margin-top:6px"><button class="link" id="newEx">🔄 مثال جديد</button></div>
+    <div class="learn-foot">${startPracticeBtn()}</div>`;
+  revealLine($('learnLine'), target);
+  speakText = `${words(n)} تقريبه إلى ${ROUND_TO[k]} هو ${words(target)}`;
+  $('newEx').onclick = () => { learnCtx.n = null; learnRound(); };
+  bindPractice();
+}
+
+/* =====================================================================
+   question makers  — every question is {view, answer, input, choices?, tf, visual?, hint?, explain}
+   ===================================================================== */
+const eqHtml = parts => `<div class="eq">${parts.map((p, i) => `<span class="${i % 2 ? 'op' : ''}">${p}</span>`).join('')}<span class="op">=</span><span class="ans" id="ans">؟</span></div>`;
+const vis = () => { const el = $('qVisual'); el.hidden = false; el.className = ''; return el; };
+const qtext = html => { const t = $('qText'); t.hidden = false; t.innerHTML = html; };
+function genNum(d, allowZero){
+  let s = String(rnd(1, 9));
+  for (let i = 1; i < d; i++) s += allowZero ? rnd(0, 9) : rnd(1, 9);
+  return +s;
+}
+function genRoundNum(k){
+  const U = 10 ** k, dl = Math.min(6, k + 1 + rnd(0, 1));
+  let n; do { n = randD(dl); } while (n % U === 0 || n < U);
+  return n;
+}
+const uniq = (arr, n) => { const out = []; for (const x of arr) if (!out.includes(x) && out.length < n) out.push(x); return out; };
+
+function multChoices(a, b){
+  const ans = a * b, set = new Set([ans]);
+  for (const c of shuffle([a * (b + 1), a * (b - 1), (a + 1) * b, (a - 1) * b, ans + 10, ans - 10, ans + 1, ans - 1, a + b, ans + a, ans - a])){ if (set.size >= 4) break; if (c > 0 && c <= 120) set.add(c); }
+  while (set.size < 4) set.add(ans + set.size * 2 + 1);
+  return shuffle([...set]).map(v => ({v, html:ar(v)}));
+}
+function multQ(a, b, mode){
+  const ans = a * b, input = mode === 'practice' ? 'choices' : 'pad';
+  return {answer:ans, input, tf:1, choices: input === 'choices' ? multChoices(a, b) : null,
+    view: () => eqHtml([ar(a), '×', ar(b)]),
+    visual: () => { renderScene(vis(), a, b); qtext(sentence(a, b)); },
+    hint: () => { const el = vis(); renderScene(el, a, b); countAlong(el, true); },
+    explain: () => { const el = vis(); renderScene(el, a, b); countAlong(el, true); qtext(`${sentence(a, b)}، والمجموع ${ar(ans)}`); },
+    onCorrect: () => $('qVisual').classList.add('sums'),
+    record: (ok, t) => record(a, b, ok, t)};
+}
+function arithQ(op, d, w, i){
+  const {a, b} = newArith(op, d), res = op === '+' ? a + b : a - b, opS = op === '+' ? '+' : '−';
+  if (d === 1) return {answer:res, input:'pad', tf:1,
+    view: () => eqHtml([ar(a), opS, ar(b)]),
+    visual: () => { vis().innerHTML = emojiArith(a, b, op); },
+    hint: () => { vis().innerHTML = emojiArith(a, b, op); },
+    explain: () => { vis().innerHTML = emojiArith(a, b, op); qtext(emojiSentence(a, b, op)); }};
+  const S = arithSteps(a, b, op), fin = S.steps[S.steps.length - 1];
+  return {answer:res, input:'column', tf: 1 + (d - 1) * 1.1, ansLen:len(res),
+    view: () => colGrid({a, b, op, n:S.n, ansLen:len(res)}),
+    hintLabel: op === '+' ? '💡 المحمول' : '💡 الاستلاف',
+    hint: () => fin.marks.forEach((m, p) => { const el = $('mk' + p); if (el) el.innerHTML = m; }),
+    explain: () => { $('qPrompt').innerHTML = colGrid({a, b, op, n:S.n, ansLen:len(res), marks:fin.marks, out:fin.out});
+      qtext(`الناتج الصحيح: <b>${fmt(res)}</b>`); },
+    teach: () => openLearn(w, i, {a, b, step:-1})};
+}
+function placeQ(d){
+  const type = pick(['value', 'value', 'place', 'place', 'read', 'read', 'write', 'expand']);
+  if (type === 'value' || type === 'place'){
+    let n, opts;
+    do { n = genNum(d, false); const s = String(n);
+      opts = [...Array(d)].map((_, p) => p).filter(p => s.split(String(digit(n, p))).length === 2);
+    } while (!opts.length);
+    const p = pick(opts), X = digit(n, p);
+    const qs = uniq([p].concat(shuffle([...Array(d)].map((_, q) => q))), 4);
+    const base = {tf:1.5, input:'choices',
+      hint: () => { vis().innerHTML = chartHtml(n); },
+      explain: () => { vis().innerHTML = chartHtml(n, p); qtext(`الرقم ${ar(X)} في منزلة ${PLACE[p]}، فقيمته <b>${fmt(X * 10 ** p)}</b>`); }};
+    if (type === 'value') return {...base, answer:X * 10 ** p,
+      choices: shuffle(qs.map(q => ({v:X * 10 ** q, html:fmt(X * 10 ** q)}))),
+      view: () => `<p class="qtext">ما قيمة الرقم ${ar(X)} في هذا العدد؟</p><div class="bignum">${numHtml(n, p)}</div>`};
+    return {...base, answer:p, choices: shuffle(qs.map(q => ({v:q, html:PLACE[q]}))),
+      view: () => `<p class="qtext">في أي منزلة يقع الرقم ${ar(X)}؟</p><div class="bignum">${numHtml(n, p)}</div>`};
+  }
+  const n = genNum(d, Math.random() < .35);
+  const show = (extra = '') => { vis().innerHTML = chartHtml(n) + `<p class="colorwords">${wordsHtml(n)}</p>` + extra; };
+  if (type === 'read'){
+    const s = String(n), alts = [];
+    for (let t = 0; t < 30 && alts.length < 3; t++){
+      const arr = [...s];
+      if (Math.random() < .5 && d > 1){ const j = rnd(0, d - 2); [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]]; }
+      else { const j = rnd(0, d - 1); arr[j] = String((+arr[j] + rnd(1, 8)) % 10); }
+      const m = +arr.join('');
+      if (arr[0] !== '0' && m !== n && !alts.includes(m)) alts.push(m);
+    }
+    return {answer:n, input:'choices', tf:1.9, wide:true,
+      choices: shuffle([n, ...alts].map(v => ({v, html:words(v)}))),
+      view: () => `<p class="qtext">كيف نقرأ هذا العدد؟</p><div class="bignum">${numHtml(n)}</div>`,
+      hint: () => { vis().innerHTML = chartHtml(n); },
+      explain: () => { show(); }};
+  }
+  if (type === 'write') return {answer:n, input:'pad', tf:2,
+    view: () => `<p class="qtext">اكتب هذا العدد بالأرقام:</p><p class="words">${words(n)}</p><div class="eq"><span class="ans" id="ans">؟</span></div>`,
+    hint: () => { vis().innerHTML = `<p class="colorwords">${wordsHtml(n)}</p>` + chartHtml(n, -1, true); },
+    explain: () => { show(); }};
+  return {answer:n, input:'pad', tf:1.6,
+    view: () => `<p class="qtext">ما العدد؟</p>${expandHtml(n, false)}<div class="eq"><span class="ans" id="ans">؟</span></div>`,
+    hint: () => { vis().innerHTML = chartHtml(n, -1, true); },
+    explain: () => { vis().innerHTML = chartHtml(n) + expandHtml(n); }};
+}
+function roundQ(k){
+  const n = genRoundNum(k), {U, lo, hi, target} = roundInfo(n, k);
+  const near = (x, u) => Math.round(x / u) * u;
+  const opts = uniq([target, lo === target ? hi : lo, k > 1 ? near(n, U / 10) : hi + U, near(n, U * 10), lo - U > 0 ? lo - U : hi + U, hi + U].filter(x => x > 0), 4);
+  return {answer:target, input:'choices', tf:1.4 + k * .2,
+    choices: shuffle(opts.map(v => ({v, html:fmt(v)}))),
+    view: () => `<p class="qtext">قرّب إلى ${ROUND_TO[k]}</p><div class="bignum">${numHtml(n)}</div>`,
+    visual: () => { vis().innerHTML = lineHtml(n, k); },
+    hint: () => { const el = vis(); el.innerHTML = lineHtml(n, k); $('qPrompt').querySelector('.bignum').innerHTML = numHtml(n, k - 1); },
+    explain: () => { const el = vis(); el.innerHTML = lineHtml(n, k); revealLine(el, target); qtext(roundExplain(n, k)); }};
+}
+
+/* =====================================================================
+   quiz engine
+   ===================================================================== */
 let Q = null, rafId = 0;
-function tableFacts(n){ return [...Array(10)].map((_, i) => [n, i + 1]); }
+const tableFacts = n => [...Array(10)].map((_, i) => [n, i + 1]);
+function weightedDeck(facts){ return shuffle(facts.slice()).map(f => [f, weakness(...f) + Math.random() * 2]).sort((x, y) => y[1] - x[1]).map(x => x[0]); }
 
-function startPractice(n){
-  startQuiz({mode:'practice', n, title:`تدريب جدول ${ar(n)}`, input:'choices', showPic:true, total:10, queue:shuffle(tableFacts(n))});
-}
-function weightedDeck(facts){
-  // shuffle, then let weaker facts drift to the front
-  return shuffle(facts.slice()).map(f => [f, weakness(...f) + Math.random() * 2]).sort((x, y) => y[1] - x[1]).map(x => x[0]);
-}
-function startChallenge(n){
-  const pool = n === 11 ? [].concat(...[2, 3, 4, 5, 6, 7, 8, 9].map(a => [...Array(8)].map((_, i) => [a, i + 2]))) : tableFacts(n);
-  startQuiz({mode:'challenge', n, title: n === 11 ? 'تحدي البطل' : `تحدي جدول ${ar(n)}`, input:'pad', showPic:false, pool, queue:weightedDeck(pool), ...LEVEL_CFG(n)}, true);
+function startQuizFor(w, i, mode){
+  const lv = WORLDS[w].levels[i], cfg = levelCfg(w, i);
+  let gen;
+  if (w === 'mult'){
+    const pool = lv.champ ? [].concat(...[2, 3, 4, 5, 6, 7, 8, 9].map(a => [...Array(8)].map((_, j) => [a, j + 2]))) : tableFacts(lv.n);
+    let deck = [];
+    gen = () => { if (!deck.length) deck = mode === 'practice' ? shuffle(pool.slice()) : weightedDeck(pool); const [a, b] = deck.shift(); return multQ(a, b, Q.mode); };
+  }
+  else if (w === 'add' || w === 'sub') gen = () => arithQ(w === 'add' ? '+' : '-', lv.d, w, i);
+  else if (w === 'place') gen = () => placeQ(lv.d);
+  else gen = () => roundQ(lv.k);
+  startQuiz({w, i, mode, gen, title:lv.title, total:10, ...cfg}, mode === 'challenge');
 }
 function startReview(){
   let pool = [];
-  for (let a = 1; a <= 10; a++) if (unlocked(a)) pool.push(...tableFacts(a));
-  const seen = pool.filter(([a, b]) => S.facts[a + 'x' + b]);
+  for (let a = 1; a <= 10; a++) if (unlocked('mult', a - 1)) pool.push(...tableFacts(a));
+  const seen = pool.filter(([a, b]) => P().facts[a + 'x' + b]);
   const base = seen.length >= 10 ? seen : pool;
-  const queue = base.map(f => [f, weakness(...f) + Math.random()]).sort((x, y) => y[1] - x[1]).slice(0, 10).map(x => x[0]);
-  startQuiz({mode:'review', title:'مراجعة ذكية', input:'pad', showPic:false, total:10, queue:shuffle(queue)});
+  const deck = shuffle(base.map(f => [f, weakness(...f) + Math.random()]).sort((x, y) => y[1] - x[1]).slice(0, 10).map(x => x[0]));
+  startQuiz({w:'mult', i:-1, mode:'review', title:'مراجعة ذكية', total:10, gen: () => { const [a, b] = deck.shift(); return multQ(a, b, 'review'); }});
 }
-
 function startQuiz(cfg, countdown){
-  Q = Object.assign({asked:0, correct:0, wrong:0, energy:0, times:[], combo:0, zaps:0, typed:'', busy:true, hinted:false, missed:[]}, cfg);
+  Q = Object.assign({asked:0, correct:0, wrong:0, energy:0, times:[], combo:0, zaps:0, typed:'', busy:true, hinted:false, missed:0, retry:[]}, cfg);
   show('quiz');
-  $('quizTitle').textContent = cfg.title;
+  $('runner').textContent = WORLDS[cfg.w].runner;
   $('runner').hidden = $('barn').hidden = cfg.mode !== 'challenge';
   $('timer').hidden = cfg.mode === 'practice';
-  $('choices').hidden = cfg.input !== 'choices';
-  $('pad').hidden = cfg.input !== 'pad';
-  if (cfg.input === 'pad') buildPad();
   updateHud();
   if (countdown) runCountdown(nextQuestion); else nextQuestion();
 }
 function runCountdown(done){
   const el = document.createElement('div'); el.className = 'countdown'; document.body.appendChild(el);
-  const seq = ['٣', '٢', '١', 'انطلق'];
-  let i = 0;
+  const seq = ['٣', '٢', '١', 'انطلق']; let i = 0;
   const step = () => {
     if (i >= seq.length){ el.remove(); done(); return; }
     el.innerHTML = `<span style="${i === 3 ? 'font-size:3.5rem' : ''}">${seq[i]}</span>`;
@@ -684,10 +1377,10 @@ function runCountdown(done){
   };
   step();
 }
-function buildPad(){
+function buildPad(hintLabel){
   const keys = ['١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩', 'hint', '٠', 'del'];
   $('pad').innerHTML = keys.map(k => k === 'del' ? '<button class="del" data-k="del" aria-label="حذف">⌫ حذف</button>'
-    : k === 'hint' ? `<button class="hint" data-k="hint" aria-label="أرني الصورة">💡 الصورة</button>` : `<button data-k="${AR.indexOf(k)}">${k}</button>`).join('');
+    : k === 'hint' ? `<button class="hint" data-k="hint">${hintLabel || '💡 مساعدة'}</button>` : `<button data-k="${AR.indexOf(k)}">${k}</button>`).join('');
   $('pad').querySelectorAll('button').forEach(b => b.onclick = () => padKey(b.dataset.k));
 }
 function updateHud(){
@@ -697,232 +1390,226 @@ function updateHud(){
     pct = Math.min(100, Q.energy / Q.goal * 100);
     $('runner').style.insetInlineStart = `calc(${pct * .9}%)`;
     $('qcount').textContent = `${ar(Q.asked)} من ${ar(Q.maxQ)}`;
-    $('qcount').title = 'عدد الأسئلة المستخدمة من الحد الأقصى';
-  } else {
-    pct = Q.asked / Q.total * 100;
-    $('qcount').textContent = `${ar(Math.min(Q.asked + 1, Q.total))} من ${ar(Q.total)}`;
-    $('qcount').title = '';
-  }
+  } else { pct = Q.asked / Q.total * 100; $('qcount').textContent = `${ar(Math.min(Q.asked + 1, Q.total))} من ${ar(Q.total)}`; }
   $('energyFill').style.width = pct + '%';
 }
-
 function nextQuestion(){
   if (!Q) return;
-  if (Q.mode === 'challenge'){
-    if (Q.energy >= Q.goal || Q.asked >= Q.maxQ) return finish();
-    if (!Q.queue.length) Q.queue = weightedDeck(Q.pool);
-  } else if (Q.asked >= Q.total) return finish();
-  const [a, b] = Q.cur = Q.queue.shift();
+  if (Q.mode === 'challenge'){ if (Q.energy >= Q.goal || Q.asked >= Q.maxQ) return finish(); }
+  else if (Q.asked >= Q.total) return finish();
+  const due = Q.retry.findIndex(r => r.at <= Q.asked);
+  const q = Q.q = due >= 0 ? Q.retry.splice(due, 1)[0].q : Q.gen();
   Q.typed = ''; Q.busy = false; Q.hinted = false;
-  $('quizEq').innerHTML = `<span>${ar(a)}</span><span class="op">×</span><span>${ar(b)}</span><span class="op">=</span><span class="ans" id="ans">؟</span>`;
-  $('quizSentence').hidden = true;
+  $('qPrompt').innerHTML = q.view();
+  $('qVisual').hidden = true; $('qVisual').innerHTML = ''; $('qText').hidden = true;
   $('wrongBox').hidden = true;
-  if (Q.showPic){ renderScene($('quizScene'), a, b); $('quizSentence').hidden = false; $('quizSentence').textContent = sentence(a, b); }
-  else { $('quizScene').hidden = true; $('quizScene').innerHTML = ''; }
-  if (Q.input === 'choices') renderChoices(a, b);
-  else { $('pad').hidden = false; $('pad').querySelectorAll('button').forEach(x => x.disabled = false); }
+  $('choices').hidden = q.input !== 'choices';
+  $('pad').hidden = q.input === 'choices';
+  $('quizCard').classList.toggle('split', q.input !== 'choices');
+  if (q.input === 'choices'){
+    $('choices').className = 'choices' + (q.wide ? ' wide' : '');
+    $('choices').innerHTML = q.choices.map(c => `<button class="choice ${q.wide ? '' : 'num'}" data-v="${c.v}">${c.html}</button>`).join('');
+    $('choices').querySelectorAll('button').forEach(btn => btn.onclick = () => answer(+btn.dataset.v, btn));
+  } else {
+    buildPad(q.hintLabel);
+    $('pad').querySelector('.hint').style.visibility = q.hint ? 'visible' : 'hidden';
+    renderTyped();
+  }
+  if (Q.mode === 'practice' && q.visual) q.visual();
   updateHud();
   Q.t0 = performance.now();
   if (Q.mode !== 'practice') tickTimer();
 }
 function tickTimer(){
   cancelAnimationFrame(rafId);
-  const C = 2 * Math.PI * 16, fg = $('timerFg');
+  const C = 2 * Math.PI * 16, fg = $('timerFg'), tf = Q.q.tf || 1;
   fg.style.strokeDasharray = C;
   const loop = () => {
     if (!Q || Q.busy) return;
-    const t = (performance.now() - Q.t0) / 1000, frac = Math.max(0, 1 - t / 8);
-    fg.style.strokeDashoffset = C * (1 - frac);
+    const t = (performance.now() - Q.t0) / 1000 / tf;
+    fg.style.strokeDashoffset = C * Math.min(1, t / 8);
     fg.style.stroke = t <= 3 ? 'var(--accent)' : t <= 8 ? 'var(--sun)' : 'var(--bad)';
     rafId = requestAnimationFrame(loop);
   };
   loop();
 }
-function renderChoices(a, b){
-  const ans = a * b, set = new Set([ans]);
-  const cands = shuffle([a * (b + 1), a * (b - 1), (a + 1) * b, (a - 1) * b, ans + 10, ans - 10, ans + 1, ans - 1, a + b, ans + a, ans - a]);
-  for (const c of cands){ if (set.size >= 4) break; if (c > 0 && c <= 120) set.add(c); }
-  while (set.size < 4) set.add(ans + set.size * 2 + 1);
-  const opts = shuffle([...set]);
-  $('choices').innerHTML = opts.map(v => `<button class="choice num" data-v="${v}">${ar(v)}</button>`).join('');
-  $('choices').querySelectorAll('button').forEach(btn => btn.onclick = () => answer(+btn.dataset.v, btn));
+function renderTyped(){
+  const q = Q.q;
+  if (q.input === 'column'){
+    for (let p = 0; p < q.ansLen; p++){ const el = $('ac' + p); if (!el) continue; el.textContent = Q.typed[p] ? ar(Q.typed[p]) : ''; el.classList.toggle('cur', p === Q.typed.length); }
+  } else if ($('ans')) $('ans').textContent = Q.typed ? ar(Q.typed) : '؟';
 }
 function padKey(k){
-  if (!Q || Q.busy || Q.input !== 'pad') return;
-  if (k === 'hint'){ showHint(); return; }
-  if (k === 'del'){ Q.typed = Q.typed.slice(0, -1); }
-  else if (Q.typed.length < 3){ Q.typed += k; }
-  const [a, b] = Q.cur, want = String(a * b);
-  $('ans').textContent = Q.typed ? ar(Q.typed) : '؟';
-  if (Q.typed.length >= want.length && k !== 'del') answer(+Q.typed);
-}
-function showHint(){
-  if (Q.hinted) return;
-  Q.hinted = true;
-  const [a, b] = Q.cur;
-  renderScene($('quizScene'), a, b);
-  countAlong($('quizScene'), true);
+  if (!Q || Q.busy || !Q.q || Q.q.input === 'choices') return;
+  if (k === 'hint'){ if (Q.q.hint && !Q.hinted){ Q.hinted = true; Q.q.hint(); } return; }
+  const want = String(Q.q.answer).length;
+  if (k === 'del') Q.typed = Q.typed.slice(0, -1);
+  else if (Q.typed.length < want) Q.typed += k;
+  renderTyped();
+  if (Q.typed.length >= want && k !== 'del') answer(Q.q.input === 'column' ? +[...Q.typed].reverse().join('') : +Q.typed);
 }
 addEventListener('keydown', e => {
-  if (!Q || $('screen-quiz').hidden) return;
+  if (!Q || $('screen-quiz').hidden || !$('overlay').hidden) return;
   if (!$('wrongBox').hidden && (e.key === 'Enter' || e.key === ' ')){ e.preventDefault(); $('wrongNext').click(); return; }
-  if (Q.input !== 'pad') { if (/^[1-4]$/.test(e.key)) $('choices').children[+e.key - 1]?.click(); return; }
-  let d = e.key;
-  const i = AR.indexOf(d); if (i >= 0) d = String(i);
+  if (!Q.q) return;
+  if (Q.q.input === 'choices'){ if (/^[1-4]$/.test(e.key)) $('choices').children[+e.key - 1]?.click(); return; }
+  let d = e.key; const i = AR.indexOf(d); if (i >= 0) d = String(i);
   if (/^\d$/.test(d)) padKey(d);
   else if (e.key === 'Backspace') padKey('del');
   else if (e.key === 'h' || e.key === '?') padKey('hint');
 });
-
 function floatMsg(txt, bad){
   const f = document.createElement('div'); f.className = 'float' + (bad ? ' bad' : ''); f.textContent = txt;
   $('quizCard').appendChild(f); setTimeout(() => f.remove(), 1000);
 }
+function markAnswer(ok){
+  const q = Q.q;
+  if (q.input === 'column'){ for (let p = 0; p < q.ansLen; p++) $('ac' + p)?.classList.add(ok ? 'ok' : 'bad'); }
+  else if (q.input === 'pad' && $('ans')){ $('ans').textContent = ar(q.answer); $('ans').classList.add(ok ? 'ok' : 'bad'); }
+}
 function answer(v, btn){
   if (Q.busy) return;
   Q.busy = true; cancelAnimationFrame(rafId);
-  const [a, b] = Q.cur, ans = a * b, ok = v === ans;
-  const t = (performance.now() - Q.t0) / 1000;
+  const q = Q.q, ok = v === q.answer, t = (performance.now() - Q.t0) / 1000, tf = q.tf || 1;
   Q.asked++;
-  record(a, b, ok, Q.hinted ? 9 : t);
-  const ansEl = $('ans');
+  q.record && q.record(ok, Q.hinted ? 9 : t / tf);
   if (ok){
+    P().correct++;
     Q.correct++; Q.times.push(t); Q.combo++;
-    ansEl.textContent = ar(ans); ansEl.classList.add('ok');
-    if (btn) btn.classList.add('ok');
-    let delay = 600;
+    markAnswer(true); if (btn) btn.classList.add('ok');
+    let delay = q.input === 'column' ? 800 : 600;
     if (Q.mode === 'challenge'){
-      const sp = Q.hinted ? {pts:HINT_PTS, label:'💡 صحيح'} : SPEED.find(s => t <= s.max);
+      const sp = Q.hinted ? {pts:HINT_PTS, label:'💡 صحيح'} : SPEED.find(s => t / tf <= s.max);
       if (!Q.hinted && sp.pts === SPEED[0].pts) Q.zaps++;
       Q.energy += sp.pts;
       floatMsg(`${sp.label} ${sgn(sp.pts)}${Q.combo >= 3 ? ' · 🔥' + ar(Q.combo) : ''}`);
       sp.pts >= 20 ? SND.zap() : SND.ok();
     } else {
-      floatMsg(t <= 3 ? '⚡ صاعقة!' : 'أحسنت!');
+      floatMsg(t / tf <= 3 ? '⚡ صاعقة!' : pick(['أحسنت!', 'رائع!', 'ممتاز!', 'برافو!']));
       SND.ok();
-      if (Q.mode === 'practice'){ $('quizScene').classList.add('sums'); delay = 850; }
+      if (Q.mode === 'practice' && q.onCorrect){ q.onCorrect(); delay = 850; }
     }
     updateHud();
     setTimeout(nextQuestion, delay);
   } else {
-    Q.wrong++; Q.combo = 0; Q.missed.push([a, b]);
+    Q.wrong++; Q.combo = 0; Q.missed++;
     SND.bad();
-    if (btn){ btn.classList.add('bad'); $('choices').querySelector(`[data-v="${ans}"]`)?.classList.add('ok'); }
-    ansEl.textContent = ar(ans); ansEl.classList.add('bad');
-    if (Q.mode === 'challenge'){
-      Q.energy = Math.max(0, Q.energy - WRONG_PENALTY);
-      Q.queue.splice(2, 0, [a, b]); // ask it again soon
-    }
+    if (btn){ btn.classList.add('bad'); $('choices').querySelector(`[data-v="${q.answer}"]`)?.classList.add('ok'); }
+    markAnswer(false);
+    if (Q.mode === 'challenge') Q.energy = Math.max(0, Q.energy - WRONG_PENALTY);
+    if (Q.mode !== 'review') Q.retry.push({q, at:Q.asked + 2});
     updateHud();
-    // learning moment: replace the keypad with the picture and the correct answer
-    renderScene($('quizScene'), a, b);
-    $('quizSentence').hidden = false; $('quizSentence').textContent = `${sentence(a, b)}، والمجموع ${ar(ans)}`;
-    countAlong($('quizScene'), true);
-    if (Q.input === 'pad') $('pad').hidden = true;
+    q.explain();
+    $('pad').hidden = true;
+    $('wrongExplain').hidden = !q.teach;
     $('wrongBox').hidden = false; $('wrongNext').focus();
   }
   save();
 }
 $('wrongNext').onclick = () => nextQuestion();
-$('quitBtn').onclick = () => { cancelAnimationFrame(rafId); Q = null; show('map'); };
+$('wrongExplain').onclick = () => { const q = Q && Q.q; cancelAnimationFrame(rafId); Q = null; q && q.teach && q.teach(); };
+$('quitBtn').onclick = () => { cancelAnimationFrame(rafId); const w = Q ? Q.w : curWorld; Q = null; curWorld = w; show('map'); };
 
-/* ================= result ================= */
+/* =====================================================================
+   result
+   ===================================================================== */
 function finish(){
   cancelAnimationFrame(rafId);
   const q = Q; Q = null;
+  const W = WORLDS[q.w], lv = W.levels[q.i];
   const avg = q.times.length ? q.times.reduce((x, y) => x + y, 0) / q.times.length : 0;
-  const fmt = s => ar(s.toFixed(1)).replace('.', '٫') + ' ث';
+  const sec = s => ar(s.toFixed(1)).replace('.', '٫') + ' ث';
   let html = '', win = true, earned = 0;
   const actions = [];
   if (q.mode === 'challenge'){
     win = q.energy >= q.goal;
     if (win){
       earned = q.asked <= q.s3 && q.wrong === 0 ? 3 : q.asked <= q.s2 ? 2 : 1;
-      S.stars[q.n] = Math.max(stars(q.n), earned);
-      if (!S.best[q.n] || q.asked < S.best[q.n].q) S.best[q.n] = {q:q.asked, avg:+avg.toFixed(1)};
+      const S = P().stars[q.w] || (P().stars[q.w] = {}), B = P().best[q.w] || (P().best[q.w] = {});
+      S[q.i] = Math.max(S[q.i] || 0, earned);
+      if (!B[q.i] || q.asked < B[q.i].q) B[q.i] = {q:q.asked, avg:+avg.toFixed(1)};
     }
-    const msgs = {3:'وصلت إلى الحظيرة بسرعة الصاعقة.', 2:'أجب أسرع قليلًا لتنال النجمة الثالثة.', 1:'كلما تدرّبت صرت أسرع ووصلت بأسئلة أقل.'};
-    const name = q.n === 11 ? 'تحدي البطل' : 'جدول ' + ar(q.n);
-    html += `<div class="r-emoji">${win ? '🏡' : '🐑'}</div><h2>${win ? 'أحسنت! تجاوزت ' + name : 'اقتربت كثيرًا!'}</h2>`;
-    if (win) html += `<div class="bigstars" aria-label="${ar(earned)} من ٣ نجوم">${[1, 2, 3].map(i => `<span class="${i <= earned ? 'on' : ''}" style="animation-delay:${i * 160}ms">★</span>`).join('')}</div>`;
-    html += `<p>${win ? msgs[earned] : 'انتهت الأسئلة قبل أن يمتلئ الشريط. راجع الجدول بالصور ثم حاول مجددًا.'}</p>`;
-    html += `<div class="r-stats">${ar(q.asked)} <span>أسئلة</span> · ${q.times.length ? fmt(avg) : '—'} <span>متوسط الإجابة</span>${q.wrong ? ` · ${ar(q.wrong)} <span>أخطاء</span>` : ''}</div>`;
-    if (win && q.n < 10) actions.push(['next', 'الجدول التالي', true]);
-    else if (win && q.n === 10 && unlocked(11)) actions.push(['champ', '🏆 تحدي البطل', true]);
-    else if (!win && q.n !== 11) actions.push(['learn', 'راجع الجدول', true]);
+    const msgs = {3:'وصلت إلى خط النهاية بسرعة الصاعقة.', 2:'أجب أسرع قليلًا لتنال النجمة الثالثة.', 1:'كلما تدرّبت صرت أسرع ووصلت بأسئلة أقل.'};
+    html += `<div class="r-emoji">${win ? '🏁' : W.runner}</div><h2>${win ? 'أحسنت يا ' + esc(kid().name) + '! تجاوزت «' + lv.title + '»' : 'اقتربت كثيرًا!'}</h2>`;
+    if (win) html += `<div class="bigstars" aria-label="${ar(earned)} من ٣ نجوم">${[1, 2, 3].map(s => `<span class="${s <= earned ? 'on' : ''}" style="animation-delay:${s * 160}ms">★</span>`).join('')}</div>`;
+    html += `<p>${win ? msgs[earned] : 'انتهت الأسئلة قبل أن يمتلئ الشريط. راجع الشرح ثم حاول مجددًا.'}</p>`;
+    html += `<div class="r-stats">${ar(q.asked)} <span>أسئلة</span> · ${q.times.length ? sec(avg) : '—'} <span>متوسط الإجابة</span>${q.wrong ? ` · ${ar(q.wrong)} <span>أخطاء</span>` : ''}</div>`;
+    if (win && q.i < W.levels.length - 1 && unlocked(q.w, q.i + 1)) actions.push(['next', 'المستوى التالي', true]);
+    else if (!win && !lv.champ) actions.push(['learn', 'راجع الشرح', true]);
     actions.push(['retry', win && earned < 3 ? 'حاول لـ ٣ نجوم' : 'أعد المحاولة', !actions.length]);
   } else {
     const pct = q.correct / q.total;
     html += `<div class="r-emoji">${pct === 1 ? '🏅' : pct >= .7 ? '🌟' : '🌱'}</div>`;
     html += `<h2>${ar(q.correct)} من ${ar(q.total)} صحيحة</h2>`;
-    if (q.missed.length) html += `<p>راجع: ${q.missed.map(([a, b]) => `<b class="num" style="white-space:nowrap;color:var(--ink)">${ar(a)} × ${ar(b)} = ${ar(a * b)}</b>`).join('، ')}</p>`;
-    else html += `<p>${q.mode === 'practice' ? 'كل الإجابات صحيحة. أنت جاهز للتحدي!' : 'ممتاز! كل الحقائق صحيحة.'}</p>`;
-    if (q.mode === 'practice'){ actions.push(['challenge', unlocked(q.n) ? 'ابدأ التحدي' : 'اختبار القفز', true]); actions.push(['retry', 'تدرّب مجددًا']); }
+    html += `<p>${pct === 1 ? 'كل الإجابات صحيحة. أنت جاهز للتحدي!' : pct >= .7 ? 'عمل رائع! تدرّب قليلًا بعد ثم جرّب التحدي.' : 'لا بأس، كل تدريب يجعلك أقوى. راجع الشرح ثم حاول مجددًا.'}</p>`;
+    if (q.mode === 'practice'){ actions.push(['challenge', unlocked(q.w, q.i) ? 'ابدأ التحدي' : 'اختبار القفز', true]); actions.push(['retry', 'تدرّب مجددًا']); }
     else actions.push(['retry', 'مراجعة أخرى', true]);
   }
-  actions.push(['map', 'العودة إلى المزرعة']);
+  actions.push(['map', 'العودة إلى الطريق']);
   html += `<div class="r-actions">${actions.map(([r, label, primary]) => `<button class="${primary ? 'btn block' : 'link'}" data-r="${r}">${label}</button>`).join('')}</div>`;
   save();
-  const box = $('result');
-  box.innerHTML = html;
+  const box = $('result'); box.innerHTML = html;
+  curWorld = q.w;
   show('result');
-  if (win && (q.mode === 'challenge' || q.correct === q.total)){ SND.win(); confetti(theme(q.n && q.n <= 10 ? q.n : 8)); }
+  if (win && (q.mode === 'challenge' || q.correct === q.total)){ SND.win(); confetti(q.w); }
   box.querySelectorAll('[data-r]').forEach(b => b.onclick = () => {
     const r = b.dataset.r;
     if (r === 'map') show('map');
-    if (r === 'next'){ show('map'); openSheet(q.n + 1); }
-    if (r === 'champ') startChallenge(11);
-    if (r === 'learn') openLearn(q.n, 1);
-    if (r === 'challenge') startChallenge(q.n);
-    if (r === 'retry') q.mode === 'challenge' ? startChallenge(q.n) : q.mode === 'practice' ? startPractice(q.n) : startReview();
+    if (r === 'next'){ show('map'); openSheet(q.w, q.i + 1); }
+    if (r === 'learn') openLearn(q.w, q.i);
+    if (r === 'challenge') startQuizFor(q.w, q.i, 'challenge');
+    if (r === 'retry') q.mode === 'review' ? startReview() : startQuizFor(q.w, q.i, q.mode);
   });
 }
-function confetti(th){
+function confetti(w){
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const c = document.createElement('div'); c.className = 'confetti';
-  const pieces = ['⭐', th.ce, '✨'];
+  const pieces = ['⭐', WORLDS[w].runner, '✨', WORLDS[w].emoji];
   for (let i = 0; i < 18; i++){
-    const p = document.createElement('i');
-    p.textContent = pieces[i % pieces.length];
+    const p = document.createElement('i'); p.textContent = pieces[i % pieces.length];
     p.style.left = Math.random() * 100 + '%';
-    p.style.animationDuration = 2 + Math.random() * 1.4 + 's';
-    p.style.animationDelay = Math.random() * .5 + 's';
+    p.style.animationDuration = 2 + Math.random() * 1.4 + 's'; p.style.animationDelay = Math.random() * .5 + 's';
     c.appendChild(p);
   }
   document.body.appendChild(c); setTimeout(() => c.remove(), 4000);
 }
 
-/* ================= mastery grid ================= */
+/* =====================================================================
+   mastery grid (multiplication)
+   ===================================================================== */
 function renderGrid(){
-  let h = '<tr><th class="num">×</th>' + [...Array(10)].map((_, j) => `<th class="num">${ar(j + 1)}</th>`).join('') + '</tr>';
-  let mastered = 0;
+  let h = '<tr><th class="num">×</th>' + [...Array(10)].map((_, j) => `<th class="num">${ar(j + 1)}</th>`).join('') + '</tr>', mastered = 0;
   for (let a = 1; a <= 10; a++){
     h += `<tr><th class="num">${ar(a)}</th>`;
-    for (let b = 1; b <= 10; b++){
-      const lv = level(a, b); if (lv === 3) mastered++;
-      h += `<td class="l${lv}"><button data-a="${a}" data-b="${b}" aria-label="${ar(a)} × ${ar(b)} = ${ar(a * b)}">${ar(a * b)}</button></td>`;
-    }
+    for (let b = 1; b <= 10; b++){ const lv = level(a, b); if (lv === 3) mastered++;
+      h += `<td class="l${lv}"><button data-a="${a}" data-b="${b}" aria-label="${ar(a)} × ${ar(b)} = ${ar(a * b)}">${ar(a * b)}</button></td>`; }
     h += '</tr>';
   }
   $('mg').innerHTML = h;
   $('mgBar').style.width = mastered + '%';
   $('mgPct').textContent = `حفظت ${ar(mastered)} من ${ar(100)}`;
-  $('mg').querySelectorAll('button').forEach(b => b.onclick = () => openLearn(+b.dataset.a, +b.dataset.b));
+  $('mg').querySelectorAll('button').forEach(b => b.onclick = () => openLearn('mult', +b.dataset.a - 1, {k:+b.dataset.b}));
 }
-
-/* ================= wiring ================= */
 $('reviewBtn').onclick = startReview;
 $('gridBtn').onclick = () => { show('grid'); renderGrid(); };
-$('soundBtn').onclick = () => { S.sound = !S.sound; save(); $('soundBtn').textContent = S.sound ? '🔊' : '🔇'; if (S.sound) SND.ok(); };
+$('gridBack').onclick = () => show('map');
 
+/* =====================================================================
+   boot
+   ===================================================================== */
 function start(data){
   load();
-  if (data && data.S) S = Object.assign(fresh(), data.S);
-  show('map');
+  if (data && data.DB && Array.isArray(data.DB.kids)) DB = data.DB;
+  if (!DB.parent) show('register');
+  else if (!kid() || DB.kids.length > 1) show('profiles');
+  else show('worlds');
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => requestAnimationFrame(drawTrail));
 }
-window.claude?.hot?.snapshot?.(() => ({S}));
+window.claude?.hot?.snapshot?.(() => ({DB}));
 window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+
+// exposed for automated checks only
+window.__nf = {words, arithSteps, roundInfo, get q(){ return Q && Q.q; }};
 })();
 </script>
 <!--ARTIFACT-END-->
