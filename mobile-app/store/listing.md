@@ -14,7 +14,7 @@ Character limits are noted per field; every text below fits its limit (checked w
 | Name | 30 | مزرعة الأرقام |
 | Subtitle | 30 | الضرب والجمع والطرح للأطفال |
 | Keywords | 100 | جدول الضرب,رياضيات,جمع,طرح,تقريب,منازل,حساب,أطفال,تعليم,أرقام,ألعاب تعليمية |
-| Promotional text | 170 | تعلّم جدول الضرب والجمع والطرح والمنازل والتقريب مع صوفي الخروفة. كلما أجبت أسرع تجاوزت المرحلة أسرع! |
+| Promotional text | 170 | تعلّم جدول الضرب والجمع والطرح والمنازل والتقريب مع صوفي الخروفة، واجمع حيوانات لمزرعتك واهزم الذئب في نهاية كل عالم! |
 
 ### Google Play
 
@@ -38,6 +38,9 @@ Character limits are noted per field; every text below fits its limit (checked w
 
 ⛰️ جبل التقريب
 من أقرب عشرة إلى أقرب مئة ألف. يسحب الطفل العنزة على خط الأعداد إلى العدد الأقرب، وإذا اختار الجهة الخاطئة تثغو العنزة رافضة!
+
+🎁 مكافآت ومرح
+كل نجمة تضيف حيوانًا أو شجرة إلى مزرعة الطفل الخاصة، والصوف الذي يجمعه من الإجابات يشتري به ملابس لصوفي. في التدريب بالونات تُفرقع، وفي التحدي سباق مع صوفي، وفي نهاية كل عالم ذئب مشاغب ينتظر من يهزمه. وكل يوم تحدٍّ جديد من ٥ أسئلة مع سلسلة أيام 🔥.
 
 ⚡ مراحل تكافئ السرعة
 في كل مرحلة شريط طاقة: كلما أجاب الطفل أسرع امتلأ الشريط أسرع، فيتجاوز المرحلة بأسئلة أقل ويجمع النجوم. ومن يعرف مستوى يستطيع القفز إليه مباشرة.
@@ -81,6 +84,8 @@ Numbers Farm is a playful Arabic maths game that helps children understand numbe
 🏰 Place-value castle: ones, tens, hundreds, thousands, ten-thousands and hundred-thousands, each with its own house and colour, plus reading and writing numbers in Arabic.
 
 ⛰️ Rounding mountain: from the nearest ten to the nearest hundred thousand. Drag the goat to the nearer number on the number line; pick the wrong end and the goat bleats in protest!
+
+🎁 Rewards and fun: every star adds an animal or a tree to the child's own farm, and the wool earned from answers buys outfits for Soufi. Practice has balloons to pop, challenges are a race against Soufi, a cheeky wolf waits at the end of every world, and a new 5-question daily challenge builds a streak 🔥.
 
 ⚡ Levels that reward speed: faster answers fill the energy bar faster, so children who know a level clear it in fewer questions and collect stars.
 
