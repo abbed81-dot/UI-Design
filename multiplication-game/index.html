@@ -184,6 +184,9 @@ details[open] summary::before{transform:rotate(-90deg)}
 .eq .ans.ok{color:var(--accent);border-color:transparent}
 .eq .ans.bad{color:var(--bad);border-color:transparent}
 .sentence{text-align:center;color:var(--muted);font-size:1rem}
+.hint-msg{background:var(--sun-soft);border-radius:16px;padding:10px 14px;margin:8px 0 0;line-height:1.55;text-align:start;animation:pop .25s both}
+.hint-row{display:flex;justify-content:center;margin-top:8px}
+.pill.hint-on{background:var(--sun-soft)}
 .qtext{text-align:center;font-weight:700;font-size:1.15rem}
 .bignum{text-align:center;font-family:var(--f-display);font-weight:800;font-size:clamp(2.4rem,11vw,3.6rem);line-height:1.2;font-variant-numeric:tabular-nums;letter-spacing:.02em}
 .bignum .hl{color:var(--accent);text-decoration:underline;text-decoration-thickness:4px;text-underline-offset:8px}
@@ -289,7 +292,7 @@ details[open] summary::before{transform:rotate(-90deg)}
 .pad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:18px}
 .pad button{min-height:58px;border-radius:14px;background:var(--surface);box-shadow:var(--shadow);font-family:var(--f-display);font-weight:700;font-size:1.6rem}
 .pad button:active{background:var(--soft)}
-.pad .del,.pad .hint{background:transparent;box-shadow:none;font-size:1.1rem;color:var(--muted)}
+.pad .del{background:transparent;box-shadow:none;font-size:1.1rem;color:var(--muted)}
 .pad button:disabled{opacity:.35}
 .wrong-box{margin-top:14px;display:grid;gap:4px;justify-items:center}
 
@@ -488,6 +491,8 @@ table.mg{border-collapse:separate;border-spacing:3px;margin:0 auto;font-family:v
     <div class="stage" id="quizCard">
       <div class="q-main">
         <div id="qPrompt"></div>
+        <div class="hint-row"><button class="pill" id="hintBtn" hidden>💡 مساعدة</button></div>
+        <p class="hint-msg" id="hintMsg" hidden aria-live="polite"></p>
         <div id="qVisual" hidden></div>
         <p class="sentence" id="qText" hidden></p>
       </div>
@@ -1247,12 +1252,14 @@ function multChoices(a, b){
   while (set.size < 4) set.add(ans + set.size * 2 + 1);
   return shuffle([...set]).map(v => ({v, html:ar(v)}));
 }
+const skipList = (b, n) => [...Array(n)].map((_, i) => ar(b * (i + 1))).join('، ');
 function multQ(a, b, mode){
   const ans = a * b, input = mode === 'practice' ? 'choices' : 'pad';
   return {answer:ans, input, tf:1, choices: input === 'choices' ? multChoices(a, b) : null,
     view: () => eqHtml([ar(a), '×', ar(b)]),
     visual: () => { renderScene(vis(), a, b); qtext(sentence(a, b)); },
-    hint: () => { const el = vis(); renderScene(el, a, b); countAlong(el, true); },
+    hint: () => { const el = vis(); renderScene(el, a, b); countAlong(el, true);
+      return `${sentence(a, b)}. عُدّ قفزًا بـ ${ar(b)}: ${skipList(b, Math.min(a, 3))}${a > 3 ? '… وأكمل حتى آخر مجموعة' : ''}`; },
     explain: () => { const el = vis(); renderScene(el, a, b); countAlong(el, true); qtext(`${sentence(a, b)}، والمجموع ${ar(ans)}`); },
     onCorrect: () => $('qVisual').classList.add('sums'),
     record: (ok, t) => record(a, b, ok, t)};
@@ -1262,13 +1269,21 @@ function arithQ(op, d, w, i){
   if (d === 1) return {answer:res, input:'pad', tf:1,
     view: () => eqHtml([ar(a), opS, ar(b)]),
     visual: () => { vis().innerHTML = emojiArith(a, b, op); },
-    hint: () => { vis().innerHTML = emojiArith(a, b, op); },
+    hint: () => { vis().innerHTML = emojiArith(a, b, op);
+      return op === '+' ? `ابدأ من ${ar(a)} وعُدّ ${ar(b)} خطوات إلى الأمام: ${[...Array(Math.min(b, 2))].map((_, j) => ar(a + j + 1)).join('، ')}…`
+                        : `ابدأ من ${ar(a)} وعُدّ ${ar(b)} خطوات إلى الخلف: ${[...Array(Math.min(b, 2))].map((_, j) => ar(a - j - 1)).join('، ')}…`; },
     explain: () => { vis().innerHTML = emojiArith(a, b, op); qtext(emojiSentence(a, b, op)); }};
   const S = arithSteps(a, b, op), fin = S.steps[S.steps.length - 1];
   return {answer:res, input:'column', tf: 1 + (d - 1) * 1.1, ansLen:len(res),
     view: () => colGrid({a, b, op, n:S.n, ansLen:len(res)}),
-    hintLabel: op === '+' ? '💡 المحمول' : '💡 الاستلاف',
-    hint: () => fin.marks.forEach((m, p) => { const el = $('mk' + p); if (el) el.innerHTML = m; }),
+    hint: () => {
+      fin.marks.forEach((m, p) => { const el = $('mk' + p); if (el) el.innerHTML = m; });
+      const p = Math.min(Q.typed.length, S.steps.length - 1), st = S.steps[p];
+      const da = digit(a, p), db = digit(b, p), any = fin.marks.some(Boolean);
+      const extra = !any ? (op === '+' ? ' لا يوجد حمل في هذه المسألة.' : ' لا يوجد استلاف في هذه المسألة.')
+        : (op === '+' ? ' الأرقام الصغيرة الحمراء فوق الأعمدة هي المحمول.' : ' الأرقام الصغيرة الحمراء فوق الأعمدة تبيّن الاستلاف.');
+      return `نحن الآن في منزلة ${PLACE[p]}: ${op === '+' ? `اجمع ${ar(da)} و ${ar(db)}${p && fin.marks[p] ? ' والمحمول' : ''}` : `اطرح ${ar(db)} من ${fin.marks[p] ? 'الرقم الأحمر' : ar(da)}`}، واكتب رقم الآحاد من الناتج فقط.${extra}`;
+    },
     explain: () => { $('qPrompt').innerHTML = colGrid({a, b, op, n:S.n, ansLen:len(res), marks:fin.marks, out:fin.out});
       qtext(`الناتج الصحيح: <b>${fmt(res)}</b>`); },
     teach: () => openLearn(w, i, {a, b, step:-1})};
@@ -1283,7 +1298,7 @@ function placeQ(d){
     const p = pick(opts), X = digit(n, p);
     const qs = uniq([p].concat(shuffle([...Array(d)].map((_, q) => q))), 4);
     const base = {tf:1.5, input:'choices',
-      hint: () => { vis().innerHTML = chartHtml(n); },
+      hint: () => { vis().innerHTML = chartHtml(n); return `ابحث عن الرقم ${ar(X)} في بيوت المنازل بالأسفل، واقرأ اسم البيت فوقه${type === 'value' ? '، ثم القيمة تحته' : ''}.`; },
       explain: () => { vis().innerHTML = chartHtml(n, p); qtext(`الرقم ${ar(X)} في منزلة ${PLACE[p]}، فقيمته <b>${fmt(X * 10 ** p)}</b>`); }};
     if (type === 'value') return {...base, answer:X * 10 ** p,
       choices: shuffle(qs.map(q => ({v:X * 10 ** q, html:fmt(X * 10 ** q)}))),
@@ -1305,16 +1320,17 @@ function placeQ(d){
     return {answer:n, input:'choices', tf:1.9, wide:true,
       choices: shuffle([n, ...alts].map(v => ({v, html:words(v)}))),
       view: () => `<p class="qtext">كيف نقرأ هذا العدد؟</p><div class="bignum">${numHtml(n)}</div>`,
-      hint: () => { vis().innerHTML = chartHtml(n); },
+      hint: () => { vis().innerHTML = chartHtml(n); return 'اقرأ من اليسار إلى اليمين بيتًا بيتًا. وتذكّر: في العربية نقرأ الآحاد قبل العشرات، مثل «خمسة وأربعون».'; },
       explain: () => { show(); }};
   }
   if (type === 'write') return {answer:n, input:'pad', tf:2,
     view: () => `<p class="qtext">اكتب هذا العدد بالأرقام:</p><p class="words">${words(n)}</p><div class="eq"><span class="ans" id="ans">؟</span></div>`,
-    hint: () => { vis().innerHTML = `<p class="colorwords">${wordsHtml(n)}</p>` + chartHtml(n, -1, true); },
+    hint: () => { vis().innerHTML = `<p class="colorwords">${wordsHtml(n)}</p>` + chartHtml(n, -1, true);
+      return `كل كلمة ملوّنة بلون بيتها. العدد فيه ${DIGITS[len(n)]}، وإذا كانت منزلة بلا كلمة فاكتب فيها ٠.`; },
     explain: () => { show(); }};
   return {answer:n, input:'pad', tf:1.6,
     view: () => `<p class="qtext">ما العدد؟</p>${expandHtml(n, false)}<div class="eq"><span class="ans" id="ans">؟</span></div>`,
-    hint: () => { vis().innerHTML = chartHtml(n, -1, true); },
+    hint: () => { vis().innerHTML = chartHtml(n, -1, true); return `ضع كل قيمة في بيتها: العدد فيه ${DIGITS[len(n)]}، وإذا كان بيت فارغًا فاكتب فيه ٠.`; },
     explain: () => { vis().innerHTML = chartHtml(n) + expandHtml(n); }};
 }
 function roundQ(k){
@@ -1325,7 +1341,8 @@ function roundQ(k){
     choices: shuffle(opts.map(v => ({v, html:fmt(v)}))),
     view: () => `<p class="qtext">قرّب إلى ${ROUND_TO[k]}</p><div class="bignum">${numHtml(n)}</div>`,
     visual: () => { vis().innerHTML = lineHtml(n, k); },
-    hint: () => { const el = vis(); el.innerHTML = lineHtml(n, k); $('qPrompt').querySelector('.bignum').innerHTML = numHtml(n, k - 1); },
+    hint: () => { const el = vis(); el.innerHTML = lineHtml(n, k); $('qPrompt').querySelector('.bignum').innerHTML = numHtml(n, k - 1);
+      return `انظر إلى الرقم المسطّر (${PLACE[k - 1]}): إذا كان ٥ أو أكثر نقرّب إلى ${fmt(hi)}، وإذا كان أقل من ٥ نقرّب إلى ${fmt(lo)}. وعلى الخط: أين النقطة أقرب؟`; },
     explain: () => { const el = vis(); el.innerHTML = lineHtml(n, k); revealLine(el, target); qtext(roundExplain(n, k)); }};
 }
 
@@ -1377,10 +1394,10 @@ function runCountdown(done){
   };
   step();
 }
-function buildPad(hintLabel){
-  const keys = ['١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩', 'hint', '٠', 'del'];
+function buildPad(){
+  const keys = ['١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩', '', '٠', 'del'];
   $('pad').innerHTML = keys.map(k => k === 'del' ? '<button class="del" data-k="del" aria-label="حذف">⌫ حذف</button>'
-    : k === 'hint' ? `<button class="hint" data-k="hint">${hintLabel || '💡 مساعدة'}</button>` : `<button data-k="${AR.indexOf(k)}">${k}</button>`).join('');
+    : k === '' ? '<span></span>' : `<button data-k="${AR.indexOf(k)}">${k}</button>`).join('');
   $('pad').querySelectorAll('button').forEach(b => b.onclick = () => padKey(b.dataset.k));
 }
 function updateHud(){
@@ -1403,6 +1420,8 @@ function nextQuestion(){
   $('qPrompt').innerHTML = q.view();
   $('qVisual').hidden = true; $('qVisual').innerHTML = ''; $('qText').hidden = true;
   $('wrongBox').hidden = true;
+  $('hintBtn').hidden = !q.hint; $('hintBtn').classList.remove('hint-on');
+  $('hintMsg').hidden = true; $('hintMsg').innerHTML = '';
   $('choices').hidden = q.input !== 'choices';
   $('pad').hidden = q.input === 'choices';
   $('quizCard').classList.toggle('split', q.input !== 'choices');
@@ -1411,8 +1430,7 @@ function nextQuestion(){
     $('choices').innerHTML = q.choices.map(c => `<button class="choice ${q.wide ? '' : 'num'}" data-v="${c.v}">${c.html}</button>`).join('');
     $('choices').querySelectorAll('button').forEach(btn => btn.onclick = () => answer(+btn.dataset.v, btn));
   } else {
-    buildPad(q.hintLabel);
-    $('pad').querySelector('.hint').style.visibility = q.hint ? 'visible' : 'hidden';
+    buildPad();
     renderTyped();
   }
   if (Q.mode === 'practice' && q.visual) q.visual();
@@ -1441,7 +1459,6 @@ function renderTyped(){
 }
 function padKey(k){
   if (!Q || Q.busy || !Q.q || Q.q.input === 'choices') return;
-  if (k === 'hint'){ if (Q.q.hint && !Q.hinted){ Q.hinted = true; Q.q.hint(); } return; }
   const want = String(Q.q.answer).length;
   if (k === 'del') Q.typed = Q.typed.slice(0, -1);
   else if (Q.typed.length < want) Q.typed += k;
@@ -1452,12 +1469,22 @@ addEventListener('keydown', e => {
   if (!Q || $('screen-quiz').hidden || !$('overlay').hidden) return;
   if (!$('wrongBox').hidden && (e.key === 'Enter' || e.key === ' ')){ e.preventDefault(); $('wrongNext').click(); return; }
   if (!Q.q) return;
-  if (Q.q.input === 'choices'){ if (/^[1-4]$/.test(e.key)) $('choices').children[+e.key - 1]?.click(); return; }
+  if (Q.q.input === 'choices'){ if (/^[1-4]$/.test(e.key)) $('choices').children[+e.key - 1]?.click(); else if (e.key === 'h' || e.key === '?') useHint(); return; }
   let d = e.key; const i = AR.indexOf(d); if (i >= 0) d = String(i);
   if (/^\d$/.test(d)) padKey(d);
   else if (e.key === 'Backspace') padKey('del');
-  else if (e.key === 'h' || e.key === '?') padKey('hint');
+  else if (e.key === 'h' || e.key === '?') useHint();
 });
+// Help can be pressed again at any time; every press shows a message so the child always sees something happen.
+function useHint(){
+  if (!Q || Q.busy || !Q.q || !Q.q.hint) return;
+  Q.hinted = true;
+  const msg = Q.q.hint();
+  if (msg){ const m = $('hintMsg'); m.hidden = false; m.innerHTML = '💡 ' + msg; }
+  $('hintBtn').classList.add('hint-on');
+  SND.tick();
+}
+$('hintBtn').onclick = useHint;
 function floatMsg(txt, bad){
   const f = document.createElement('div'); f.className = 'float' + (bad ? ' bad' : ''); f.textContent = txt;
   $('quizCard').appendChild(f); setTimeout(() => f.remove(), 1000);
@@ -1470,6 +1497,7 @@ function markAnswer(ok){
 function answer(v, btn){
   if (Q.busy) return;
   Q.busy = true; cancelAnimationFrame(rafId);
+  $('hintBtn').hidden = true;
   const q = Q.q, ok = v === q.answer, t = (performance.now() - Q.t0) / 1000, tf = q.tf || 1;
   Q.asked++;
   q.record && q.record(ok, Q.hinted ? 9 : t / tf);
