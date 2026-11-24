@@ -234,9 +234,17 @@ details[open] summary::before{transform:rotate(-90deg)}
 .csign{display:grid;place-items:center;color:var(--muted)}
 .cline{grid-column:1/-1;height:3px;border-radius:3px;background:var(--ink);margin:2px 0}
 .cbox{border:2px dashed var(--line);min-height:1.45em;color:var(--ink)}
+.cbox{cursor:pointer}
+.pad.nudge{animation:nudge .5s ease-out}
+@keyframes nudge{30%{transform:translateY(-6px)}60%{transform:translateY(2px)}}
 .cbox.cur{border-color:var(--accent);border-style:solid;background:color-mix(in srgb,var(--accent) 8%,transparent)}
 .cbox.ok{border-color:transparent;color:var(--accent)}
 .cbox.bad{border-color:transparent;color:var(--bad)}
+.mini-pad{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:10px 0 4px}
+.mini-pad.with-del{grid-template-columns:repeat(6,1fr)}
+.mini-pad button{min-height:52px;border-radius:12px;background:var(--surface);box-shadow:var(--shadow);font-family:var(--f-display);font-weight:700;font-size:1.5rem}
+.mini-pad button:active{background:var(--soft)}
+.col-tip{text-align:center;color:var(--muted);font-size:.85rem;margin-top:2px}
 .step-msg{background:var(--surface);box-shadow:var(--shadow);border-radius:16px;padding:12px 16px;margin:10px 0;min-height:3.2em;line-height:1.55}
 
 /* ---------- place-value houses ---------- */
@@ -1144,11 +1152,12 @@ function arithSteps(a, b, op){
   let carry = 0;
   for (let p = 0; p < n; p++){
     const da = digit(a, p), db = digit(b, p);
-    let msg, w;
+    let msg, w, ask;
     if (op === '+'){
-      if (p >= len(a) && p >= len(b)){ w = carry; msg = `ننزل المحمول ${ar(carry)} إلى منزلة ${PLACE[p]}.`; carry = 0; }
+      if (p >= len(a) && p >= len(b)){ w = carry; msg = `ننزل المحمول ${ar(carry)} إلى منزلة ${PLACE[p]}.`; ask = `منزلة ${PLACE[p]} فارغة، لكن عندنا محمول. ماذا نكتب فيها؟`; carry = 0; }
       else {
         const s = da + db + carry; w = s % 10;
+        ask = `منزلة ${PLACE[p]}: ${ar(da)} + ${ar(db)}${carry ? ` + ${ar(carry)} (المحمول)` : ''} = ؟ اكتب رقم الآحاد من الناتج.`;
         msg = `منزلة ${PLACE[p]}: ${ar(da)} + ${ar(db)}${carry ? ` + ${ar(carry)} (المحمول)` : ''} = ${ar(s)}.` + (s >= 10 ? ` نكتب ${ar(w)} ونحمل ${ar(1)} إلى منزلة ${PLACE[p + 1]}.` : ` نكتب ${ar(w)}.`);
         carry = s >= 10 ? 1 : 0;
         if (carry) marks[p + 1] = ar(1);
@@ -1158,15 +1167,16 @@ function arithSteps(a, b, op){
       if (top < db){ top += 10; borrow = 1; }
       w = top - db;
       if (lent || borrow) marks[p] = `<s>${ar(da)}</s>${ar(top)}`;
-      msg = `منزلة ${PLACE[p]}: `
+      const pre = `منزلة ${PLACE[p]}: `
         + (lent && borrow ? `أعطى ${ar(da)} واحدًا للمنزلة السابقة، ثم استلف من منزلة ${PLACE[p + 1]} فصار ${ar(top)}. `
           : lent ? `أعطى ${ar(da)} واحدًا للمنزلة السابقة فصار ${ar(top)}. `
-          : borrow ? `${ar(da)} أصغر من ${ar(db)}، فنستلف ${ar(1)} من منزلة ${PLACE[p + 1]} فيصبح ${ar(top)}. ` : '')
-        + `${ar(top)} − ${ar(db)} = ${ar(w)}.` + (p >= len(res) && w === 0 ? ' وهو صفر في أول العدد فلا نكتبه.' : '');
+          : borrow ? `${ar(da)} أصغر من ${ar(db)}، فنستلف ${ar(1)} من منزلة ${PLACE[p + 1]} فيصبح ${ar(top)}. ` : '');
+      ask = pre + `${ar(top)} − ${ar(db)} = ؟`;
+      msg = pre + `${ar(top)} − ${ar(db)} = ${ar(w)}.` + (p >= len(res) && w === 0 ? ' وهو صفر في أول العدد فلا نكتبه.' : '');
       carry = borrow;
     }
     out[p] = op === '-' && p >= len(res) ? '' : ar(w);
-    steps.push({p, msg, marks:marks.slice(), out:out.slice()});
+    steps.push({p, msg, ask, w, box: p < len(res), marks:marks.slice(), out:out.slice()});
   }
   return {res, n, steps};
 }
@@ -1302,36 +1312,81 @@ function newArith(op, d){
   }
   return {a, b};
 }
+const miniPad = (withDel = false) => `<div class="mini-pad${withDel ? ' with-del' : ''}" id="miniPad">${['١','٢','٣','٤','٥','٦','٧','٨','٩','٠'].map(k => `<button data-k="${AR.indexOf(k)}">${k}</button>`).join('')}${withDel ? '<button data-k="del" aria-label="حذف">⌫</button>' : ''}</div>`;
+let learnKey = null; // digit handler for the learn screen (keypad and keyboard)
 function learnArith(){
   const {w} = learnCtx, op = w === 'add' ? '+' : '-', d = WORLDS[w].levels[learnCtx.i].d;
-  if (learnCtx.a == null){ const x = newArith(op, d); learnCtx.a = x.a; learnCtx.b = x.b; learnCtx.step = -1; }
+  if (learnCtx.a == null){ const x = newArith(op, d); learnCtx.a = x.a; learnCtx.b = x.b; learnCtx.step = -1; learnCtx.done = false; learnCtx.miss = 0; }
   const {a, b} = learnCtx, opS = op === '+' ? '+' : '−', res = op === '+' ? a + b : a - b;
   const again = `<button class="link" id="newEx">🔄 مثال جديد</button>`;
+  learnKey = null;
   if (d === 1){
+    // single digits: the child answers, helped by the picture
+    const solved = learnCtx.done;
     $('learnBody').innerHTML = `
       <p class="lesson">${op === '+' ? 'الجمع يعني أن نضع الأشياء معًا ثم نعدّها كلها.' : 'الطرح يعني أن نأخذ من الأشياء ثم نعدّ ما بقي.'}</p>
-      <div class="eq"><span>${ar(a)}</span><span class="op">${opS}</span><span>${ar(b)}</span><span class="op">=</span><span class="ans ok">${ar(res)}</span></div>
-      ${emojiArith(a, b, op)}<p class="sentence">${emojiSentence(a, b, op)}</p>
-      <div class="row" style="margin-top:8px">${again}</div><div class="learn-foot">${startPracticeBtn()}</div>`;
+      <div class="eq"><span>${ar(a)}</span><span class="op">${opS}</span><span>${ar(b)}</span><span class="op">=</span><span class="ans ${solved ? 'ok' : ''}" id="learnAns">${solved ? ar(res) : '؟'}</span></div>
+      ${emojiArith(a, b, op)}
+      <div class="step-msg" id="learnMsg" aria-live="polite">${solved ? '🎉 ' + emojiSentence(a, b, op) : 'عُدّ الصور، ثم اكتب الجواب بالأزرار.'}</div>
+      ${solved ? '' : miniPad(String(res).length > 1) + `<div class="row"><button class="link" id="showAns">أرني الجواب</button></div>`}
+      <div class="learn-foot">${solved ? startPracticeBtn() : ''}<div class="row">${again}</div></div>`;
     speakText = `${a} ${op === '+' ? 'زائد' : 'ناقص'} ${b} يساوي ${res}`;
+    if (!solved){
+      let typed = '';
+      learnKey = k => {
+        if (k === 'del'){ typed = typed.slice(0, -1); $('learnAns').textContent = typed ? ar(typed) : '؟'; return; }
+        typed += k; $('learnAns').textContent = ar(typed);
+        if (typed.length < String(res).length) return;
+        if (+typed === res){ SND.ok(); haptic('ok'); learnCtx.done = true; learnArith(); }
+        else { SND.bad(); haptic('bad'); $('learnMsg').textContent = `ليس ${ar(typed)}. ${emojiSentence(a, b, op).split('،')[0]}… عُدّ مرة أخرى.`; typed = ''; setTimeout(() => { if ($('learnAns')) $('learnAns').textContent = '؟'; }, 600); }
+      };
+      $('showAns').onclick = () => { learnCtx.done = true; learnArith(); };
+    }
   } else {
-    const S = learnCtx.S || (learnCtx.S = arithSteps(a, b, op)), st = learnCtx.step, last = S.steps.length - 1;
-    const snap = st >= 0 ? S.steps[st] : {marks:[], out:[], p:-1};
-    const msg = st < 0
+    // columns: the child writes the digit of each column; "show me" reveals it
+    const S = learnCtx.S || (learnCtx.S = arithSteps(a, b, op)), last = S.steps.length - 1;
+    let st = learnCtx.step;
+    if (st >= 0 && !S.steps[st].box) learnCtx.done = true;          // a leading zero: nothing to write
+    const step = st >= 0 ? S.steps[st] : null, solved = !!(step && learnCtx.done);
+    const prev = st > 0 ? S.steps[st - 1] : {marks:[], out:[]};
+    const marks = !step ? [] : (solved || op === '-') ? step.marks : prev.marks;
+    const out = solved ? step.out : prev.out;
+    const msg = !step
       ? (op === '+' ? 'نكتب العددين فوق بعضهما، كل رقم تحت منزلته. ثم نجمع عمودًا عمودًا، ونبدأ من الآحاد على اليمين.'
                     : 'نكتب العدد الأكبر فوق والأصغر تحته، كل رقم تحت منزلته. ثم نطرح عمودًا عمودًا، ونبدأ من الآحاد على اليمين.')
-      : S.steps[st].msg + (st === last ? ` <br><b>الناتج: ${fmt(res)} 🎉</b>` : '');
+      : solved ? '✅ ' + step.msg + (st === last ? ` <br><b>الناتج: ${fmt(res)} 🎉</b>` : '')
+      : step.ask + ' <b>اكتبه في الخانة الصفراء.</b>';
+    const waiting = step && !solved;
     $('learnBody').innerHTML = `
-      ${colGrid({a, b, op, n:S.n, ansLen:len(res), marks:snap.marks, out:snap.out, active:snap.p})}
-      <div class="step-msg" aria-live="polite">${msg}</div>
-      <div class="learn-foot">${st < last ? `<button class="btn block" id="stepBtn">${st < 0 ? 'ابدأ الحل' : 'الخطوة التالية'}</button>` : startPracticeBtn()}
+      ${colGrid({a, b, op, n:S.n, ansLen:len(res), marks, out, active: step ? step.p : -1})}
+      <div class="step-msg" id="learnMsg" aria-live="polite">${msg}</div>
+      ${waiting ? miniPad() + `<div class="row"><button class="link" id="showAns">أرني الجواب</button></div>` : ''}
+      <div class="learn-foot">${!step ? `<button class="btn block" id="stepBtn">ابدأ الحل</button>`
+        : solved && st < last ? `<button class="btn block" id="stepBtn">الخطوة التالية</button>`
+        : solved ? startPracticeBtn() : ''}
       <div class="row">${again}</div></div>`;
-    if ($('stepBtn')) $('stepBtn').onclick = () => { learnCtx.step++; SND.tick(); learnArith(); };
-    speakText = st < 0 ? '' : S.steps[st].msg.replace(/<[^>]+>/g, '');
+    if (waiting){ const box = $('ac' + step.p); if (box) box.classList.add('cur'); }
+    if ($('stepBtn')) $('stepBtn').onclick = () => { learnCtx.step++; learnCtx.done = false; SND.tick(); learnArith(); };
+    if (waiting){
+      learnKey = k => {
+        if (+k === step.w){ SND.ok(); haptic('ok'); learnCtx.done = true; learnArith(); }
+        else { SND.bad(); haptic('bad'); const box = $('ac' + step.p); if (box){ box.textContent = ar(k); box.classList.add('bad'); setTimeout(() => { if (box.isConnected){ box.textContent = ''; box.classList.remove('bad'); } }, 650); }
+          $('learnMsg').innerHTML = `ليس ${ar(k)}. ` + step.ask; }
+      };
+      $('showAns').onclick = () => { learnCtx.done = true; learnArith(); };
+    }
+    speakText = !step ? '' : (solved ? step.msg : step.ask).replace(/<[^>]+>/g, '');
   }
+  if ($('miniPad')) $('miniPad').querySelectorAll('button').forEach(btn => btn.onclick = () => learnKey && learnKey(btn.dataset.k));
   $('newEx').onclick = () => { learnCtx.a = null; learnCtx.S = null; learnArith(); };
   bindPractice();
 }
+addEventListener('keydown', e => {
+  if ($('screen-learn').hidden || !learnKey || !$('overlay').hidden) return;
+  let d = e.key; const i = AR.indexOf(d); if (i >= 0) d = String(i);
+  if (/^\d$/.test(d)){ e.preventDefault(); learnKey(d); }
+  else if (e.key === 'Backspace' && $('miniPad')?.querySelector('[data-k="del"]')){ e.preventDefault(); learnKey('del'); }
+});
 
 function learnPlace(){
   const d = WORLDS.place.levels[learnCtx.i].d;
@@ -1425,10 +1480,10 @@ function arithQ(op, d, w, i){
     explain: () => { vis().innerHTML = emojiArith(a, b, op); qtext(emojiSentence(a, b, op)); }};
   const S = arithSteps(a, b, op), fin = S.steps[S.steps.length - 1];
   return {answer:res, input:'column', tf: 1 + (d - 1) * 1.1, ansLen:len(res),
-    view: () => colGrid({a, b, op, n:S.n, ansLen:len(res)}),
+    view: () => colGrid({a, b, op, n:S.n, ansLen:len(res)}) + `<p class="col-tip">ابدأ من الآحاد (اليمين)، أو اضغط على أي خانة لتكتب فيها</p>`,
     hint: () => {
       fin.marks.forEach((m, p) => { const el = $('mk' + p); if (el) el.innerHTML = m; });
-      const p = Math.min(Q.typed.length, S.steps.length - 1), st = S.steps[p];
+      const p = Math.max(0, Math.min(Q.cursor, S.steps.length - 1)), st = S.steps[p];
       const da = digit(a, p), db = digit(b, p), any = fin.marks.some(Boolean);
       const extra = !any ? (op === '+' ? ' لا يوجد حمل في هذه المسألة.' : ' لا يوجد استلاف في هذه المسألة.')
         : (op === '+' ? ' الأرقام الصغيرة الحمراء فوق الأعمدة هي المحمول.' : ' الأرقام الصغيرة الحمراء فوق الأعمدة تبيّن الاستلاف.');
@@ -1436,7 +1491,7 @@ function arithQ(op, d, w, i){
     },
     explain: () => { $('qPrompt').innerHTML = colGrid({a, b, op, n:S.n, ansLen:len(res), marks:fin.marks, out:fin.out});
       qtext(`الناتج الصحيح: <b>${fmt(res)}</b>`); },
-    teach: () => openLearn(w, i, {a, b, step:-1})};
+    teach: () => openLearn(w, i, {a, b, step:-1, done:false})};
 }
 function placeQ(d){
   const type = pick(['value', 'value', 'place', 'place', 'read', 'read', 'write', 'expand']);
@@ -1581,6 +1636,7 @@ function nextQuestion(){
     $('choices').querySelectorAll('button').forEach(btn => btn.onclick = () => answer(+btn.dataset.v, btn));
   } else if (q.input !== 'drag'){
     buildPad();
+    if (q.input === 'column') setupColumnBoxes(q);
     renderTyped();
   }
   if ((Q.mode === 'practice' || q.input === 'drag') && q.visual) q.visual();
@@ -1604,16 +1660,51 @@ function tickTimer(){
 function renderTyped(){
   const q = Q.q;
   if (q.input === 'column'){
-    for (let p = 0; p < q.ansLen; p++){ const el = $('ac' + p); if (!el) continue; el.textContent = Q.typed[p] ? ar(Q.typed[p]) : ''; el.classList.toggle('cur', p === Q.typed.length); }
+    for (let p = 0; p < q.ansLen; p++){ const el = $('ac' + p); if (!el) continue; el.textContent = Q.cells[p] ? ar(Q.cells[p]) : ''; el.classList.toggle('cur', p === Q.cursor); }
   } else if ($('ans')) $('ans').textContent = Q.typed ? ar(Q.typed) : '؟';
+}
+/* Column answers: each box can be tapped to choose where the next digit goes (it starts at the ones box).
+   Digits come from the keypad or keyboard; when every box is filled the answer is checked. */
+function setupColumnBoxes(q){
+  Q.cells = Array(q.ansLen).fill(''); Q.cursor = 0; Q.hist = []; Q.dir = 1; // dir 1: from the ones towards bigger places; -1: left to right
+  for (let p = 0; p < q.ansLen; p++){
+    const el = $('ac' + p); if (!el) continue;
+    el.setAttribute('role', 'button'); el.setAttribute('tabindex', '0');
+    el.setAttribute('aria-label', `خانة ${PLACE[p]} في الناتج`);
+    el.onclick = () => {
+      if (!Q || Q.busy) return;
+      Q.cursor = p; if (p === q.ansLen - 1 && p > 0) Q.dir = -1; else if (p === 0) Q.dir = 1;
+      renderTyped(); SND.tick();
+      const pad = $('pad'), r = pad.getBoundingClientRect();
+      if (r.bottom > innerHeight) pad.scrollIntoView({block:'end', behavior:'smooth'});
+      pad.classList.remove('nudge'); void pad.offsetWidth; pad.classList.add('nudge');
+    };
+  }
 }
 function padKey(k){
   if (!Q || Q.busy || !Q.q || Q.q.input === 'choices' || Q.q.input === 'drag') return;
+  if (Q.q.input === 'column'){
+    const n = Q.q.ansLen;
+    if (k === 'del'){
+      if (Q.cells[Q.cursor]){ Q.cells[Q.cursor] = ''; Q.hist = Q.hist.filter(x => x !== Q.cursor); }
+      else if (Q.hist.length){ Q.cursor = Q.hist.pop(); Q.cells[Q.cursor] = ''; }
+      renderTyped(); return;
+    }
+    Q.cells[Q.cursor] = k; Q.hist = Q.hist.filter(x => x !== Q.cursor); Q.hist.push(Q.cursor);
+    // next empty box in the direction the child is typing, otherwise any empty box
+    let next = -1;
+    for (let p = Q.cursor + Q.dir; p >= 0 && p < n; p += Q.dir) if (!Q.cells[p]){ next = p; break; }
+    if (next < 0) for (let p = 0; p < n; p++) if (!Q.cells[p]){ next = p; break; }
+    if (next >= 0){ Q.cursor = next; renderTyped(); return; }
+    Q.cursor = -1; renderTyped();
+    answer(+[...Q.cells].reverse().join(''));
+    return;
+  }
   const want = String(Q.q.answer).length;
   if (k === 'del') Q.typed = Q.typed.slice(0, -1);
   else if (Q.typed.length < want) Q.typed += k;
   renderTyped();
-  if (Q.typed.length >= want && k !== 'del') answer(Q.q.input === 'column' ? +[...Q.typed].reverse().join('') : +Q.typed);
+  if (Q.typed.length >= want && k !== 'del') answer(+Q.typed);
 }
 addEventListener('keydown', e => {
   if (!Q || $('screen-quiz').hidden || !$('overlay').hidden) return;
@@ -1621,6 +1712,7 @@ addEventListener('keydown', e => {
   if (!Q.q) return;
   if (Q.q.input === 'drag'){ if (!Q.busy && Q.q.goat && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')){ e.preventDefault(); Q.q.goat.pick(e.key === 'ArrowLeft' ? Q.q.goat.hi : Q.q.goat.lo); } else if (e.key === 'h' || e.key === '?') useHint(); return; }
   if (Q.q.input === 'choices'){ if (/^[1-4]$/.test(e.key)) $('choices').children[+e.key - 1]?.click(); else if (e.key === 'h' || e.key === '?') useHint(); return; }
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.classList && e.target.classList.contains('cbox')){ e.preventDefault(); e.target.click(); return; }
   let d = e.key; const i = AR.indexOf(d); if (i >= 0) d = String(i);
   if (/^\d$/.test(d)) padKey(d);
   else if (e.key === 'Backspace') padKey('del');
@@ -1836,7 +1928,7 @@ window.claude?.hot?.snapshot?.(() => ({DB}));
 window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
 
 // exposed for automated checks only
-window.__nf = {words, arithSteps, roundInfo, goatReady: () => goatBufs.length, get q(){ return Q && !Q.busy ? Q.q : null; }};
+window.__nf = {words, arithSteps, roundInfo, goatReady: () => goatBufs.length, get learn(){ return learnCtx; }, get q(){ return Q && !Q.busy ? Q.q : null; }};
 })();
 </script>
 <!--ARTIFACT-END-->

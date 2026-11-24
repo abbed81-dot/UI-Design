@@ -41,7 +41,7 @@ async function shoot(page, dir, i){ await page.waitForTimeout(700); await page.s
     await shoot(p, dir, 3);                                                     // 8 x 8 sheep
     await p.click('#learnBack'); await p.click('#mapBack'); await p.click('[data-w="add"]'); await p.waitForTimeout(300);
     await p.locator('.node').nth(2).click(); await p.click('[data-act="learn"]');
-    await p.click('#stepBtn'); await p.click('#stepBtn');
+    await p.click('#stepBtn'); await p.evaluate(() => window.__nf.learn.S.steps[window.__nf.learn.step].w).then(w => p.click(`#miniPad button[data-k="${w}"]`)); await p.click('#stepBtn');
     await shoot(p, dir, 4);                                                     // column addition
     await p.click('#learnBack'); await p.click('#mapBack'); await p.click('[data-w="place"]'); await p.waitForTimeout(300);
     await p.locator('.node').nth(2).click(); await p.click('[data-act="learn"]');
