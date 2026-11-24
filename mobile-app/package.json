@@ -1,0 +1,26 @@
+{
+  "name": "numbers-farm",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Numbers Farm (مزرعة الأرقام): an Arabic maths game for children, packaged for iOS and Android with Capacitor.",
+  "scripts": {
+    "build": "node scripts/build-www.mjs",
+    "sync": "npm run build && npx cap sync",
+    "assets": "npx @capacitor/assets generate --iconBackgroundColor '#3E9B4F' --iconBackgroundColorDark '#1B3A24' --splashBackgroundColor '#F5F7F2' --splashBackgroundColorDark '#11181C'",
+    "android": "npm run sync && npx cap open android",
+    "ios": "npm run sync && npx cap open ios"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.0.0",
+    "@capacitor/app": "^8.0.0",
+    "@capacitor/core": "^8.0.0",
+    "@capacitor/haptics": "^8.0.0",
+    "@capacitor/ios": "^8.0.0",
+    "@capacitor/splash-screen": "^8.0.0",
+    "@capacitor/status-bar": "^8.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^8.0.0"
+  }
+}

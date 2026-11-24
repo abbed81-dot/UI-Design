@@ -1,0 +1,27 @@
+{
+  "appId": "com.numbersfarm.kids",
+  "appName": "مزرعة الأرقام",
+  "webDir": "www",
+  "backgroundColor": "#F5F7F2",
+  "ios": {
+    "contentInset": "never",
+    "scrollEnabled": true,
+    "backgroundColor": "#F5F7F2"
+  },
+  "android": {
+    "backgroundColor": "#F5F7F2",
+    "allowMixedContent": false
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 3000,
+      "launchAutoHide": true,
+      "backgroundColor": "#F5F7F2",
+      "showSpinner": false,
+      "androidScaleType": "CENTER_CROP"
+    },
+    "StatusBar": {
+      "overlaysWebView": true
+    }
+  }
+}

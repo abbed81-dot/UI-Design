@@ -1,0 +1,2385 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#F5F7F2" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#11181C" media="(prefers-color-scheme: dark)">
+<meta name="format-detection" content="telephone=no">
+<title>مزرعة الأرقام</title>
+<link rel="stylesheet" href="fonts/fonts.css">
+<style>
+/* Layout: one calm column (wider on tablets). Parent signs up once, picks a child, the child picks a "world"
+   (multiplication, addition, subtraction, place value, rounding); each world is a winding trail of levels.
+   Place values keep one colour everywhere: ones blue, tens green, hundreds orange, thousands purple,
+   ten-thousands pink, hundred-thousands teal. */
+:root{
+  --bg:#F5F7F2; --surface:#FFFFFF; --soft:#EDF1E8; --ink:#25362C; --muted:#7B8A80; --line:#E2E8DC; --road:#E3EAD6;
+  --accent:#3E9B4F; --accent-ink:#FFFFFF; --sun:#F2B630; --sun-soft:#FDF1D3; --bad:#D9534F; --bad-soft:#FBE7E6; --focus:#3A86C8;
+  --w-mult:#3E9B4F; --w-add:#2B7BD6; --w-sub:#C9771E; --w-place:#8A4FC2; --w-round:#12999A;
+  --p0:#2B7BD6; --p1:#2E9D57; --p2:#E07B1F; --p3:#8A4FC2; --p4:#D2457E; --p5:#12999A;
+  --shadow:0 1px 2px rgba(37,54,44,.05),0 6px 20px rgba(37,54,44,.05);
+  --f-display:"Baloo Bhaijaan 2","Tajawal","Segoe UI","Noto Sans Arabic",system-ui,sans-serif;
+  --f-body:"Tajawal","Segoe UI","Noto Sans Arabic",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#11181C; --surface:#182228; --soft:#1F2B31; --ink:#E6EEE7; --muted:#93A39A; --line:#26343B; --road:#22313A;
+    --accent:#5DBB6C; --accent-ink:#0E1A12; --sun:#F5C451; --sun-soft:#3A3220; --bad:#F07470; --bad-soft:#3A2224; --focus:#6DB1EA;
+    --w-mult:#5DBB6C; --w-add:#5FA8F5; --w-sub:#E9A04E; --w-place:#B98CF0; --w-round:#3FCFCB;
+    --p0:#6CB2FF; --p1:#62D08A; --p2:#FFA65A; --p3:#B98CF0; --p4:#FF7FB0; --p5:#4FD4D2;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.18);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#11181C; --surface:#182228; --soft:#1F2B31; --ink:#E6EEE7; --muted:#93A39A; --line:#26343B; --road:#22313A;
+  --accent:#5DBB6C; --accent-ink:#0E1A12; --sun:#F5C451; --sun-soft:#3A3220; --bad:#F07470; --bad-soft:#3A2224; --focus:#6DB1EA;
+  --w-mult:#5DBB6C; --w-add:#5FA8F5; --w-sub:#E9A04E; --w-place:#B98CF0; --w-round:#3FCFCB;
+  --p0:#6CB2FF; --p1:#62D08A; --p2:#FFA65A; --p3:#B98CF0; --p4:#FF7FB0; --p5:#4FD4D2;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.18);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{min-height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:17px;line-height:1.6;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+button:focus-visible,summary:focus-visible,input:focus-visible{outline:3px solid var(--focus);outline-offset:3px;border-radius:14px}
+.app{max-width:680px;margin:0 auto;padding-block:16px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.num{font-family:var(--f-display);font-variant-numeric:tabular-nums}
+h1,h2,h3{font-family:var(--f-display);line-height:1.25;margin:0;text-wrap:balance;font-weight:700}
+p{margin:0}
+.pc0{color:var(--p0)}.pc1{color:var(--p1)}.pc2{color:var(--p2)}.pc3{color:var(--p3)}.pc4{color:var(--p4)}.pc5{color:var(--p5)}
+
+/* ---------- inside the native app (iOS / Android) ---------- */
+.app-native,.app-native body{overscroll-behavior:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.app-native input{-webkit-user-select:text;user-select:text}
+.app-native .app{padding-top:calc(16px + env(safe-area-inset-top,0px));padding-bottom:calc(56px + env(safe-area-inset-bottom,0px))}
+button,a,input{touch-action:manipulation}
+.gate-q{font-family:var(--f-display);font-weight:700;font-size:1.1rem;text-align:center;margin:6px 0 12px}
+.gate input{text-align:center;font-size:1.6rem;letter-spacing:.3em;direction:ltr}
+
+/* ---------- fun layer: Soufi, wool, farm, wardrobe, buddy, race, boss, balloons, builders ---------- */
+.soufi{position:relative;display:inline-block;line-height:1}
+.soufi .wear{position:absolute;font-style:normal;line-height:1;pointer-events:none}
+.soufi .wear.head{font-size:.55em;top:-.34em;left:-.02em}
+.soufi .wear.face{font-size:.36em;top:.2em;left:.02em}
+.hello-sheep .soufi,.mascot .soufi{font-size:1em}
+.wool-chip{display:inline-flex;align-items:center;gap:4px;font-family:var(--f-display);font-weight:700;color:var(--muted)}
+.extras{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.extra{display:grid;gap:2px;justify-items:start;text-align:start;padding:14px;border-radius:20px;background:var(--surface);box-shadow:var(--shadow)}
+.extra .x-emoji{font-size:1.9rem;line-height:1.1}
+.extra b{font-family:var(--f-display);font-size:1.08rem;line-height:1.2}
+.extra small{color:var(--muted);line-height:1.3}
+.extra.done{background:color-mix(in srgb,var(--accent) 12%,var(--surface))}
+.extra .flame{font-family:var(--f-display);font-weight:800;color:var(--sun)}
+.tabs{display:flex;gap:6px;background:var(--soft);border-radius:99px;padding:4px;margin:6px 0 12px}
+.tabs button{flex:1;min-height:42px;border-radius:99px;font-weight:700;color:var(--muted)}
+.tabs button[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.field{position:relative;width:100%;aspect-ratio:4/3;max-height:70vh;border-radius:24px;overflow:hidden;touch-action:none;
+  background:linear-gradient(180deg,#BFE6FF 0,#DDF2FF 30%,#9BD67F 30%,#7CC35F 100%);box-shadow:var(--shadow)}
+.field::before{content:"☀️";position:absolute;top:4%;inset-inline-end:6%;font-size:2.4rem}
+.field::after{content:"";position:absolute;inset-inline:0;top:30%;height:8px;background:repeating-linear-gradient(90deg,#B5824D 0 6px,transparent 6px 26px);opacity:.7}
+.field .item{position:absolute;transform:translate(-50%,-50%);font-size:clamp(1.9rem,8vw,2.6rem);line-height:1;cursor:grab;user-select:none;-webkit-user-select:none;touch-action:none;filter:drop-shadow(0 3px 2px rgba(0,0,0,.18));z-index:1}
+.field .item.held{cursor:grabbing;transform:translate(-50%,-50%) scale(1.25);z-index:3}
+.field .item.new{animation:pop .5s both}
+.field-empty{position:absolute;inset:auto 0 12%;text-align:center;font-weight:700;color:#2E5A22;padding:0 18px}
+.farm-note{color:var(--muted);text-align:center;font-size:.9rem;margin-top:8px}
+.wardrobe-preview{display:grid;place-items:center;font-size:6rem;padding:16px 0 4px}
+.outfits{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.outfit{display:grid;justify-items:center;gap:2px;padding:12px 8px;border-radius:18px;background:var(--surface);box-shadow:var(--shadow);text-align:center}
+.outfit .o-e{font-size:2.2rem;line-height:1.2}
+.outfit b{font-family:var(--f-display)}
+.outfit small{color:var(--muted)}
+.outfit.on{box-shadow:0 0 0 3px var(--sun),var(--shadow)}
+.outfit[disabled]{opacity:.5}
+.buddy{position:absolute;top:-6px;inset-inline-start:0;display:flex;align-items:flex-start;gap:4px;pointer-events:none;z-index:2}
+.buddy .b-s{font-size:2rem;line-height:1}
+.buddy .b-say{background:var(--surface);box-shadow:var(--shadow);border-radius:12px;padding:2px 10px;font-weight:700;font-size:.85rem;white-space:nowrap;opacity:0;transform:translateY(4px);transition:opacity .2s,transform .2s}
+.buddy .b-say.on{opacity:1;transform:none}
+.buddy.happy .b-s{animation:hop .6s ease-out}
+.buddy.sad .b-s{animation:refuse .6s ease-in-out}
+.boss-top{position:absolute;top:-8px;inset-inline-end:0;display:flex;flex-direction:row-reverse;align-items:flex-start;gap:4px;pointer-events:none;z-index:2}
+.boss-top .w-e{font-size:2.6rem;line-height:1}
+.boss-top.hit .w-e{animation:refuse .5s ease-in-out}
+.boss-top.laugh .w-e{animation:hop .5s ease-out}
+.boss-top .b-say{background:var(--surface);box-shadow:var(--shadow);border-radius:12px;padding:2px 10px;font-weight:800;font-size:.85rem;white-space:nowrap;opacity:0;transition:opacity .2s}
+.boss-top .b-say.on{opacity:1}
+.bar.boss .fill{background:var(--bad)}
+.bar .rival{position:absolute;top:50%;inset-inline-start:0;transform:translate(40%,-58%);font-size:1.25rem;opacity:.9;transition:inset-inline-start .2s linear}
+.hearts{font-size:1rem;letter-spacing:1px;white-space:nowrap}
+.rewards{display:grid;gap:4px;justify-items:center;background:var(--sun-soft);border-radius:18px;padding:12px 18px;font-weight:700}
+.rewards .big{font-size:2.2rem;line-height:1.1}
+.balloons{position:relative;height:300px;overflow:hidden;border-radius:22px;background:linear-gradient(180deg,color-mix(in srgb,#9fd8ff 35%,var(--surface)),var(--surface));margin-top:12px;display:block!important}
+.balloon{position:absolute;bottom:-90px;width:78px;height:92px;border-radius:50% 50% 46% 46%;color:#fff;font-family:var(--f-display);font-weight:800;font-size:1.5rem;display:grid;place-items:center;box-shadow:inset -8px -10px 0 rgba(0,0,0,.12);animation:float var(--dur,7s) linear infinite;animation-delay:var(--delay,0s)}
+.balloon::after{content:"";position:absolute;bottom:-26px;left:50%;width:2px;height:26px;background:rgba(0,0,0,.25)}
+.balloons.stopped .balloon{animation-play-state:paused}
+.balloon.ok{outline:5px solid var(--sun);outline-offset:2px}
+.balloon.picked.ok{animation:popb .4s ease-out forwards}
+.balloon.bad{animation:shake .3s;filter:grayscale(.7)}
+@keyframes float{from{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-200px) rotate(3deg)}to{transform:translateY(-420px) rotate(-3deg)}}
+@keyframes popb{to{transform:scale(1.8);opacity:0}}
+.builder{display:grid;gap:10px;margin:12px 0}
+.tray{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:10px;border-radius:18px;background:var(--soft)}
+.token{min-height:52px;padding:6px 12px;border-radius:14px;background:var(--surface);box-shadow:var(--shadow);font-family:var(--f-display);font-weight:800;font-size:1.15rem;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
+.drag-ghost{position:fixed;z-index:50;pointer-events:none;transform:translate(-50%,-50%) scale(1.1);opacity:.92}
+.pens{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.pen{min-width:84px;min-height:84px;border-radius:16px;border:2px dashed var(--line);display:grid;justify-items:center;align-content:center;gap:2px;padding:6px;background:var(--surface);font-size:1.25rem}
+.pen.full{border-style:solid;border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,var(--surface))}
+.pen.over{border-color:var(--sun);background:var(--sun-soft)}
+.pen .p-head{font-size:1.6rem}
+.pen .p-items{display:grid;grid-template-columns:repeat(var(--cols),1fr);gap:1px;font-size:.95rem}
+.pen .p-items span{animation:pop .3s both}
+.build-total{text-align:center;font-family:var(--f-display);font-weight:800;font-size:1.25rem}
+.houses{display:flex;direction:ltr;justify-content:center;gap:6px}
+.house{flex:1;max-width:96px;min-width:0;display:grid;justify-items:center;border-radius:14px;overflow:hidden;background:var(--surface);box-shadow:var(--shadow);padding-bottom:6px}
+.house.over{box-shadow:0 0 0 3px var(--sun),var(--shadow)}
+.house.ok{box-shadow:0 0 0 3px var(--accent),var(--shadow)}
+.house .h-count{font-family:var(--f-display);font-weight:800;font-size:clamp(1.6rem,7vw,2.2rem);line-height:1.3}
+.house .h-chips{display:flex;flex-wrap:wrap;gap:2px;justify-content:center;min-height:16px;padding:0 4px}
+.house .h-chips i{width:9px;height:9px;border-radius:3px;background:currentColor}
+.house .h-minus{min-width:36px;min-height:30px;border-radius:10px;background:var(--soft);font-weight:800;color:var(--muted)}
+
+/* ---------- shared controls ---------- */
+.icon-btn{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:1.15rem;color:var(--muted);flex:none}
+.icon-btn:hover{background:var(--soft)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:54px;padding:0 26px;border-radius:14px;font-family:var(--f-display);font-weight:700;font-size:1.15rem;background:var(--accent);color:var(--accent-ink)}
+.btn:active{transform:scale(.98)}
+.btn.block{width:100%}
+.link{min-height:44px;padding:0 14px;border-radius:12px;font-weight:700;color:var(--muted)}
+.link:hover{background:var(--soft);color:var(--ink)}
+.link:disabled{opacity:.3;pointer-events:none}
+.row{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;align-items:center}
+.head{display:flex;align-items:center;gap:8px;min-height:44px;margin-bottom:8px}
+.head h2{font-size:1.15rem;flex:1;min-width:0;color:var(--muted);font-weight:500;font-family:var(--f-body)}
+.title-xl{font-size:clamp(1.8rem,6vw,2.4rem);font-weight:800}
+.hello{display:flex;align-items:flex-end;gap:10px}
+.hello-sheep{font-size:3rem;line-height:1;animation:hop 2.4s ease-in-out infinite;flex:none}
+.bubble{background:var(--surface);box-shadow:var(--shadow);border-radius:18px 18px 18px 4px;padding:10px 14px;font-weight:700;max-width:34ch;line-height:1.45}
+@keyframes hop{0%,100%{transform:translateY(0)}40%{transform:translateY(-8px)}55%{transform:translateY(0)}}
+.pills{display:flex;gap:8px;flex-wrap:wrap}
+.pill{display:inline-flex;align-items:center;gap:6px;min-height:42px;padding:0 14px;border-radius:99px;background:var(--soft);font-weight:700;font-size:.95rem}
+.pill:hover{background:var(--line)}
+.fine{color:var(--muted);font-size:.88rem;text-align:center}
+
+/* ---------- forms ---------- */
+.form{display:grid;gap:16px;margin-top:18px}
+.card{background:var(--surface);border-radius:20px;padding:16px;box-shadow:var(--shadow);display:grid;gap:12px}
+.card h3{font-size:1.05rem;color:var(--muted);font-family:var(--f-body);font-weight:700}
+.field{display:grid;gap:4px;font-weight:700;font-size:.95rem}
+.field input{min-height:52px;border-radius:14px;border:2px solid var(--line);background:var(--bg);padding:0 14px;font:inherit;font-weight:500;color:var(--ink);width:100%}
+.field input:focus{border-color:var(--accent);outline:none}
+.field input[aria-invalid="true"]{border-color:var(--bad)}
+.err{color:var(--bad);font-weight:700;font-size:.92rem;min-height:1.2em}
+.avatars{display:flex;flex-wrap:wrap;gap:8px}
+.avatars button{width:52px;height:52px;border-radius:16px;font-size:1.8rem;background:var(--soft);display:grid;place-items:center}
+.avatars button[aria-pressed="true"]{background:var(--sun-soft);box-shadow:0 0 0 3px var(--sun)}
+
+/* ---------- profiles / parent ---------- */
+.kids{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-top:18px}
+.kid{display:grid;justify-items:center;gap:2px;padding:18px 10px 14px;border-radius:22px;background:var(--surface);box-shadow:var(--shadow)}
+.kid .av{font-size:3.2rem;line-height:1.1}
+.kid b{font-family:var(--f-display);font-size:1.2rem}
+.kid small{color:var(--muted)}
+.kid.add{background:transparent;box-shadow:none;border:2px dashed var(--line);color:var(--muted);align-content:center}
+.kid-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line);flex-wrap:wrap}
+.kid-row:first-of-type{border-top:0}
+.kid-row .av{font-size:2rem}
+.kid-row .info{flex:1;min-width:140px}
+.kid-row .info b{font-family:var(--f-display);font-size:1.1rem;display:block}
+.kid-row .info small{color:var(--muted);display:block}
+.kid-row .acts2{display:flex;gap:4px}
+.danger{color:var(--bad)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.ok-msg{color:var(--accent);font-weight:700;font-size:.92rem}
+
+/* ---------- worlds ---------- */
+.top{display:flex;align-items:center;gap:8px;justify-content:space-between}
+.who{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 12px 0 6px;border-radius:99px;background:var(--surface);box-shadow:var(--shadow);font-weight:700}
+.who .av{font-size:1.6rem}
+.star-count{display:inline-flex;align-items:center;gap:6px;font-family:var(--f-display);font-weight:700;color:var(--muted)}
+.star-count b{color:var(--sun)}
+.worlds{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}
+.world{--wc:var(--accent);position:relative;display:grid;gap:4px;justify-items:start;text-align:start;padding:16px;border-radius:24px;background:color-mix(in srgb,var(--wc) 13%,var(--surface));overflow:hidden;min-height:150px}
+.world:active{transform:scale(.98)}
+.world .w-emoji{font-size:2.6rem;line-height:1.1}
+.world b{font-family:var(--f-display);font-size:1.25rem;line-height:1.2}
+.world small{color:var(--muted);line-height:1.3}
+.world .w-bar{width:100%;height:8px;border-radius:99px;background:color-mix(in srgb,var(--wc) 18%,var(--surface));margin-top:auto}
+.world .w-bar i{display:block;height:100%;border-radius:99px;background:var(--wc)}
+.world .w-stars{font-family:var(--f-display);font-weight:700;color:var(--muted);font-size:.9rem}
+.world.wide{grid-column:1/-1}
+
+/* ---------- winding trail ---------- */
+.intro{padding:6px 0 4px;display:grid;gap:12px}
+.trail{--amp:min(84px,19vw);position:relative;display:flex;flex-direction:column;align-items:center;gap:40px;padding:34px 0 26px}
+.trail-svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+.road{fill:none;stroke:var(--road);stroke-width:30;stroke-linecap:round;stroke-linejoin:round}
+.road-line{fill:none;stroke:var(--surface);stroke-width:3;stroke-linecap:round;stroke-dasharray:1 14}
+.road-done{fill:none;stroke:var(--wc,var(--accent));stroke-width:8;stroke-linecap:round;opacity:.75}
+.deco{position:absolute;transform:translate(-50%,-50%);font-size:1.7rem;line-height:1;pointer-events:none;opacity:.9}
+.node{position:relative;display:grid;justify-items:center;gap:4px;transform:translateX(calc(var(--x) * var(--amp)))}
+.disc{position:relative;width:82px;height:82px;border-radius:50%;display:grid;place-items:center;font-size:2.4rem;background:var(--surface);box-shadow:0 0 0 4px var(--wc,var(--accent)),0 7px 0 4px color-mix(in srgb,var(--wc,var(--accent)) 45%,var(--bg));transition:transform .15s}
+.node:active .disc{transform:translateY(4px) scale(.97)}
+.node .badge{position:absolute;top:-6px;inset-inline-start:-6px;min-width:30px;height:30px;padding:0 5px;border-radius:99px;background:var(--wc,var(--accent));color:#fff;font-family:var(--f-display);font-weight:800;font-size:1rem;display:grid;place-items:center;box-shadow:0 0 0 3px var(--bg)}
+.node .n-stars{font-size:1rem;letter-spacing:2px;line-height:1;color:var(--line)}
+.node .n-stars .on{color:var(--sun)}
+.node .n-label{font-family:var(--f-display);font-weight:700;font-size:.95rem;background:var(--bg);padding:0 8px;border-radius:8px;margin-top:6px}
+.node.locked .disc{background:var(--soft);box-shadow:0 0 0 3px var(--line);font-size:2rem}
+.node.locked .disc>.em{opacity:.35;filter:grayscale(1)}
+.node.locked .badge{background:var(--line);color:var(--muted)}
+.node.locked .n-label{color:var(--muted)}
+.node.current .disc{box-shadow:0 0 0 5px var(--sun),0 7px 0 5px color-mix(in srgb,var(--sun) 50%,var(--bg))}
+.node.current .badge{background:var(--sun);color:#3A2A00}
+.mascot{position:absolute;top:14px;font-size:2.1rem;line-height:1;animation:hop 1.4s ease-in-out infinite;pointer-events:none}
+.mascot.on-left{left:-50px}
+.mascot.on-right{right:-50px}
+.mascot::after{content:"هنا!";position:absolute;top:-16px;inset-inline-end:-6px;font-family:var(--f-display);font-size:.8rem;font-weight:800;background:var(--sun);color:#3A2A00;border-radius:99px;padding:0 7px;line-height:1.7;white-space:nowrap}
+.node.champ .disc{width:96px;height:96px;font-size:2.8rem}
+.goal-flag{text-align:center;color:var(--muted);font-size:.9rem}
+
+/* ---------- sheet ---------- */
+.overlay{position:fixed;inset:0;background:rgba(12,22,16,.38);z-index:20;display:flex;align-items:flex-end;justify-content:center}
+.sheet{width:100%;max-width:540px;background:var(--bg);border-radius:24px 24px 0 0;padding:20px max(18px,env(safe-area-inset-right,0px)) calc(22px + env(safe-area-inset-bottom,0px)) max(18px,env(safe-area-inset-left,0px));max-height:92vh;overflow:auto;animation:up .22s ease-out}
+@keyframes up{from{transform:translateY(30px);opacity:.5}}
+.s-head{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.s-head .big{font-size:2.8rem;line-height:1}
+.s-head h2{font-size:1.45rem}
+.s-head p{color:var(--muted);font-size:.95rem}
+.s-head .icon-btn{margin-inline-start:auto}
+.acts{display:grid;gap:8px}
+.act{display:flex;align-items:center;gap:14px;text-align:start;padding:12px 14px;border-radius:16px;background:var(--surface);min-height:64px}
+.act .ai{font-size:1.6rem}
+.act b{font-family:var(--f-display);font-size:1.12rem;display:block;line-height:1.25}
+.act small{color:var(--muted);display:block;line-height:1.35}
+.act.primary{background:var(--accent);color:var(--accent-ink)}
+.act.primary small{color:inherit;opacity:.85}
+.note{color:var(--muted);font-size:.92rem;margin-top:14px;line-height:1.5}
+.locked-note{background:var(--soft);border-radius:14px;padding:10px 14px;margin-bottom:12px;font-size:.95rem}
+details{margin-top:8px;font-size:.9rem;color:var(--muted)}
+summary{cursor:pointer;font-weight:700;padding:6px 0;list-style:none}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"‹ ";display:inline-block;transition:transform .2s}
+details[open] summary::before{transform:rotate(-90deg)}
+.rules{display:grid;grid-template-columns:1fr auto;gap:4px 16px;padding:6px 2px 2px;max-width:340px}
+.rules b{color:var(--ink);text-align:end}
+
+/* ---------- equation & numbers ---------- */
+.eq{display:flex;justify-content:center;align-items:center;gap:.3em;font-family:var(--f-display);font-weight:800;font-size:clamp(2.4rem,10vw,3.4rem);line-height:1.15;font-variant-numeric:tabular-nums;flex-wrap:wrap}
+.eq .op{color:var(--muted);font-weight:500}
+.eq .ans{min-width:1.6em;text-align:center;border-bottom:4px solid var(--line);color:var(--muted)}
+.eq .ans.ok{color:var(--accent);border-color:transparent}
+.eq .ans.bad{color:var(--bad);border-color:transparent}
+.sentence{text-align:center;color:var(--muted);font-size:1rem}
+.hint-msg{background:var(--sun-soft);border-radius:16px;padding:10px 14px;margin:8px 0 0;line-height:1.55;text-align:start;animation:pop .25s both}
+.hint-row{display:flex;justify-content:center;margin-top:8px}
+.pill.hint-on{background:var(--sun-soft)}
+.qtext{text-align:center;font-weight:700;font-size:1.15rem}
+.bignum{text-align:center;font-family:var(--f-display);font-weight:800;font-size:clamp(2.4rem,11vw,3.6rem);line-height:1.2;font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.bignum .hl{color:var(--accent);text-decoration:underline;text-decoration-thickness:4px;text-underline-offset:8px}
+.words{text-align:center;font-family:var(--f-display);font-weight:700;font-size:clamp(1.3rem,5vw,1.7rem);line-height:1.5;max-width:28ch;margin:4px auto 0}
+.colorwords{font-family:var(--f-display);font-weight:700;font-size:1.35rem;line-height:1.6;text-align:center}
+
+/* ---------- multiplication picture ---------- */
+.scene{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;padding:14px;background:var(--soft);border-radius:22px;margin:14px 0}
+.group{position:relative;display:grid;justify-items:center;gap:2px;padding:6px 6px 20px;border-radius:14px;background:var(--surface);animation:pop .3s both;animation-delay:var(--d,0ms);transition:background .2s,box-shadow .2s}
+@keyframes pop{from{transform:scale(.8);opacity:0}}
+.g-head{font-size:1.8em;line-height:1}
+.g-items{display:grid;grid-template-columns:repeat(var(--cols),1fr);gap:1px;line-height:1.15}
+.g-sum{position:absolute;bottom:1px;inset-inline:0;text-align:center;font-family:var(--f-display);font-weight:700;font-size:.9rem;color:var(--accent);opacity:0;transition:opacity .2s}
+.group.lit{background:var(--sun-soft);box-shadow:0 0 0 2px var(--sun)}
+.group.lit .g-sum,.scene.sums .g-sum{opacity:1}
+.scene.size-lg{font-size:1.45rem}
+.scene.size-md{font-size:1.1rem}
+.scene.size-sm{font-size:.84rem;gap:6px;padding:10px}
+.scene.size-sm .group{padding:4px 4px 18px}
+
+/* ---------- small sums with pictures ---------- */
+.ea{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px;padding:14px;background:var(--soft);border-radius:22px;margin:14px 0}
+.ea-g{display:flex;flex-wrap:wrap;gap:2px;max-width:200px;justify-content:center;font-size:1.7rem;background:var(--surface);border-radius:14px;padding:6px 8px}
+.ea-op{font-family:var(--f-display);font-size:2rem;color:var(--muted)}
+.ea .gone{opacity:.22;position:relative}
+.ea .gone::after{content:"✕";position:absolute;inset:0;display:grid;place-items:center;color:var(--bad);font-size:1.3rem;font-weight:800}
+
+/* ---------- column arithmetic ---------- */
+.cg{display:grid;grid-template-columns:30px repeat(var(--n),minmax(30px,50px));direction:ltr;justify-content:center;gap:2px 4px;font-family:var(--f-display);font-weight:800;font-size:clamp(1.6rem,7vw,2.3rem);line-height:1.2;margin:6px auto;font-variant-numeric:tabular-nums}
+.cc{display:grid;place-items:center;border-radius:10px;min-height:1.3em}
+.cc.act{background:var(--sun-soft)}
+.ch{font-family:var(--f-body);font-size:.62rem;font-weight:700;line-height:1.15;text-align:center;min-height:2.4em}
+.cm{font-size:.9rem;color:var(--bad);min-height:1.2em}
+.cm s{color:var(--muted);margin-inline-end:2px}
+.csign{display:grid;place-items:center;color:var(--muted)}
+.cline{grid-column:1/-1;height:3px;border-radius:3px;background:var(--ink);margin:2px 0}
+.cbox{border:2px dashed var(--line);min-height:1.45em;color:var(--ink)}
+.cbox{cursor:pointer}
+.pad.nudge{animation:nudge .5s ease-out}
+@keyframes nudge{30%{transform:translateY(-6px)}60%{transform:translateY(2px)}}
+.cbox.cur{border-color:var(--accent);border-style:solid;background:color-mix(in srgb,var(--accent) 8%,transparent)}
+.cbox.ok{border-color:transparent;color:var(--accent)}
+.cbox.bad{border-color:transparent;color:var(--bad)}
+.mini-pad{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:10px 0 4px}
+.mini-pad.with-del{grid-template-columns:repeat(6,1fr)}
+.mini-pad button{min-height:52px;border-radius:12px;background:var(--surface);box-shadow:var(--shadow);font-family:var(--f-display);font-weight:700;font-size:1.5rem}
+.mini-pad button:active{background:var(--soft)}
+.col-tip{text-align:center;color:var(--muted);font-size:.85rem;margin-top:2px}
+.step-msg{background:var(--surface);box-shadow:var(--shadow);border-radius:16px;padding:12px 16px;margin:10px 0;min-height:3.2em;line-height:1.55}
+
+/* ---------- place-value houses ---------- */
+.pv{display:flex;direction:ltr;justify-content:center;gap:6px;margin:12px 0}
+.pv-col{flex:1;max-width:96px;min-width:0;display:grid;justify-items:center;border-radius:14px;overflow:hidden;background:var(--surface);box-shadow:var(--shadow);transition:transform .2s}
+.pv-roof{width:100%;text-align:center;font-size:.66rem;font-weight:700;line-height:1.2;padding:6px 2px;color:#fff;min-height:3em;display:grid;place-items:center}
+.pv-dig{font-family:var(--f-display);font-weight:800;font-size:clamp(1.7rem,7vw,2.4rem);line-height:1.3}
+.pv-val{font-family:var(--f-display);font-size:.78rem;color:var(--muted);padding-bottom:6px;font-variant-numeric:tabular-nums}
+.pv-col.hi{transform:translateY(-6px);box-shadow:0 0 0 3px var(--sun),var(--shadow)}
+.pb0 .pv-roof{background:var(--p0)}.pb1 .pv-roof{background:var(--p1)}.pb2 .pv-roof{background:var(--p2)}
+.pb3 .pv-roof{background:var(--p3)}.pb4 .pv-roof{background:var(--p4)}.pb5 .pv-roof{background:var(--p5)}
+.expand{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;font-family:var(--f-display);font-weight:800;font-size:1.3rem}
+.expand .op{color:var(--muted);font-weight:500}
+
+/* ---------- number line ---------- */
+.nl{margin:18px 6px 8px;direction:rtl} /* right = smaller, left = larger, as Arabic is read */
+.nl-track{position:relative;height:10px;border-radius:99px;background:linear-gradient(90deg,var(--soft),var(--line),var(--soft));margin:40px 22px 0}
+.nl-track::before,.nl-track::after{content:"";position:absolute;top:-8px;width:4px;height:26px;border-radius:4px;background:var(--ink)}
+.nl-track::before{left:-2px}.nl-track::after{right:-2px}
+.nl-mid{position:absolute;left:50%;top:-5px;width:2px;height:20px;background:var(--muted);transform:translateX(-50%)}
+.nl-dot{position:absolute;top:50%;width:14px;height:14px;border-radius:50%;background:var(--accent);transform:translate(50%,-50%);box-shadow:0 0 0 3px var(--surface)}
+.nl-dot b{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);font-family:var(--f-display);font-size:1.05rem;white-space:nowrap;color:var(--accent)}
+.nl-goat{position:absolute;top:10px;font-size:1.8rem;transform:translateX(50%);transition:right 1s cubic-bezier(.4,1.4,.5,1)}
+.nl-goat.drag{cursor:grab;touch-action:none;font-size:2.6rem;top:6px;padding:0 6px;border-radius:14px;line-height:1.1}
+.nl-goat.drag .g{display:inline-block;animation:wiggle 1.4s ease-in-out infinite}
+.nl-goat.held{cursor:grabbing;transition:none}
+.nl-goat.held .g{animation:none;transform:scale(1.25) rotate(-8deg)}
+.nl-goat.jump .g{animation:goatJump .5s ease-out}
+.nl-goat.no .g{animation:refuse .6s ease-in-out 2}
+@keyframes refuse{0%,100%{transform:translateX(0) rotate(0)}20%{transform:translateX(-7px) rotate(-14deg)}40%{transform:translateX(7px) rotate(14deg)}60%{transform:translateX(-5px) rotate(-8deg)}80%{transform:translateX(5px) rotate(8deg)}}
+.nl-say{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:var(--surface);color:var(--bad);box-shadow:var(--shadow);border-radius:12px;padding:2px 10px;font-family:var(--f-display);font-weight:800;font-size:1rem;white-space:nowrap;font-style:normal;pointer-events:none;animation:pop .2s both}
+.nl-end.nope{background:var(--bad-soft);color:var(--bad)}
+@keyframes wiggle{0%,100%{transform:rotate(0)}20%{transform:rotate(-10deg)}40%{transform:rotate(8deg)}60%{transform:rotate(0)}}
+@keyframes goatJump{0%{transform:translateY(0)}40%{transform:translateY(-22px) rotate(-12deg)}100%{transform:translateY(0)}}
+.nl-end{font:inherit;color:inherit;font-weight:700;border-radius:10px;padding:2px 10px;background:var(--soft);min-height:40px}
+.nl-end:hover{background:var(--line)}
+.drag-tip{text-align:center;color:var(--muted);font-weight:700;font-size:.95rem;margin-top:4px}
+.nl-labels{display:flex;justify-content:space-between;align-items:center;margin-top:52px;font-family:var(--f-display);font-weight:700;font-variant-numeric:tabular-nums}
+.nl-labels .mid{color:var(--muted);font-weight:500;font-size:.9rem}
+.nl-labels .win{color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,transparent);border-radius:8px;padding:0 6px}
+
+/* ---------- learn ---------- */
+.learn-eq{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:4px}
+.arrow{width:50px;height:50px;border-radius:50%;background:var(--surface);box-shadow:var(--shadow);font-size:1.3rem;display:grid;place-items:center}
+.arrow:disabled{opacity:.25;box-shadow:none}
+.skip{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;margin:4px 0 6px}
+.skip button{min-height:42px;border-radius:10px;font-family:var(--f-display);font-weight:700;font-size:1rem;color:var(--muted)}
+.skip button.on{background:var(--accent);color:var(--accent-ink)}
+.skip-label{text-align:center;color:var(--muted);font-size:.85rem}
+.tip{background:var(--sun-soft);border-radius:16px;padding:12px 16px;margin:8px 0;font-size:.98rem;display:grid;gap:6px}
+.learn-foot{margin-top:18px;display:grid;gap:6px}
+.lesson{color:var(--muted);text-align:center;max-width:44ch;margin:0 auto 6px}
+
+/* ---------- quiz ---------- */
+.hud{display:flex;align-items:center;gap:12px;min-height:44px;margin-bottom:14px}
+.bar{flex:1;position:relative;height:10px;background:var(--soft);border-radius:99px}
+.bar .fill{position:absolute;inset-block:0;inset-inline-start:0;width:0;border-radius:99px;background:var(--accent);transition:width .45s cubic-bezier(.3,1.3,.5,1)}
+.bar .runner{position:absolute;top:50%;inset-inline-start:0;transform:translate(40%,-58%);font-size:1.3rem;transition:inset-inline-start .45s cubic-bezier(.3,1.3,.5,1)}
+.bar .barn{position:absolute;inset-inline-end:-4px;top:50%;transform:translateY(-58%);font-size:1.25rem}
+.qcount{font-family:var(--f-display);font-weight:700;color:var(--muted);font-size:.95rem;white-space:nowrap}
+.timer{width:30px;height:30px;flex:none}
+.timer svg{width:100%;height:100%;transform:rotate(-90deg)}
+.timer circle{fill:none;stroke-width:7}
+.timer .bg{stroke:var(--soft)}
+.timer .fg{stroke:var(--accent);stroke-linecap:round;transition:stroke .2s}
+.stage{position:relative;padding-top:16px;display:grid;gap:4px}
+.float{position:absolute;inset-inline:0;top:-8px;text-align:center;font-family:var(--f-display);font-weight:700;font-size:1.2rem;color:var(--accent);pointer-events:none;animation:rise 1s ease-out forwards;z-index:2}
+.float.bad{color:var(--bad)}
+@keyframes rise{from{transform:translateY(8px);opacity:0}25%{opacity:1}to{transform:translateY(-22px);opacity:0}}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.choices.wide{grid-template-columns:1fr}
+.choice{min-height:64px;border-radius:16px;background:var(--surface);box-shadow:var(--shadow);font-family:var(--f-display);font-weight:700;font-size:1.7rem;padding:6px 12px;line-height:1.3}
+.choices.wide .choice{font-size:1.15rem;min-height:58px}
+.choice.ok{background:var(--accent);color:var(--accent-ink)}
+.choice.bad{background:var(--bad-soft);color:var(--bad);animation:shake .3s}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:18px}
+.pad button{min-height:58px;border-radius:14px;background:var(--surface);box-shadow:var(--shadow);font-family:var(--f-display);font-weight:700;font-size:1.6rem}
+.pad button:active{background:var(--soft)}
+.pad .del{background:transparent;box-shadow:none;font-size:1.1rem;color:var(--muted)}
+.pad button:disabled{opacity:.35}
+.wrong-box{margin-top:14px;display:grid;gap:4px;justify-items:center}
+
+.countdown{position:fixed;inset:0;display:grid;place-items:center;z-index:30;background:color-mix(in srgb,var(--bg) 82%,transparent);font-family:var(--f-display);font-weight:800;font-size:6rem;color:var(--accent)}
+.countdown span{animation:zoom .7s ease-out both}
+@keyframes zoom{from{transform:scale(1.5);opacity:0}30%{opacity:1}to{transform:scale(.95)}}
+
+/* ---------- result ---------- */
+.result{text-align:center;display:grid;gap:14px;justify-items:center;padding-top:40px}
+.result .r-emoji{font-size:3rem;line-height:1}
+.result h2{font-size:clamp(1.6rem,6vw,2rem)}
+.bigstars{display:flex;gap:8px;font-size:2.4rem;line-height:1;color:var(--line)}
+.bigstars .on{color:var(--sun);animation:starIn .45s both}
+@keyframes starIn{from{transform:scale(0)}70%{transform:scale(1.2)}}
+.result p{max-width:36ch;color:var(--muted)}
+.r-stats{font-family:var(--f-display);font-weight:700;color:var(--ink);font-size:1.05rem}
+.r-stats span{color:var(--muted);font-weight:500;font-family:var(--f-body)}
+.r-actions{display:grid;gap:4px;width:100%;max-width:340px;margin-top:8px}
+
+/* ---------- mastery grid ---------- */
+.grid-wrap{overflow-x:auto;margin:14px 0;padding-bottom:4px}
+table.mg{border-collapse:separate;border-spacing:3px;margin:0 auto;font-family:var(--f-display);font-weight:700}
+.mg th{width:32px;height:28px;color:var(--muted);font-size:.9rem;font-weight:500}
+.mg td{padding:0}
+.mg td button{width:32px;height:32px;border-radius:8px;font-size:.82rem;font-weight:700;background:var(--soft);color:var(--muted);font-variant-numeric:tabular-nums}
+.mg .l1 button{background:var(--bad-soft);color:var(--bad)}
+.mg .l2 button{background:var(--sun-soft);color:var(--ink)}
+.mg .l3 button{background:var(--accent);color:var(--accent-ink)}
+.mg-legend{display:flex;flex-wrap:wrap;gap:6px 14px;justify-content:center;font-size:.85rem;color:var(--muted)}
+.mg-legend i{display:inline-block;width:12px;height:12px;border-radius:4px;vertical-align:-1px;margin-inline-end:5px;background:var(--soft)}
+.mg-legend .l1{background:var(--bad)}.mg-legend .l2{background:var(--sun)}.mg-legend .l3{background:var(--accent)}
+.progress-line{height:8px;border-radius:99px;background:var(--soft);overflow:hidden;margin:14px 0 6px}
+.progress-line div{height:100%;background:var(--accent);border-radius:99px}
+
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:40;overflow:hidden}
+.confetti i{position:absolute;top:-30px;font-style:normal;font-size:1.4rem;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(400deg)}}
+
+/* ---------- phones ---------- */
+@media (max-width:420px){
+  .disc{width:74px;height:74px;font-size:2.1rem}
+  .node.champ .disc{width:86px;height:86px}
+  .trail{gap:36px}
+  .skip{grid-template-columns:repeat(5,1fr)}
+  .mg th{width:27px}
+  .mg td button{width:28px;height:29px;font-size:.72rem;border-radius:7px}
+  .world{min-height:140px;padding:14px}
+  .world .w-emoji{font-size:2.2rem}
+  .world b{font-size:1.1rem}
+}
+/* ---------- tablets ---------- */
+@media (min-width:700px){
+  body{font-size:19px}
+  .app{max-width:860px;padding-block:24px 64px}
+  .worlds{grid-template-columns:repeat(3,1fr);gap:16px}
+  .world{min-height:190px;padding:20px}
+  .world .w-emoji{font-size:3.2rem}
+  .world.wide{grid-column:span 2}
+  .kids{grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}
+  .trail{--amp:110px;gap:48px}
+  .disc{width:96px;height:96px;font-size:2.8rem}
+  .node.champ .disc{width:110px;height:110px}
+  .form{grid-template-columns:1fr 1fr;align-items:start}
+  .form .full{grid-column:1/-1}
+  .pad button{min-height:68px;font-size:1.9rem}
+  .choice{min-height:76px}
+  .mg th{width:44px;height:34px}
+  .mg td button{width:44px;height:42px;font-size:1rem}
+  .pv-col{max-width:120px}
+  .pv-roof{font-size:.8rem}
+  .ch{font-size:.72rem}
+  .cg{grid-template-columns:36px repeat(var(--n),minmax(40px,60px))}
+}
+/* tablet landscape: question beside the keypad */
+@media (min-width:900px) and (orientation:landscape){
+  .stage.split{grid-template-columns:1.2fr 1fr;column-gap:32px;align-items:start}
+  .stage.split>.q-main{grid-column:1}
+  .stage.split>.q-input{grid-column:2;grid-row:1 / span 4;position:sticky;top:20px}
+}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+</style>
+</head>
+<body>
+
+<div class="app" id="app" dir="rtl" lang="ar">
+
+  <!-- ================= REGISTER ================= -->
+  <section id="screen-register" hidden>
+    <h1 class="title-xl" style="color:var(--accent)">مزرعة الأرقام</h1>
+    <div class="hello" style="margin-top:12px"><span class="hello-sheep" aria-hidden="true">🐑</span><p class="bubble">أهلًا! أنا صوفي. سجّلوا مرة واحدة فقط، ثم نتعلّم الضرب والجمع والطرح والمنازل والتقريب ونحن نلعب.</p></div>
+    <form class="form" id="regForm" novalidate>
+      <div class="card">
+        <h3>👤 ولي الأمر</h3>
+        <label class="field">الاسم<input id="regParent" autocomplete="name" placeholder="مثال: أم سارة"></label>
+        <label class="field">رقم الهاتف<input id="regPhone" type="tel" inputmode="tel" autocomplete="tel" dir="ltr" placeholder="05xxxxxxxx"></label>
+      </div>
+      <div class="card">
+        <h3>🧒 الطفل</h3>
+        <label class="field">اسم الطفل<input id="regKid" autocomplete="off" placeholder="مثال: سارة"></label>
+        <div><p class="field" style="margin-bottom:6px">اختر صورة</p><div class="avatars" id="regAvatars"></div></div>
+      </div>
+      <div class="full" style="display:grid;gap:10px">
+        <p class="err" id="regErr" role="alert"></p>
+        <button class="btn block" type="submit">ابدأ اللعب</button>
+        <p class="fine">تُحفظ البيانات على هذا الجهاز فقط. يمكنك إضافة إخوة وأخوات لاحقًا من نفس الحساب.</p>
+      </div>
+    </form>
+  </section>
+
+  <!-- ================= PROFILES ================= -->
+  <section id="screen-profiles" hidden>
+    <div class="top">
+      <h1 class="title-xl">من يلعب الآن؟</h1>
+      <button class="pill" id="parentBtn">👤 ولي الأمر</button>
+    </div>
+    <div class="kids" id="kidList"></div>
+    <form class="card" id="addKidForm" style="margin-top:16px" hidden novalidate>
+      <h3>➕ طفل جديد</h3>
+      <label class="field">اسم الطفل<input id="newKidName" autocomplete="off"></label>
+      <div class="avatars" id="newKidAvatars"></div>
+      <p class="err" id="newKidErr" role="alert"></p>
+      <div class="row" style="justify-content:flex-start"><button class="btn" type="submit">إضافة</button><button class="link" type="button" id="cancelAddKid">إلغاء</button></div>
+    </form>
+  </section>
+
+  <!-- ================= PARENT ================= -->
+  <section id="screen-parent" hidden>
+    <div class="head">
+      <button class="icon-btn" id="parentBack" aria-label="رجوع">→</button>
+      <h2>حساب ولي الأمر</h2>
+    </div>
+    <form class="card" id="parentForm" novalidate>
+      <label class="field">الاسم<input id="pName" autocomplete="name"></label>
+      <label class="field">رقم الهاتف<input id="pPhone" type="tel" inputmode="tel" dir="ltr" autocomplete="tel"></label>
+      <p class="err" id="pErr" role="alert"></p>
+      <div class="row" style="justify-content:flex-start"><button class="btn" type="submit">حفظ</button><span class="ok-msg" id="pSaved" hidden>تم الحفظ ✓</span></div>
+    </form>
+    <div class="card" style="margin-top:16px">
+      <h3>الأطفال وتقدّمهم</h3>
+      <div id="parentKids"></div>
+      <button class="pill" id="parentAddKid" style="justify-self:start">➕ أضف طفلًا</button>
+    </div>
+    <div style="margin-top:20px;display:grid;gap:4px;justify-items:center">
+      <button class="link" id="relockBtn">🔒 اقفل صفحة ولي الأمر مجددًا على هذا الجهاز</button>
+      <button class="link danger" id="wipeBtn">حذف الحساب وكل البيانات من هذا الجهاز</button>
+    </div>
+  </section>
+
+  <!-- ================= WORLDS ================= -->
+  <section id="screen-worlds" hidden>
+    <div class="top">
+      <button class="who" id="whoBtn" aria-label="تغيير الطفل"><span class="av" id="whoAv">🦁</span><span id="whoName"></span></button>
+      <div class="row"><span class="wool-chip" title="الصوف">🧶 <span id="woolTotal" class="num">٠</span></span><span class="star-count" title="مجموع النجوم"><b>★</b> <span id="starTotal" class="num">٠</span></span>
+      <button class="icon-btn" id="soundBtn" aria-label="تشغيل أو إيقاف الصوت">🔊</button></div>
+    </div>
+    <div class="hello" style="margin-top:16px"><span class="hello-sheep" aria-hidden="true">🐑</span><p class="bubble" id="worldsBubble"></p></div>
+    <div class="extras" id="extras"></div>
+    <div class="worlds" id="worldList"></div>
+  </section>
+
+  <!-- ================= FARM & WARDROBE ================= -->
+  <section id="screen-farm" hidden>
+    <div class="head">
+      <button class="icon-btn" id="farmBack" aria-label="رجوع">→</button>
+      <h2>مزرعتي</h2>
+      <span class="wool-chip">🧶 <span id="farmWool" class="num">٠</span></span>
+    </div>
+    <div class="tabs" role="tablist">
+      <button role="tab" id="tabFarm" aria-selected="true">🏡 مزرعتي</button>
+      <button role="tab" id="tabWear" aria-selected="false">👕 خزانة صوفي</button>
+    </div>
+    <div id="farmPane">
+      <div class="field" id="field"></div>
+      <p class="farm-note" id="farmNote"></p>
+    </div>
+    <div id="wearPane" hidden>
+      <div class="wardrobe-preview" id="wearPreview"></div>
+      <p class="farm-note" style="margin:0 0 12px">اجمع الصوف 🧶 من الإجابات الصحيحة، واشترِ به ملابس لصوفي.</p>
+      <div class="outfits" id="outfits"></div>
+    </div>
+  </section>
+
+  <!-- ================= MAP ================= -->
+  <section id="screen-map" hidden>
+    <div class="head">
+      <button class="icon-btn" id="mapBack" aria-label="العودة إلى العوالم">→</button>
+      <h2 id="mapTitle"></h2>
+    </div>
+    <div class="intro">
+      <div class="hello"><span class="hello-sheep" aria-hidden="true">🐑</span><p class="bubble" id="bubble"></p></div>
+      <div class="pills" id="multPills">
+        <button class="pill" id="reviewBtn">🧠 مراجعة ذكية</button>
+        <button class="pill" id="gridBtn">🗺️ خريطة الحفظ</button>
+      </div>
+    </div>
+    <div class="trail" id="trail"></div>
+    <p class="goal-flag" id="goalFlag"></p>
+  </section>
+
+  <!-- ================= LEARN ================= -->
+  <section id="screen-learn" hidden>
+    <div class="head">
+      <button class="icon-btn" id="learnBack" aria-label="رجوع">→</button>
+      <h2 id="learnTitle"></h2>
+      <button class="icon-btn" id="speakBtn" aria-label="اقرأ بصوت عالٍ">🔈</button>
+    </div>
+    <div id="learnBody"></div>
+  </section>
+
+  <!-- ================= QUIZ ================= -->
+  <section id="screen-quiz" hidden>
+    <div class="hud">
+      <button class="icon-btn" id="quitBtn" aria-label="إنهاء والعودة">✕</button>
+      <div class="bar" id="hudBar"><div class="fill" id="energyFill"></div><span class="rival" id="rival" hidden></span><span class="runner" id="runner" hidden>🐑</span><span class="barn" id="barn" hidden>🏁</span></div>
+      <span class="qcount" id="qcount"></span>
+      <div class="timer" id="timer" hidden aria-hidden="true">
+        <svg viewBox="0 0 40 40"><circle class="bg" cx="20" cy="20" r="16"/><circle class="fg" id="timerFg" cx="20" cy="20" r="16"/></svg>
+      </div>
+    </div>
+    <div class="stage" id="quizCard">
+      <div class="buddy" id="buddy" aria-hidden="true"><span class="b-s" id="buddyS">🐑</span><span class="b-say" id="buddySay"></span></div>
+      <div class="boss-top" id="bossTop" hidden aria-hidden="true"><span class="w-e">🐺</span><span class="b-say" id="bossSay"></span></div>
+      <div class="q-main">
+        <div id="qPrompt"></div>
+        <div class="hint-row"><button class="pill" id="hintBtn" hidden>💡 مساعدة</button></div>
+        <p class="hint-msg" id="hintMsg" hidden aria-live="polite"></p>
+        <div id="qVisual" hidden></div>
+        <p class="sentence" id="qText" hidden></p>
+      </div>
+      <div class="q-input">
+        <div class="choices" id="choices" hidden></div>
+        <div class="pad" id="pad" hidden></div>
+        <div class="wrong-box" id="wrongBox" hidden><button class="btn" id="wrongNext">فهمت، التالي</button><button class="link" id="wrongExplain" hidden>اشرح لي خطوة بخطوة</button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= RESULT ================= -->
+  <section id="screen-result" hidden>
+    <div class="result" id="result"></div>
+  </section>
+
+  <!-- ================= MASTERY GRID ================= -->
+  <section id="screen-grid" hidden>
+    <div class="head">
+      <button class="icon-btn" id="gridBack" aria-label="رجوع">→</button>
+      <h2>خريطة الحفظ</h2>
+    </div>
+    <p class="num" id="mgPct" style="font-weight:700;font-size:1.2rem"></p>
+    <div class="progress-line"><div id="mgBar" style="width:0"></div></div>
+    <p style="color:var(--muted);font-size:.92rem">اضغط أي مربع لترى صورته.</p>
+    <div class="grid-wrap"><table class="mg" id="mg"></table></div>
+    <div class="mg-legend"><span><i class="l1"></i>تحتاج مراجعة</span><span><i class="l2"></i>قيد الحفظ</span><span><i class="l3"></i>محفوظة</span></div>
+  </section>
+</div>
+
+<div class="overlay" id="overlay" hidden><div class="sheet" id="sheet" role="dialog" aria-modal="true"></div></div>
+
+<script>
+(() => {
+/* =====================================================================
+   helpers
+   ===================================================================== */
+const AR = '٠١٢٣٤٥٦٧٨٩';
+const ar = n => String(n).replace(/\d/g, d => AR[d]);
+const fmt = n => ar(Number(n).toLocaleString('en-US')).replace(/,/g, '٬');
+const sgn = n => '⁦' + (n < 0 ? '−' : '+') + ar(Math.abs(n)) + '⁩';
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const rnd = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+const pick = a => a[Math.floor(Math.random() * a.length)];
+const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const digit = (n, p) => Math.floor(n / 10 ** p) % 10;
+const len = n => String(n).length;
+const randD = d => d === 1 ? rnd(1, 9) : rnd(10 ** (d - 1), 10 ** d - 1);
+// Arabic-Indic, Persian and full-width digits -> 0-9
+const toLatin = s => String(s).replace(/[٠-٩]/g, d => AR.indexOf(d)).replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace(/[０-９]/g, d => d.charCodeAt(0) - 0xFF10).replace(/＋/g, '+');
+document.documentElement.lang = 'ar'; document.documentElement.dir = 'rtl';
+
+const PLACE = ['الآحاد', 'العشرات', 'المئات', 'الآلاف', 'عشرات الألوف', 'مئات الألوف', 'الملايين'];
+const PLACE_SHORT = ['آحاد', 'عشرات', 'مئات', 'آلاف', 'عشرات الألوف', 'مئات الألوف', 'ملايين'];
+const DIGITS = ['', 'خانة واحدة', 'خانتان', 'ثلاث خانات', 'أربع خانات', 'خمس خانات', 'ست خانات'];
+
+/* ---------- reading numbers in Arabic (0 – 999,999) ----------
+   Returned as phrases joined by "و"; each word carries the place it belongs to, so it can be coloured.
+   Arabic reads hundreds, then ones, then tens: ٣٤٥ = ثلاثمئة وخمسة وأربعون. */
+const ONES = ['', 'واحد', 'اثنان', 'ثلاثة', 'أربعة', 'خمسة', 'ستة', 'سبعة', 'ثمانية', 'تسعة'];
+const TEENS = ['عشرة', 'أحد عشر', 'اثنا عشر', 'ثلاثة عشر', 'أربعة عشر', 'خمسة عشر', 'ستة عشر', 'سبعة عشر', 'ثمانية عشر', 'تسعة عشر'];
+const TENS = ['', '', 'عشرون', 'ثلاثون', 'أربعون', 'خمسون', 'ستون', 'سبعون', 'ثمانون', 'تسعون'];
+const HUNDS = ['', 'مئة', 'مئتان', 'ثلاثمئة', 'أربعمئة', 'خمسمئة', 'ستمئة', 'سبعمئة', 'ثمانمئة', 'تسعمئة'];
+function under1000(n, base){
+  const ph = [], h = Math.floor(n / 100), r = n % 100;
+  if (h) ph.push([{t:HUNDS[h], p:base + 2}]);
+  if (r){
+    if (r < 10) ph.push([{t:ONES[r], p:base}]);
+    else if (r < 20) ph.push([{t:TEENS[r - 10], p:base + 1}]);
+    else { const u = r % 10; if (u) ph.push([{t:ONES[u], p:base}]); ph.push([{t:TENS[Math.floor(r / 10)], p:base + 1}]); }
+  }
+  return ph;
+}
+function readPhrases(n){
+  if (n === 0) return [[{t:'صفر', p:0}]];
+  const k = Math.floor(n / 1000), rest = n % 1000, U = t => ({t, p:3});
+  let ph = [];
+  if (k){
+    if (k === 1) ph = [[U('ألف')]];
+    else if (k === 2) ph = [[U('ألفان')]];
+    else if (k < 100){ ph = under1000(k, 3); ph[ph.length - 1].push(U(k <= 10 ? 'آلاف' : 'ألفًا')); }
+    else {
+      const h = Math.floor(k / 100), r2 = k % 100;
+      ph = [[{t: r2 === 0 && h === 2 ? 'مئتا' : HUNDS[h], p:5}]];
+      if (r2 === 0) ph[0].push(U('ألف'));
+      else if (r2 === 1) ph.push([U('ألف')]);
+      else if (r2 === 2) ph.push([U('ألفان')]);
+      else { const sub = under1000(r2, 3); sub[sub.length - 1].push(U(r2 <= 10 ? 'آلاف' : 'ألفًا')); ph = ph.concat(sub); }
+    }
+  }
+  return ph.concat(under1000(rest, 0));
+}
+const words = n => readPhrases(n).map(ph => ph.map(s => s.t).join(' ')).join(' و');
+const wordsHtml = n => readPhrases(n).map(ph => ph.map(s => `<span class="pc${s.p}">${s.t}</span>`).join(' ')).join(' و');
+const numHtml = (n, hiP = -1, colour = false) => {
+  const s = String(n), L = s.length;
+  return [...s].map((d, i) => { const p = L - 1 - i; const sep = p > 0 && p % 3 === 0 ? '٬' : '';
+    return `<span class="${p === hiP ? 'hl' : ''} ${colour ? 'pc' + p : ''}">${ar(d)}</span>${sep}`; }).join('');
+};
+
+/* =====================================================================
+   worlds & levels
+   ===================================================================== */
+const THEMES = {
+  1:  {name:'التفاح',    pe:'🧺', ce:'🍎', p:['سلة','سلتان','سلال'],       pg:'f', rel:'في كل',  c:['تفاحة','تفاحتان','تفاحات'],               cg:'f'},
+  2:  {name:'الكتاكيت',  pe:'🐔', ce:'🐤', p:['دجاجة','دجاجتان','دجاجات'],   pg:'f', rel:'مع كل',  c:['كتكوت','كتكوتان','كتاكيت'],              cg:'m'},
+  3:  {name:'البرتقال',  pe:'🌳', ce:'🍊', p:['شجرة','شجرتان','أشجار'],      pg:'f', rel:'على كل', c:['برتقالة','برتقالتان','برتقالات'],         cg:'f'},
+  4:  {name:'النحل',     pe:'🌻', ce:'🐝', p:['زهرة','زهرتان','زهرات'],      pg:'f', rel:'على كل', c:['نحلة','نحلتان','نحلات'],                  cg:'f'},
+  5:  {name:'الحافلات',  pe:'🚌', ce:'🧒', p:['حافلة','حافلتان','حافلات'],   pg:'f', rel:'في كل',  c:['طفل','طفلان','أطفال'],                    cg:'m'},
+  6:  {name:'السمك',     pe:'⛵', ce:'🐟', p:['قارب','قاربان','قوارب'],      pg:'m', rel:'في كل',  c:['سمكة','سمكتان','سمكات'],                  cg:'f'},
+  7:  {name:'الكرات',    pe:'📦', ce:'⚽', p:['صندوق','صندوقان','صناديق'],   pg:'m', rel:'في كل',  c:['كرة','كرتان','كرات'],                     cg:'f'},
+  8:  {name:'الخراف',    pe:'🐏', ce:'🐑', p:['خروف','خروفان','خراف'],       pg:'m', rel:'مع كل',  c:['خروف صغير','خروفان صغيران','خراف صغيرة'], cg:'m'},
+  9:  {name:'البط',      pe:'🦆', ce:'🐥', p:['بطة','بطتان','بطات'],         pg:'f', rel:'مع كل',  c:['فرخ','فرخان','فراخ'],                     cg:'m'},
+  10: {name:'القطط',     pe:'🏠', ce:'🐱', p:['بيت','بيتان','بيوت'],         pg:'m', rel:'في كل',  c:['قطة','قطتان','قطط'],                      cg:'f'},
+};
+const TIPS = {
+  1: 'أي عدد مضروب في ١ يبقى كما هو: ١ × ٧ = ٧.',
+  2: 'الضرب في ٢ يعني مضاعفة العدد: ٢ × ٨ هو ٨ + ٨ = ١٦.',
+  3: 'عُدّ قفزًا بثلاث: ٣، ٦، ٩، ١٢، ١٥... وكل ثلاث قفزات تزيد ٩.',
+  4: 'الضرب في ٤ = ضاعف مرتين: ٤ × ٧ ← ٧ ثم ١٤ ثم ٢٨.',
+  5: 'ناتج الضرب في ٥ ينتهي دائمًا بـ ٥ أو ٠، وهو نصف الضرب في ١٠: ٥ × ٨ = نصف ٨٠ = ٤٠.',
+  6: 'عندما تضرب ٦ في عدد زوجي يتكرر العدد في الآحاد: ٦ × ٤ = ٢٤، ٦ × ٦ = ٣٦، ٦ × ٨ = ٤٨.',
+  7: 'تذكّر ٥٦ = ٧ × ٨ بالترتيب ٥، ٦، ٧، ٨. وفكّر في ٧ × ٧ كأنها ٧ × ٥ ثم ٧ × ٢: ٣٥ + ١٤ = ٤٩.',
+  8: 'الضرب في ٨ = ضاعف ثلاث مرات: ٨ × ٦ ← ١٢ ← ٢٤ ← ٤٨.',
+  9: 'رقما الناتج مجموعهما ٩، والعشرات أقل من العدد بواحد: ٩ × ٧ ← عشرات ٦ وآحاد ٣ = ٦٣.',
+  10: 'أضف صفرًا في خانة الآحاد: ١٠ × ٧ = ٧٠.',
+};
+function swapTip(n){
+  const k = n <= 5 ? n + 4 : n - 4;
+  return `وتذكّر أن الترتيب لا يغيّر الناتج: ${ar(n)} × ${ar(k)} هو نفسه ${ar(k)} × ${ar(n)}، وكلاهما ${ar(n * k)}. كل حقيقة تحفظها تعطيك حقيقتين!`;
+}
+const ROUND_TO = ['', 'أقرب عشرة', 'أقرب مئة', 'أقرب ألف', 'أقرب عشرة آلاف', 'أقرب مئة ألف'];
+const LEVEL_NAMES = ['', 'الآحاد', 'العشرات', 'المئات', 'الآلاف', 'عشرات الألوف', 'مئات الألوف'];
+
+const BOSS = () => ({title:'الذئب المشاغب', emoji:'🐺', boss:true, label:'الذئب المشاغب', desc:'أسئلة من كل مستويات هذا العالم'});
+const WORLDS = {
+  mult:  {name:'حظيرة الضرب', emoji:'🐑', color:'--w-mult', runner:'🐑', sub:'جدول الضرب بالصور',
+          decos:['🌳','🌼','🍄','🌷','🌲','🦋','🌻','🐞','🌸','🌾','🎈'],
+          intro:'كل جدول حظيرة فيها حيوانات. عُدّها، ثم تحدَّ الوقت!',
+          levels:[...Array(10)].map((_, i) => ({title:'جدول ' + ar(i + 1), emoji:THEMES[i + 1].pe, badge:ar(i + 1), n:i + 1}))
+            .concat([BOSS()])},
+  add:   {name:'جزيرة الجمع', emoji:'🏝️', color:'--w-add', runner:'🐢', sub:'من الآحاد إلى مئات الألوف',
+          decos:['🌴','🐚','⛵','🦀','🌊','🐠','☀️'],
+          intro:'في جزيرة الجمع نجمع منزلةً منزلة، ونبدأ دائمًا من الآحاد!',
+          levels:[1, 2, 3, 4, 5, 6].map((d, i) => ({d, title:'جمع ' + LEVEL_NAMES[d], label:LEVEL_NAMES[d], desc:`عددان من ${DIGITS[d]}`, emoji:['🐚','🦀','🐠','🐢','🐬','🐳'][i], badge:ar(i + 1)})).concat([BOSS()])},
+  sub:   {name:'غابة الطرح', emoji:'🌲', color:'--w-sub', runner:'🦔', sub:'نطرح ونستلف من الجيران',
+          decos:['🌲','🍄','🦋','🌿','🐞','🌰','🍂'],
+          intro:'في غابة الطرح نبدأ من الآحاد، وإذا لم يكفِ الرقم نستلف من جاره!',
+          levels:[1, 2, 3, 4, 5, 6].map((d, i) => ({d, title:'طرح ' + LEVEL_NAMES[d], label:LEVEL_NAMES[d], desc:`أعداد من ${DIGITS[d]}`, emoji:['🐿️','🦔','🦉','🦊','🦌','🐻'][i], badge:ar(i + 1)})).concat([BOSS()])},
+  place: {name:'قلعة المنازل', emoji:'🏰', color:'--w-place', runner:'🧱', sub:'الآحاد والعشرات والمئات… وكيف نقرأ الأعداد',
+          decos:['🚩','🧱','👑','🛡️','🗝️','⭐','🏳️'],
+          intro:'في قلعة المنازل لكل رقم بيت: آحاد، عشرات، مئات… ونتعلّم كيف نقرأ الأعداد بالعربية.',
+          levels:[2, 3, 4, 5, 6].map((d, i) => ({d, title: d === 2 ? 'الآحاد والعشرات' : LEVEL_NAMES[d], label: d === 2 ? 'آحاد وعشرات' : LEVEL_NAMES[d], desc:`أعداد من ${DIGITS[d]}`, emoji:['🛖','🏠','🏡','🏘️','🏰'][i], badge:ar(i + 1)})).concat([BOSS()])},
+  round: {name:'جبل التقريب', emoji:'⛰️', color:'--w-round', runner:'🐐', sub:'من أقرب عشرة إلى أقرب مئة ألف',
+          decos:['☁️','🌲','🦅','❄️','⛅','🌿','🌤️'],
+          intro:'على جبل التقريب نسأل: هل العدد أقرب إلى الأسفل أم إلى الأعلى؟',
+          levels:[1, 2, 3, 4, 5].map((k, i) => ({k, title:'التقريب إلى ' + ROUND_TO[k], label:ROUND_TO[k], desc:`ننظر إلى رقم ${PLACE[k - 1]}`, emoji:['🌱','🌿','🌲','⛰️','🏔️'][i], badge:ar(i + 1)})).concat([BOSS()])},
+};
+const WORLD_ORDER = ['mult', 'add', 'sub', 'place', 'round'];
+
+const SPEED = [
+  {max:3,  pts:20, label:'⚡ صاعقة!'},
+  {max:5,  pts:15, label:'🚀 سريع!'},
+  {max:8,  pts:10, label:'👍 صحيح'},
+  {max:1e9,pts:6,  label:'🐢 صحيح'},
+];
+const WRONG_PENALTY = 8, HINT_PTS = 6;
+const levelCfg = (w, i) => ({goal:100, maxQ:18, s3:7, s2:10});
+const levelTF = (w, lv) => w === 'add' || w === 'sub' ? (lv.d === 1 ? 1 : 1 + (lv.d - 1) * 1.1)
+  : w === 'place' ? 1.7 : w === 'round' ? 1.4 + lv.k * .2 : 1;
+
+/* =====================================================================
+   storage: one parent account, several children on this device
+   ===================================================================== */
+const KEY = 'numbers-farm-v2', OLD_KEY = 'multiplication-farm-v1';
+const AVATARS = ['🦁', '🐰', '🐼', '🦊', '🐸', '🐯', '🐨', '🐵', '🦄', '🐧'];
+const freshProg = () => ({stars:{}, best:{}, facts:{}, correct:0});
+let DB = {parent:null, kids:[], active:null, sound:true};
+function load(){ try { const d = JSON.parse(localStorage.getItem(KEY)); if (d && Array.isArray(d.kids)) DB = Object.assign({parent:null, kids:[], active:null, sound:true}, d); } catch(e){} }
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(DB)); } catch(e){} }
+const kid = () => DB.kids.find(k => k.id === DB.active);
+const P = () => kid().prog;
+const newId = () => 'k' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+function oldProgress(){ // progress saved by the first version of the game
+  try { const s = JSON.parse(localStorage.getItem(OLD_KEY)); if (!s || !s.facts) return null;
+    const pr = freshProg(), st = {}, be = {};
+    Object.entries(s.stars || {}).forEach(([n, v]) => st[n - 1] = v);
+    Object.entries(s.best || {}).forEach(([n, v]) => be[n - 1] = v);
+    pr.stars.mult = st; pr.best.mult = be; pr.facts = s.facts; pr.correct = s.sheep || 0; return pr;
+  } catch(e){ return null; }
+}
+
+const stars = (w, i) => (P().stars[w] || {})[i] || 0;
+const worldStars = w => Object.values(P().stars[w] || {}).reduce((x, y) => x + y, 0);
+const kidStars = k => Object.values(k.prog.stars).reduce((t, o) => t + Object.values(o).reduce((x, y) => x + y, 0), 0);
+function unlocked(w, i){
+  const L = WORLDS[w].levels;
+  if (stars(w, i) > 0) return true;
+  if (L[i].boss) return L.every((lv, j) => lv.boss || stars(w, j) > 0);   // the wolf comes after every level has a star
+  return i === 0 || stars(w, i - 1) > 0;
+}
+const theme = a => THEMES[a] || THEMES[8];
+
+/* ---------- rewards: wool 🧶, the child's farm, Soufi's wardrobe, the daily challenge ---------- */
+const FARM_ITEMS = [
+  ['🐄','بقرة'],['🐓','ديك'],['🦆','بطة'],['🐐','عنزة'],['🐎','حصان'],['🐇','أرنب'],['🌳','شجرة'],['🐕','كلب'],['🐈','قطة'],
+  ['🌻','عبّاد شمس'],['🐫','جمل'],['🌴','نخلة'],['🦃','ديك رومي'],['🐣','كتكوت'],['🌷','زهرة'],['🦢','بجعة'],['🐝','نحلة'],
+  ['🌲','صنوبرة'],['🐿️','سنجاب'],['🍄','فطر'],['🦚','طاووس'],['🐢','سلحفاة'],['🌼','أقحوانة'],['🦔','قنفذ'],['🦜','ببغاء'],['🏡','بيت']];
+const OUTFITS = [
+  {id:'flower', e:'🌸', n:'وردة', price:10, pos:'head'}, {id:'bow', e:'🎀', n:'فيونكة', price:15, pos:'head'},
+  {id:'cap', e:'🧢', n:'قبعة رياضية', price:25, pos:'head'}, {id:'glasses', e:'🕶️', n:'نظارة شمسية', price:30, pos:'face'},
+  {id:'tophat', e:'🎩', n:'قبعة الساحر', price:45, pos:'head'}, {id:'grad', e:'🎓', n:'قبعة التخرّج', price:60, pos:'head'},
+  {id:'party', e:'🥳', n:'قبعة الحفلة', price:75, pos:'face'}, {id:'crown', e:'👑', n:'تاج', price:100, pos:'head'}];
+function R(){ // reward fields on the active child's progress (older saves get them on first use)
+  const p = P();
+  if (p.wool == null) p.wool = 0;
+  if (!p.farm) p.farm = [];
+  if (!p.owned) p.owned = [];
+  if (p.wear == null) p.wear = '';
+  if (!p.daily) p.daily = {date:'', streak:0};
+  if (!p.bossWins) p.bossWins = {};
+  return p;
+}
+function soufiHtml(){
+  let wear = '';
+  try { const o = kid() && OUTFITS.find(x => x.id === R().wear); if (o) wear = `<i class="wear ${o.pos}">${o.e}</i>`; } catch(e){}
+  return `<span class="soufi">🐑${wear}</span>`;
+}
+function paintSoufi(){ document.querySelectorAll('#screen-worlds .hello-sheep, #screen-map .hello-sheep').forEach(el => el.innerHTML = soufiHtml()); }
+function addFarmItem(special){
+  const p = R(), [e, n] = special || FARM_ITEMS[p.farm.length % FARM_ITEMS.length];
+  p.farm.push({e, x: rnd(8, 92), y: rnd(42, 90), t: Date.now()});
+  return {e, n};
+}
+const todayStr = () => new Date().toLocaleDateString('en-CA');
+const dayBefore = d => { const t = new Date(d + 'T12:00:00'); t.setDate(t.getDate() - 1); return t.toLocaleDateString('en-CA'); };
+function dailyDoneToday(){ return R().daily.date === todayStr(); }
+
+/* multiplication fact memory (for smart review & mastery grid) */
+function record(a, b, ok, t){
+  const F = P().facts, k = a + 'x' + b, f = F[k] || (F[k] = {c:0, w:0, s:0, t:[]});
+  if (ok){ f.c++; f.s++; f.t.push(Math.round(t * 10) / 10); if (f.t.length > 3) f.t.shift(); }
+  else { f.w++; f.s = 0; f.t = []; }
+}
+function level(a, b){
+  const f = P().facts[a + 'x' + b];
+  if (!f) return 0;
+  if (f.s === 0) return 1;
+  const avg = f.t.reduce((x, y) => x + y, 0) / f.t.length;
+  return f.s >= 3 && avg <= 5 ? 3 : 2;
+}
+function weakness(a, b){
+  const f = P().facts[a + 'x' + b];
+  if (!f) return 2.5;
+  const avg = f.t.length ? f.t.reduce((x, y) => x + y, 0) / f.t.length : 9;
+  return (f.s === 0 ? 4 : 0) + f.w / (f.c + f.w + 1) * 3 + Math.min(avg, 10) / 5 - Math.min(f.s, 4) * .5;
+}
+
+/* =====================================================================
+   sound & speech
+   ===================================================================== */
+let AC = null;
+function audio(){
+  AC = AC || new (window.AudioContext || window.webkitAudioContext)();
+  if (AC.state === 'suspended') AC.resume();
+  return AC;
+}
+['pointerdown', 'keydown', 'touchend'].forEach(ev => addEventListener(ev, () => { if (DB.sound) { try { audio(); loadGoat(); } catch(e){} } }, {passive:true}));
+function beep(notes, type = 'triangle', l = .11){
+  if (!DB.sound) return;
+  try {
+    audio();
+    const t0 = AC.currentTime;
+    notes.forEach((f, i) => {
+      const o = AC.createOscillator(), g = AC.createGain();
+      o.type = type; o.frequency.value = f;
+      g.gain.setValueAtTime(.0001, t0 + i * l);
+      g.gain.exponentialRampToValueAtTime(.14, t0 + i * l + .02);
+      g.gain.exponentialRampToValueAtTime(.0001, t0 + i * l + l * 1.6);
+      o.connect(g).connect(AC.destination); o.start(t0 + i * l); o.stop(t0 + i * l + l * 1.8);
+    });
+  } catch(e){}
+}
+const SND = {
+  ok: () => beep([660, 880]), zap: () => beep([660, 880, 1175], 'triangle', .07),
+  bad: () => beep([260, 220], 'sine', .14), tick: () => beep([520], 'sine', .05),
+  win: () => beep([523, 659, 784, 1047], 'triangle', .13),
+};
+// Two real goat bleats, free to use: "Single Goat Bleating 2x" by Kinoton on Freesound (freesound.org/s/581240),
+// released under CC0 1.0 (public domain). Cut into two calls, pitched up slightly and embedded so they work offline.
+// They are decoded into Web Audio buffers on the first touch, so they can also play on iPhone/iPad after a short delay.
+const GOAT_MP3 = ['SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjYwLjE2LjEwMAAAAAAAAAAAAAAA//tUwAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAAkAAAbwAANDRQUFBsbGyIiIikpMDAwNzc3Pj4+RUVMTExTU1NZWVlgYGBnZ25ubnV1dXx8fIODioqKkZGRmJiYn5+fpqasrKyzs7O6urrBwcjIyM/Pz9bW1t3d3eTk6+vr8vLy+fn5//8AAAAATGF2YzYwLjMxAAAAAAAAIi8AAAAAJAWlAAAAAAAAG8Bmare8AAAAAAAAAAAAAAAAAAAA//tUxAAAB7RHDCSYYQEUC2Qk9iBQAUDayKZBXMABMme9eE4gv93+miUW4ekBO8HwOD5RyjiJOXPlC4f3xPKHC8hEHL+D+vBD5fJ5efwQd9FZ8MAyPTq1AsZlnWTAYLmSdC507DgsIhNGTCi5bn0XZ5JKaVPfOe4SE4EPCd7bRZYuOhoIm0j1uFS5poWWplFrxyv//V/931JBakoEWB4RFA0GLqJ4St42RCQTkI7M0ZzC420obP1Yzw0WQnats46j//tUxBQACzB1ISwwZ8G9GCY1hiLMLh3EmkhmEUmp4MRA+GDwKJgYMIHBpJ4UaJSZ5x96gkGFIcFEYwml6gwfIFEff3///oAAUtrcZJIAEPARB4wRJjKc7bRWHnXqvpIC5jFJIzNlThMsbSgdRmcGSGmeehf90mat+zRa5bAIi+8JacAMTlBUQebsYVj9TFe3f5RBwwUFCHg/bPd6FwWB5TsKELfIwUMQTngQh0vAhQilnUnQjl6IgkgKzSJe76Qk//tUxAUDyrSzNg09J8FAFmhBkJsIESjcCaHLCYmKB3+KnIQghCUOd3GmjEEqgyVjHViAAaIu1J9fuzcd7ncdv/PW1K9rH5DUCNQkjsXTkxIEA+bDI1E4ZuOP9n//6v//dHSUc5SQcU1Z5I7S2s8bGDdXHlfu/ncvMwe1QxmbvMvmJW3iWwkwhkmqqsou3VlFPSfnzRhFkdEwf2z+Lr/s7ngMoHYs6MeSU1vTGWkDlTilAdlcYAEocvFieClo5DUL//tUxAeACzUlWaekq0lXlSu08wqIhMSkf5J2hG0AwJQGJ8fNcPoXO158eA2VZPOO5/0PRnzz/v/+ioFhIOgQaYiixHQSFXJbI5GXr0vIikYw4jf/1qitUgpThrjjICDgATqASCsActghahTVcd7mppepIClU/PKjPp54bYPcgziZTpczIaQJAyVWSJJLtn/arMr2///1nKOKEISFep95a8WDx4QhNQs37gjjzRI9tBh6f/isIKVBuZNqFuIlFQRF//tUxAUACqilbaekbPFVFSoJpJV4TXZy9EAJshokxXkJIPBZkEhEknWxxsdIYssm1wwEzM09Wya0HLDPp1eH7vW/+fl2qFYctBk2XE4OmkrYnZVZX9lD0KSt4OLZ/+mAQpLtuyOJ2WpiSAGCRpUzEVjOlEY246J7RjhggIx14VhLWos72USFSEvCUa7IHgdFk+zPXPT2VvrTKa2YsBQVGrDrL16xGPgL/yxNAqk8MbkvIPy+LOUAVBAADcrFw6pD//tUxAUACoRxUYwwZeFPlKulhhhmvvMDoJEDYViwbNjoJJBWHqU+ORIaK58pvGsarGIARYRGrBA7CK7hSRFBxAHGc8gaAYaYLuD4IpYoHV5dsc8P5mQLst+ox7ku9guBVQgWopmgqHgWFABWCabgZdLg6ldSiQJgmIQyJ5LNtsLqC6Uge0Xn5VIE7Iy2n1M5VfJ85Vbf7+qNn1ZU6RKrKsr1qpyAiRYHVllStJJZ50VEVpbYXQCflzYuqeBnqWJF//tUxAaBCrSjWAwlGAlQD20k/CbA6DGV65Z3aXOgDYcYGHJAK5TLLbOwNv24FyC2j8uwuRpL5VWX0CwkZf+L0MAQQgWQChVGzvzf/E2iPcCh+CgFhhYue6N+cCYfJADfl4VXI0nAgbtZOh/Dnw/rr1YU6kckpAe02ehkoNdrTCmCbPBfMI0FQqLionFXe6sWfUmZpQTUCIgC58eQQisy8yzrBVQGSp1LUBndtOGWYWL/WqSUmgAAQnBKhZ2k9jqV//tUxAcACxzBd6eYTVFVIi/0xBW6MkgTpdjWZmSPOj8KPmQMBJnkDvOWcQCFaD4RAKftuxUWrK5S/+gcymKY0gVw48milX+UZQOmjS1G7//zlBogX/l4wmJjSwUOydYpUy9YQAHHbdoQaCpkESYOK0DaovGDQCHhQ3ai4NG3z6wQaLFZttz/xpURBhoJHdd3/dDfzIsMESq1P/7+dVOcX/t29CL6xOrgsPCf5wggutDY4F2hl9WpkywgAOyW24IQ//tUxAUACnyhfaYNbZFQrC909JVrn+BU0UjQYOj26YENTDAlcKQwYjz4gEYMSKQW0/0sTORBvDJk25zO/iFKl/PDJem96f+NIkX0LevqEYHi/uD4gca9ogLn40XoVEuiRbrBASktGqRkGUuD5mXjHX1KXugneQlyp3nlaSJWpb980APXHnFXZve9cwsv/qwUPN8eZDx1V///ciujs7t3sTp8zvXm////8WIezxBTDo0qbNaTIjJEIABTktunEqUP//tUxAaAChyde+egTVFsna3084rSTOtl8LkYJr5IJaons3GPnQXW3B0A35VwiHxX/atyAS/9kmdE7OopK3nGfLn3ES1sXSEoaRvrNdJahTPgIFguG0YlM9eJLCZAADbkk0fx3c+fkYZ+kBNvl3t03bNWrXWKLn4e9ed7KKbHHQcMha29d6nIL3XfgmQzFRGmlAmK3lBCv/ledwxAh4Mk0pzDCh1+Bj6i/quEaHWIY9NutzeYkiEyNTEQU25JWIXU//tUxAYACTiFd+esUJFIny7085Xa7efOuhnI2K3ZdPktZ2arc/yc1MszBkEPi9sWw7IX03VJBTv6eOftpW50td5UXaloNySFK+z9caGnM+d9/6ukmn0AAW3NdBPY+OfLhUsaBB3l651zSjm5IcZidkIz2UecDRmcqtf+9aAcvefyPam8a9qfL//67yVel+Z3jT7zDHt0lQVI19REKCUMlTT1dzMkhDQ0VzEAFHbcMHyLv0ylLg/dDZJJUkrnBDcc//tUxA2ACRTXf+eIrtEpFy/89hVKN1FWdD1xpB7V/pvSgMqbyVW/94xqo4tSEUU12l/u5Kjy65/9firxdIGULcwdTKEZkimIhoy27MKeFkxK0YINMepSaBbsIvNVBIVUWs6C8KeeIrH7V3rv/8R3rjkCQ6aNeWNcxccW8ut7kFPCNqV7q347fTGsIf/dshEgPBAAiXnrkEkJdQ5AztgI7SLrgaMdT/EX2i3WO2WyiubETwLj3FNqbxCo//96VeJ1//tUxBmACUS5b+U8p8EvFTA88SHyDIjGi7mjXmoOG9C7mVeEdpShKv//d/dSGZErGIBuS24KEeogm2w2sEwsuEbzxcube22guDZFplgmrOO70aetTFcQ3124vr7kjLDUlbiPBI8AnwTY/S559n1eWdiNbg8m7hsi6TSeYARSkltj1Q/pBA1DnwWA24XRIFmqVJK1b3cVm2UHeGmcuvtXGp670+9WiZyoCNHKucDRHmWiBVbM0ztRmT5V3+6bc+Nb//tUxCQACSSreaesR9EuFPB88onC9VIiMSuhCE27durUeWDlklci4leV5t7L+48LCIuMMhR2E0ywXq1PTPB4//7/rQ8HiSBlNwsn3igbPoZg2Jey0eNfpkAAP+gUi6dXFU3kklVgAEFwSPjpS/PiPgopjPLFc/Y+D5kU25GeYXh9GgKgoL+Qaf3qKldWp/728lRTlPHcFtW5t/1kGFwmGD7v/lQZyUYLXVKGvDcERCRKYgAEnJLhXo3nsl8jvinq//tUxC8ACVzTcaecUJEgm67884naWDSQ+C12f+LoULqQ2iTEAzWjf/TE3/k9/PBvRJyHT/T+6nK40OU03Q7pViAp16e2VAhr/WmUI0FGURCScsoURkClRUxHsAAvASNuGaBcSmxTFUsQpojVotCh9EGFm9NrtF6/1o8m0hxE0aKCNqFVI5YkNCcPf/uPVU9tCAAAMQAAAFDBpXlx3YtcF60ZgbtUjvoDCI9IvfKi5etpmahNeNIa90SogF83z0LC//tUxDsACLSffeewo5EllOz885bA6mlfpp59o9lJI8cgZ/yAlAofJmf/Xnf3aqU0NUZDEJt27BjQ0FNNDQWRHXZRDDbgk/jXB6/I5L/OiK7wT0gh3T2o7EeNT+3641Wh3QQ46ddlX+TSHdQi82VLufrxQse7dNgGJeJNOQkBJOWjBUgLtUygsFU5CLCXsBRmtiXkuTcrsC/i/oOMbiGj/mo8ykEv/v7VxdWkxpfTb9c7KzssYCNrWKs+k46vMa7h//tUxEkACVzdg+ewStEem6809IlqdZREYkZSMJNy7ZtGQObA9zylCTmoLGV2yA37TlEzZWNi+DrUXg8E00Mf3rvXF1/pteuSrXaVATf7rFvJ2vo9FM2B1QEjmibP9OEJESS4AAjLtxArFuIbLAxkqTK2WxpynKHpBbk71xPlG+TfRFzOZ7rkrg/vTIquxq/12iO0PEYVUayj7nflxRhEwKPY725kSrAamSy3UVryEhEnMBAZdswL6EmMDCRSmCDO//tUxFUACQSrgeesUFE6FK38t5T4Jgi0aN6bpWEit7d9JUsY+2q3P+xRI+RMKUN9lBMQqGOUav9PTqD5sgGik54XE7UzLP+QVHtf1ZlQqskEmSKDB6h/6gprIpqfG4NXRvzcy7N8sQcse4Y6W8gssHejMIp7e9Hj//HKUg0rzjgMQPO6EKxSzpb/ugxA6Rv/9OMOorUYX0WTNDRGVBBbl1uVpbjk8ArYAFRyI0GDyUreUOqeuKK3xykVwejw+PZl//tUxF8ACTyXbeeUVgEvGe609JXaG/WUjDGUEq/99W3jNqi01W9v80gsAQpAu7+s0fY/WWHt6dKFOdpxKntNpVogtuyW2Upc9LyV0POAMop7JC3PCrC0ZhcYNKUxyozHnQtXe2RuWOFbX/T03n/BZKcED7m+3/+0NNUOPMioGGcot9fpFMQm1dIRUDpQABKP7iKcxwdMOOS2o89xt7KKLAlbDjmTCSnuHMwfI5+XRncaWCi9dKC7jZQ8qP/3nrir//tUxGmACgjNf+eIspEoFW9084369N61f/1TT1X9/X/0EzSViDeUYvi3KJCZuoAA1d/uzGQInFTEfAytHuKVcob4Qe16gkxSXi6UdQpCoJQtExe+zJcezxqfzfrYM/t2uJXDVI5phdyZJf7BHVeKej/Xvpoo4RABKUEACrvfkIG4+yJxRkVuiaOnAo9ofeVvxXJUR6omCcJOJRvg8qFD7etcEyCb/2e+q1LvM9zOVUtTteeg4/Xu/ZowERBjXoR6//tUxHGACZUJbeewq0Etle3884ngkUhoZIzEYTlutE2KCWtyPNnySI8UhtwMkWj5pDeQx2kvdgjMxxag+JQof/q08YDqJ/r/KzDx76XOOmjKi54UCzxGm8Itt9Kvp63EmAtkAEyRsNxUmj24rsF6LASwreXXPWdNs0FY05rG3Ly6yjMHw01OmIC9v1yTBv/dSkadjHAjCJDPR70au9SKKGGBlmpSj38X//9faaTsIATttoLMOYTaFg8oIOWOeiG2//tUxHsACXzNa+YUVgEjkq+9hhTqKBpow0SBZAewqWVq0H4WLuNpR/9WnVGyp/1NvupVh2xSAiyZi6OTQFn6032UiJNwdGvR8yoAWiIEgAAAsLmcQxF+svOkI9xAQavrXoxuUj9Fv8QsBYoRwZewsvEIANjKDGwuEG6ySSwCE4JjiKha8GIR2HFRmSHiORKAgqmsqjLGXxZIsgZlMOiGqNsoLWeJn8wOjnE8XC6OU1aKv/SU7qWZLo9f/SuhRRUi//tUxIYACXTHaaecthEnE222nnAC3//+y2dJ0q1It////5igiiDGUvi2iGniSINUlBvCHHEpScmTETzLWta6wrlUuidHEkRJRDTxJEDmSpKiFNJfR6TJbDSUOgaBpZ0FSwdErwV///rOgrDtTEFNRTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxJCAEJ2BOnmaAAEfC9iDnvAAVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxH+DwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV', 'SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjYwLjE2LjEwMAAAAAAAAAAAAAAA//tUwAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAAmAAAdQAANDRMTExoaICAgJycnLS00NDQ7OztBQUhISE5OVVVVW1tbYmJpaWlvb292dnx8fIODiYmJkJCQlpadnZ2kpKSqqrGxsbe3t76+xMTEy8vS0tLY2Njf3+Xl5ezs7PLy+fn5//8AAAAATGF2YzYwLjMxAAAAAAAAIi8AAAAAJAWgAAAAAAAAHUDRWlpyAAAAAAAAAAAAAAAAAAAA//tUxAADwAABpAAAACAAADSAAAAETEFMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxFWDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV'];
+let goatBufs = [], goatLoading = false;
+function loadGoat(){
+  if (goatBufs.length || goatLoading) return; goatLoading = true;
+  try {
+    GOAT_MP3.forEach(b64 => {
+      const bin = atob(b64), bytes = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      audio().decodeAudioData(bytes.buffer, buf => { goatBufs.push(buf); }, () => {});
+    });
+  } catch(e){ goatLoading = false; }
+}
+function bleat(){
+  if (!DB.sound) return;
+  try {
+    if (goatBufs.length){
+      const src = audio().createBufferSource(), g = AC.createGain();
+      src.buffer = pick(goatBufs); src.playbackRate.value = .95 + Math.random() * .15; g.gain.value = .9;
+      src.connect(g).connect(AC.destination); src.start();
+      return;
+    }
+    loadGoat();
+  } catch(e){}
+  synthBleat();
+}
+// fallback "maaa" made with oscillators, used until the recording has been decoded
+function synthBleat(){
+  if (!DB.sound) return;
+  try {
+    audio();
+    const t0 = AC.currentTime, T = .95;
+    const o = AC.createOscillator(), o2 = AC.createOscillator(), g = AC.createGain(), f = AC.createBiquadFilter();
+    const vib = AC.createOscillator(), vibG = AC.createGain(), trem = AC.createGain(), tre = AC.createOscillator(), treG = AC.createGain();
+    o.type = 'sawtooth'; o2.type = 'square';
+    o.frequency.setValueAtTime(620, t0); o.frequency.linearRampToValueAtTime(470, t0 + T);
+    o2.frequency.setValueAtTime(311, t0); o2.frequency.linearRampToValueAtTime(236, t0 + T);
+    vib.frequency.value = 6; vibG.gain.value = 18; vib.connect(vibG); vibG.connect(o.frequency); vibG.connect(o2.frequency);
+    tre.frequency.value = 9; treG.gain.value = .45; trem.gain.value = .55; tre.connect(treG).connect(trem.gain);
+    f.type = 'bandpass'; f.frequency.value = 1100; f.Q.value = .9;
+    g.gain.setValueAtTime(.0001, t0); g.gain.exponentialRampToValueAtTime(.22, t0 + .05); g.gain.setValueAtTime(.22, t0 + T - .25); g.gain.exponentialRampToValueAtTime(.0001, t0 + T);
+    o.connect(f); o2.connect(f); f.connect(trem).connect(g).connect(AC.destination);
+    [o, o2, vib, tre].forEach(x => { x.start(t0); x.stop(t0 + T + .05); });
+  } catch(e){}
+}
+let speakText = '';
+function speak(text){
+  try {
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'ar-SA'; u.rate = .85;
+    const v = speechSynthesis.getVoices().find(v => v.lang && v.lang.startsWith('ar'));
+    if (v) u.voice = v;
+    speechSynthesis.cancel(); speechSynthesis.speak(u);
+  } catch(e){}
+}
+if (!('speechSynthesis' in window)) $('speakBtn').hidden = true;
+$('speakBtn').onclick = () => speakText && speak(speakText);
+
+/* =====================================================================
+   navigation
+   ===================================================================== */
+const SCREENS = ['register', 'profiles', 'parent', 'worlds', 'map', 'learn', 'quiz', 'result', 'grid', 'farm'];
+let curWorld = 'mult';
+function show(name){
+  SCREENS.forEach(s => $('screen-' + s).hidden = s !== name);
+  window.scrollTo({top:0});
+  if (name === 'profiles') renderProfiles();
+  if (name === 'parent') renderParent();
+  if (name === 'worlds') renderWorlds();
+  if (name === 'map') renderMap(curWorld);
+  if (name === 'farm') renderFarm();
+}
+
+/* =====================================================================
+   registration, children, parent account
+   ===================================================================== */
+function avatarPicker(el, current){
+  let sel = current || AVATARS[0];
+  el.innerHTML = AVATARS.map(a => `<button type="button" aria-pressed="${a === sel}" aria-label="صورة ${a}">${a}</button>`).join('');
+  el.querySelectorAll('button').forEach(b => b.onclick = () => { sel = b.textContent; el.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b)); });
+  return () => sel;
+}
+// Accepts any way a phone writes a number: spaces, any dash, dots, slashes, brackets, invisible direction marks
+// (iOS paste/autofill), other digit scripts. Keeps the digits and one leading +; 7 to 15 digits.
+function validPhone(s){
+  const t = toLatin(s).trim().replace(/^[^\d+]+/, '');
+  const plus = t.startsWith('+') || t.startsWith('00') ? '+' : '';
+  let d = t.replace(/\D/g, '');
+  if (t.startsWith('00')) d = d.slice(2);
+  return d.length >= 7 && d.length <= 15 ? plus + d : null;
+}
+function fieldError(input, errEl, msg){ input.setAttribute('aria-invalid', 'true'); errEl.textContent = msg; input.focus(); return false; }
+
+let regAvatar = avatarPicker($('regAvatars'));
+document.querySelectorAll('.field input').forEach(inp => inp.addEventListener('input', () => inp.removeAttribute('aria-invalid')));
+$('regForm').onsubmit = e => {
+  e.preventDefault();
+  ['regParent', 'regPhone', 'regKid'].forEach(id => $(id).removeAttribute('aria-invalid'));
+  const pn = $('regParent').value.trim(), ph = validPhone($('regPhone').value), kn = $('regKid').value.trim();
+  if (!pn) return fieldError($('regParent'), $('regErr'), 'اكتب اسم ولي الأمر.');
+  if (!ph) return fieldError($('regPhone'), $('regErr'), 'رقم الهاتف قصير جدًا أو طويل جدًا. اكتب من ٧ إلى ١٥ رقمًا، مثل ٠٥٠١٢٣٤٥٦٧.');
+  if (!kn) return fieldError($('regKid'), $('regErr'), 'اكتب اسم الطفل.');
+  const k = {id:newId(), name:kn.slice(0, 30), avatar:regAvatar(), prog:oldProgress() || freshProg()};
+  DB.parent = {name:pn.slice(0, 40), phone:ph, created:Date.now()};
+  DB.kids = [k]; DB.active = k.id; save();
+  show('worlds');
+};
+
+function renderProfiles(){
+  $('kidList').innerHTML = DB.kids.map(k => `<button class="kid" data-id="${k.id}"><span class="av">${k.avatar}</span><b>${esc(k.name)}</b><small>★ ${ar(kidStars(k))}</small></button>`).join('')
+    + `<button class="kid add" id="addKidCard"><span class="av" style="font-size:2.4rem">➕</span><b>طفل جديد</b></button>`;
+  $('kidList').querySelectorAll('[data-id]').forEach(b => b.onclick = () => { DB.active = b.dataset.id; save(); show('worlds'); });
+  $('addKidCard').onclick = openAddKid;
+}
+let newKidAvatar = () => AVATARS[0];
+function openAddKid(){
+  $('addKidForm').hidden = false; $('newKidName').value = ''; $('newKidErr').textContent = '';
+  newKidAvatar = avatarPicker($('newKidAvatars'), AVATARS[DB.kids.length % AVATARS.length]);
+  $('newKidName').focus();
+}
+$('cancelAddKid').onclick = () => $('addKidForm').hidden = true;
+$('addKidForm').onsubmit = e => {
+  e.preventDefault();
+  const n = $('newKidName').value.trim();
+  if (!n) return fieldError($('newKidName'), $('newKidErr'), 'اكتب اسم الطفل.');
+  const k = {id:newId(), name:n.slice(0, 30), avatar:newKidAvatar(), prog:freshProg()};
+  DB.kids.push(k); save(); $('addKidForm').hidden = true; renderProfiles();
+};
+/* Parental gate (required for apps in the Kids category): the parent types the last 4 digits of their phone number. */
+function parentGate(onOk){
+  if (DB.parentUnlocked){ onOk(); return; }   // asked once per device; the parent can lock it again
+  const last4 = toLatin(DB.parent.phone).replace(/\D/g, '').slice(-4);
+  $('sheet').innerHTML = `<div class="s-head"><span class="big">🔒</span><div><h2>للوالدين فقط</h2><p>هذه الصفحة لولي الأمر</p></div><button class="icon-btn" data-close aria-label="إغلاق">✕</button></div>
+    <form class="gate" id="gateForm" novalidate>
+      <p class="gate-q">اكتب آخر ٤ أرقام من رقم هاتف ولي الأمر</p>
+      <label class="field"><span class="sr">آخر ٤ أرقام</span><input id="gateIn" inputmode="numeric" maxlength="4" autocomplete="off"></label>
+      <p class="err" id="gateErr" role="alert"></p>
+      <button class="btn block" type="submit">فتح</button>
+    </form>`;
+  $('sheet').querySelector('[data-close]').onclick = closeSheet;
+  $('gateForm').onsubmit = e => {
+    e.preventDefault();
+    if (toLatin($('gateIn').value).replace(/\D/g, '') === last4){ DB.parentUnlocked = true; save(); closeSheet(); onOk(); }
+    else { $('gateErr').textContent = 'الأرقام غير صحيحة. اطلب المساعدة من ولي الأمر.'; $('gateIn').value = ''; }
+  };
+  $('overlay').hidden = false; $('gateIn').focus();
+}
+$('parentBtn').onclick = () => parentGate(() => show('parent'));
+$('whoBtn').onclick = () => show('profiles');
+$('parentBack').onclick = () => show('profiles');
+$('parentAddKid').onclick = () => { show('profiles'); openAddKid(); };
+
+function twoStep(btn, label, action){
+  if (btn.dataset.armed){ action(); return; }
+  btn.dataset.armed = '1'; const old = btn.textContent; btn.textContent = label;
+  setTimeout(() => { if (btn.isConnected){ delete btn.dataset.armed; btn.textContent = old; } }, 4000);
+}
+function renderParent(){
+  $('pName').value = DB.parent.name; $('pPhone').value = DB.parent.phone; $('pErr').textContent = ''; $('pSaved').hidden = true;
+  $('parentKids').innerHTML = DB.kids.map(k => `
+    <div class="kid-row" data-id="${k.id}">
+      <span class="av">${k.avatar}</span>
+      <div class="info"><b>${esc(k.name)}</b><small>${WORLD_ORDER.map(w => `${WORLDS[w].emoji} ${ar(Object.values(k.prog.stars[w] || {}).reduce((x, y) => x + y, 0))}`).join(' · ')}</small></div>
+      <div class="acts2"><button class="link" data-rename>تعديل الاسم</button><button class="link danger" data-del>حذف</button></div>
+    </div>`).join('');
+  $('parentKids').querySelectorAll('.kid-row').forEach(row => {
+    const k = DB.kids.find(x => x.id === row.dataset.id);
+    row.querySelector('[data-rename]').onclick = () => {
+      const info = row.querySelector('.info');
+      info.innerHTML = `<label class="field"><span class="sr">الاسم الجديد</span><input value="${esc(k.name)}" id="rn-${k.id}"></label>`;
+      const inp = info.querySelector('input'); inp.focus(); inp.select();
+      const done = () => { const v = inp.value.trim(); if (v){ k.name = v.slice(0, 30); save(); } renderParent(); };
+      inp.onkeydown = ev => { if (ev.key === 'Enter') done(); if (ev.key === 'Escape') renderParent(); };
+      inp.onblur = done;
+    };
+    row.querySelector('[data-del]').onclick = ev => twoStep(ev.currentTarget, 'اضغط مرة أخرى للتأكيد', () => {
+      DB.kids = DB.kids.filter(x => x.id !== k.id);
+      if (DB.active === k.id) DB.active = DB.kids[0]?.id || null;
+      save(); renderParent();
+    });
+  });
+}
+$('parentForm').onsubmit = e => {
+  e.preventDefault();
+  ['pName', 'pPhone'].forEach(id => $(id).removeAttribute('aria-invalid'));
+  const n = $('pName').value.trim(), ph = validPhone($('pPhone').value);
+  if (!n) return fieldError($('pName'), $('pErr'), 'اكتب اسم ولي الأمر.');
+  if (!ph) return fieldError($('pPhone'), $('pErr'), 'رقم الهاتف قصير جدًا أو طويل جدًا. اكتب من ٧ إلى ١٥ رقمًا.');
+  DB.parent.name = n.slice(0, 40); DB.parent.phone = ph; save();
+  $('pErr').textContent = ''; $('pSaved').hidden = false;
+};
+$('relockBtn').onclick = () => { DB.parentUnlocked = false; save(); show('profiles'); };
+$('wipeBtn').onclick = ev => twoStep(ev.currentTarget, 'متأكد؟ اضغط مرة أخرى لحذف كل شيء', () => {
+  DB = {parent:null, kids:[], active:null, sound:DB.sound}; save();
+  try { localStorage.removeItem(OLD_KEY); } catch(e){}
+  $('regForm').reset(); regAvatar = avatarPicker($('regAvatars')); show('register');
+});
+
+/* =====================================================================
+   worlds screen
+   ===================================================================== */
+function renderWorlds(){
+  const k = kid();
+  $('whoAv').textContent = k.avatar; $('whoName').textContent = k.name;
+  $('starTotal').textContent = ar(kidStars(k));
+  $('woolTotal').textContent = ar(R().wool);
+  paintSoufi();
+  const d = R().daily, done = dailyDoneToday(), streakAlive = done || d.date === dayBefore(todayStr());
+  $('extras').innerHTML = `
+    <button class="extra ${done ? 'done' : ''}" id="dailyBtn"><span class="x-emoji">${done ? '✅' : '☀️'}</span><b>تحدي اليوم</b>
+      <small>${done ? 'أنجزته اليوم! عُد غدًا' : '٥ أسئلة من كل العوالم'}</small>${streakAlive && d.streak ? `<span class="flame">🔥 ${ar(d.streak)} ${d.streak === 1 ? 'يوم' : d.streak === 2 ? 'يومان' : d.streak <= 10 ? 'أيام' : 'يومًا'}</span>` : ''}</button>
+    <button class="extra" id="farmBtn"><span class="x-emoji">🏡</span><b>مزرعتي</b><small>${R().farm.length ? `${ar(R().farm.length)} في مزرعتك · خزانة صوفي` : 'كل نجمة تضيف حيوانًا · خزانة صوفي'}</small></button>`;
+  $('dailyBtn').onclick = startDaily;
+  $('farmBtn').onclick = () => show('farm');
+  $('soundBtn').textContent = DB.sound ? '🔊' : '🔇';
+  $('worldsBubble').textContent = kidStars(k) === 0 ? `أهلًا يا ${k.name}! اختر عالمًا نلعب فيه. أنصحك أن تبدأ بقلعة المنازل أو جزيرة الجمع.` : `أهلًا يا ${k.name}! إلى أين نذهب اليوم؟`;
+  $('worldList').innerHTML = WORLD_ORDER.map((w, i) => {
+    const W = WORLDS[w], max = W.levels.length * 3, got = worldStars(w);
+    return `<button class="world ${i === 0 ? 'wide' : ''}" data-w="${w}" style="--wc:var(${W.color})">
+      <span class="w-emoji">${W.emoji}</span><b>${W.name}</b><small>${W.sub}</small>
+      <span class="w-stars">★ ${ar(got)} من ${ar(max)}</span><span class="w-bar"><i style="width:${got / max * 100}%"></i></span></button>`;
+  }).join('');
+  $('worldList').querySelectorAll('[data-w]').forEach(b => b.onclick = () => { curWorld = b.dataset.w; show('map'); });
+}
+$('soundBtn').onclick = () => { DB.sound = !DB.sound; save(); $('soundBtn').textContent = DB.sound ? '🔊' : '🔇'; if (DB.sound) SND.ok(); };
+
+/* =====================================================================
+   winding trail (one per world)
+   ===================================================================== */
+const OFFS = [0, .9, 1.3, .9, 0, -.9, -1.3, -.9];
+let currentNode = -1;
+function renderMap(w){
+  const W = WORLDS[w], L = W.levels;
+  $('screen-map').style.setProperty('--wc', `var(${W.color})`);
+  $('mapTitle').textContent = `${W.emoji} ${W.name}`;
+  $('multPills').hidden = w !== 'mult';
+  currentNode = -1;
+  for (let i = 0; i < L.length; i++) if (unlocked(w, i) && !stars(w, i)) { currentNode = i; break; }
+  const got = worldStars(w);
+  paintSoufi();
+  $('bubble').textContent = currentNode === -1 ? 'أنهيت كل مستويات هذا العالم! جرّب أن تجمع كل النجوم ⭐'
+    : got === 0 ? `${W.intro} هيا نبدأ بـ«${L[currentNode].title}». اضغط على الدائرة التي أقف عندها.`
+    : `أحسنت! هيا إلى «${L[currentNode].title}». كلما أجبت أسرع وصلنا أسرع!`;
+  $('goalFlag').textContent = 'في نهاية الطريق ينتظرك الذئب المشاغب 🐺';
+  const trail = $('trail');
+  trail.innerHTML = '<svg class="trail-svg" aria-hidden="true"><path class="road" id="road"/><path class="road-line" id="roadLine"/><path class="road-done" id="roadDone"/></svg>';
+  L.forEach((lv, i) => {
+    const lock = !unlocked(w, i), st = stars(w, i), off = OFFS[i % OFFS.length];
+    const btn = document.createElement('button');
+    btn.className = 'node' + (lock ? ' locked' : '') + (i === currentNode ? ' current' : '') + (lv.boss ? ' champ' : '');
+    btn.style.setProperty('--x', off);
+    btn.innerHTML = `
+      <span class="disc"><span class="em">${lv.emoji}</span>${lv.boss ? '' : `<span class="badge num">${lock ? '🔒' : lv.badge}</span>`}${i === currentNode ? `<span class="mascot ${off > 0 ? 'on-left' : 'on-right'}" aria-hidden="true">${soufiHtml()}</span>` : ''}</span>
+      ${lv.label ? `<span class="n-label">${lv.label}</span>` : ''}
+      ${lock ? '' : `<span class="n-stars" aria-hidden="true">${[1, 2, 3].map(s => `<span class="${s <= st ? 'on' : ''}">★</span>`).join('')}</span>`}`;
+    btn.setAttribute('aria-label', lv.title + (lock ? '، مقفل' : '') + '، ' + ar(st) + ' من ٣ نجوم');
+    btn.onclick = () => openSheet(w, i);
+    trail.appendChild(btn);
+  });
+  W.decos.forEach((d, i) => { if (i >= L.length) return; const e = document.createElement('span'); e.className = 'deco'; e.dataset.i = i; e.textContent = d; trail.appendChild(e); });
+  requestAnimationFrame(() => {
+    drawTrail();
+    if (currentNode >= 3){
+      const el = trail.querySelectorAll('.node')[currentNode];
+      el && el.scrollIntoView({block:'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'});
+    }
+  });
+}
+function drawTrail(){
+  const trail = $('trail'), road = $('road');
+  if (!road || $('screen-map').hidden) return;
+  const r0 = trail.getBoundingClientRect(), W = r0.width;
+  const pts = [...trail.querySelectorAll('.disc')].map(d => { const r = d.getBoundingClientRect(); return [r.left + r.width / 2 - r0.left, r.top + r.height / 2 - r0.top]; });
+  const curve = list => list.reduce((d, [x1, y1], i) => {
+    if (!i) return `M${x1},${y1}`;
+    const [x0, y0] = list[i - 1], m = (y1 - y0) / 2;
+    return d + ` C${x0},${y0 + m} ${x1},${y1 - m} ${x1},${y1}`;
+  }, '');
+  const full = curve(pts);
+  road.setAttribute('d', full); $('roadLine').setAttribute('d', full);
+  const reach = currentNode === -1 ? pts.length : currentNode + 1;
+  $('roadDone').setAttribute('d', reach > 1 ? curve(pts.slice(0, reach)) : '');
+  trail.querySelectorAll('.deco').forEach(e => {
+    const i = +e.dataset.i, [x, y] = pts[i], off = OFFS[i % OFFS.length];
+    const side = off > 0 ? -1 : off < 0 ? 1 : (i % 4 === 0 ? 1 : -1);
+    const gap = Math.min(150, W * .32);
+    e.style.left = Math.max(22, Math.min(W - 22, x + side * gap)) + 'px';
+    e.style.top = (y + (i % 2 ? 16 : -8)) + 'px';
+  });
+}
+addEventListener('resize', () => requestAnimationFrame(drawTrail));
+$('mapBack').onclick = () => show('worlds');
+
+/* =====================================================================
+   level sheet
+   ===================================================================== */
+const ruleSec = (s, tf) => s > 100 ? 'أبطأ من ذلك' : `أقل من ${ar(Math.round(s * tf))} ثوانٍ`;
+function openBossSheet(w, i){
+  const W = WORLDS[w], lv = W.levels[i], lock = !unlocked(w, i), st = stars(w, i);
+  $('sheet').innerHTML = `<div class="s-head"><span class="big">🐺</span><div><h2>الذئب المشاغب</h2><p>${st ? `<span style="color:var(--sun)">${'★'.repeat(st)}</span> · هزمته من قبل` : 'يحرس نهاية ' + W.name}</p></div><button class="icon-btn" data-close aria-label="إغلاق">✕</button></div>
+    ${lock ? `<div class="locked-note">🔒 احصل على نجمة واحدة على الأقل في كل مستويات ${W.name}، ثم تعال لمواجهته.</div>`
+      : `<div class="acts"><button class="act primary" data-act="boss"><span class="ai">⚔️</span><span><b>واجه الذئب</b><small>كل إجابة صحيحة تُضعفه، والسريعة تُضعفه أكثر</small></span></button></div>`}
+    <p class="note">للذئب ${ar(bossHP(w))} نقطة قوة، ولك ٣ قلوب ❤️. الإجابة الصحيحة تنقص قوته، والإجابة الصاعقة ⚡ تنقصها مرتين، والخطأ يكلّفك قلبًا. إذا هزمته تحصل على جائزة خاصة لمزرعتك 🏆</p>`;
+  $('sheet').querySelector('[data-close]').onclick = closeSheet;
+  const b = $('sheet').querySelector('[data-act="boss"]'); if (b) b.onclick = () => { closeSheet(); startBoss(w, i); };
+  $('overlay').hidden = false;
+  ($('sheet').querySelector('[data-act]') || $('sheet').querySelector('[data-close]')).focus();
+}
+function openSheet(w, i){
+  if (WORLDS[w].levels[i].boss) return openBossSheet(w, i);
+  const W = WORLDS[w], lv = W.levels[i], lock = !unlocked(w, i), best = (P().best[w] || {})[i], cfg = levelCfg(w, i), tf = levelTF(w, lv);
+  const starLine = stars(w, i) ? `<span style="color:var(--sun)">${'★'.repeat(stars(w, i))}</span>` + (best ? ` · أفضل رقم ${ar(best.q)} أسئلة` : '') : (lv.desc || 'لم تبدأ بعد');
+  let body = '';
+  if (lock){
+    body += `<div class="locked-note">🔒 أكمل «${W.levels[i - 1].title}» أولًا. وإن كنت تعرف هذا المستوى، اقفز إليه باختبار التحدي.</div>`;
+  }
+  body += '<div class="acts">';
+  {
+    body += `<button class="act" data-act="learn"><span class="ai">📖</span><span><b>تعلّم</b><small>${w === 'mult' ? 'الجدول بالصور' : 'شرح خطوة بخطوة'}</small></span></button>`;
+    body += `<button class="act" data-act="practice"><span class="ai">🎯</span><span><b>تدرّب</b><small>١٠ أسئلة بلا وقت، مع مساعدة</small></span></button>`;
+  }
+  body += `<button class="act primary" data-act="challenge"><span class="ai">⚡</span><span><b>${lock ? 'اختبار القفز' : 'التحدي'}</b><small>املأ الشريط قبل أن تنتهي الأسئلة</small></span></button>`;
+  body += '</div>';
+  body += `<p class="note">في التحدي، الإجابة الأسرع تملأ الشريط أسرع، فتنهي المرحلة بأسئلة أقل.</p>
+    <details><summary>كيف تُحسب النقاط والنجوم؟</summary>
+      <div class="rules">${SPEED.map(s => `<span>${ruleSec(s.max, tf)}</span><b class="num">${sgn(s.pts)}</b>`).join('')}
+        <span>إجابة خاطئة</span><b class="num">${sgn(-WRONG_PENALTY)}</b><span>بمساعدة 💡</span><b class="num">${sgn(HINT_PTS)}</b></div>
+      <p style="margin-top:8px">يكتمل الشريط عند ${ar(cfg.goal)} نقطة. ٣ نجوم: ${ar(cfg.s3)} أسئلة أو أقل بلا أخطاء. نجمتان: ${ar(cfg.s2)} أسئلة أو أقل.</p>
+    </details>`;
+  $('sheet').innerHTML = `<div class="s-head"><span class="big">${lv.emoji}</span><div><h2>${lv.title}</h2><p>${starLine}</p></div><button class="icon-btn" data-close aria-label="إغلاق">✕</button></div>${body}`;
+  $('sheet').querySelector('[data-close]').onclick = closeSheet;
+  $('sheet').querySelectorAll('[data-act]').forEach(b => b.onclick = () => {
+    closeSheet();
+    const a = b.dataset.act;
+    if (a === 'learn') openLearn(w, i);
+    if (a === 'practice') startQuizFor(w, i, 'practice');
+    if (a === 'challenge') startQuizFor(w, i, 'challenge');
+  });
+  $('overlay').hidden = false;
+  $('sheet').querySelector('[data-act]')?.focus();
+}
+function closeSheet(){ $('overlay').hidden = true; }
+$('overlay').onclick = e => { if (e.target === $('overlay')) closeSheet(); };
+addEventListener('keydown', e => { if (e.key === 'Escape' && !$('overlay').hidden) closeSheet(); });
+
+/* =====================================================================
+   pictures & diagrams
+   ===================================================================== */
+function countPhrase(n, forms, g){
+  if (n === 1) return forms[0] + (g === 'f' ? ' واحدة' : ' واحد');
+  if (n === 2) return forms[1];
+  return ar(n) + ' ' + forms[2];
+}
+function sentence(a, b){ const th = theme(a); return `${countPhrase(a, th.p, th.pg)}، ${th.rel} ${th.p[0]} ${countPhrase(b, th.c, th.cg)}`; }
+function renderScene(el, a, b){
+  const th = theme(a), total = a * b;
+  el.hidden = false;
+  el.className = 'scene size-' + (total <= 20 ? 'lg' : total <= 50 ? 'md' : 'sm');
+  el.innerHTML = '';
+  const cols = Math.min(b, 5);
+  for (let i = 0; i < a; i++){
+    const g = document.createElement('div');
+    g.className = 'group'; g.style.setProperty('--d', Math.min(i * 40, 360) + 'ms');
+    g.innerHTML = `<div class="g-head">${th.pe}</div><div class="g-items" style="--cols:${cols}">${('<span>' + th.ce + '</span>').repeat(b)}</div><div class="g-sum">${ar(b * (i + 1))}</div>`;
+    el.appendChild(g);
+  }
+  el.setAttribute('aria-label', `${sentence(a, b)}، المجموع ${ar(total)}`);
+}
+let countRun = 0;
+async function countAlong(el, fast){
+  const run = ++countRun, groups = [...el.querySelectorAll('.group')];
+  el.classList.remove('sums'); groups.forEach(g => g.classList.remove('lit'));
+  const step = fast ? 160 : Math.max(260, 520 - groups.length * 20);
+  for (const g of groups){ if (run !== countRun) return; g.classList.add('lit'); SND.tick(); await new Promise(r => setTimeout(r, step)); }
+  if (run === countRun) el.classList.add('sums');
+}
+function emojiArith(a, b, op){
+  if (op === '+') return `<div class="ea"><div class="ea-g">${'<span>🍎</span>'.repeat(a)}</div><b class="ea-op">+</b><div class="ea-g">${'<span>🍏</span>'.repeat(b)}</div></div>`;
+  return `<div class="ea"><div class="ea-g" style="max-width:260px">${[...Array(a)].map((_, i) => `<span class="${i >= a - b ? 'gone' : ''}">🎈</span>`).join('')}</div></div>`;
+}
+const emojiSentence = (a, b, op) => op === '+'
+  ? `عندنا ${ar(a)} 🍎 و ${ar(b)} 🍏. نعدّها كلها معًا: ${ar(a + b)}`
+  : `عندنا ${ar(a)} 🎈 طار منها ${ar(b)}، فبقي ${ar(a - b)}`;
+
+/* column arithmetic grid (always laid out left-to-right like written digits) */
+function colGrid({a, b, op, n, ansLen, marks = [], out = [], active = -1}){
+  const ps = [...Array(n)].map((_, i) => n - 1 - i);
+  const c = (p, inner, cls = '', id = '') => `<span class="cc ${cls}${p === active ? ' act' : ''}"${id ? ` id="${id}"` : ''}>${inner}</span>`;
+  const dig = (x, p) => p < len(x) ? `<span class="pc${p}">${ar(digit(x, p))}</span>` : '';
+  let h = `<div class="cg" style="--n:${n}" role="img" aria-label="${fmt(a)} ${op === '+' ? 'زائد' : 'ناقص'} ${fmt(b)}">`;
+  h += '<span></span>' + ps.map(p => c(p, PLACE_SHORT[p], 'ch pc' + p)).join('');
+  h += '<span></span>' + ps.map(p => c(p, marks[p] || '', 'cm', 'mk' + p)).join('');
+  h += '<span></span>' + ps.map(p => c(p, dig(a, p))).join('');
+  h += `<span class="csign">${op === '+' ? '+' : '−'}</span>` + ps.map(p => c(p, dig(b, p))).join('');
+  h += '<span class="cline"></span>';
+  h += '<span></span>' + ps.map(p => p < ansLen ? c(p, out[p] || '', 'cbox', 'ac' + p) : c(p, '')).join('');
+  return h + '</div>';
+}
+/* step-by-step solution: carries for addition, borrowing for subtraction */
+function arithSteps(a, b, op){
+  const res = op === '+' ? a + b : a - b, n = Math.max(len(a), len(b), len(res)), steps = [];
+  const marks = Array(n).fill(''), out = Array(n).fill('');
+  let carry = 0;
+  for (let p = 0; p < n; p++){
+    const da = digit(a, p), db = digit(b, p);
+    let msg, w, ask;
+    if (op === '+'){
+      if (p >= len(a) && p >= len(b)){ w = carry; msg = `ننزل المحمول ${ar(carry)} إلى منزلة ${PLACE[p]}.`; ask = `منزلة ${PLACE[p]} فارغة، لكن عندنا محمول. ماذا نكتب فيها؟`; carry = 0; }
+      else {
+        const s = da + db + carry; w = s % 10;
+        ask = `منزلة ${PLACE[p]}: ${ar(da)} + ${ar(db)}${carry ? ` + ${ar(carry)} (المحمول)` : ''} = ؟ اكتب رقم الآحاد من الناتج.`;
+        msg = `منزلة ${PLACE[p]}: ${ar(da)} + ${ar(db)}${carry ? ` + ${ar(carry)} (المحمول)` : ''} = ${ar(s)}.` + (s >= 10 ? ` نكتب ${ar(w)} ونحمل ${ar(1)} إلى منزلة ${PLACE[p + 1]}.` : ` نكتب ${ar(w)}.`);
+        carry = s >= 10 ? 1 : 0;
+        if (carry) marks[p + 1] = ar(1);
+      }
+    } else {
+      const lent = carry; let top = da - lent, borrow = 0;
+      if (top < db){ top += 10; borrow = 1; }
+      w = top - db;
+      if (lent || borrow) marks[p] = `<s>${ar(da)}</s>${ar(top)}`;
+      const pre = `منزلة ${PLACE[p]}: `
+        + (lent && borrow ? `أعطى ${ar(da)} واحدًا للمنزلة السابقة، ثم استلف من منزلة ${PLACE[p + 1]} فصار ${ar(top)}. `
+          : lent ? `أعطى ${ar(da)} واحدًا للمنزلة السابقة فصار ${ar(top)}. `
+          : borrow ? `${ar(da)} أصغر من ${ar(db)}، فنستلف ${ar(1)} من منزلة ${PLACE[p + 1]} فيصبح ${ar(top)}. ` : '');
+      ask = pre + `${ar(top)} − ${ar(db)} = ؟`;
+      msg = pre + `${ar(top)} − ${ar(db)} = ${ar(w)}.` + (p >= len(res) && w === 0 ? ' وهو صفر في أول العدد فلا نكتبه.' : '');
+      carry = borrow;
+    }
+    out[p] = op === '-' && p >= len(res) ? '' : ar(w);
+    steps.push({p, msg, ask, w, box: p < len(res), marks:marks.slice(), out:out.slice()});
+  }
+  return {res, n, steps};
+}
+/* place-value houses */
+function chartHtml(n, hiP = -1, blank = false){
+  const L = len(n);
+  return `<div class="pv">${[...Array(L)].map((_, i) => { const p = L - 1 - i, d = digit(n, p);
+    return `<div class="pv-col pb${p} ${p === hiP ? 'hi' : ''}"><span class="pv-roof">${PLACE[p]}</span><span class="pv-dig pc${p}">${blank ? '؟' : ar(d)}</span><span class="pv-val">${blank ? '' : fmt(d * 10 ** p)}</span></div>`; }).join('')}</div>`;
+}
+function expandHtml(n, colour = true){
+  const parts = [...Array(len(n))].map((_, i) => len(n) - 1 - i).filter(p => digit(n, p)).map(p => `<span class="${colour ? 'pc' + p : ''}">${fmt(digit(n, p) * 10 ** p)}</span>`);
+  return `<div class="expand">${parts.join('<span class="op">+</span>')}</div>`;
+}
+/* number line for rounding */
+function roundInfo(n, k){
+  const U = 10 ** k, lo = Math.floor(n / U) * U, hi = lo + U, d = digit(n, k - 1);
+  return {U, lo, hi, d, target: d >= 5 ? hi : lo};
+}
+function lineHtml(n, k, interactive = false){
+  const {U, lo, hi} = roundInfo(n, k), pos = (n - lo) / U * 100;
+  const goat = interactive
+    ? `<button type="button" class="nl-goat drag" style="right:${pos}%" aria-label="العنزة. اسحبها إلى العدد الأقرب، أو استخدم السهمين"><span class="g">🐐</span></button>`
+    : `<span class="nl-goat" style="right:${pos}%"><span class="g">🐐</span></span>`;
+  const end = v => interactive ? `<button type="button" class="nl-end num" data-v="${v}">${fmt(v)}</button>` : `<span data-v="${v}">${fmt(v)}</span>`;
+  return `<div class="nl" data-pos="${pos}"><div class="nl-track"><span class="nl-mid"></span><span class="nl-dot" style="right:${pos}%"><b>${fmt(n)}</b></span>${goat}</div>
+    <div class="nl-labels">${end(lo)}<span class="mid">${fmt(lo + U / 2)}</span>${end(hi)}</div></div>
+    ${interactive ? `<p class="drag-tip">اسحب العنزة 🐐 إلى العدد الأقرب: يمينًا إلى ${fmt(lo)} أو يسارًا إلى ${fmt(hi)}</p>` : ''}`;
+}
+/* Drag the goat along the line (right = smaller, left = larger). Letting go near an end, tapping an end,
+   or pressing an arrow key picks that number; letting go in the middle sends the goat back to its place. */
+function attachGoat(el, n, k, onPick, opts = {}){
+  const nl = el.querySelector('.nl'), track = nl.querySelector('.nl-track'), goat = nl.querySelector('.nl-goat');
+  const {lo, hi, target} = roundInfo(n, k), start = parseFloat(nl.dataset.pos) / 100;
+  const say = on => { goat.querySelector('.nl-say')?.remove(); if (on) goat.insertAdjacentHTML('beforeend', '<i class="nl-say">مَاااء! 🙅</i>'); };
+  let dragging = false, done = false, x0 = 0, moved = 0;
+  const setPos = f => goat.style.right = (f * 100) + '%';
+  const frac = x => { const r = track.getBoundingClientRect(); return Math.max(0, Math.min(1, (r.right - x) / r.width)); };
+  const pickVal = v => {
+    if (done) return; done = true;
+    const right = v === target;
+    goat.classList.remove('drag', 'held', 'no'); goat.classList.add('jump');
+    setPos(v === hi ? 1 : 0); SND.tick();
+    nl.querySelectorAll('[data-v]').forEach(b => { b.classList.toggle('win', right && +b.dataset.v === v); b.classList.toggle('nope', !right && +b.dataset.v === v); });
+    if (right){ setTimeout(() => onPick(v), 550); return; }
+    // wrong side: the goat shakes its head and bleats
+    setTimeout(() => { goat.classList.remove('jump'); goat.classList.add('no'); say(true); bleat(); }, 450);
+    if (opts.retry){
+      opts.onRefuse && opts.onRefuse();
+      setTimeout(() => { // walk back and let the child try again
+        goat.classList.remove('no'); goat.classList.add('drag'); say(false); setPos(start);
+        nl.querySelectorAll('[data-v]').forEach(b => b.classList.remove('nope')); done = false;
+      }, 1800);
+    } else setTimeout(() => onPick(v), 1700);
+  };
+  goat.addEventListener('pointerdown', e => { if (done) return; dragging = true; x0 = e.clientX; moved = 0; goat.setPointerCapture(e.pointerId); goat.classList.add('held'); e.preventDefault(); });
+  goat.addEventListener('pointermove', e => { if (!dragging) return; moved = Math.max(moved, Math.abs(e.clientX - x0)); setPos(frac(e.clientX)); });
+  const up = e => {
+    if (!dragging) return; dragging = false; goat.classList.remove('held');
+    const f = frac(e.clientX);
+    if ((moved > 12 || f >= .96) && f >= .85) pickVal(hi);
+    else if ((moved > 12 || f <= .04) && f <= .15) pickVal(lo);
+    else { setPos(start); if (moved > 12) floatTip(el, 'اسحبها حتى أحد الطرفين!'); }
+  };
+  goat.addEventListener('pointerup', up); goat.addEventListener('pointercancel', up);
+  goat.addEventListener('keydown', e => { if (e.key === 'ArrowLeft'){ e.preventDefault(); pickVal(hi); } if (e.key === 'ArrowRight'){ e.preventDefault(); pickVal(lo); } });
+  nl.querySelectorAll('.nl-end').forEach(b => b.onclick = () => pickVal(+b.dataset.v));
+  return {pick: v => pickVal(v), lo, hi};
+}
+function floatTip(el, txt){
+  const t = el.querySelector('.drag-tip'); if (!t) return;
+  const old = t.textContent; t.textContent = txt; t.style.color = 'var(--sun)';
+  setTimeout(() => { if (t.isConnected){ t.textContent = old; t.style.color = ''; } }, 1600);
+}
+function revealLine(el, target){
+  const nl = el.querySelector('.nl'); if (!nl) return;
+  nl.querySelectorAll('[data-v]').forEach(s => s.classList.toggle('win', +s.dataset.v === target));
+  const goat = nl.querySelector('.nl-goat'), isHi = +nl.querySelectorAll('[data-v]')[1].dataset.v === target;
+  requestAnimationFrame(() => requestAnimationFrame(() => goat.style.right = isHi ? '100%' : '0%'));
+}
+function roundExplain(n, k){
+  const {d, target} = roundInfo(n, k);
+  return `ننظر إلى رقم ${PLACE[k - 1]}: <b class="pc${k - 1}">${ar(d)}</b>. ${d >= 5 ? 'هو ٥ أو أكثر، فنقرّب إلى الأعلى' : 'هو أقل من ٥، فنقرّب إلى الأسفل'}: ${fmt(n)} ← <b>${fmt(target)}</b>`;
+}
+
+/* =====================================================================
+   learn screens
+   ===================================================================== */
+let learnCtx = null;
+function openLearn(w, i, extra = {}){
+  learnCtx = {w, i, ...extra};
+  $('learnTitle').textContent = `${WORLDS[w].emoji} ${WORLDS[w].levels[i].title}`;
+  show('learn');
+  ({mult:learnMult, add:learnArith, sub:learnArith, place:learnPlace, round:learnRound})[w]();
+}
+$('learnBack').onclick = () => show('map');
+const startPracticeBtn = () => `<button class="btn block" id="toPractice">ابدأ التدريب</button>`;
+function bindPractice(){ const b = $('toPractice'); if (b) b.onclick = () => startQuizFor(learnCtx.w, learnCtx.i, 'practice'); }
+
+function learnMult(){
+  const n = learnCtx.i + 1, k = learnCtx.k || 1, th = theme(n);
+  learnCtx.k = k;
+  $('learnBody').innerHTML = `
+    <div class="learn-eq"><button class="arrow" id="prevBtn" aria-label="السابق">→</button>
+      <div class="eq"><span>${ar(n)}</span><span class="op">×</span><span>${ar(k)}</span><span class="op">=</span><span class="ans ok">${ar(n * k)}</span></div>
+      <button class="arrow" id="nextBtn" aria-label="التالي">←</button></div>
+    <div class="scene" id="learnScene"></div>
+    <p class="sentence">${sentence(n, k)}، والمجموع ${ar(n * k)}</p>
+    <div class="row" style="margin:10px 0 14px"><button class="link" id="countBtn">👆 عُدّ معي</button><button class="link" id="buildBtn">🧩 ابنِ بنفسك</button><button class="link" id="tipBtn" aria-expanded="${!!learnCtx.tip}">💡 حيلة للحفظ</button></div>
+    <div class="tip" ${learnCtx.tip ? '' : 'hidden'} id="tipBox"><p>${TIPS[n]}</p><p>${swapTip(n)}</p></div>
+    <p class="skip-label">نواتج جدول ${ar(n)} · حظيرة ${th.name}</p>
+    <div class="skip" id="skipRow">${[...Array(10)].map((_, j) => `<button class="${j + 1 === k ? 'on' : ''}" data-k="${j + 1}" aria-label="${ar(n)} × ${ar(j + 1)} = ${ar(n * (j + 1))}">${ar(n * (j + 1))}</button>`).join('')}</div>
+    <div class="learn-foot">${startPracticeBtn()}</div>`;
+  if (learnCtx.build) buildGroups($('learnScene'), n, k); else renderScene($('learnScene'), n, k);
+  $('buildBtn').textContent = learnCtx.build ? '🖼️ عودة إلى الصورة' : '🧩 ابنِ بنفسك';
+  $('buildBtn').onclick = () => { learnCtx.build = !learnCtx.build; learnMult(); };
+  speakText = `${n} في ${k} يساوي ${n * k}`;
+  $('prevBtn').disabled = k === 1; $('nextBtn').disabled = k === 10;
+  $('prevBtn').onclick = () => { learnCtx.k = k - 1; learnMult(); };
+  $('nextBtn').onclick = () => { learnCtx.k = k + 1; learnMult(); };
+  $('skipRow').querySelectorAll('button').forEach(b => b.onclick = () => { learnCtx.k = +b.dataset.k; learnMult(); });
+  $('countBtn').onclick = () => countAlong($('learnScene'));
+  $('tipBtn').onclick = () => { learnCtx.tip = !learnCtx.tip; $('tipBox').hidden = !learnCtx.tip; $('tipBtn').setAttribute('aria-expanded', learnCtx.tip); };
+  bindPractice();
+}
+
+function newArith(op, d){
+  let a, b;
+  if (op === '+'){
+    if (d === 1){ a = rnd(1, 9); b = rnd(1, 9); }
+    else if (d === 6){ a = rnd(100000, 599999); b = rnd(100000, 999999 - a); }
+    else { a = randD(d); b = randD(d); }
+  } else {
+    if (d === 1){ a = rnd(2, 9); b = rnd(1, a); }
+    else { a = rnd(10 ** (d - 1) + 1, 10 ** d - 1); b = rnd(10 ** (d - 1), a - 1); }
+  }
+  return {a, b};
+}
+const miniPad = (withDel = false) => `<div class="mini-pad${withDel ? ' with-del' : ''}" id="miniPad">${['١','٢','٣','٤','٥','٦','٧','٨','٩','٠'].map(k => `<button data-k="${AR.indexOf(k)}">${k}</button>`).join('')}${withDel ? '<button data-k="del" aria-label="حذف">⌫</button>' : ''}</div>`;
+let learnKey = null; // digit handler for the learn screen (keypad and keyboard)
+function learnArith(){
+  const {w} = learnCtx, op = w === 'add' ? '+' : '-', d = WORLDS[w].levels[learnCtx.i].d;
+  if (learnCtx.a == null){ const x = newArith(op, d); learnCtx.a = x.a; learnCtx.b = x.b; learnCtx.step = -1; learnCtx.done = false; learnCtx.miss = 0; }
+  const {a, b} = learnCtx, opS = op === '+' ? '+' : '−', res = op === '+' ? a + b : a - b;
+  const again = `<button class="link" id="newEx">🔄 مثال جديد</button>`;
+  learnKey = null;
+  if (d === 1){
+    // single digits: the child answers, helped by the picture
+    const solved = learnCtx.done;
+    $('learnBody').innerHTML = `
+      <p class="lesson">${op === '+' ? 'الجمع يعني أن نضع الأشياء معًا ثم نعدّها كلها.' : 'الطرح يعني أن نأخذ من الأشياء ثم نعدّ ما بقي.'}</p>
+      <div class="eq"><span>${ar(a)}</span><span class="op">${opS}</span><span>${ar(b)}</span><span class="op">=</span><span class="ans ${solved ? 'ok' : ''}" id="learnAns">${solved ? ar(res) : '؟'}</span></div>
+      ${emojiArith(a, b, op)}
+      <div class="step-msg" id="learnMsg" aria-live="polite">${solved ? '🎉 ' + emojiSentence(a, b, op) : 'عُدّ الصور، ثم اكتب الجواب بالأزرار.'}</div>
+      ${solved ? '' : miniPad(String(res).length > 1) + `<div class="row"><button class="link" id="showAns">أرني الجواب</button></div>`}
+      <div class="learn-foot">${solved ? startPracticeBtn() : ''}<div class="row">${again}</div></div>`;
+    speakText = `${a} ${op === '+' ? 'زائد' : 'ناقص'} ${b} يساوي ${res}`;
+    if (!solved){
+      let typed = '';
+      learnKey = k => {
+        if (k === 'del'){ typed = typed.slice(0, -1); $('learnAns').textContent = typed ? ar(typed) : '؟'; return; }
+        typed += k; $('learnAns').textContent = ar(typed);
+        if (typed.length < String(res).length) return;
+        if (+typed === res){ SND.ok(); haptic('ok'); learnCtx.done = true; learnArith(); }
+        else { SND.bad(); haptic('bad'); $('learnMsg').textContent = `ليس ${ar(typed)}. ${emojiSentence(a, b, op).split('،')[0]}… عُدّ مرة أخرى.`; typed = ''; setTimeout(() => { if ($('learnAns')) $('learnAns').textContent = '؟'; }, 600); }
+      };
+      $('showAns').onclick = () => { learnCtx.done = true; learnArith(); };
+    }
+  } else {
+    // columns: the child writes the digit of each column; "show me" reveals it
+    const S = learnCtx.S || (learnCtx.S = arithSteps(a, b, op)), last = S.steps.length - 1;
+    let st = learnCtx.step;
+    if (st >= 0 && !S.steps[st].box) learnCtx.done = true;          // a leading zero: nothing to write
+    const step = st >= 0 ? S.steps[st] : null, solved = !!(step && learnCtx.done);
+    const prev = st > 0 ? S.steps[st - 1] : {marks:[], out:[]};
+    const marks = !step ? [] : (solved || op === '-') ? step.marks : prev.marks;
+    const out = solved ? step.out : prev.out;
+    const msg = !step
+      ? (op === '+' ? 'نكتب العددين فوق بعضهما، كل رقم تحت منزلته. ثم نجمع عمودًا عمودًا، ونبدأ من الآحاد على اليمين.'
+                    : 'نكتب العدد الأكبر فوق والأصغر تحته، كل رقم تحت منزلته. ثم نطرح عمودًا عمودًا، ونبدأ من الآحاد على اليمين.')
+      : solved ? '✅ ' + step.msg + (st === last ? ` <br><b>الناتج: ${fmt(res)} 🎉</b>` : '')
+      : step.ask + ' <b>اكتبه في الخانة الصفراء.</b>';
+    const waiting = step && !solved;
+    $('learnBody').innerHTML = `
+      ${colGrid({a, b, op, n:S.n, ansLen:len(res), marks, out, active: step ? step.p : -1})}
+      <div class="step-msg" id="learnMsg" aria-live="polite">${msg}</div>
+      ${waiting ? miniPad() + `<div class="row"><button class="link" id="showAns">أرني الجواب</button></div>` : ''}
+      <div class="learn-foot">${!step ? `<button class="btn block" id="stepBtn">ابدأ الحل</button>`
+        : solved && st < last ? `<button class="btn block" id="stepBtn">الخطوة التالية</button>`
+        : solved ? startPracticeBtn() : ''}
+      <div class="row">${again}</div></div>`;
+    if (waiting){ const box = $('ac' + step.p); if (box) box.classList.add('cur'); }
+    if ($('stepBtn')) $('stepBtn').onclick = () => { learnCtx.step++; learnCtx.done = false; SND.tick(); learnArith(); };
+    if (waiting){
+      learnKey = k => {
+        if (+k === step.w){ SND.ok(); haptic('ok'); learnCtx.done = true; learnArith(); }
+        else { SND.bad(); haptic('bad'); const box = $('ac' + step.p); if (box){ box.textContent = ar(k); box.classList.add('bad'); setTimeout(() => { if (box.isConnected){ box.textContent = ''; box.classList.remove('bad'); } }, 650); }
+          $('learnMsg').innerHTML = `ليس ${ar(k)}. ` + step.ask; }
+      };
+      $('showAns').onclick = () => { learnCtx.done = true; learnArith(); };
+    }
+    speakText = !step ? '' : (solved ? step.msg : step.ask).replace(/<[^>]+>/g, '');
+  }
+  if ($('miniPad')) $('miniPad').querySelectorAll('button').forEach(btn => btn.onclick = () => learnKey && learnKey(btn.dataset.k));
+  $('newEx').onclick = () => { learnCtx.a = null; learnCtx.S = null; learnArith(); };
+  bindPractice();
+}
+addEventListener('keydown', e => {
+  if ($('screen-learn').hidden || !learnKey || !$('overlay').hidden) return;
+  let d = e.key; const i = AR.indexOf(d); if (i >= 0) d = String(i);
+  if (/^\d$/.test(d)){ e.preventDefault(); learnKey(d); }
+  else if (e.key === 'Backspace' && $('miniPad')?.querySelector('[data-k="del"]')){ e.preventDefault(); learnKey('del'); }
+});
+
+/* the child drags (or taps) a group of k animals into each of the n pens: n × k built by hand */
+function buildGroups(el, n, k){
+  const th = theme(n), cols = Math.min(k, 5);
+  el.className = 'builder';
+  el.innerHTML = `<p class="lesson" style="margin:0">اسحب مجموعة من ${countPhrase(k, th.c, th.cg)} إلى كل ${th.p[0]}، أو اضغط على ${th.p[0]}.</p>
+    <div class="tray"><span class="token" id="groupToken" aria-label="مجموعة من ${ar(k)}">${th.ce.repeat(Math.min(k, 4))}${k > 4 ? '…' : ''} <b class="num">× ${ar(k)}</b></span></div>
+    <div class="pens">${[...Array(n)].map((_, j) => `<div class="pen" data-drop data-j="${j}" role="button" tabindex="0" aria-label="${th.p[0]} ${ar(j + 1)}"><span class="p-head">${th.pe}</span><div class="p-items" style="--cols:${cols}"></div></div>`).join('')}</div>
+    <p class="build-total" id="buildTotal" aria-live="polite">المجموع: ${ar(0)}</p>`;
+  const filled = [];
+  const fill = pen => {
+    const j = +pen.dataset.j;
+    if (filled[j]){ $('buildTotal').textContent = `هذه ${th.p[0]} ممتلئة، اختر غيرها!`; SND.tick(); return; }
+    filled[j] = true; pen.classList.add('full');
+    pen.querySelector('.p-items').innerHTML = [...Array(k)].map((_, m) => `<span style="animation-delay:${m * 30}ms">${th.ce}</span>`).join('');
+    const c = filled.filter(Boolean).length;
+    SND.tick(); haptic('ok');
+    if (c === n){
+      $('buildTotal').innerHTML = `🎉 ${ar(n)} × ${ar(k)} = ${ar(n * k)}`; SND.win();
+      buddyLearn(`رائع! بنيت ${ar(n)} مجموعات، في كل واحدة ${ar(k)}`);
+    } else $('buildTotal').textContent = `المجموع: ${[...Array(c)].map((_, m) => ar(k * (m + 1))).join(' ← ')}`;
+  };
+  el.querySelectorAll('.pen').forEach(pen => { pen.onclick = () => fill(pen); pen.onkeydown = e => { if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); fill(pen); } }; });
+  dragToken($('groupToken'), t => fill(t), () => { const free = el.querySelector('.pen:not(.full)'); if (free) fill(free); });
+}
+function buddyLearn(text){ const m = document.querySelector('#learnBody .step-msg'); if (m) m.innerHTML = '🐑 ' + text; }
+
+function learnPlace(){
+  const d = WORLDS.place.levels[learnCtx.i].d;
+  if (learnCtx.n == null) learnCtx.n = genNum(d, Math.random() < .3);
+  const n = learnCtx.n;
+  $('learnBody').innerHTML = `
+    <p class="lesson">لكل رقم في العدد بيت اسمه «منزلة». كل منزلة أكبر ١٠ مرات من المنزلة التي على يمينها.</p>
+    <div class="bignum">${numHtml(n, -1, true)}</div>
+    ${chartHtml(n)}
+    <p class="skip-label">نقرؤه هكذا</p>
+    <p class="colorwords">${wordsHtml(n)}</p>
+    <p class="skip-label" style="margin-top:10px">ونفكّه هكذا</p>
+    ${expandHtml(n)}
+    ${d >= 2 && n % 100 > 20 && n % 10 ? `<div class="tip" style="margin-top:12px"><p>في العربية نقرأ الآحاد قبل العشرات: «<span class="pc0">${ONES[n % 10]}</span> و<span class="pc1">${TENS[Math.floor(n % 100 / 10)]}</span>» وليس العكس.</p></div>` : ''}
+    <div class="row" style="margin-top:10px"><button class="link" id="sayBtn">🔈 اسمع العدد</button><button class="link" id="buildNum">🧱 ابنِ العدد بنفسك</button><button class="link" id="newEx">🔄 عدد جديد</button></div>
+    <div class="learn-foot">${startPracticeBtn()}</div>`;
+  if (learnCtx.build) return buildNumber();
+  $('buildNum').onclick = () => { learnCtx.build = true; learnPlace(); };
+  speakText = words(n);
+  $('sayBtn').onclick = () => speak(words(n));
+  $('newEx').onclick = () => { learnCtx.n = null; learnPlace(); };
+  bindPractice();
+}
+
+/* the child builds the number: drag (or tap) a ١ / ١٠ / ١٠٠ … block into the house it belongs to */
+function buildNumber(){
+  const n = learnCtx.n, L = len(n), ps = [...Array(L)].map((_, i) => L - 1 - i);
+  const cnt = Array(L).fill(0);
+  $('learnBody').innerHTML = `
+    <p class="lesson">ابنِ هذا العدد: اسحب كل قطعة إلى بيتها، أو اضغط على القطعة. كل بيت يتسع لـ ٩ قطع.</p>
+    <div class="bignum">${numHtml(n, -1, true)}</div>
+    <div class="tray" style="direction:ltr">${ps.map(p => `<span class="token pc${p}" data-p="${p}">${fmt(10 ** p)}</span>`).join('')}</div>
+    <div class="houses">${ps.map(p => `<div class="house pb${p}" data-drop data-p="${p}"><span class="pv-roof">${PLACE[p]}</span><span class="h-count pc${p}" id="hc${p}">${ar(0)}</span><span class="h-chips pc${p}" id="hh${p}"></span><button class="h-minus" data-m="${p}" aria-label="أنقص ${PLACE[p]}">−</button></div>`).join('')}</div>
+    <div class="step-msg" id="buildMsg" aria-live="polite">عددك الآن: ${ar(0)}</div>
+    <div class="row"><button class="link" id="buildNew">🔄 عدد جديد</button><button class="link" id="buildBack">🏠 عودة إلى الشرح</button></div>
+    <div class="learn-foot">${startPracticeBtn()}</div>`;
+  const msg = $('buildMsg');
+  const update = () => {
+    ps.forEach(p => { $('hc' + p).textContent = ar(cnt[p]); $('hh' + p).innerHTML = '<i></i>'.repeat(cnt[p]); });
+    const v = cnt.reduce((t, c, p) => t + c * 10 ** p, 0);
+    document.querySelectorAll('.house').forEach(h => h.classList.toggle('ok', cnt[+h.dataset.p] === digit(n, +h.dataset.p)));
+    if (v === n){ msg.innerHTML = `🎉 أحسنت! بنيت ${fmt(n)}: ${wordsHtml(n)}`; SND.win(); }
+    else msg.innerHTML = `عددك الآن: <b>${fmt(v)}</b> · المطلوب: <b>${fmt(n)}</b>`;
+  };
+  const add = (p, house) => {
+    if (house != null && house !== p){ msg.innerHTML = `هذه القطعة (${fmt(10 ** p)}) مكانها بيت <b class="pc${p}">${PLACE[p]}</b>!`; SND.bad(); return; }
+    if (cnt[p] >= 9){ msg.innerHTML = `بيت ${PLACE[p]} ممتلئ! ١٠ قطع من ${fmt(10 ** p)} تساوي قطعة واحدة من ${fmt(10 ** (p + 1))}.`; SND.tick(); return; }
+    cnt[p]++; SND.tick(); update();
+  };
+  document.querySelectorAll('#learnBody .token').forEach(t => dragToken(t, h => add(+t.dataset.p, +h.dataset.p), () => add(+t.dataset.p)));
+  document.querySelectorAll('#learnBody .h-minus').forEach(b => b.onclick = () => { const p = +b.dataset.m; if (cnt[p]){ cnt[p]--; update(); } });
+  $('buildNew').onclick = () => { learnCtx.n = null; learnPlace(); };
+  $('buildBack').onclick = () => { learnCtx.build = false; learnPlace(); };
+  speakText = words(n);
+  bindPractice();
+}
+
+function learnRound(){
+  const k = WORLDS.round.levels[learnCtx.i].k;
+  if (learnCtx.n == null) learnCtx.n = genRoundNum(k);
+  const n = learnCtx.n, {target} = roundInfo(n, k);
+  $('learnBody').innerHTML = `
+    <p class="lesson">التقريب يعني أن نختار أقرب عدد «مدوّر». على الخط يكون الأصغر على اليمين والأكبر على اليسار، ونسأل: هل العدد أقرب إلى اليمين أم إلى اليسار؟</p>
+    <p class="qtext">قرّب ${fmt(n)} إلى ${ROUND_TO[k]}</p>
+    <div class="bignum">${numHtml(n, k - 1)}</div>
+    <div id="learnLine">${lineHtml(n, k, true)}</div>
+    <div class="step-msg" id="roundMsg" aria-live="polite">جرّب أنت: حرّك العنزة إلى العدد الذي تراه أقرب.</div>
+    <div class="tip"><p>القاعدة: انظر إلى الرقم في المنزلة الأصغر مباشرةً (${PLACE[k - 1]}). إذا كان ٥ أو أكثر نقرّب للأعلى، وإذا كان أقل من ٥ نقرّب للأسفل.</p></div>
+    <div class="row" style="margin-top:6px"><button class="link" id="newEx">🔄 مثال جديد</button></div>
+    <div class="learn-foot">${startPracticeBtn()}</div>`;
+  attachGoat($('learnLine'), n, k, () => {
+    SND.ok();
+    $('roundMsg').innerHTML = '🎉 أحسنت! ' + roundExplain(n, k);
+  }, {retry:true, onRefuse: () => {
+    $('roundMsg').innerHTML = 'مَاااء! العنزة ترفض، فهذا ليس العدد الأقرب. انظر إلى النقطة: إلى أي طرف هي أقرب؟ جرّب الجهة الأخرى.';
+  }});
+  speakText = `${words(n)} تقريبه إلى ${ROUND_TO[k]} هو ${words(target)}`;
+  $('newEx').onclick = () => { learnCtx.n = null; learnRound(); };
+  bindPractice();
+}
+
+/* =====================================================================
+   question makers  — every question is {view, answer, input, choices?, tf, visual?, hint?, explain}
+   ===================================================================== */
+const eqHtml = parts => `<div class="eq">${parts.map((p, i) => `<span class="${i % 2 ? 'op' : ''}">${p}</span>`).join('')}<span class="op">=</span><span class="ans" id="ans">؟</span></div>`;
+const vis = () => { const el = $('qVisual'); el.hidden = false; el.className = ''; return el; };
+const qtext = html => { const t = $('qText'); t.hidden = false; t.innerHTML = html; };
+function genNum(d, allowZero){
+  let s = String(rnd(1, 9));
+  for (let i = 1; i < d; i++) s += allowZero ? rnd(0, 9) : rnd(1, 9);
+  return +s;
+}
+function genRoundNum(k){
+  const U = 10 ** k, dl = Math.min(6, k + 1 + rnd(0, 1));
+  let n; do { n = randD(dl); } while (n % U === 0 || n < U);
+  return n;
+}
+const uniq = (arr, n) => { const out = []; for (const x of arr) if (!out.includes(x) && out.length < n) out.push(x); return out; };
+
+function multChoices(a, b){
+  const ans = a * b, set = new Set([ans]);
+  for (const c of shuffle([a * (b + 1), a * (b - 1), (a + 1) * b, (a - 1) * b, ans + 10, ans - 10, ans + 1, ans - 1, a + b, ans + a, ans - a])){ if (set.size >= 4) break; if (c > 0 && c <= 120) set.add(c); }
+  while (set.size < 4) set.add(ans + set.size * 2 + 1);
+  return shuffle([...set]).map(v => ({v, html:ar(v)}));
+}
+const skipList = (b, n) => [...Array(n)].map((_, i) => ar(b * (i + 1))).join('، ');
+function multQ(a, b, mode){
+  const ans = a * b, input = mode === 'practice' ? 'choices' : 'pad';
+  return {answer:ans, input, tf:1, choices: input === 'choices' ? multChoices(a, b) : null,
+    view: () => eqHtml([ar(a), '×', ar(b)]),
+    visual: () => { renderScene(vis(), a, b); qtext(sentence(a, b)); },
+    hint: () => { const el = vis(); renderScene(el, a, b); countAlong(el, true);
+      return `${sentence(a, b)}. عُدّ قفزًا بـ ${ar(b)}: ${skipList(b, Math.min(a, 3))}${a > 3 ? '… وأكمل حتى آخر مجموعة' : ''}`; },
+    explain: () => { const el = vis(); renderScene(el, a, b); countAlong(el, true); qtext(`${sentence(a, b)}، والمجموع ${ar(ans)}`); },
+    onCorrect: () => $('qVisual').classList.add('sums'),
+    record: (ok, t) => record(a, b, ok, t)};
+}
+function arithQ(op, d, w, i){
+  const {a, b} = newArith(op, d), res = op === '+' ? a + b : a - b, opS = op === '+' ? '+' : '−';
+  if (d === 1) return {answer:res, input:'pad', tf:1,
+    view: () => eqHtml([ar(a), opS, ar(b)]),
+    visual: () => { vis().innerHTML = emojiArith(a, b, op); },
+    hint: () => { vis().innerHTML = emojiArith(a, b, op);
+      return op === '+' ? `ابدأ من ${ar(a)} وعُدّ ${ar(b)} خطوات إلى الأمام: ${[...Array(Math.min(b, 2))].map((_, j) => ar(a + j + 1)).join('، ')}…`
+                        : `ابدأ من ${ar(a)} وعُدّ ${ar(b)} خطوات إلى الخلف: ${[...Array(Math.min(b, 2))].map((_, j) => ar(a - j - 1)).join('، ')}…`; },
+    explain: () => { vis().innerHTML = emojiArith(a, b, op); qtext(emojiSentence(a, b, op)); }};
+  const S = arithSteps(a, b, op), fin = S.steps[S.steps.length - 1];
+  return {answer:res, input:'column', tf: 1 + (d - 1) * 1.1, ansLen:len(res),
+    view: () => colGrid({a, b, op, n:S.n, ansLen:len(res)}) + `<p class="col-tip">ابدأ من الآحاد (اليمين)، أو اضغط على أي خانة لتكتب فيها</p>`,
+    hint: () => {
+      fin.marks.forEach((m, p) => { const el = $('mk' + p); if (el) el.innerHTML = m; });
+      const p = Math.max(0, Math.min(Q.cursor, S.steps.length - 1)), st = S.steps[p];
+      const da = digit(a, p), db = digit(b, p), any = fin.marks.some(Boolean);
+      const extra = !any ? (op === '+' ? ' لا يوجد حمل في هذه المسألة.' : ' لا يوجد استلاف في هذه المسألة.')
+        : (op === '+' ? ' الأرقام الصغيرة الحمراء فوق الأعمدة هي المحمول.' : ' الأرقام الصغيرة الحمراء فوق الأعمدة تبيّن الاستلاف.');
+      return `نحن الآن في منزلة ${PLACE[p]}: ${op === '+' ? `اجمع ${ar(da)} و ${ar(db)}${p && fin.marks[p] ? ' والمحمول' : ''}` : `اطرح ${ar(db)} من ${fin.marks[p] ? 'الرقم الأحمر' : ar(da)}`}، واكتب رقم الآحاد من الناتج فقط.${extra}`;
+    },
+    explain: () => { $('qPrompt').innerHTML = colGrid({a, b, op, n:S.n, ansLen:len(res), marks:fin.marks, out:fin.out});
+      qtext(`الناتج الصحيح: <b>${fmt(res)}</b>`); },
+    teach: () => openLearn(w, i, {a, b, step:-1, done:false})};
+}
+function placeQ(d){
+  const type = pick(['value', 'value', 'place', 'place', 'read', 'read', 'write', 'expand']);
+  if (type === 'value' || type === 'place'){
+    let n, opts;
+    do { n = genNum(d, false); const s = String(n);
+      opts = [...Array(d)].map((_, p) => p).filter(p => s.split(String(digit(n, p))).length === 2);
+    } while (!opts.length);
+    const p = pick(opts), X = digit(n, p);
+    const qs = uniq([p].concat(shuffle([...Array(d)].map((_, q) => q))), 4);
+    const base = {tf:1.5, input:'choices',
+      hint: () => { vis().innerHTML = chartHtml(n); return `ابحث عن الرقم ${ar(X)} في بيوت المنازل بالأسفل، واقرأ اسم البيت فوقه${type === 'value' ? '، ثم القيمة تحته' : ''}.`; },
+      explain: () => { vis().innerHTML = chartHtml(n, p); qtext(`الرقم ${ar(X)} في منزلة ${PLACE[p]}، فقيمته <b>${fmt(X * 10 ** p)}</b>`); }};
+    if (type === 'value') return {...base, answer:X * 10 ** p,
+      choices: shuffle(qs.map(q => ({v:X * 10 ** q, html:fmt(X * 10 ** q)}))),
+      view: () => `<p class="qtext">ما قيمة الرقم ${ar(X)} في هذا العدد؟</p><div class="bignum">${numHtml(n, p)}</div>`};
+    return {...base, answer:p, choices: shuffle(qs.map(q => ({v:q, html:PLACE[q]}))),
+      view: () => `<p class="qtext">في أي منزلة يقع الرقم ${ar(X)}؟</p><div class="bignum">${numHtml(n, p)}</div>`};
+  }
+  const n = genNum(d, Math.random() < .35);
+  const show = (extra = '') => { vis().innerHTML = chartHtml(n) + `<p class="colorwords">${wordsHtml(n)}</p>` + extra; };
+  if (type === 'read'){
+    const s = String(n), alts = [];
+    for (let t = 0; t < 30 && alts.length < 3; t++){
+      const arr = [...s];
+      if (Math.random() < .5 && d > 1){ const j = rnd(0, d - 2); [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]]; }
+      else { const j = rnd(0, d - 1); arr[j] = String((+arr[j] + rnd(1, 8)) % 10); }
+      const m = +arr.join('');
+      if (arr[0] !== '0' && m !== n && !alts.includes(m)) alts.push(m);
+    }
+    return {answer:n, input:'choices', tf:1.9, wide:true,
+      choices: shuffle([n, ...alts].map(v => ({v, html:words(v)}))),
+      view: () => `<p class="qtext">كيف نقرأ هذا العدد؟</p><div class="bignum">${numHtml(n)}</div>`,
+      hint: () => { vis().innerHTML = chartHtml(n); return 'اقرأ من اليسار إلى اليمين بيتًا بيتًا. وتذكّر: في العربية نقرأ الآحاد قبل العشرات، مثل «خمسة وأربعون».'; },
+      explain: () => { show(); }};
+  }
+  if (type === 'write') return {answer:n, input:'pad', tf:2,
+    view: () => `<p class="qtext">اكتب هذا العدد بالأرقام:</p><p class="words">${words(n)}</p><div class="eq"><span class="ans" id="ans">؟</span></div>`,
+    hint: () => { vis().innerHTML = `<p class="colorwords">${wordsHtml(n)}</p>` + chartHtml(n, -1, true);
+      return `كل كلمة ملوّنة بلون بيتها. العدد فيه ${DIGITS[len(n)]}، وإذا كانت منزلة بلا كلمة فاكتب فيها ٠.`; },
+    explain: () => { show(); }};
+  return {answer:n, input:'pad', tf:1.6,
+    view: () => `<p class="qtext">ما العدد؟</p>${expandHtml(n, false)}<div class="eq"><span class="ans" id="ans">؟</span></div>`,
+    hint: () => { vis().innerHTML = chartHtml(n, -1, true); return `ضع كل قيمة في بيتها: العدد فيه ${DIGITS[len(n)]}، وإذا كان بيت فارغًا فاكتب فيه ٠.`; },
+    explain: () => { vis().innerHTML = chartHtml(n) + expandHtml(n); }};
+}
+function roundQ(k){
+  const n = genRoundNum(k), {U, lo, hi, target} = roundInfo(n, k);
+  const q = {answer:target, input:'drag', tf:1.4 + k * .2,
+    view: () => `<p class="qtext">قرّب إلى ${ROUND_TO[k]}</p><div class="bignum">${numHtml(n)}</div>`,
+    visual: () => { const el = vis(); el.innerHTML = lineHtml(n, k, true);
+      q.goat = attachGoat(el, n, k, v => answer(v), {retry: Q.mode === 'practice',
+        onRefuse: () => { q.refused = true; qtext('العنزة لا تريد الذهاب إلى هناك، فهذا ليس العدد الأقرب. جرّب الجهة الأخرى!'); }}); },
+    hint: () => { $('qPrompt').querySelector('.bignum').innerHTML = numHtml(n, k - 1);
+      return `انظر إلى الرقم المسطّر (${PLACE[k - 1]}): إذا كان ٥ أو أكثر نقرّب إلى ${fmt(hi)}، وإذا كان أقل من ٥ نقرّب إلى ${fmt(lo)}. وعلى الخط: أين النقطة أقرب؟`; },
+    explain: () => { const el = vis(); el.innerHTML = lineHtml(n, k); revealLine(el, target); qtext(roundExplain(n, k)); }};
+  return q;
+}
+
+/* =====================================================================
+   quiz engine
+   ===================================================================== */
+let Q = null, rafId = 0;
+const tableFacts = n => [...Array(10)].map((_, i) => [n, i + 1]);
+function weightedDeck(facts){ return shuffle(facts.slice()).map(f => [f, weakness(...f) + Math.random() * 2]).sort((x, y) => y[1] - x[1]).map(x => x[0]); }
+
+function startQuizFor(w, i, mode){
+  const lv = WORLDS[w].levels[i], cfg = levelCfg(w, i);
+  let gen;
+  gen = levelGen(w, i, mode);
+  startQuiz({w, i, mode, gen, title:lv.title, total:10, ...cfg, raceTime: (cfg.goal / 15) * 4.5 * levelTF(w, lv)}, mode === 'challenge');
+}
+// question generator for one level (mode decides multiple choice vs keypad in multiplication)
+function levelGen(w, i, mode){
+  const lv = WORLDS[w].levels[i];
+  if (w === 'mult'){
+    const pool = tableFacts(lv.n); let deck = [];
+    return () => { if (!deck.length) deck = mode === 'practice' ? shuffle(pool.slice()) : weightedDeck(pool); const [a, b] = deck.shift(); return multQ(a, b, mode); };
+  }
+  if (w === 'add' || w === 'sub') return () => arithQ(w === 'add' ? '+' : '-', lv.d, w, i);
+  if (w === 'place') return () => placeQ(lv.d);
+  return () => roundQ(lv.k);
+}
+const bossHP = w => w === 'mult' ? 14 : 12;
+function startBoss(w, i){
+  const L = WORLDS[w].levels;
+  let gen;
+  if (w === 'mult'){
+    const pool = [].concat(...[2, 3, 4, 5, 6, 7, 8, 9].map(a => [...Array(8)].map((_, j) => [a, j + 2]))); let deck = [];
+    gen = () => { if (!deck.length) deck = weightedDeck(pool); const [a, b] = deck.shift(); return multQ(a, b, 'challenge'); };
+  } else {
+    const gens = L.map((lv, j) => lv.boss ? null : levelGen(w, j, 'challenge')).filter(Boolean);
+    gen = () => pick(gens)();
+  }
+  startQuiz({w, i, mode:'boss', gen, title:'الذئب المشاغب', hp:bossHP(w), hpMax:bossHP(w), lives:3, total:99}, true);
+}
+function startDaily(){
+  const gens = [];
+  WORLD_ORDER.forEach(w => WORLDS[w].levels.forEach((lv, j) => { if (!lv.boss && unlocked(w, j)) gens.push([w, levelGen(w, j, 'challenge')]); }));
+  const byWorld = WORLD_ORDER.map(w => gens.filter(g => g[0] === w)).filter(a => a.length);
+  const plan = shuffle([...Array(5)].map((_, n) => pick(byWorld[n % byWorld.length])[1]));
+  startQuiz({w:'mult', i:-1, mode:'daily', home:'worlds', title:'تحدي اليوم', total:5, gen: () => plan.shift()()});
+}
+function startReview(){
+  let pool = [];
+  for (let a = 1; a <= 10; a++) if (unlocked('mult', a - 1)) pool.push(...tableFacts(a));
+  const seen = pool.filter(([a, b]) => P().facts[a + 'x' + b]);
+  const base = seen.length >= 10 ? seen : pool;
+  const deck = shuffle(base.map(f => [f, weakness(...f) + Math.random()]).sort((x, y) => y[1] - x[1]).slice(0, 10).map(x => x[0]));
+  startQuiz({w:'mult', i:-1, mode:'review', title:'مراجعة ذكية', total:10, gen: () => { const [a, b] = deck.shift(); return multQ(a, b, 'review'); }});
+}
+function startQuiz(cfg, countdown){
+  Q = Object.assign({asked:0, correct:0, wrong:0, energy:0, times:[], combo:0, zaps:0, typed:'', busy:true, hinted:false, missed:0, retry:[], raceAcc:0, rivalDone:false, woolStart:R().wool}, cfg);
+  show('quiz');
+  const race = cfg.mode === 'challenge', boss = cfg.mode === 'boss';
+  $('runner').textContent = kid().avatar;                       // you…
+  $('rival').innerHTML = soufiHtml();                            // …against Soufi
+  $('runner').hidden = $('barn').hidden = !race;
+  $('rival').hidden = !race;
+  $('rival').style.insetInlineStart = '0%';
+  $('hudBar').classList.toggle('boss', boss);
+  $('bossTop').hidden = !boss;
+  $('buddyS').innerHTML = soufiHtml();
+  $('buddy').className = 'buddy'; $('buddySay').classList.remove('on');
+  $('timer').hidden = cfg.mode === 'practice';
+  updateHud();
+  if (countdown) runCountdown(nextQuestion); else nextQuestion();
+}
+function runCountdown(done){
+  const el = document.createElement('div'); el.className = 'countdown'; document.body.appendChild(el);
+  const seq = ['٣', '٢', '١', 'انطلق']; let i = 0;
+  const step = () => {
+    if (i >= seq.length){ el.remove(); done(); return; }
+    el.innerHTML = `<span style="${i === 3 ? 'font-size:3.5rem' : ''}">${seq[i]}</span>`;
+    i < 3 ? SND.tick() : SND.ok();
+    i++; setTimeout(step, i === 4 ? 500 : 650);
+  };
+  step();
+}
+function buildPad(){
+  const keys = ['١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩', '', '٠', 'del'];
+  $('pad').innerHTML = keys.map(k => k === 'del' ? '<button class="del" data-k="del" aria-label="حذف">⌫ حذف</button>'
+    : k === '' ? '<span></span>' : `<button data-k="${AR.indexOf(k)}">${k}</button>`).join('');
+  $('pad').querySelectorAll('button').forEach(b => b.onclick = () => padKey(b.dataset.k));
+}
+function updateHud(){
+  if (!Q) return;
+  let pct;
+  if (Q.mode === 'boss'){
+    pct = Math.max(0, Q.hp / Q.hpMax * 100);
+    $('qcount').innerHTML = `<span class="hearts" aria-label="${ar(Q.lives)} قلوب">${'❤️'.repeat(Q.lives)}${'🤍'.repeat(3 - Q.lives)}</span>`;
+  } else if (Q.mode === 'challenge'){
+    pct = Math.min(100, Q.energy / Q.goal * 100);
+    $('runner').style.insetInlineStart = `calc(${pct * .9}%)`;
+    $('qcount').textContent = `${ar(Q.asked)} من ${ar(Q.maxQ)}`;
+  } else { pct = Q.asked / Q.total * 100; $('qcount').textContent = `${ar(Math.min(Q.asked + 1, Q.total))} من ${ar(Q.total)}`; }
+  $('energyFill').style.width = pct + '%';
+}
+function nextQuestion(){
+  if (!Q) return;
+  if (Q.mode === 'challenge'){ if (Q.energy >= Q.goal || Q.asked >= Q.maxQ) return finish(); }
+  else if (Q.mode === 'boss'){ if (Q.hp <= 0 || Q.lives <= 0) return finish(); }
+  else if (Q.asked >= Q.total) return finish();
+  const due = Q.retry.findIndex(r => r.at <= Q.asked);
+  const q = Q.q = due >= 0 ? Q.retry.splice(due, 1)[0].q : Q.gen();
+  Q.typed = ''; Q.busy = false; Q.hinted = false;
+  $('qPrompt').innerHTML = q.view();
+  $('qVisual').hidden = true; $('qVisual').innerHTML = ''; $('qText').hidden = true;
+  $('wrongBox').hidden = true;
+  $('hintBtn').hidden = !q.hint; $('hintBtn').classList.remove('hint-on');
+  $('hintMsg').hidden = true; $('hintMsg').innerHTML = '';
+  $('choices').hidden = q.input !== 'choices';
+  $('pad').hidden = q.input === 'choices' || q.input === 'drag';
+  $('quizCard').classList.toggle('split', q.input === 'pad' || q.input === 'column');
+  if (q.input === 'choices'){
+    $('choices').className = 'choices' + (q.wide ? ' wide' : '');
+    $('choices').innerHTML = q.choices.map(c => `<button class="choice ${q.wide ? '' : 'num'}" data-v="${c.v}">${c.html}</button>`).join('');
+    $('choices').querySelectorAll('button').forEach(btn => btn.onclick = () => answer(+btn.dataset.v, btn));
+  } else if (q.input !== 'drag'){
+    buildPad();
+    if (q.input === 'column') setupColumnBoxes(q);
+    renderTyped();
+  }
+  if ((Q.mode === 'practice' || q.input === 'drag') && q.visual) q.visual();
+  if (Q.mode === 'practice' && (q.balloon || (Q.asked % 3 === 1 && balloonable(q)))){ $('pad').hidden = true; $('quizCard').classList.remove('split'); renderBalloons(q); }
+  updateHud();
+  Q.t0 = performance.now();
+  if (Q.mode !== 'practice') tickTimer();
+}
+function tickTimer(){
+  cancelAnimationFrame(rafId);
+  const C = 2 * Math.PI * 16, fg = $('timerFg'), tf = Q.q.tf || 1;
+  fg.style.strokeDasharray = C;
+  const loop = () => {
+    if (!Q || Q.busy) return;
+    const t = (performance.now() - Q.t0) / 1000 / tf;
+    fg.style.strokeDashoffset = C * Math.min(1, t / 8);
+    fg.style.stroke = t <= 3 ? 'var(--accent)' : t <= 8 ? 'var(--sun)' : 'var(--bad)';
+    if (Q.mode === 'challenge' && Q.raceTime){
+      const pr = Math.min(1, (Q.raceAcc + (performance.now() - Q.t0) / 1000) / Q.raceTime);
+      $('rival').style.insetInlineStart = `calc(${pr * 90}%)`;
+      if (pr >= 1 && !Q.rivalDone){ Q.rivalDone = true; buddySay('sad', 'وصلتُ قبلك! أسرِع 😜'); }
+    }
+    rafId = requestAnimationFrame(loop);
+  };
+  loop();
+}
+function renderTyped(){
+  const q = Q.q;
+  if (q.input === 'column'){
+    for (let p = 0; p < q.ansLen; p++){ const el = $('ac' + p); if (!el) continue; el.textContent = Q.cells[p] ? ar(Q.cells[p]) : ''; el.classList.toggle('cur', p === Q.cursor); }
+  } else if ($('ans')) $('ans').textContent = Q.typed ? ar(Q.typed) : '؟';
+}
+/* Column answers: each box can be tapped to choose where the next digit goes (it starts at the ones box).
+   Digits come from the keypad or keyboard; when every box is filled the answer is checked. */
+function setupColumnBoxes(q){
+  Q.cells = Array(q.ansLen).fill(''); Q.cursor = 0; Q.hist = []; Q.dir = 1; // dir 1: from the ones towards bigger places; -1: left to right
+  for (let p = 0; p < q.ansLen; p++){
+    const el = $('ac' + p); if (!el) continue;
+    el.setAttribute('role', 'button'); el.setAttribute('tabindex', '0');
+    el.setAttribute('aria-label', `خانة ${PLACE[p]} في الناتج`);
+    el.onclick = () => {
+      if (!Q || Q.busy) return;
+      Q.cursor = p; if (p === q.ansLen - 1 && p > 0) Q.dir = -1; else if (p === 0) Q.dir = 1;
+      renderTyped(); SND.tick();
+      const pad = $('pad'), r = pad.getBoundingClientRect();
+      if (r.bottom > innerHeight) pad.scrollIntoView({block:'end', behavior:'smooth'});
+      pad.classList.remove('nudge'); void pad.offsetWidth; pad.classList.add('nudge');
+    };
+  }
+}
+function padKey(k){
+  if (!Q || Q.busy || !Q.q || Q.q.input === 'choices' || Q.q.input === 'drag') return;
+  if (Q.q.input === 'column'){
+    const n = Q.q.ansLen;
+    if (k === 'del'){
+      if (Q.cells[Q.cursor]){ Q.cells[Q.cursor] = ''; Q.hist = Q.hist.filter(x => x !== Q.cursor); }
+      else if (Q.hist.length){ Q.cursor = Q.hist.pop(); Q.cells[Q.cursor] = ''; }
+      renderTyped(); return;
+    }
+    Q.cells[Q.cursor] = k; Q.hist = Q.hist.filter(x => x !== Q.cursor); Q.hist.push(Q.cursor);
+    // next empty box in the direction the child is typing, otherwise any empty box
+    let next = -1;
+    for (let p = Q.cursor + Q.dir; p >= 0 && p < n; p += Q.dir) if (!Q.cells[p]){ next = p; break; }
+    if (next < 0) for (let p = 0; p < n; p++) if (!Q.cells[p]){ next = p; break; }
+    if (next >= 0){ Q.cursor = next; renderTyped(); return; }
+    Q.cursor = -1; renderTyped();
+    answer(+[...Q.cells].reverse().join(''));
+    return;
+  }
+  const want = String(Q.q.answer).length;
+  if (k === 'del') Q.typed = Q.typed.slice(0, -1);
+  else if (Q.typed.length < want) Q.typed += k;
+  renderTyped();
+  if (Q.typed.length >= want && k !== 'del') answer(+Q.typed);
+}
+addEventListener('keydown', e => {
+  if (!Q || $('screen-quiz').hidden || !$('overlay').hidden) return;
+  if (!$('wrongBox').hidden && (e.key === 'Enter' || e.key === ' ')){ e.preventDefault(); $('wrongNext').click(); return; }
+  if (!Q.q) return;
+  if (Q.q.input === 'drag'){ if (!Q.busy && Q.q.goat && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')){ e.preventDefault(); Q.q.goat.pick(e.key === 'ArrowLeft' ? Q.q.goat.hi : Q.q.goat.lo); } else if (e.key === 'h' || e.key === '?') useHint(); return; }
+  if (Q.q.input === 'choices'){ if (/^[1-4]$/.test(e.key)) $('choices').children[+e.key - 1]?.click(); else if (e.key === 'h' || e.key === '?') useHint(); return; }
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.classList && e.target.classList.contains('cbox')){ e.preventDefault(); e.target.click(); return; }
+  let d = e.key; const i = AR.indexOf(d); if (i >= 0) d = String(i);
+  if (/^\d$/.test(d)) padKey(d);
+  else if (e.key === 'Backspace') padKey('del');
+  else if (e.key === 'h' || e.key === '?') useHint();
+});
+// Help can be pressed again at any time; every press shows a message so the child always sees something happen.
+function useHint(){
+  if (!Q || Q.busy || !Q.q || !Q.q.hint) return;
+  Q.hinted = true;
+  const msg = Q.q.hint();
+  if (msg){ const m = $('hintMsg'); m.hidden = false; m.innerHTML = '💡 ' + msg; }
+  $('hintBtn').classList.add('hint-on');
+  SND.tick();
+}
+$('hintBtn').onclick = useHint;
+function floatMsg(txt, bad){
+  const f = document.createElement('div'); f.className = 'float' + (bad ? ' bad' : ''); f.textContent = txt;
+  $('quizCard').appendChild(f); setTimeout(() => f.remove(), 1000);
+}
+function markAnswer(ok){
+  const q = Q.q;
+  if (q.balloon && $('ans')){ $('ans').textContent = ar(q.answer); $('ans').classList.add(ok ? 'ok' : 'bad'); return; }
+  if (q.input === 'column'){ for (let p = 0; p < q.ansLen; p++) $('ac' + p)?.classList.add(ok ? 'ok' : 'bad'); }
+  else if (q.input === 'pad' && $('ans')){ $('ans').textContent = ar(q.answer); $('ans').classList.add(ok ? 'ok' : 'bad'); }
+}
+/* drag a token onto a [data-drop] target (a tap calls onTap instead) */
+const dropAt = (x, y) => { const el = document.elementFromPoint(x, y); return el && el.closest('[data-drop]'); };
+function dragToken(el, onDrop, onTap){
+  el.addEventListener('pointerdown', e => {
+    e.preventDefault();
+    const sx = e.clientX, sy = e.clientY; let ghost = null, moved = false, over = null;
+    const mv = ev => {
+      if (!moved && Math.hypot(ev.clientX - sx, ev.clientY - sy) > 8){ moved = true; ghost = el.cloneNode(true); ghost.classList.add('drag-ghost'); ghost.removeAttribute('id'); document.body.appendChild(ghost); }
+      if (ghost){ ghost.style.left = ev.clientX + 'px'; ghost.style.top = ev.clientY + 'px';
+        const t = dropAt(ev.clientX, ev.clientY); if (t !== over){ over && over.classList.remove('over'); over = t; over && over.classList.add('over'); } }
+    };
+    const up = ev => {
+      document.removeEventListener('pointermove', mv); document.removeEventListener('pointerup', up); document.removeEventListener('pointercancel', up);
+      over && over.classList.remove('over'); ghost && ghost.remove();
+      if (moved){ const t = dropAt(ev.clientX, ev.clientY); if (t) onDrop(t); } else if (onTap) onTap();
+    };
+    document.addEventListener('pointermove', mv); document.addEventListener('pointerup', up); document.addEventListener('pointercancel', up);
+  });
+}
+/* practice: every third question floats its answers up on balloons */
+function genericChoices(ans){
+  const s = String(ans), set = new Set([ans]);
+  const swap = s.length > 1 ? +[...s].reverse().join('') : ans + 3;
+  for (const c of shuffle([ans + 1, ans - 1, ans + 2, ans - 2, ans + 10, ans - 10, swap])){ if (set.size >= 4) break; if (c >= 0) set.add(c); }
+  while (set.size < 4) set.add(ans + set.size * 3);
+  return shuffle([...set]).map(v => ({v, html:ar(v)}));
+}
+const balloonable = q => (q.input === 'choices' && !q.wide) || (q.input === 'pad' && q.answer < 1000);
+function renderBalloons(q){
+  if (!q.choices) q.choices = genericChoices(q.answer);
+  q.input = 'choices'; q.balloon = true;
+  const box = $('choices'); box.hidden = false; box.className = 'choices balloons';
+  const lefts = shuffle([4, 28, 52, 76]), colors = shuffle(['#E8505B', '#F2A93B', '#3E9B4F', '#2B7BD6', '#8A4FC2']);
+  box.innerHTML = q.choices.map((c, i) => { const dur = 6.5 + Math.random() * 2;
+    return `<button class="balloon" data-v="${c.v}" style="left:${lefts[i]}%;background:${colors[i]};--dur:${dur.toFixed(1)}s;--delay:-${(Math.random() * dur * .6).toFixed(1)}s">${c.html}</button>`; }).join('');
+  box.querySelectorAll('button').forEach(btn => btn.onclick = () => { btn.classList.add('picked'); box.classList.add('stopped'); answer(+btn.dataset.v, btn); });
+  qtext('🎈 فرقع البالون الذي يحمل الجواب!');
+}
+const CHEERS = ['أحسنت!', 'رائع!', 'ممتاز!', 'برافو!', 'شاطر!', 'هذا هو!'];
+const COMFORT = ['لا بأس، جرّب!', 'كدت تصيب!', 'نتعلّم من الخطأ', 'انظر إلى الشرح'];
+let buddyT = 0, bossT = 0;
+function buddySay(mood, text){
+  const b = $('buddy'); if (!b) return;
+  b.className = 'buddy'; void b.offsetWidth; b.className = 'buddy ' + mood;
+  $('buddySay').textContent = text; $('buddySay').classList.add('on');
+  clearTimeout(buddyT); buddyT = setTimeout(() => $('buddySay').classList.remove('on'), 1600);
+}
+function wolfSay(mood, text){
+  const b = $('bossTop'); b.classList.remove('hit', 'laugh'); void b.offsetWidth; b.classList.add(mood);
+  $('bossSay').textContent = text; $('bossSay').classList.add('on');
+  clearTimeout(bossT); bossT = setTimeout(() => $('bossSay').classList.remove('on'), 1400);
+}
+function answer(v, btn){
+  if (Q.busy) return;
+  Q.busy = true; cancelAnimationFrame(rafId);
+  $('hintBtn').hidden = true;
+  const q = Q.q, ok = v === q.answer, t = (performance.now() - Q.t0) / 1000, tf = q.tf || 1;
+  Q.asked++; Q.raceAcc += t;
+  q.record && q.record(ok, Q.hinted ? 9 : t / tf);
+  if (ok && q.refused){ // practice: right on the second try
+    Q.wrong++; Q.combo = 0;
+    floatMsg('👍 صحيح في المحاولة الثانية'); SND.ok(); updateHud();
+    setTimeout(nextQuestion, 800); save(); return;
+  }
+  if (ok){
+    P().correct++; R().wool++; haptic('ok');
+    Q.correct++; Q.times.push(t); Q.combo++;
+    buddySay('happy', Q.combo >= 3 ? `${ar(Q.combo)} متتالية! 🔥` : pick(CHEERS));
+    markAnswer(true); if (btn) btn.classList.add('ok');
+    let delay = q.input === 'column' ? 800 : 600;
+    if (Q.mode === 'boss'){
+      const zap = !Q.hinted && t / tf <= 3, dmg = zap ? 2 : 1;
+      Q.hp = Math.max(0, Q.hp - dmg);
+      wolfSay('hit', Q.hp <= 0 ? 'آآآه! سأهرب! 💨' : zap ? 'آي آي! ⚡' : 'آي!');
+      floatMsg(zap ? `⚡ ضربة مزدوجة! −${ar(2)}` : 'ضربة! 💥');
+      zap ? SND.zap() : SND.ok();
+    } else if (Q.mode === 'challenge'){
+      const sp = Q.hinted ? {pts:HINT_PTS, label:'💡 صحيح'} : SPEED.find(s => t / tf <= s.max);
+      if (!Q.hinted && sp.pts === SPEED[0].pts) Q.zaps++;
+      Q.energy += sp.pts;
+      floatMsg(`${sp.label} ${sgn(sp.pts)}${Q.combo >= 3 ? ' · 🔥' + ar(Q.combo) : ''}`);
+      sp.pts >= 20 ? SND.zap() : SND.ok();
+    } else {
+      floatMsg(t / tf <= 3 ? '⚡ صاعقة!' : pick(['أحسنت!', 'رائع!', 'ممتاز!', 'برافو!']));
+      SND.ok();
+      if (Q.mode === 'practice' && q.onCorrect){ q.onCorrect(); delay = 850; }
+    }
+    updateHud();
+    setTimeout(nextQuestion, delay);
+  } else {
+    Q.wrong++; Q.combo = 0; Q.missed++;
+    SND.bad(); haptic('bad');
+    buddySay('sad', pick(COMFORT));
+    if (Q.mode === 'boss'){ Q.lives = Math.max(0, Q.lives - 1); wolfSay('laugh', 'هاها! 😏'); }
+    if (btn){ btn.classList.add('bad'); $('choices').querySelector(`[data-v="${q.answer}"]`)?.classList.add('ok'); }
+    markAnswer(false);
+    if (Q.mode === 'challenge') Q.energy = Math.max(0, Q.energy - WRONG_PENALTY);
+    if (Q.mode !== 'review' && Q.mode !== 'daily') Q.retry.push({q, at:Q.asked + 2});
+    updateHud();
+    q.explain();
+    $('pad').hidden = true;
+    $('wrongExplain').hidden = !q.teach;
+    $('wrongBox').hidden = false; $('wrongNext').focus();
+  }
+  save();
+}
+$('wrongNext').onclick = () => nextQuestion();
+$('wrongExplain').onclick = () => { const q = Q && Q.q; cancelAnimationFrame(rafId); Q = null; q && q.teach && q.teach(); };
+$('quitBtn').onclick = () => { cancelAnimationFrame(rafId); const w = Q ? Q.w : curWorld, home = Q && Q.home; save(); Q = null; curWorld = w; show(home || 'map'); };
+
+/* =====================================================================
+   result
+   ===================================================================== */
+function grantStars(w, i, newStars){
+  const S = P().stars[w] || (P().stars[w] = {}), prev = S[i] || 0, gained = Math.max(0, newStars - prev);
+  S[i] = Math.max(prev, newStars);
+  const items = [];
+  for (let n = 0; n < gained; n++){ items.push(addFarmItem()); R().wool += 10; }
+  return items;
+}
+function rewardsHtml(q, items, extra = ''){
+  const wool = R().wool - q.woolStart;
+  if (!wool && !items.length && !extra) return '';
+  return `<div class="rewards">${items.length ? `<span class="big">🎁 ${items.map(x => x.e).join(' ')}</span><span>${items.length === 1 ? `${items[0].n} جديدة في مزرعتك!` : `${ar(items.length)} أصدقاء جدد في مزرعتك!`}</span>` : ''}
+    ${extra}${wool ? `<span>🧶 ${sgn(wool)} صوف</span>` : ''}</div>`;
+}
+function finish(){
+  cancelAnimationFrame(rafId);
+  const q = Q; Q = null;
+  if (q.mode === 'boss') return finishBoss(q);
+  if (q.mode === 'daily') return finishDaily(q);
+  const W = WORLDS[q.w], lv = W.levels[q.i];
+  const avg = q.times.length ? q.times.reduce((x, y) => x + y, 0) / q.times.length : 0;
+  const sec = s => ar(s.toFixed(1)).replace('.', '٫') + ' ث';
+  let html = '', win = true, earned = 0, items = [], raceLine = '';
+  const actions = [];
+  if (q.mode === 'challenge'){
+    win = q.energy >= q.goal;
+    if (win){
+      earned = q.asked <= q.s3 && q.wrong === 0 ? 3 : q.asked <= q.s2 ? 2 : 1;
+      const B = P().best[q.w] || (P().best[q.w] = {});
+      items = grantStars(q.w, q.i, earned);
+      if (!B[q.i] || q.asked < B[q.i].q) B[q.i] = {q:q.asked, avg:+avg.toFixed(1)};
+      if (!q.rivalDone){ R().wool += 5; raceLine = '<span>🏆 سبقتَ صوفي إلى خط النهاية!</span>'; }
+      else raceLine = '<span>🐑 سبقتك صوفي هذه المرة، أسرِع أكثر!</span>';
+    }
+    const msgs = {3:'وصلت إلى خط النهاية بسرعة الصاعقة.', 2:'أجب أسرع قليلًا لتنال النجمة الثالثة.', 1:'كلما تدرّبت صرت أسرع ووصلت بأسئلة أقل.'};
+    html += `<div class="r-emoji">${win ? '🏁' : W.runner}</div><h2>${win ? 'أحسنت يا ' + esc(kid().name) + '! تجاوزت «' + lv.title + '»' : 'اقتربت كثيرًا!'}</h2>`;
+    if (win) html += `<div class="bigstars" aria-label="${ar(earned)} من ٣ نجوم">${[1, 2, 3].map(s => `<span class="${s <= earned ? 'on' : ''}" style="animation-delay:${s * 160}ms">★</span>`).join('')}</div>`;
+    html += `<p>${win ? msgs[earned] : 'انتهت الأسئلة قبل أن يمتلئ الشريط. راجع الشرح ثم حاول مجددًا.'}</p>`;
+    html += `<div class="r-stats">${ar(q.asked)} <span>أسئلة</span> · ${q.times.length ? sec(avg) : '—'} <span>متوسط الإجابة</span>${q.wrong ? ` · ${ar(q.wrong)} <span>أخطاء</span>` : ''}</div>`;
+    html += rewardsHtml(q, items, raceLine);
+    if (win && q.i < W.levels.length - 1 && unlocked(q.w, q.i + 1)) actions.push(['next', W.levels[q.i + 1].boss ? 'واجه الذئب 🐺' : 'المستوى التالي', true]);
+    else if (!win) actions.push(['learn', 'راجع الشرح', true]);
+    actions.push(['retry', win && earned < 3 ? 'حاول لـ ٣ نجوم' : 'أعد المحاولة', !actions.length]);
+  } else {
+    const pct = q.correct / q.total;
+    html += `<div class="r-emoji">${pct === 1 ? '🏅' : pct >= .7 ? '🌟' : '🌱'}</div>`;
+    html += `<h2>${ar(q.correct)} من ${ar(q.total)} صحيحة</h2>`;
+    html += `<p>${pct === 1 ? 'كل الإجابات صحيحة. أنت جاهز للتحدي!' : pct >= .7 ? 'عمل رائع! تدرّب قليلًا بعد ثم جرّب التحدي.' : 'لا بأس، كل تدريب يجعلك أقوى. راجع الشرح ثم حاول مجددًا.'}</p>`;
+    html += rewardsHtml(q, []);
+    if (q.mode === 'practice'){ actions.push(['challenge', unlocked(q.w, q.i) ? 'ابدأ التحدي' : 'اختبار القفز', true]); actions.push(['retry', 'تدرّب مجددًا']); }
+    else actions.push(['retry', 'مراجعة أخرى', true]);
+  }
+  if (items.length) actions.push(['farm', '🏡 اذهب إلى مزرعتي']);
+  actions.push(['map', 'العودة إلى الطريق']);
+  html += `<div class="r-actions">${actions.map(([r, label, primary]) => `<button class="${primary ? 'btn block' : 'link'}" data-r="${r}">${label}</button>`).join('')}</div>`;
+  save();
+  const box = $('result'); box.innerHTML = html;
+  curWorld = q.w;
+  show('result');
+  if (win && (q.mode === 'challenge' || q.correct === q.total)){ SND.win(); confetti(q.w); }
+  box.querySelectorAll('[data-r]').forEach(b => b.onclick = () => {
+    const r = b.dataset.r;
+    if (r === 'map') show('map');
+    if (r === 'farm') show('farm');
+    if (r === 'next'){ show('map'); openSheet(q.w, q.i + 1); }
+    if (r === 'learn') openLearn(q.w, q.i);
+    if (r === 'challenge') startQuizFor(q.w, q.i, 'challenge');
+    if (r === 'retry') q.mode === 'review' ? startReview() : startQuizFor(q.w, q.i, q.mode);
+  });
+}
+function showResult(html, q, onAction, celebrate){
+  save();
+  const box = $('result'); box.innerHTML = html;
+  show('result');
+  if (celebrate){ SND.win(); confetti(q.w); }
+  box.querySelectorAll('[data-r]').forEach(b => b.onclick = () => onAction(b.dataset.r));
+}
+const resultButtons = actions => `<div class="r-actions">${actions.map(([r, label, primary]) => `<button class="${primary ? 'btn block' : 'link'}" data-r="${r}">${label}</button>`).join('')}</div>`;
+function finishBoss(q){
+  const win = q.hp <= 0, W = WORLDS[q.w];
+  let html = '', items = [], extra = '';
+  curWorld = q.w;
+  if (win){
+    const earned = q.lives;                                   // hearts left = stars
+    const firstWin = !R().bossWins[q.w];
+    items = grantStars(q.w, q.i, earned);
+    if (firstWin){ R().bossWins[q.w] = true; items.push(addFarmItem(['🏆', 'كأس الفوز على الذئب'])); R().wool += 30; extra = '<span>🏆 جائزة خاصة لهزيمة الذئب!</span>'; }
+    html += `<div class="r-emoji">🐺💨</div><h2>هزمت الذئب المشاغب!</h2><div class="bigstars">${[1, 2, 3].map(s => `<span class="${s <= earned ? 'on' : ''}" style="animation-delay:${s * 160}ms">★</span>`).join('')}</div>
+      <p>هرب الذئب وهو يضحك، وعادت ${W.name} آمنة. ${earned < 3 ? 'حاول مرة أخرى بلا أخطاء لتنال ٣ نجوم.' : 'بلا خطأ واحد! أنت بطل.'}</p>`;
+  } else {
+    html += `<div class="r-emoji">🐺😏</div><h2>الذئب ما زال يضحك!</h2><p>بقيت له ${ar(q.hp)} نقطة قوة فقط. تدرّب قليلًا ثم عُد إليه، أنت قادر عليه!</p>`;
+  }
+  html += rewardsHtml(q, items, extra);
+  const actions = [['retry', win ? 'واجهه مرة أخرى' : 'حاول مجددًا', !items.length], ...(items.length ? [['farm', '🏡 اذهب إلى مزرعتي', true]] : []), ['map', 'العودة إلى الطريق']];
+  showResult(html + resultButtons(actions), q, r => { if (r === 'retry') startBoss(q.w, q.i); if (r === 'farm') show('farm'); if (r === 'map') show('map'); }, win);
+}
+function finishDaily(q){
+  const good = q.correct >= 3, already = dailyDoneToday();
+  let items = [], extra = '';
+  if (good && !already){
+    const d = R().daily, t = todayStr();
+    d.streak = d.date === dayBefore(t) ? d.streak + 1 : 1; d.date = t;
+    R().wool += 15;
+    if (d.streak % 3 === 0) items.push(addFarmItem());
+    extra = `<span>🔥 سلسلة ${ar(d.streak)} ${d.streak === 1 ? 'يوم' : d.streak === 2 ? 'يومان' : d.streak <= 10 ? 'أيام' : 'يومًا'}${d.streak % 3 === 0 ? ' · هدية لمزرعتك!' : ' · كل ٣ أيام هدية لمزرعتك'}</span>`;
+  }
+  const html = `<div class="r-emoji">${good ? '☀️' : '🌱'}</div><h2>${ar(q.correct)} من ${ar(q.total)} صحيحة</h2>
+    <p>${good ? (already ? 'أحسنت! لقد أنجزت تحدي اليوم من قبل، عُد غدًا لتحدٍّ جديد.' : 'أنجزت تحدي اليوم! عُد غدًا لتطيل سلسلتك.') : 'تحتاج ٣ إجابات صحيحة على الأقل لإنجاز تحدي اليوم. حاول مجددًا!'}</p>
+    ${rewardsHtml(q, items, extra)}`;
+  const actions = [...(good ? [] : [['retry', 'حاول مجددًا', true]]), ...(items.length ? [['farm', '🏡 اذهب إلى مزرعتي', true]] : []), ['worlds', 'العودة إلى العوالم', good && !items.length]];
+  showResult(html + resultButtons(actions), q, r => { if (r === 'retry') startDaily(); if (r === 'farm') show('farm'); if (r === 'worlds') show('worlds'); }, good && !already);
+}
+function confetti(w){
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const c = document.createElement('div'); c.className = 'confetti';
+  const pieces = ['⭐', WORLDS[w].runner, '✨', WORLDS[w].emoji];
+  for (let i = 0; i < 18; i++){
+    const p = document.createElement('i'); p.textContent = pieces[i % pieces.length];
+    p.style.left = Math.random() * 100 + '%';
+    p.style.animationDuration = 2 + Math.random() * 1.4 + 's'; p.style.animationDelay = Math.random() * .5 + 's';
+    c.appendChild(p);
+  }
+  document.body.appendChild(c); setTimeout(() => c.remove(), 4000);
+}
+
+/* =====================================================================
+   my farm & Soufi's wardrobe
+   ===================================================================== */
+let farmTab = 'farm';
+function renderFarm(){
+  const p = R();
+  $('farmWool').textContent = ar(p.wool);
+  $('tabFarm').setAttribute('aria-selected', farmTab === 'farm'); $('tabWear').setAttribute('aria-selected', farmTab === 'wear');
+  $('farmPane').hidden = farmTab !== 'farm'; $('wearPane').hidden = farmTab !== 'wear';
+  if (farmTab === 'farm'){
+    const field = $('field'), fresh = Date.now() - 60000;
+    field.innerHTML = p.farm.length ? '' : '<p class="field-empty">مزرعتك تنتظرك! كل نجمة تربحها تضيف حيوانًا أو شجرة هنا.</p>';
+    p.farm.forEach((it, idx) => {
+      const el = document.createElement('span');
+      el.className = 'item' + (it.t > fresh ? ' new' : ''); el.textContent = it.e;
+      el.style.left = it.x + '%'; el.style.top = it.y + '%';
+      el.setAttribute('role', 'img'); el.setAttribute('aria-label', (FARM_ITEMS.find(f => f[0] === it.e) || ['', 'كأس'])[1]);
+      el.addEventListener('pointerdown', e => {
+        e.preventDefault(); el.setPointerCapture(e.pointerId); el.classList.add('held'); SND.tick();
+        const move = ev => { const r = field.getBoundingClientRect();
+          it.x = Math.max(4, Math.min(96, (ev.clientX - r.left) / r.width * 100)); it.y = Math.max(36, Math.min(95, (ev.clientY - r.top) / r.height * 100));
+          el.style.left = it.x + '%'; el.style.top = it.y + '%'; };
+        const up = () => { el.classList.remove('held'); el.removeEventListener('pointermove', move); el.removeEventListener('pointerup', up); el.removeEventListener('pointercancel', up); save(); };
+        el.addEventListener('pointermove', move); el.addEventListener('pointerup', up); el.addEventListener('pointercancel', up);
+      });
+      field.appendChild(el);
+    });
+    $('farmNote').textContent = p.farm.length ? `في مزرعتك ${ar(p.farm.length)}. اسحب أي حيوان أو شجرة لترتّب مزرعتك كما تحب.` : 'العب وتعلّم لتجمع النجوم ⭐';
+  } else {
+    $('wearPreview').innerHTML = soufiHtml();
+    $('outfits').innerHTML = `<button class="outfit ${!p.wear ? 'on' : ''}" data-o=""><span class="o-e">🐑</span><b>بلا ملابس</b><small>${!p.wear ? 'تلبسها الآن' : 'اخلع الملابس'}</small></button>` +
+      OUTFITS.map(o => { const own = p.owned.includes(o.id), on = p.wear === o.id, can = own || p.wool >= o.price;
+        return `<button class="outfit ${on ? 'on' : ''}" data-o="${o.id}" ${can ? '' : 'disabled'}><span class="o-e">${o.e}</span><b>${o.n}</b><small>${on ? 'تلبسها الآن ✓' : own ? 'البسها' : `🧶 ${ar(o.price)}${can ? ' · اشترِ' : ''}`}</small></button>`; }).join('');
+    $('outfits').querySelectorAll('[data-o]').forEach(b => b.onclick = () => {
+      const id = b.dataset.o, o = OUTFITS.find(x => x.id === id);
+      if (o && !p.owned.includes(id)){ if (p.wool < o.price) return; p.wool -= o.price; p.owned.push(id); SND.win(); }
+      else SND.tick();
+      p.wear = id; save(); renderFarm();
+    });
+  }
+}
+$('tabFarm').onclick = () => { farmTab = 'farm'; renderFarm(); };
+$('tabWear').onclick = () => { farmTab = 'wear'; renderFarm(); };
+$('farmBack').onclick = () => show('worlds');
+
+/* =====================================================================
+   mastery grid (multiplication)
+   ===================================================================== */
+function renderGrid(){
+  let h = '<tr><th class="num">×</th>' + [...Array(10)].map((_, j) => `<th class="num">${ar(j + 1)}</th>`).join('') + '</tr>', mastered = 0;
+  for (let a = 1; a <= 10; a++){
+    h += `<tr><th class="num">${ar(a)}</th>`;
+    for (let b = 1; b <= 10; b++){ const lv = level(a, b); if (lv === 3) mastered++;
+      h += `<td class="l${lv}"><button data-a="${a}" data-b="${b}" aria-label="${ar(a)} × ${ar(b)} = ${ar(a * b)}">${ar(a * b)}</button></td>`; }
+    h += '</tr>';
+  }
+  $('mg').innerHTML = h;
+  $('mgBar').style.width = mastered + '%';
+  $('mgPct').textContent = `حفظت ${ar(mastered)} من ${ar(100)}`;
+  $('mg').querySelectorAll('button').forEach(b => b.onclick = () => openLearn('mult', +b.dataset.a - 1, {k:+b.dataset.b}));
+}
+$('reviewBtn').onclick = startReview;
+$('gridBtn').onclick = () => { show('grid'); renderGrid(); };
+$('gridBack').onclick = () => show('map');
+
+/* =====================================================================
+   boot
+   ===================================================================== */
+/* =====================================================================
+   native app bridge (Capacitor). Everything is optional: on the web these plugins are simply absent.
+   ===================================================================== */
+const NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+const plugin = name => NATIVE && window.Capacitor.Plugins ? window.Capacitor.Plugins[name] : null;
+if (NATIVE) document.documentElement.classList.add('app-native');
+function haptic(kind){
+  try {
+    const H = plugin('Haptics');
+    if (H){ kind === 'ok' ? H.impact({style:'LIGHT'}) : H.notification({type:'ERROR'}); }
+    else if (navigator.vibrate) navigator.vibrate(kind === 'ok' ? 15 : [40, 60, 40]);
+  } catch(e){}
+}
+// Android back button: step back through the screens, leave the app from the first screen.
+function goBack(){
+  if (!$('overlay').hidden){ closeSheet(); return; }
+  if (document.querySelector('.countdown')) return;
+  const cur = SCREENS.find(s => !$('screen-' + s).hidden);
+  if (cur === 'quiz'){ $('quitBtn').click(); return; }
+  if (cur === 'learn' || cur === 'grid' || cur === 'result'){ show('map'); return; }
+  if (cur === 'map' || cur === 'farm'){ show('worlds'); return; }
+  if (cur === 'parent'){ show('profiles'); return; }
+  if (cur === 'worlds' && DB.kids.length > 1){ show('profiles'); return; }
+  const A = plugin('App'); if (A) A.exitApp();
+}
+// Pause the question timer while the app is in the background, so time away is not counted.
+let hiddenAt = 0;
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden){ hiddenAt = performance.now(); return; }
+  if (hiddenAt && Q && !Q.busy && Q.t0) Q.t0 += performance.now() - hiddenAt;
+  hiddenAt = 0;
+});
+function nativeSetup(){
+  if (!NATIVE) return;
+  try {
+    const A = plugin('App'); if (A) A.addListener('backButton', goBack);
+    const SB = plugin('StatusBar');
+    if (SB){ const dark = matchMedia('(prefers-color-scheme: dark)').matches; SB.setStyle({style: dark ? 'DARK' : 'LIGHT'}); }
+    const SS = plugin('SplashScreen'); if (SS) setTimeout(() => SS.hide(), 300);
+  } catch(e){}
+}
+
+function start(data){
+  load();
+  if (data && data.DB && Array.isArray(data.DB.kids)) DB = data.DB;
+  if (!DB.parent) show('register');
+  else if (!kid()) show('profiles');
+  else show('worlds');
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => requestAnimationFrame(drawTrail));
+}
+nativeSetup();
+window.claude?.hot?.snapshot?.(() => ({DB}));
+window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+
+// exposed for automated checks only
+window.__nf = {words, arithSteps, roundInfo, goatReady: () => goatBufs.length, get learn(){ return learnCtx; }, get q(){ return Q && !Q.busy ? Q.q : null; }};
+})();
+</script>
+</body>
+</html>
