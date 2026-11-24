@@ -18,6 +18,9 @@ let game = readFileSync(join(repo, 'multiplication-game', 'index.html'), 'utf8')
 writeFileSync(join(docs, 'index.html'), game);
 writeFileSync(join(docs, 'privacy', 'index.html'), readFileSync(join(app, 'store', 'privacy-policy.html'), 'utf8'));
 writeFileSync(join(docs, '.nojekyll'), '');
-// custom domain for GitHub Pages (the DNS record lives in Cloudflare: CNAME games -> abbed81-dot.github.io)
-writeFileSync(join(docs, 'CNAME'), 'games.basesolution.me\n');
-console.log('docs/ built: index.html, privacy/index.html, CNAME');
+// Optional custom domain for GitHub Pages: set SITE_DOMAIN (e.g. games.basesolution.me) once its DNS record
+// exists (CNAME games -> abbed81-dot.github.io). Without it the site is served at https://abbed81-dot.github.io/UI-Design/
+import { rmSync } from 'node:fs';
+if (process.env.SITE_DOMAIN) writeFileSync(join(docs, 'CNAME'), process.env.SITE_DOMAIN + '\n');
+else rmSync(join(docs, 'CNAME'), { force: true });
+console.log('docs/ built: index.html, privacy/index.html' + (process.env.SITE_DOMAIN ? ', CNAME' : ''));
