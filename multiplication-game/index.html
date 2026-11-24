@@ -6,9 +6,11 @@
 <!--ARTIFACT-START-->
 <title>مزرعة الأرقام</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<!--WEB-FONTS-->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@500;700;800&family=Tajawal:wght@400;500;700&display=swap">
+<!--/WEB-FONTS-->
 <style>
 /* Layout: one calm column (wider on tablets). Parent signs up once, picks a child, the child picks a "world"
    (multiplication, addition, subtraction, place value, rounding); each world is a winding trail of levels.
@@ -52,6 +54,14 @@ button:focus-visible,summary:focus-visible,input:focus-visible{outline:3px solid
 h1,h2,h3{font-family:var(--f-display);line-height:1.25;margin:0;text-wrap:balance;font-weight:700}
 p{margin:0}
 .pc0{color:var(--p0)}.pc1{color:var(--p1)}.pc2{color:var(--p2)}.pc3{color:var(--p3)}.pc4{color:var(--p4)}.pc5{color:var(--p5)}
+
+/* ---------- inside the native app (iOS / Android) ---------- */
+.app-native,.app-native body{overscroll-behavior:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.app-native input{-webkit-user-select:text;user-select:text}
+.app-native .app{padding-top:calc(16px + env(safe-area-inset-top,0px));padding-bottom:calc(56px + env(safe-area-inset-bottom,0px))}
+button,a,input{touch-action:manipulation}
+.gate-q{font-family:var(--f-display);font-weight:700;font-size:1.1rem;text-align:center;margin:6px 0 12px}
+.gate input{text-align:center;font-size:1.6rem;letter-spacing:.3em;direction:ltr}
 
 /* ---------- shared controls ---------- */
 .icon-btn{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:1.15rem;color:var(--muted);flex:none}
@@ -879,7 +889,25 @@ $('addKidForm').onsubmit = e => {
   const k = {id:newId(), name:n.slice(0, 30), avatar:newKidAvatar(), prog:freshProg()};
   DB.kids.push(k); save(); $('addKidForm').hidden = true; renderProfiles();
 };
-$('parentBtn').onclick = () => show('parent');
+/* Parental gate (required for apps in the Kids category): the parent types the last 4 digits of their phone number. */
+function parentGate(onOk){
+  const last4 = toLatin(DB.parent.phone).replace(/\D/g, '').slice(-4);
+  $('sheet').innerHTML = `<div class="s-head"><span class="big">🔒</span><div><h2>للوالدين فقط</h2><p>هذه الصفحة لولي الأمر</p></div><button class="icon-btn" data-close aria-label="إغلاق">✕</button></div>
+    <form class="gate" id="gateForm" novalidate>
+      <p class="gate-q">اكتب آخر ٤ أرقام من رقم هاتف ولي الأمر</p>
+      <label class="field"><span class="sr">آخر ٤ أرقام</span><input id="gateIn" inputmode="numeric" maxlength="4" autocomplete="off"></label>
+      <p class="err" id="gateErr" role="alert"></p>
+      <button class="btn block" type="submit">فتح</button>
+    </form>`;
+  $('sheet').querySelector('[data-close]').onclick = closeSheet;
+  $('gateForm').onsubmit = e => {
+    e.preventDefault();
+    if (toLatin($('gateIn').value).replace(/\D/g, '') === last4){ closeSheet(); onOk(); }
+    else { $('gateErr').textContent = 'الأرقام غير صحيحة. اطلب المساعدة من ولي الأمر.'; $('gateIn').value = ''; }
+  };
+  $('overlay').hidden = false; $('gateIn').focus();
+}
+$('parentBtn').onclick = () => parentGate(() => show('parent'));
 $('whoBtn').onclick = () => show('profiles');
 $('parentBack').onclick = () => show('profiles');
 $('parentAddKid').onclick = () => { show('profiles'); openAddKid(); };
@@ -1630,7 +1658,7 @@ function answer(v, btn){
     setTimeout(nextQuestion, 800); save(); return;
   }
   if (ok){
-    P().correct++;
+    P().correct++; haptic('ok');
     Q.correct++; Q.times.push(t); Q.combo++;
     markAnswer(true); if (btn) btn.classList.add('ok');
     let delay = q.input === 'column' ? 800 : 600;
@@ -1649,7 +1677,7 @@ function answer(v, btn){
     setTimeout(nextQuestion, delay);
   } else {
     Q.wrong++; Q.combo = 0; Q.missed++;
-    SND.bad();
+    SND.bad(); haptic('bad');
     if (btn){ btn.classList.add('bad'); $('choices').querySelector(`[data-v="${q.answer}"]`)?.classList.add('ok'); }
     markAnswer(false);
     if (Q.mode === 'challenge') Q.energy = Math.max(0, Q.energy - WRONG_PENALTY);
@@ -1753,6 +1781,48 @@ $('gridBack').onclick = () => show('map');
 /* =====================================================================
    boot
    ===================================================================== */
+/* =====================================================================
+   native app bridge (Capacitor). Everything is optional: on the web these plugins are simply absent.
+   ===================================================================== */
+const NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+const plugin = name => NATIVE && window.Capacitor.Plugins ? window.Capacitor.Plugins[name] : null;
+if (NATIVE) document.documentElement.classList.add('app-native');
+function haptic(kind){
+  try {
+    const H = plugin('Haptics');
+    if (H){ kind === 'ok' ? H.impact({style:'LIGHT'}) : H.notification({type:'ERROR'}); }
+    else if (navigator.vibrate) navigator.vibrate(kind === 'ok' ? 15 : [40, 60, 40]);
+  } catch(e){}
+}
+// Android back button: step back through the screens, leave the app from the first screen.
+function goBack(){
+  if (!$('overlay').hidden){ closeSheet(); return; }
+  if (document.querySelector('.countdown')) return;
+  const cur = SCREENS.find(s => !$('screen-' + s).hidden);
+  if (cur === 'quiz'){ $('quitBtn').click(); return; }
+  if (cur === 'learn' || cur === 'grid' || cur === 'result'){ show('map'); return; }
+  if (cur === 'map'){ show('worlds'); return; }
+  if (cur === 'parent'){ show('profiles'); return; }
+  if (cur === 'worlds' && DB.kids.length > 1){ show('profiles'); return; }
+  const A = plugin('App'); if (A) A.exitApp();
+}
+// Pause the question timer while the app is in the background, so time away is not counted.
+let hiddenAt = 0;
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden){ hiddenAt = performance.now(); return; }
+  if (hiddenAt && Q && !Q.busy && Q.t0) Q.t0 += performance.now() - hiddenAt;
+  hiddenAt = 0;
+});
+function nativeSetup(){
+  if (!NATIVE) return;
+  try {
+    const A = plugin('App'); if (A) A.addListener('backButton', goBack);
+    const SB = plugin('StatusBar');
+    if (SB){ const dark = matchMedia('(prefers-color-scheme: dark)').matches; SB.setStyle({style: dark ? 'DARK' : 'LIGHT'}); }
+    const SS = plugin('SplashScreen'); if (SS) setTimeout(() => SS.hide(), 300);
+  } catch(e){}
+}
+
 function start(data){
   load();
   if (data && data.DB && Array.isArray(data.DB.kids)) DB = data.DB;
@@ -1761,6 +1831,7 @@ function start(data){
   else show('worlds');
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => requestAnimationFrame(drawTrail));
 }
+nativeSetup();
 window.claude?.hot?.snapshot?.(() => ({DB}));
 window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
 
