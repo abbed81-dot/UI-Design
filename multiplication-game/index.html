@@ -242,15 +242,29 @@ details[open] summary::before{transform:rotate(-90deg)}
 .expand .op{color:var(--muted);font-weight:500}
 
 /* ---------- number line ---------- */
-.nl{margin:18px 6px 8px;direction:ltr}
-.nl-track{position:relative;height:10px;border-radius:99px;background:linear-gradient(90deg,var(--soft),var(--line),var(--soft));margin:44px 14px 0}
+.nl{margin:18px 6px 8px;direction:rtl} /* right = smaller, left = larger, as Arabic is read */
+.nl-track{position:relative;height:10px;border-radius:99px;background:linear-gradient(90deg,var(--soft),var(--line),var(--soft));margin:40px 22px 0}
 .nl-track::before,.nl-track::after{content:"";position:absolute;top:-8px;width:4px;height:26px;border-radius:4px;background:var(--ink)}
 .nl-track::before{left:-2px}.nl-track::after{right:-2px}
 .nl-mid{position:absolute;left:50%;top:-5px;width:2px;height:20px;background:var(--muted);transform:translateX(-50%)}
-.nl-dot{position:absolute;top:50%;width:14px;height:14px;border-radius:50%;background:var(--accent);transform:translate(-50%,-50%);box-shadow:0 0 0 3px var(--surface)}
+.nl-dot{position:absolute;top:50%;width:14px;height:14px;border-radius:50%;background:var(--accent);transform:translate(50%,-50%);box-shadow:0 0 0 3px var(--surface)}
 .nl-dot b{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);font-family:var(--f-display);font-size:1.05rem;white-space:nowrap;color:var(--accent)}
-.nl-goat{position:absolute;top:-44px;font-size:1.8rem;transform:translateX(-50%);transition:left 1s cubic-bezier(.4,1.4,.5,1)}
-.nl-labels{display:flex;justify-content:space-between;margin-top:14px;font-family:var(--f-display);font-weight:700;font-variant-numeric:tabular-nums}
+.nl-goat{position:absolute;top:10px;font-size:1.8rem;transform:translateX(50%);transition:right 1s cubic-bezier(.4,1.4,.5,1)}
+.nl-goat.drag{cursor:grab;touch-action:none;font-size:2.6rem;top:6px;padding:0 6px;border-radius:14px;line-height:1.1}
+.nl-goat.drag .g{display:inline-block;animation:wiggle 1.4s ease-in-out infinite}
+.nl-goat.held{cursor:grabbing;transition:none}
+.nl-goat.held .g{animation:none;transform:scale(1.25) rotate(-8deg)}
+.nl-goat.jump .g{animation:goatJump .5s ease-out}
+.nl-goat.no .g{animation:refuse .6s ease-in-out 2}
+@keyframes refuse{0%,100%{transform:translateX(0) rotate(0)}20%{transform:translateX(-7px) rotate(-14deg)}40%{transform:translateX(7px) rotate(14deg)}60%{transform:translateX(-5px) rotate(-8deg)}80%{transform:translateX(5px) rotate(8deg)}}
+.nl-say{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:var(--surface);color:var(--bad);box-shadow:var(--shadow);border-radius:12px;padding:2px 10px;font-family:var(--f-display);font-weight:800;font-size:1rem;white-space:nowrap;font-style:normal;pointer-events:none;animation:pop .2s both}
+.nl-end.nope{background:var(--bad-soft);color:var(--bad)}
+@keyframes wiggle{0%,100%{transform:rotate(0)}20%{transform:rotate(-10deg)}40%{transform:rotate(8deg)}60%{transform:rotate(0)}}
+@keyframes goatJump{0%{transform:translateY(0)}40%{transform:translateY(-22px) rotate(-12deg)}100%{transform:translateY(0)}}
+.nl-end{font:inherit;color:inherit;font-weight:700;border-radius:10px;padding:2px 10px;background:var(--soft);min-height:40px}
+.nl-end:hover{background:var(--line)}
+.drag-tip{text-align:center;color:var(--muted);font-weight:700;font-size:.95rem;margin-top:4px}
+.nl-labels{display:flex;justify-content:space-between;align-items:center;margin-top:52px;font-family:var(--f-display);font-weight:700;font-variant-numeric:tabular-nums}
 .nl-labels .mid{color:var(--muted);font-weight:500;font-size:.9rem}
 .nl-labels .win{color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,transparent);border-radius:8px;padding:0 6px}
 
@@ -718,10 +732,16 @@ function weakness(a, b){
    sound & speech
    ===================================================================== */
 let AC = null;
+function audio(){
+  AC = AC || new (window.AudioContext || window.webkitAudioContext)();
+  if (AC.state === 'suspended') AC.resume();
+  return AC;
+}
+['pointerdown', 'keydown', 'touchend'].forEach(ev => addEventListener(ev, () => { if (DB.sound) { try { audio(); } catch(e){} } }, {passive:true}));
 function beep(notes, type = 'triangle', l = .11){
   if (!DB.sound) return;
   try {
-    AC = AC || new (window.AudioContext || window.webkitAudioContext)();
+    audio();
     const t0 = AC.currentTime;
     notes.forEach((f, i) => {
       const o = AC.createOscillator(), g = AC.createGain();
@@ -738,6 +758,25 @@ const SND = {
   bad: () => beep([260, 220], 'sine', .14), tick: () => beep([520], 'sine', .05),
   win: () => beep([523, 659, 784, 1047], 'triangle', .13),
 };
+// a goat's "maaa": a sliding sawtooth with a fast wobble
+function bleat(){
+  if (!DB.sound) return;
+  try {
+    audio();
+    const t0 = AC.currentTime, T = .95;
+    const o = AC.createOscillator(), o2 = AC.createOscillator(), g = AC.createGain(), f = AC.createBiquadFilter();
+    const vib = AC.createOscillator(), vibG = AC.createGain(), trem = AC.createGain(), tre = AC.createOscillator(), treG = AC.createGain();
+    o.type = 'sawtooth'; o2.type = 'square';
+    o.frequency.setValueAtTime(620, t0); o.frequency.linearRampToValueAtTime(470, t0 + T);
+    o2.frequency.setValueAtTime(311, t0); o2.frequency.linearRampToValueAtTime(236, t0 + T);
+    vib.frequency.value = 6; vibG.gain.value = 18; vib.connect(vibG); vibG.connect(o.frequency); vibG.connect(o2.frequency);
+    tre.frequency.value = 9; treG.gain.value = .45; trem.gain.value = .55; tre.connect(treG).connect(trem.gain);
+    f.type = 'bandpass'; f.frequency.value = 1100; f.Q.value = .9;
+    g.gain.setValueAtTime(.0001, t0); g.gain.exponentialRampToValueAtTime(.22, t0 + .05); g.gain.setValueAtTime(.22, t0 + T - .25); g.gain.exponentialRampToValueAtTime(.0001, t0 + T);
+    o.connect(f); o2.connect(f); f.connect(trem).connect(g).connect(AC.destination);
+    [o, o2, vib, tre].forEach(x => { x.start(t0); x.stop(t0 + T + .05); });
+  } catch(e){}
+}
 let speakText = '';
 function speak(text){
   try {
@@ -1090,16 +1129,66 @@ function roundInfo(n, k){
   const U = 10 ** k, lo = Math.floor(n / U) * U, hi = lo + U, d = digit(n, k - 1);
   return {U, lo, hi, d, target: d >= 5 ? hi : lo};
 }
-function lineHtml(n, k){
+function lineHtml(n, k, interactive = false){
   const {U, lo, hi} = roundInfo(n, k), pos = (n - lo) / U * 100;
-  return `<div class="nl" data-pos="${pos}"><div class="nl-track"><span class="nl-mid"></span><span class="nl-dot" style="left:${pos}%"><b>${fmt(n)}</b></span><span class="nl-goat" style="left:${pos}%">🐐</span></div>
-    <div class="nl-labels"><span data-v="${lo}">${fmt(lo)}</span><span class="mid">${fmt(lo + U / 2)}</span><span data-v="${hi}">${fmt(hi)}</span></div></div>`;
+  const goat = interactive
+    ? `<button type="button" class="nl-goat drag" style="right:${pos}%" aria-label="العنزة. اسحبها إلى العدد الأقرب، أو استخدم السهمين"><span class="g">🐐</span></button>`
+    : `<span class="nl-goat" style="right:${pos}%"><span class="g">🐐</span></span>`;
+  const end = v => interactive ? `<button type="button" class="nl-end num" data-v="${v}">${fmt(v)}</button>` : `<span data-v="${v}">${fmt(v)}</span>`;
+  return `<div class="nl" data-pos="${pos}"><div class="nl-track"><span class="nl-mid"></span><span class="nl-dot" style="right:${pos}%"><b>${fmt(n)}</b></span>${goat}</div>
+    <div class="nl-labels">${end(lo)}<span class="mid">${fmt(lo + U / 2)}</span>${end(hi)}</div></div>
+    ${interactive ? `<p class="drag-tip">اسحب العنزة 🐐 إلى العدد الأقرب: يمينًا إلى ${fmt(lo)} أو يسارًا إلى ${fmt(hi)}</p>` : ''}`;
+}
+/* Drag the goat along the line (right = smaller, left = larger). Letting go near an end, tapping an end,
+   or pressing an arrow key picks that number; letting go in the middle sends the goat back to its place. */
+function attachGoat(el, n, k, onPick, opts = {}){
+  const nl = el.querySelector('.nl'), track = nl.querySelector('.nl-track'), goat = nl.querySelector('.nl-goat');
+  const {lo, hi, target} = roundInfo(n, k), start = parseFloat(nl.dataset.pos) / 100;
+  const say = on => { goat.querySelector('.nl-say')?.remove(); if (on) goat.insertAdjacentHTML('beforeend', '<i class="nl-say">مَاااء! 🙅</i>'); };
+  let dragging = false, done = false, x0 = 0, moved = 0;
+  const setPos = f => goat.style.right = (f * 100) + '%';
+  const frac = x => { const r = track.getBoundingClientRect(); return Math.max(0, Math.min(1, (r.right - x) / r.width)); };
+  const pickVal = v => {
+    if (done) return; done = true;
+    const right = v === target;
+    goat.classList.remove('drag', 'held', 'no'); goat.classList.add('jump');
+    setPos(v === hi ? 1 : 0); SND.tick();
+    nl.querySelectorAll('[data-v]').forEach(b => { b.classList.toggle('win', right && +b.dataset.v === v); b.classList.toggle('nope', !right && +b.dataset.v === v); });
+    if (right){ setTimeout(() => onPick(v), 550); return; }
+    // wrong side: the goat shakes its head and bleats
+    setTimeout(() => { goat.classList.remove('jump'); goat.classList.add('no'); say(true); bleat(); }, 450);
+    if (opts.retry){
+      opts.onRefuse && opts.onRefuse();
+      setTimeout(() => { // walk back and let the child try again
+        goat.classList.remove('no'); goat.classList.add('drag'); say(false); setPos(start);
+        nl.querySelectorAll('[data-v]').forEach(b => b.classList.remove('nope')); done = false;
+      }, 1800);
+    } else setTimeout(() => onPick(v), 1700);
+  };
+  goat.addEventListener('pointerdown', e => { if (done) return; dragging = true; x0 = e.clientX; moved = 0; goat.setPointerCapture(e.pointerId); goat.classList.add('held'); e.preventDefault(); });
+  goat.addEventListener('pointermove', e => { if (!dragging) return; moved = Math.max(moved, Math.abs(e.clientX - x0)); setPos(frac(e.clientX)); });
+  const up = e => {
+    if (!dragging) return; dragging = false; goat.classList.remove('held');
+    const f = frac(e.clientX);
+    if ((moved > 12 || f >= .96) && f >= .85) pickVal(hi);
+    else if ((moved > 12 || f <= .04) && f <= .15) pickVal(lo);
+    else { setPos(start); if (moved > 12) floatTip(el, 'اسحبها حتى أحد الطرفين!'); }
+  };
+  goat.addEventListener('pointerup', up); goat.addEventListener('pointercancel', up);
+  goat.addEventListener('keydown', e => { if (e.key === 'ArrowLeft'){ e.preventDefault(); pickVal(hi); } if (e.key === 'ArrowRight'){ e.preventDefault(); pickVal(lo); } });
+  nl.querySelectorAll('.nl-end').forEach(b => b.onclick = () => pickVal(+b.dataset.v));
+  return {pick: v => pickVal(v), lo, hi};
+}
+function floatTip(el, txt){
+  const t = el.querySelector('.drag-tip'); if (!t) return;
+  const old = t.textContent; t.textContent = txt; t.style.color = 'var(--sun)';
+  setTimeout(() => { if (t.isConnected){ t.textContent = old; t.style.color = ''; } }, 1600);
 }
 function revealLine(el, target){
   const nl = el.querySelector('.nl'); if (!nl) return;
   nl.querySelectorAll('[data-v]').forEach(s => s.classList.toggle('win', +s.dataset.v === target));
   const goat = nl.querySelector('.nl-goat'), isHi = +nl.querySelectorAll('[data-v]')[1].dataset.v === target;
-  requestAnimationFrame(() => requestAnimationFrame(() => goat.style.left = isHi ? '100%' : '0%'));
+  requestAnimationFrame(() => requestAnimationFrame(() => goat.style.right = isHi ? '100%' : '0%'));
 }
 function roundExplain(n, k){
   const {d, target} = roundInfo(n, k);
@@ -1214,15 +1303,20 @@ function learnRound(){
   if (learnCtx.n == null) learnCtx.n = genRoundNum(k);
   const n = learnCtx.n, {target} = roundInfo(n, k);
   $('learnBody').innerHTML = `
-    <p class="lesson">التقريب يعني أن نختار أقرب عدد «مدوّر». نسأل: هل العدد أقرب إلى البداية أم إلى النهاية؟</p>
+    <p class="lesson">التقريب يعني أن نختار أقرب عدد «مدوّر». على الخط يكون الأصغر على اليمين والأكبر على اليسار، ونسأل: هل العدد أقرب إلى اليمين أم إلى اليسار؟</p>
     <p class="qtext">قرّب ${fmt(n)} إلى ${ROUND_TO[k]}</p>
     <div class="bignum">${numHtml(n, k - 1)}</div>
-    <div id="learnLine">${lineHtml(n, k)}</div>
-    <div class="step-msg">${roundExplain(n, k)}</div>
+    <div id="learnLine">${lineHtml(n, k, true)}</div>
+    <div class="step-msg" id="roundMsg" aria-live="polite">جرّب أنت: حرّك العنزة إلى العدد الذي تراه أقرب.</div>
     <div class="tip"><p>القاعدة: انظر إلى الرقم في المنزلة الأصغر مباشرةً (${PLACE[k - 1]}). إذا كان ٥ أو أكثر نقرّب للأعلى، وإذا كان أقل من ٥ نقرّب للأسفل.</p></div>
     <div class="row" style="margin-top:6px"><button class="link" id="newEx">🔄 مثال جديد</button></div>
     <div class="learn-foot">${startPracticeBtn()}</div>`;
-  revealLine($('learnLine'), target);
+  attachGoat($('learnLine'), n, k, () => {
+    SND.ok();
+    $('roundMsg').innerHTML = '🎉 أحسنت! ' + roundExplain(n, k);
+  }, {retry:true, onRefuse: () => {
+    $('roundMsg').innerHTML = 'مَاااء! العنزة ترفض، فهذا ليس العدد الأقرب. انظر إلى النقطة: إلى أي طرف هي أقرب؟ جرّب الجهة الأخرى.';
+  }});
   speakText = `${words(n)} تقريبه إلى ${ROUND_TO[k]} هو ${words(target)}`;
   $('newEx').onclick = () => { learnCtx.n = null; learnRound(); };
   bindPractice();
@@ -1335,15 +1429,15 @@ function placeQ(d){
 }
 function roundQ(k){
   const n = genRoundNum(k), {U, lo, hi, target} = roundInfo(n, k);
-  const near = (x, u) => Math.round(x / u) * u;
-  const opts = uniq([target, lo === target ? hi : lo, k > 1 ? near(n, U / 10) : hi + U, near(n, U * 10), lo - U > 0 ? lo - U : hi + U, hi + U].filter(x => x > 0), 4);
-  return {answer:target, input:'choices', tf:1.4 + k * .2,
-    choices: shuffle(opts.map(v => ({v, html:fmt(v)}))),
+  const q = {answer:target, input:'drag', tf:1.4 + k * .2,
     view: () => `<p class="qtext">قرّب إلى ${ROUND_TO[k]}</p><div class="bignum">${numHtml(n)}</div>`,
-    visual: () => { vis().innerHTML = lineHtml(n, k); },
-    hint: () => { const el = vis(); el.innerHTML = lineHtml(n, k); $('qPrompt').querySelector('.bignum').innerHTML = numHtml(n, k - 1);
+    visual: () => { const el = vis(); el.innerHTML = lineHtml(n, k, true);
+      q.goat = attachGoat(el, n, k, v => answer(v), {retry: Q.mode === 'practice',
+        onRefuse: () => { q.refused = true; qtext('العنزة لا تريد الذهاب إلى هناك، فهذا ليس العدد الأقرب. جرّب الجهة الأخرى!'); }}); },
+    hint: () => { $('qPrompt').querySelector('.bignum').innerHTML = numHtml(n, k - 1);
       return `انظر إلى الرقم المسطّر (${PLACE[k - 1]}): إذا كان ٥ أو أكثر نقرّب إلى ${fmt(hi)}، وإذا كان أقل من ٥ نقرّب إلى ${fmt(lo)}. وعلى الخط: أين النقطة أقرب؟`; },
     explain: () => { const el = vis(); el.innerHTML = lineHtml(n, k); revealLine(el, target); qtext(roundExplain(n, k)); }};
+  return q;
 }
 
 /* =====================================================================
@@ -1423,17 +1517,17 @@ function nextQuestion(){
   $('hintBtn').hidden = !q.hint; $('hintBtn').classList.remove('hint-on');
   $('hintMsg').hidden = true; $('hintMsg').innerHTML = '';
   $('choices').hidden = q.input !== 'choices';
-  $('pad').hidden = q.input === 'choices';
-  $('quizCard').classList.toggle('split', q.input !== 'choices');
+  $('pad').hidden = q.input === 'choices' || q.input === 'drag';
+  $('quizCard').classList.toggle('split', q.input === 'pad' || q.input === 'column');
   if (q.input === 'choices'){
     $('choices').className = 'choices' + (q.wide ? ' wide' : '');
     $('choices').innerHTML = q.choices.map(c => `<button class="choice ${q.wide ? '' : 'num'}" data-v="${c.v}">${c.html}</button>`).join('');
     $('choices').querySelectorAll('button').forEach(btn => btn.onclick = () => answer(+btn.dataset.v, btn));
-  } else {
+  } else if (q.input !== 'drag'){
     buildPad();
     renderTyped();
   }
-  if (Q.mode === 'practice' && q.visual) q.visual();
+  if ((Q.mode === 'practice' || q.input === 'drag') && q.visual) q.visual();
   updateHud();
   Q.t0 = performance.now();
   if (Q.mode !== 'practice') tickTimer();
@@ -1458,7 +1552,7 @@ function renderTyped(){
   } else if ($('ans')) $('ans').textContent = Q.typed ? ar(Q.typed) : '؟';
 }
 function padKey(k){
-  if (!Q || Q.busy || !Q.q || Q.q.input === 'choices') return;
+  if (!Q || Q.busy || !Q.q || Q.q.input === 'choices' || Q.q.input === 'drag') return;
   const want = String(Q.q.answer).length;
   if (k === 'del') Q.typed = Q.typed.slice(0, -1);
   else if (Q.typed.length < want) Q.typed += k;
@@ -1469,6 +1563,7 @@ addEventListener('keydown', e => {
   if (!Q || $('screen-quiz').hidden || !$('overlay').hidden) return;
   if (!$('wrongBox').hidden && (e.key === 'Enter' || e.key === ' ')){ e.preventDefault(); $('wrongNext').click(); return; }
   if (!Q.q) return;
+  if (Q.q.input === 'drag'){ if (!Q.busy && Q.q.goat && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')){ e.preventDefault(); Q.q.goat.pick(e.key === 'ArrowLeft' ? Q.q.goat.hi : Q.q.goat.lo); } else if (e.key === 'h' || e.key === '?') useHint(); return; }
   if (Q.q.input === 'choices'){ if (/^[1-4]$/.test(e.key)) $('choices').children[+e.key - 1]?.click(); else if (e.key === 'h' || e.key === '?') useHint(); return; }
   let d = e.key; const i = AR.indexOf(d); if (i >= 0) d = String(i);
   if (/^\d$/.test(d)) padKey(d);
@@ -1501,6 +1596,11 @@ function answer(v, btn){
   const q = Q.q, ok = v === q.answer, t = (performance.now() - Q.t0) / 1000, tf = q.tf || 1;
   Q.asked++;
   q.record && q.record(ok, Q.hinted ? 9 : t / tf);
+  if (ok && q.refused){ // practice: right on the second try
+    Q.wrong++; Q.combo = 0;
+    floatMsg('👍 صحيح في المحاولة الثانية'); SND.ok(); updateHud();
+    setTimeout(nextQuestion, 800); save(); return;
+  }
   if (ok){
     P().correct++;
     Q.correct++; Q.times.push(t); Q.combo++;
@@ -1637,7 +1737,7 @@ window.claude?.hot?.snapshot?.(() => ({DB}));
 window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
 
 // exposed for automated checks only
-window.__nf = {words, arithSteps, roundInfo, get q(){ return Q && Q.q; }};
+window.__nf = {words, arithSteps, roundInfo, get q(){ return Q && !Q.busy ? Q.q : null; }};
 })();
 </script>
 <!--ARTIFACT-END-->
