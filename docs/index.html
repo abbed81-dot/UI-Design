@@ -80,13 +80,13 @@ button,a,input{touch-action:manipulation}
 .tabs{display:flex;gap:6px;background:var(--soft);border-radius:99px;padding:4px;margin:6px 0 12px}
 .tabs button{flex:1;min-height:42px;border-radius:99px;font-weight:700;color:var(--muted)}
 .tabs button[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
-.field{position:relative;width:100%;aspect-ratio:4/3;max-height:70vh;border-radius:24px;overflow:hidden;touch-action:none;
+.farm-field{position:relative;width:100%;aspect-ratio:4/3;max-height:70vh;border-radius:24px;overflow:hidden;touch-action:none;
   background:linear-gradient(180deg,#BFE6FF 0,#DDF2FF 30%,#9BD67F 30%,#7CC35F 100%);box-shadow:var(--shadow)}
-.field::before{content:"☀️";position:absolute;top:4%;inset-inline-end:6%;font-size:2.4rem}
-.field::after{content:"";position:absolute;inset-inline:0;top:30%;height:8px;background:repeating-linear-gradient(90deg,#B5824D 0 6px,transparent 6px 26px);opacity:.7}
-.field .item{position:absolute;transform:translate(-50%,-50%);font-size:clamp(1.9rem,8vw,2.6rem);line-height:1;cursor:grab;user-select:none;-webkit-user-select:none;touch-action:none;filter:drop-shadow(0 3px 2px rgba(0,0,0,.18));z-index:1}
-.field .item.held{cursor:grabbing;transform:translate(-50%,-50%) scale(1.25);z-index:3}
-.field .item.new{animation:pop .5s both}
+.farm-field::before{content:"☀️";position:absolute;top:4%;inset-inline-end:6%;font-size:2.4rem}
+.farm-field::after{content:"";position:absolute;inset-inline:0;top:30%;height:8px;background:repeating-linear-gradient(90deg,#B5824D 0 6px,transparent 6px 26px);opacity:.7}
+.farm-field .item{position:absolute;transform:translate(-50%,-50%);font-size:clamp(1.9rem,8vw,2.6rem);line-height:1;cursor:grab;user-select:none;-webkit-user-select:none;touch-action:none;filter:drop-shadow(0 3px 2px rgba(0,0,0,.18));z-index:1}
+.farm-field .item.held{cursor:grabbing;transform:translate(-50%,-50%) scale(1.25);z-index:3}
+.farm-field .item.new{animation:pop .5s both}
 .field-empty{position:absolute;inset:auto 0 12%;text-align:center;font-weight:700;color:#2E5A22;padding:0 18px}
 .farm-note{color:var(--muted);text-align:center;font-size:.9rem;margin-top:8px}
 .wardrobe-preview{display:grid;place-items:center;font-size:6rem;padding:16px 0 4px}
@@ -580,7 +580,7 @@ table.mg{border-collapse:separate;border-spacing:3px;margin:0 auto;font-family:v
       <button role="tab" id="tabWear" aria-selected="false">👕 خزانة صوفي</button>
     </div>
     <div id="farmPane">
-      <div class="field" id="field"></div>
+      <div class="farm-field" id="field"></div>
       <p class="farm-note" id="farmNote"></p>
     </div>
     <div id="wearPane" hidden>
