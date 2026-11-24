@@ -14,7 +14,7 @@ These answers match how the app is built today: offline, no network permission o
   - No third-party analytics or advertising.
   - No external links.
   - No purchases.
-  - The parent page sits behind a **parental gate**: the parent types the last 4 digits of their phone number.
+  - The parent page sits behind a **parental gate**: the parent types the last 4 digits of their phone number. The device remembers it after the first time; the parent can lock it again from the parent page.
   - Nothing else in the app leaves it, so no other gate is needed.
 
 ### Age rating questionnaire

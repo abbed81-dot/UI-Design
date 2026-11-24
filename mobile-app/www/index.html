@@ -466,7 +466,10 @@ table.mg{border-collapse:separate;border-spacing:3px;margin:0 auto;font-family:v
       <div id="parentKids"></div>
       <button class="pill" id="parentAddKid" style="justify-self:start">➕ أضف طفلًا</button>
     </div>
-    <div style="margin-top:20px;text-align:center"><button class="link danger" id="wipeBtn">حذف الحساب وكل البيانات من هذا الجهاز</button></div>
+    <div style="margin-top:20px;display:grid;gap:4px;justify-items:center">
+      <button class="link" id="relockBtn">🔒 اقفل صفحة ولي الأمر مجددًا على هذا الجهاز</button>
+      <button class="link danger" id="wipeBtn">حذف الحساب وكل البيانات من هذا الجهاز</button>
+    </div>
   </section>
 
   <!-- ================= WORLDS ================= -->
@@ -896,6 +899,7 @@ $('addKidForm').onsubmit = e => {
 };
 /* Parental gate (required for apps in the Kids category): the parent types the last 4 digits of their phone number. */
 function parentGate(onOk){
+  if (DB.parentUnlocked){ onOk(); return; }   // asked once per device; the parent can lock it again
   const last4 = toLatin(DB.parent.phone).replace(/\D/g, '').slice(-4);
   $('sheet').innerHTML = `<div class="s-head"><span class="big">🔒</span><div><h2>للوالدين فقط</h2><p>هذه الصفحة لولي الأمر</p></div><button class="icon-btn" data-close aria-label="إغلاق">✕</button></div>
     <form class="gate" id="gateForm" novalidate>
@@ -907,7 +911,7 @@ function parentGate(onOk){
   $('sheet').querySelector('[data-close]').onclick = closeSheet;
   $('gateForm').onsubmit = e => {
     e.preventDefault();
-    if (toLatin($('gateIn').value).replace(/\D/g, '') === last4){ closeSheet(); onOk(); }
+    if (toLatin($('gateIn').value).replace(/\D/g, '') === last4){ DB.parentUnlocked = true; save(); closeSheet(); onOk(); }
     else { $('gateErr').textContent = 'الأرقام غير صحيحة. اطلب المساعدة من ولي الأمر.'; $('gateIn').value = ''; }
   };
   $('overlay').hidden = false; $('gateIn').focus();
@@ -956,6 +960,7 @@ $('parentForm').onsubmit = e => {
   DB.parent.name = n.slice(0, 40); DB.parent.phone = ph; save();
   $('pErr').textContent = ''; $('pSaved').hidden = false;
 };
+$('relockBtn').onclick = () => { DB.parentUnlocked = false; save(); show('profiles'); };
 $('wipeBtn').onclick = ev => twoStep(ev.currentTarget, 'متأكد؟ اضغط مرة أخرى لحذف كل شيء', () => {
   DB = {parent:null, kids:[], active:null, sound:DB.sound}; save();
   try { localStorage.removeItem(OLD_KEY); } catch(e){}
@@ -1916,7 +1921,7 @@ function start(data){
   load();
   if (data && data.DB && Array.isArray(data.DB.kids)) DB = data.DB;
   if (!DB.parent) show('register');
-  else if (!kid() || DB.kids.length > 1) show('profiles');
+  else if (!kid()) show('profiles');
   else show('worlds');
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => requestAnimationFrame(drawTrail));
 }
