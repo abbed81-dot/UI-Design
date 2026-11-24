@@ -577,7 +577,8 @@ const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.r
 const digit = (n, p) => Math.floor(n / 10 ** p) % 10;
 const len = n => String(n).length;
 const randD = d => d === 1 ? rnd(1, 9) : rnd(10 ** (d - 1), 10 ** d - 1);
-const toLatin = s => String(s).replace(/[٠-٩]/g, d => AR.indexOf(d)).replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
+// Arabic-Indic, Persian and full-width digits -> 0-9
+const toLatin = s => String(s).replace(/[٠-٩]/g, d => AR.indexOf(d)).replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace(/[０-９]/g, d => d.charCodeAt(0) - 0xFF10).replace(/＋/g, '+');
 document.documentElement.lang = 'ar'; document.documentElement.dir = 'rtl';
 
 const PLACE = ['الآحاد', 'العشرات', 'المئات', 'الآلاف', 'عشرات الألوف', 'مئات الألوف', 'الملايين'];
@@ -862,7 +863,15 @@ function avatarPicker(el, current){
   el.querySelectorAll('button').forEach(b => b.onclick = () => { sel = b.textContent; el.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b)); });
   return () => sel;
 }
-function validPhone(s){ const d = toLatin(s).replace(/[\s\-().]/g, ''); return /^\+?\d{8,15}$/.test(d) ? d : null; }
+// Accepts any way a phone writes a number: spaces, any dash, dots, slashes, brackets, invisible direction marks
+// (iOS paste/autofill), other digit scripts. Keeps the digits and one leading +; 7 to 15 digits.
+function validPhone(s){
+  const t = toLatin(s).trim().replace(/^[^\d+]+/, '');
+  const plus = t.startsWith('+') || t.startsWith('00') ? '+' : '';
+  let d = t.replace(/\D/g, '');
+  if (t.startsWith('00')) d = d.slice(2);
+  return d.length >= 7 && d.length <= 15 ? plus + d : null;
+}
 function fieldError(input, errEl, msg){ input.setAttribute('aria-invalid', 'true'); errEl.textContent = msg; input.focus(); return false; }
 
 let regAvatar = avatarPicker($('regAvatars'));
@@ -872,7 +881,7 @@ $('regForm').onsubmit = e => {
   ['regParent', 'regPhone', 'regKid'].forEach(id => $(id).removeAttribute('aria-invalid'));
   const pn = $('regParent').value.trim(), ph = validPhone($('regPhone').value), kn = $('regKid').value.trim();
   if (!pn) return fieldError($('regParent'), $('regErr'), 'اكتب اسم ولي الأمر.');
-  if (!ph) return fieldError($('regPhone'), $('regErr'), 'اكتب رقم هاتف صحيحًا (من ٨ إلى ١٥ رقمًا).');
+  if (!ph) return fieldError($('regPhone'), $('regErr'), 'رقم الهاتف قصير جدًا أو طويل جدًا. اكتب من ٧ إلى ١٥ رقمًا، مثل ٠٥٠١٢٣٤٥٦٧.');
   if (!kn) return fieldError($('regKid'), $('regErr'), 'اكتب اسم الطفل.');
   const k = {id:newId(), name:kn.slice(0, 30), avatar:regAvatar(), prog:oldProgress() || freshProg()};
   DB.parent = {name:pn.slice(0, 40), phone:ph, created:Date.now()};
@@ -959,7 +968,7 @@ $('parentForm').onsubmit = e => {
   ['pName', 'pPhone'].forEach(id => $(id).removeAttribute('aria-invalid'));
   const n = $('pName').value.trim(), ph = validPhone($('pPhone').value);
   if (!n) return fieldError($('pName'), $('pErr'), 'اكتب اسم ولي الأمر.');
-  if (!ph) return fieldError($('pPhone'), $('pErr'), 'اكتب رقم هاتف صحيحًا (من ٨ إلى ١٥ رقمًا).');
+  if (!ph) return fieldError($('pPhone'), $('pErr'), 'رقم الهاتف قصير جدًا أو طويل جدًا. اكتب من ٧ إلى ١٥ رقمًا.');
   DB.parent.name = n.slice(0, 40); DB.parent.phone = ph; save();
   $('pErr').textContent = ''; $('pSaved').hidden = false;
 };
