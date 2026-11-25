@@ -64,6 +64,27 @@ button,a,input{touch-action:manipulation}
 .gate input{text-align:center;font-size:1.6rem;letter-spacing:.3em;direction:ltr}
 
 
+/* ---------- motivation: next step, goal, surprise box, break, parent message ---------- */
+#nudges{display:grid;gap:10px;margin-top:12px}
+#nudges:empty{display:none}
+.continue{display:flex;align-items:center;gap:12px;text-align:start;padding:12px 14px;border-radius:20px;background:color-mix(in srgb,var(--wc) 14%,var(--surface));box-shadow:var(--shadow)}
+.continue .c-play{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:var(--wc);color:#fff;font-size:1.1rem;flex:none}
+.continue b{display:block;font-family:var(--f-display);font-size:1.08rem;line-height:1.3}
+.continue small{display:block;color:var(--muted);line-height:1.35}
+.goal-bar{display:flex;align-items:center;gap:10px;text-align:start;padding:10px 14px;border-radius:20px;background:var(--surface);box-shadow:var(--shadow)}
+.goal-bar .g-s{font-size:2rem;flex:none}
+.goal-bar .g-t{flex:1;min-width:0;display:grid;gap:5px}
+.goal-bar .g-t b{font-size:.95rem;line-height:1.3}
+.goal-bar .gb{height:9px;border-radius:99px;background:var(--soft);overflow:hidden}
+.goal-bar .gb i{display:block;height:100%;border-radius:99px;background:var(--sun)}
+.goal-bar .g-n{font-weight:800;color:var(--muted);white-space:nowrap;font-size:.92rem}
+.gift{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;width:100%;padding:12px 14px;border-radius:20px;background:linear-gradient(135deg,#FFE7A3,#FFC8DD);color:#4A2A00;font-size:1.05rem;box-shadow:var(--shadow);animation:hop 1.6s ease-in-out infinite}
+.gift small{opacity:.8}
+.gift.open{animation:pop .4s both;font-weight:800}
+.goal-line{color:var(--muted);font-size:.95rem}
+.break-tip{background:var(--soft);border-radius:16px;padding:10px 14px;text-align:center;line-height:1.55}
+.msg-state{flex-basis:100%;margin:0;color:var(--muted);font-size:.88rem}
+
 /* ---------- division bakery ---------- */
 .t-n{color:var(--p3)}.t-k{color:var(--p4)}.t-q{color:var(--p1)}.t-r{color:var(--bad)}
 .terms{display:flex;justify-content:center;flex-wrap:wrap;gap:6px;font-size:.92rem;font-weight:700;color:var(--muted);margin:6px 0}
@@ -643,6 +664,7 @@ table.mg{border-collapse:separate;border-spacing:3px;margin:0 auto;font-family:v
     </div>
     <div class="hello" style="margin-top:16px"><span class="hello-sheep" aria-hidden="true">🐑</span><p class="bubble" id="worldsBubble"></p></div>
     <div class="extras" id="extras"></div>
+    <div id="nudges"></div>
     <div class="worlds" id="worldList"></div>
   </section>
 
@@ -799,13 +821,13 @@ function readPhrases(n){
       const h = Math.floor(k / 100), r2 = k % 100;
       ph = [[{t: r2 === 0 && h === 2 ? 'مئتا' : HUNDS[h], p:5}]];
       if (r2 === 0) ph[0].push(U('ألف'));
-      else if (r2 === 1) ph.push([U('ألف')]);
-      else if (r2 === 2) ph.push([U('ألفان')]);
+      else if (r2 <= 2){ ph = [[{t: h === 2 ? 'مئتا' : HUNDS[h], p:5}, U('ألف')], [U(r2 === 1 ? 'ألف' : 'ألفان')]]; }
       else { const sub = under1000(r2, 3); sub[sub.length - 1].push(U(r2 <= 10 ? 'آلاف' : 'ألفًا')); ph = ph.concat(sub); }
     }
   }
   return ph.concat(under1000(rest, 0));
 }
+const countN = (n, f) => n === 1 ? f[0] : n === 2 ? f[1] : `${ar(n)} ${n <= 10 ? f[2] : f[3]}`;
 const words = n => readPhrases(n).map(ph => ph.map(s => s.t).join(' ')).join(' و');
 const wordsHtml = n => readPhrases(n).map(ph => ph.map(s => `<span class="pc${s.p}">${s.t}</span>`).join(' ')).join(' و');
 const numHtml = (n, hiP = -1, colour = false) => {
@@ -992,6 +1014,15 @@ function addFarmItem(special){
 const todayStr = () => new Date().toLocaleDateString('en-CA');
 const dayBefore = d => { const t = new Date(d + 'T12:00:00'); t.setDate(t.getDate() - 1); return t.toLocaleDateString('en-CA'); };
 function dailyDoneToday(){ return R().daily.date === todayStr(); }
+const daysBetween = (a, b) => Math.round((new Date(b + 'T12:00:00') - new Date(a + 'T12:00:00')) / 864e5);
+/* A streak survives one missed day once a week (a "shield"): losing a long streak to one busy day makes children give up. */
+function streakInfo(){
+  const d = R().daily, t = todayStr(), y = dayBefore(t);
+  if (!d.streak) return {alive:false, shield:false};
+  if (d.date === t || d.date === y) return {alive:true, shield:false};
+  const shieldOk = !d.shield || daysBetween(d.shield, t) >= 7;
+  return d.date === dayBefore(y) && shieldOk ? {alive:true, shield:true} : {alive:false, shield:false};
+}
 
 /* multiplication fact memory (for smart review & mastery grid) */
 function record(a, b, ok, t){
@@ -1203,13 +1234,39 @@ function twoStep(btn, label, action){
   btn.dataset.armed = '1'; const old = btn.textContent; btn.textContent = label;
   setTimeout(() => { if (btn.isConnected){ delete btn.dataset.armed; btn.textContent = old; } }, 4000);
 }
+/* The next step, so the child never has to wonder what to do: the first level of the last world that still has stars to win. */
+function suggestion(){
+  const last = R().last; if (!last || !WORLDS[last.w]) return null;
+  const order = [last.w, ...WORLD_ORDER.filter(w => w !== last.w)];
+  for (const w of order){
+    const L = WORLDS[w].levels;
+    let j = L.findIndex((lv, x) => unlocked(w, x) && stars(w, x) === 0);
+    if (j < 0) j = L.findIndex((lv, x) => unlocked(w, x) && stars(w, x) < 3 && !lv.boss);
+    if (j >= 0) return {w, i:j};
+  }
+  return null;
+}
+function renderNudges(){
+  const sg = suggestion(), o = nextOutfit(), p = R();
+  let h = giftBtnHtml();
+  if (sg){ const W = WORLDS[sg.w], lv = W.levels[sg.i];
+    h += `<button class="continue" id="contBtn" style="--wc:var(${W.color})"><span class="c-play">▶</span><span><b>${stars(sg.w, sg.i) ? 'نجوم أكثر في' : 'خطوتك التالية'}</b><small>${W.emoji} ${W.name} · ${lv.emoji} ${lv.title}</small></span></button>`; }
+  if (o){ const pct = Math.min(100, p.wool / o.price * 100);
+    h += `<button class="goal-bar" id="goalBtn"><span class="g-s">${soufiHtml(o.id)}</span><span class="g-t"><b>${p.wool >= o.price ? `صوفك يكفي لـ«${o.n}»! 🎉` : `الهدف التالي: ${o.n}`}</b><span class="gb"><i style="width:${pct}%"></i></span></span><span class="g-n num">🧶 ${ar(Math.min(p.wool, o.price))}/${ar(o.price)}</span></button>`; }
+  $('nudges').innerHTML = h;
+  bindGift($('nudges'), () => { $('woolTotal').textContent = ar(R().wool); });
+  if (sg) $('contBtn').onclick = () => { curWorld = sg.w; show('map'); openSheet(sg.w, sg.i); };
+  if (o) $('goalBtn').onclick = () => { farmTab = 'wear'; show('farm'); };
+}
+
 function renderParent(){
   $('pName').value = DB.parent.name; $('pPhone').value = DB.parent.phone; $('pErr').textContent = ''; $('pSaved').hidden = true;
   $('parentKids').innerHTML = DB.kids.map(k => `
     <div class="kid-row" data-id="${k.id}">
       <span class="av">${k.avatar}</span>
       <div class="info"><b>${esc(k.name)}</b><small>${WORLD_ORDER.map(w => `${WORLDS[w].emoji} ${ar(Object.values(k.prog.stars[w] || {}).reduce((x, y) => x + y, 0))}`).join(' · ')}</small></div>
-      <div class="acts2"><button class="link" data-rename>تعديل الاسم</button><button class="link danger" data-del>حذف</button></div>
+      <div class="acts2"><button class="link" data-msg>✉️ رسالة تشجيع</button><button class="link" data-rename>تعديل الاسم</button><button class="link danger" data-del>حذف</button></div>
+      ${k.msg ? `<p class="msg-state">آخر رسالة: «${esc(k.msg.text)}» · ${k.msg.seen ? 'قرأها ✓' : 'لم تُقرأ بعد'}</p>` : ''}
     </div>`).join('');
   $('parentKids').querySelectorAll('.kid-row').forEach(row => {
     const k = DB.kids.find(x => x.id === row.dataset.id);
@@ -1217,9 +1274,20 @@ function renderParent(){
       const info = row.querySelector('.info');
       info.innerHTML = `<label class="field"><span class="sr">الاسم الجديد</span><input value="${esc(k.name)}" id="rn-${k.id}"></label>`;
       const inp = info.querySelector('input'); inp.focus(); inp.select();
-      const done = () => { const v = inp.value.trim(); if (v){ k.name = v.slice(0, 30); save(); } renderParent(); };
-      inp.onkeydown = ev => { if (ev.key === 'Enter') done(); if (ev.key === 'Escape') renderParent(); };
+      let closed = false;
+      const done = () => { if (closed) return; closed = true; const v = inp.value.trim(); if (v){ k.name = v.slice(0, 30); save(); } renderParent(); };
+      inp.onkeydown = ev => { if (ev.key === 'Enter') done(); if (ev.key === 'Escape'){ closed = true; renderParent(); } };
       inp.onblur = done;
+    };
+    row.querySelector('[data-msg]').onclick = () => {
+      const info = row.querySelector('.info');
+      info.innerHTML = `<label class="field"><span class="sr">رسالة تشجيع</span><input maxlength="80" placeholder="مثلًا: فخورة بك يا بطل! 💚" id="msg-${k.id}"></label>
+        <div class="row" style="justify-content:flex-start"><button class="link" data-send>إرسال</button><button class="link" data-cancel>إلغاء</button></div>
+        <small>تظهر الرسالة لطفلك في صفحة العوالم حتى يقرأها.</small>`;
+      const inp = info.querySelector('input'); inp.focus();
+      const send = () => { const v = inp.value.trim(); if (v){ k.msg = {text:v.slice(0, 80), seen:false, at:Date.now()}; save(); } renderParent(); };
+      inp.onkeydown = ev => { if (ev.key === 'Enter') send(); if (ev.key === 'Escape') renderParent(); };
+      info.querySelector('[data-send]').onclick = send; info.querySelector('[data-cancel]').onclick = () => renderParent();
     };
     row.querySelector('[data-del]').onclick = ev => twoStep(ev.currentTarget, 'اضغط مرة أخرى للتأكيد', () => {
       DB.kids = DB.kids.filter(x => x.id !== k.id);
@@ -1253,15 +1321,20 @@ function renderWorlds(){
   $('starTotal').textContent = ar(kidStars(k));
   $('woolTotal').textContent = ar(R().wool);
   paintSoufi();
-  const d = R().daily, done = dailyDoneToday(), streakAlive = done || d.date === dayBefore(todayStr());
+  const d = R().daily, done = dailyDoneToday(), streakAlive = done || streakInfo().alive;
   $('extras').innerHTML = `
     <button class="extra ${done ? 'done' : ''}" id="dailyBtn"><span class="x-emoji">${done ? '✅' : '☀️'}</span><b>تحدي اليوم</b>
       <small>${done ? 'أنجزته اليوم! عُد غدًا' : '٥ أسئلة من كل العوالم'}</small>${streakAlive && d.streak ? `<span class="flame">🔥 ${ar(d.streak)} ${d.streak === 1 ? 'يوم' : d.streak === 2 ? 'يومان' : d.streak <= 10 ? 'أيام' : 'يومًا'}</span>` : ''}</button>
     <button class="extra" id="farmBtn"><span class="x-emoji">🏡</span><b>مزرعتي</b><small>${R().farm.length ? `${ar(R().farm.length)} في مزرعتك · خزانة صوفي` : 'كل نجمة تضيف حيوانًا · خزانة صوفي'}</small></button>`;
   $('dailyBtn').onclick = startDaily;
   $('farmBtn').onclick = () => show('farm');
+  renderNudges();
   $('soundBtn').textContent = DB.sound ? '🔊' : '🔇';
-  $('worldsBubble').textContent = kidStars(k) === 0 ? `أهلًا يا ${k.name}! اختر عالمًا نلعب فيه. أنصحك أن تبدأ بقلعة المنازل أو جزيرة الجمع.` : `أهلًا يا ${k.name}! إلى أين نذهب اليوم؟`;
+  const msg = k.msg && !k.msg.seen ? k.msg : null;
+  if (msg){
+    $('worldsBubble').innerHTML = `📩 رسالة من ${esc(DB.parent.name)}: «${esc(msg.text)}» <button class="link" id="msgThanks">شكرًا 💚</button>`;
+    $('msgThanks').onclick = () => { k.msg.seen = true; k.msg.seenAt = Date.now(); save(); SND.ok(); renderWorlds(); };
+  } else $('worldsBubble').textContent = kidStars(k) === 0 ? `أهلًا يا ${k.name}! اختر عالمًا نلعب فيه. أنصحك أن تبدأ بقلعة المنازل أو جزيرة الجمع.` : `أهلًا يا ${k.name}! إلى أين نذهب اليوم؟`;
   $('worldList').innerHTML = WORLD_ORDER.map((w, i) => {
     const W = WORLDS[w], max = W.levels.length * 3, got = worldStars(w);
     const wide = i === 0 || (i === WORLD_ORDER.length - 1 && i % 2 === 1);   // keep the two-column grid even
@@ -1343,13 +1416,13 @@ $('mapBack').onclick = () => show('worlds');
 /* =====================================================================
    level sheet
    ===================================================================== */
-const ruleSec = (s, tf) => s > 100 ? 'أبطأ من ذلك' : `أقل من ${ar(Math.round(s * tf))} ثوانٍ`;
+const ruleSec = (s, tf) => s > 100 ? 'أبطأ من ذلك' : `أقل من ${countN(Math.round(s * tf), ['ثانية واحدة', 'ثانيتين', 'ثوانٍ', 'ثانية'])}`;
 function openBossSheet(w, i){
   const W = WORLDS[w], lv = W.levels[i], lock = !unlocked(w, i), st = stars(w, i);
   $('sheet').innerHTML = `<div class="s-head"><span class="big">🐺</span><div><h2>الذئب المشاغب</h2><p>${st ? `<span style="color:var(--sun)">${'★'.repeat(st)}</span> · هزمته من قبل` : 'يحرس نهاية ' + W.name}</p></div><button class="icon-btn" data-close aria-label="إغلاق">✕</button></div>
     ${lock ? `<div class="locked-note">🔒 احصل على نجمة واحدة على الأقل في كل مستويات ${W.name}، ثم تعال لمواجهته.</div>`
       : `<div class="acts"><button class="act primary" data-act="boss"><span class="ai">⚔️</span><span><b>واجه الذئب</b><small>كل إجابة صحيحة تُضعفه، والسريعة تُضعفه أكثر</small></span></button></div>`}
-    <p class="note">للذئب ${ar(bossHP(w))} نقطة قوة، ولك ٣ قلوب ❤️. الإجابة الصحيحة تنقص قوته، والإجابة الصاعقة ⚡ تنقصها مرتين، والخطأ يكلّفك قلبًا. إذا هزمته تحصل على جائزة خاصة لمزرعتك 🏆</p>`;
+    <p class="note">للذئب ${countN(bossHP(w), ['نقطة قوة واحدة', 'نقطتا قوة', 'نقاط قوة', 'نقطة قوة'])}، ولك ٣ قلوب ❤️. الإجابة الصحيحة تنقص قوته، والإجابة الصاعقة ⚡ تنقصها مرتين، والخطأ يكلّفك قلبًا. إذا هزمته تحصل على جائزة خاصة لمزرعتك 🏆</p>`;
   $('sheet').querySelector('[data-close]').onclick = closeSheet;
   const b = $('sheet').querySelector('[data-act="boss"]'); if (b) b.onclick = () => { closeSheet(); startBoss(w, i); };
   $('overlay').hidden = false;
@@ -1358,7 +1431,7 @@ function openBossSheet(w, i){
 function openSheet(w, i){
   if (WORLDS[w].levels[i].boss) return openBossSheet(w, i);
   const W = WORLDS[w], lv = W.levels[i], lock = !unlocked(w, i), best = (P().best[w] || {})[i], cfg = levelCfg(w, i), tf = levelTF(w, lv);
-  const starLine = stars(w, i) ? `<span style="color:var(--sun)">${'★'.repeat(stars(w, i))}</span>` + (best ? ` · أفضل رقم ${ar(best.q)} أسئلة` : '') : (lv.desc || 'لم تبدأ بعد');
+  const starLine = stars(w, i) ? `<span style="color:var(--sun)">${'★'.repeat(stars(w, i))}</span>` + (best ? ` · أفضل رقم: ${countN(best.q, ['سؤال واحد', 'سؤالان', 'أسئلة', 'سؤالًا'])}` : '') : (lv.desc || 'لم تبدأ بعد');
   let body = '';
   if (lock){
     body += `<div class="locked-note">🔒 أكمل «${W.levels[i - 1].title}» أولًا. وإن كنت تعرف هذا المستوى، اقفز إليه باختبار التحدي.</div>`;
@@ -1517,6 +1590,7 @@ function attachGoat(el, n, k, onPick, opts = {}){
   const pickVal = v => {
     if (done) return; done = true;
     const right = v === target;
+    if (right || !opts.retry) opts.onPicked && opts.onPicked();
     goat.classList.remove('drag', 'held', 'no'); goat.classList.add('jump');
     setPos(v === hi ? 1 : 0); SND.tick();
     nl.querySelectorAll('[data-v]').forEach(b => { b.classList.toggle('win', right && +b.dataset.v === v); b.classList.toggle('nope', !right && +b.dataset.v === v); });
@@ -1576,6 +1650,7 @@ function roundExplain(n, k){
    ===================================================================== */
 let learnCtx = null;
 function openLearn(w, i, extra = {}){
+  curWorld = w;
   learnCtx = {w, i, ...extra};
   $('learnTitle').textContent = `${WORLDS[w].emoji} ${WORLDS[w].levels[i].title}`;
   show('learn');
@@ -1712,14 +1787,14 @@ function buildGroups(el, n, k){
   const filled = [];
   const fill = pen => {
     const j = +pen.dataset.j;
-    if (filled[j]){ $('buildTotal').textContent = `هذه ${th.p[0]} ممتلئة، اختر غيرها!`; SND.tick(); return; }
+    if (filled[j]){ $('buildTotal').textContent = th.pg === 'm' ? `هذا ال${th.p[0]} ممتلئ، اختر غيره!` : `هذه ال${th.p[0]} ممتلئة، اختر غيرها!`; SND.tick(); return; }
     filled[j] = true; pen.classList.add('full');
     pen.querySelector('.p-items').innerHTML = [...Array(k)].map((_, m) => `<span style="animation-delay:${m * 30}ms">${th.ce}</span>`).join('');
     const c = filled.filter(Boolean).length;
     SND.tick(); haptic('ok');
     if (c === n){
       $('buildTotal').innerHTML = `🎉 ${ar(n)} × ${ar(k)} = ${ar(n * k)}`; SND.win();
-      buddyLearn(`رائع! بنيت ${ar(n)} مجموعات، في كل واحدة ${ar(k)}`);
+      buddyLearn(`رائع! بنيت ${countN(n, ['مجموعة واحدة', 'مجموعتين', 'مجموعات', 'مجموعة'])}، في كل واحدة ${ar(k)}`);
     } else $('buildTotal').textContent = `المجموع: ${[...Array(c)].map((_, m) => ar(k * (m + 1))).join(' ← ')}`;
   };
   el.querySelectorAll('.pen').forEach(pen => { onTap(pen, () => fill(pen)); pen.onkeydown = e => { if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); fill(pen); } }; });
@@ -1849,8 +1924,8 @@ function arithQ(op, d, w, i){
     view: () => eqHtml([ar(a), opS, ar(b)]),
     visual: () => { vis().innerHTML = emojiArith(a, b, op); },
     hint: () => { vis().innerHTML = emojiArith(a, b, op);
-      return op === '+' ? `ابدأ من ${ar(a)} وعُدّ ${ar(b)} خطوات إلى الأمام: ${[...Array(Math.min(b, 2))].map((_, j) => ar(a + j + 1)).join('، ')}…`
-                        : `ابدأ من ${ar(a)} وعُدّ ${ar(b)} خطوات إلى الخلف: ${[...Array(Math.min(b, 2))].map((_, j) => ar(a - j - 1)).join('، ')}…`; },
+      return op === '+' ? `ابدأ من ${ar(a)} وعُدّ ${countN(b, ['خطوة واحدة', 'خطوتين', 'خطوات', 'خطوة'])} إلى الأمام: ${[...Array(Math.min(b, 2))].map((_, j) => ar(a + j + 1)).join('، ')}…`
+                        : `ابدأ من ${ar(a)} وعُدّ ${countN(b, ['خطوة واحدة', 'خطوتين', 'خطوات', 'خطوة'])} إلى الخلف: ${[...Array(Math.min(b, 2))].map((_, j) => ar(a - j - 1)).join('، ')}…`; },
     explain: () => { vis().innerHTML = emojiArith(a, b, op); qtext(emojiSentence(a, b, op)); }};
   const S = arithSteps(a, b, op), fin = S.steps[S.steps.length - 1];
   return {answer:res, input:'column', tf: 1 + (d - 1) * 1.1, ansLen:len(res),
@@ -1917,7 +1992,7 @@ function roundQ(k){
   const q = {answer:target, input:'drag', tf:1.4 + k * .2,
     view: () => `<p class="qtext">قرّب إلى ${ROUND_TO[k]}</p><div class="bignum">${numHtml(n)}</div>${watchHtml(k)}`,
     visual: () => { const el = vis(); el.innerHTML = lineHtml(n, k, true);
-      q.goat = attachGoat(el, n, k, v => answer(v), {retry: Q.mode === 'practice',
+      q.goat = attachGoat(el, n, k, v => { if (Q && Q.q === q && !Q.busy) answer(v); }, {retry: Q.mode === 'practice', onPicked: () => { q.pickedAt = performance.now(); },
         onRefuse: () => { q.refused = true; qtext('العنزة لا تريد الذهاب إلى هناك، فهذا ليس العدد الأقرب. جرّب الجهة الأخرى!'); }}); },
     hint: () => { const b = $('qPrompt').querySelector('.bignum'); if (b) b.outerHTML = roundNumHtml(n, k);
       return `انظر إلى الرقم الذي عليه 👀، إنه رقم ${PLACE[k - 1]}: إذا كان ٥ أو أكثر نقرّب إلى ${fmt(hi)}، وإذا كان أقل من ٥ نقرّب إلى ${fmt(lo)}. وعلى الخط: أين النقطة أقرب؟`; },
@@ -2063,14 +2138,14 @@ function divQ(lv, mode, w, i){
     const ask = `وزّع ${cnt(n, s.item.f, true)} ${s.item.e} على ${friendsTxt(k)} بالتساوي.${rem ? ' كم لكل صديق، وكم يبقى؟' : ' كم لكل صديق؟'}`;
     const base = {tf: rem ? 2.2 : 1.6,
       view: () => `<p class="qtext">${ask}</p>${eqHtml([ar(n), '÷', ar(k)])}`,
-      visual: () => { const el = vis();
+      visual: () => { const el = vis(); s.dealt = s.dealt.map(() => 0); s.finished = false;
         el.innerHTML = `<div id="qShare"></div><div class="row"><button class="btn small" id="qRound">🤲 وزّع جولة</button></div><p class="share-say" id="qSay">وزّع لتعرف الجواب: اضغط على ${s.item.e} أو على طبق صديق.</p>`;
         mountShare($('qShare'), s, {roundBtn: $('qRound'), say: h => { if ($('qSay')) $('qSay').innerHTML = h; },
           onFinish: () => { if ($('qSay')) $('qSay').innerHTML = rem ? `انتهى التوزيع! كم مع كل صديق، وكم بقي في صندوق الباقي؟ اختر الجواب.` : `انتهى التوزيع! كم مع كل صديق؟ اكتب الجواب.`; }}); },
       hint: () => { vis().innerHTML = shareHtml(dealAll({...s, dealt:[...s.dealt]}));
         return rem ? `وزّعنا جولة بعد جولة: كل صديق أخذ ${cnt(q, s.item.f, true)}، وما بقي في السلة لا يكفي لجولة أخرى، فهو الباقي. والباقي دائمًا أصغر من ${ar(k)}.`
                    : `في كل جولة يأخذ كل صديق ${s.item.f[0]} واحدة، أي ${ar(k)} في الجولة. عُدّ ما على طبق واحد.`; },
-      explain: () => { vis().innerHTML = shareHtml(dealAll(s));
+      explain: () => { vis().innerHTML = shareHtml(dealAll({...s, dealt:[...s.dealt]}));
         qtext(rem ? `${ar(n)} ÷ ${ar(k)} = ${ar(q)} والباقي ${ar(r)}، لأن ${ar(k)} × ${ar(q)} = ${ar(n - r)} و ${ar(n)} − ${ar(n - r)} = ${ar(r)}`
                   : `كل صديق أخذ ${cnt(q, s.item.f, true)}: ${ar(n)} ÷ ${ar(k)} = ${ar(q)}، لأن ${ar(k)} × ${ar(q)} = ${ar(n)}`); },
       teach: () => openLearn(w, i, {n, k})};
@@ -2267,6 +2342,7 @@ function weightedDeck(facts){ return shuffle(facts.slice()).map(f => [f, weaknes
 
 function startQuizFor(w, i, mode){
   const lv = WORLDS[w].levels[i], cfg = levelCfg(w, i);
+  R().last = {w, i};
   let gen;
   gen = levelGen(w, i, mode);
   startQuiz({w, i, mode, gen, title:lv.title, total:10, ...cfg, raceTime: (cfg.goal / 15) * 4.5 * levelTF(w, lv)}, mode === 'challenge');
@@ -2300,7 +2376,8 @@ function startDaily(){
   const gens = [];
   WORLD_ORDER.forEach(w => WORLDS[w].levels.forEach((lv, j) => { if (!lv.boss && unlocked(w, j)) gens.push([w, levelGen(w, j, 'challenge')]); }));
   const byWorld = WORLD_ORDER.map(w => gens.filter(g => g[0] === w)).filter(a => a.length);
-  const plan = shuffle([...Array(5)].map((_, n) => pick(byWorld[n % byWorld.length])[1]));
+  const worlds = shuffle(byWorld.slice());                      // a different set of worlds each day, round robin
+  const plan = shuffle([...Array(5)].map((_, n) => pick(worlds[n % worlds.length])[1]));
   startQuiz({w:'mult', i:-1, mode:'daily', home:'worlds', title:'تحدي اليوم', total:5, gen: () => plan.shift()()});
 }
 function startReview(){
@@ -2312,7 +2389,9 @@ function startReview(){
   startQuiz({w:'mult', i:-1, mode:'review', title:'مراجعة ذكية', total:10, gen: () => { const [a, b] = deck.shift(); return multQ(a, b, 'review'); }});
 }
 function startQuiz(cfg, countdown){
-  Q = Object.assign({asked:0, correct:0, wrong:0, energy:0, times:[], combo:0, zaps:0, typed:'', busy:true, hinted:false, missed:0, retry:[], raceAcc:0, rivalDone:false, woolStart:R().wool}, cfg);
+  Q = Object.assign({asked:0, correct:0, wrong:0, energy:0, times:[], combo:0, zaps:0, typed:'', busy:true, hinted:false, missed:0, retry:[], raceAcc:0, rivalDone:false, woolStart:R().wool, q:null}, cfg);
+  $('wrongBox').hidden = true; $('qPrompt').innerHTML = ''; $('qVisual').hidden = true; $('qVisual').innerHTML = ''; $('qText').hidden = true;
+  $('choices').hidden = true; $('choices').innerHTML = ''; $('hintMsg').hidden = true;
   show('quiz');
   const race = cfg.mode === 'challenge', boss = cfg.mode === 'boss';
   $('runner').textContent = kid().avatar;                       // you…
@@ -2350,7 +2429,7 @@ function updateHud(){
   let pct;
   if (Q.mode === 'boss'){
     pct = Math.max(0, Q.hp / Q.hpMax * 100);
-    $('qcount').innerHTML = `<span class="hearts" aria-label="${ar(Q.lives)} قلوب">${'❤️'.repeat(Q.lives)}${'🤍'.repeat(3 - Q.lives)}</span>`;
+    $('qcount').innerHTML = `<span class="hearts" aria-label="${countN(Q.lives, ['قلب واحد', 'قلبان', 'قلوب', 'قلبًا'])}">${'❤️'.repeat(Q.lives)}${'🤍'.repeat(3 - Q.lives)}</span>`;
   } else if (Q.mode === 'challenge'){
     pct = Math.min(100, Q.energy / Q.goal * 100);
     $('runner').style.insetInlineStart = `calc((100% - 1.4em) * ${pct / 100})`;   // the flag is at 100%
@@ -2365,6 +2444,7 @@ function nextQuestion(){
   else if (Q.asked >= Q.total) return finish();
   const due = Q.retry.findIndex(r => r.at <= Q.asked);
   const q = Q.q = due >= 0 ? Q.retry.splice(due, 1)[0].q : Q.gen();
+  q.pickedAt = 0; q.refused = false;
   Q.typed = ''; Q.busy = false; Q.hinted = false;
   $('qPrompt').innerHTML = q.view();
   $('qVisual').hidden = true; $('qVisual').innerHTML = ''; $('qText').hidden = true;
@@ -2398,7 +2478,7 @@ function tickTimer(){
     if (!Q || Q.busy) return;
     const t = (performance.now() - Q.t0) / 1000 / tf;
     fg.style.strokeDashoffset = C * Math.min(1, t / 8);
-    fg.style.stroke = t <= 3 ? 'var(--accent)' : t <= 8 ? 'var(--sun)' : 'var(--bad)';
+    fg.style.stroke = t <= 3 ? 'var(--accent)' : 'var(--sun)';   // no red: a red countdown adds stress, not learning
     if (Q.mode === 'challenge' && Q.raceTime){
       const pr = Math.min(1, (Q.raceAcc + (performance.now() - Q.t0) / 1000) / Q.raceTime);
       $('rival').style.insetInlineStart = `calc((100% - 1.45em) * ${pr})`;      // Soufi stops right on the flag
@@ -2533,8 +2613,8 @@ function renderBalloons(q){
   box.querySelectorAll('button').forEach(btn => btn.onclick = () => { btn.classList.add('picked'); box.classList.add('stopped'); answer(+btn.dataset.v, btn); });
   qtext('🎈 فرقع البالون الذي يحمل الجواب!');
 }
-const CHEERS = ['أحسنت!', 'رائع!', 'ممتاز!', 'برافو!', 'شاطر!', 'هذا هو!'];
-const COMFORT = ['لا بأس، جرّب!', 'كدت تصيب!', 'نتعلّم من الخطأ', 'انظر إلى الشرح'];
+const CHEERS = ['أحسنت!', 'تفكير ذكي!', 'تركيزك رائع!', 'تمرينك يثمر!', 'برافو!', 'هذا هو!'];   // praise effort and strategy, not "being clever"
+const COMFORT = ['الخطأ يعلّمنا', 'كدت تصيب!', 'لنفهمها معًا', 'دماغك يتمرّن 💪'];
 let buddyT = 0, bossT = 0;
 function buddySay(mood, text, ms = 1600){
   const b = $('buddy'); if (!b) return;
@@ -2549,10 +2629,10 @@ function wolfSay(mood, text){
   clearTimeout(bossT); bossT = setTimeout(() => $('bossSay').classList.remove('on'), 1400);
 }
 function answer(v, btn){
-  if (Q.busy) return;
+  if (!Q || Q.busy) return;
   Q.busy = true; cancelAnimationFrame(rafId);
   $('hintBtn').hidden = true;
-  const q = Q.q, ok = v === q.answer, t = (performance.now() - Q.t0) / 1000, tf = q.tf || 1;
+  const q = Q.q, ok = v === q.answer, t = ((q.pickedAt || performance.now()) - Q.t0) / 1000, tf = q.tf || 1;
   Q.asked++; Q.raceAcc += t;
   q.record && q.record(ok, Q.hinted ? 9 : t / tf);
   if (ok && q.refused){ // practice: right on the second try
@@ -2617,10 +2697,36 @@ function grantStars(w, i, newStars){
   return items;
 }
 function rewardsHtml(q, items, extra = ''){
-  const wool = R().wool - q.woolStart;
+  const wool = R().wool - q.woolStart, o = nextOutfit();
   if (!wool && !items.length && !extra) return '';
-  return `<div class="rewards">${items.length ? `<span class="big">🎁 ${items.map(x => x.e).join(' ')}</span><span>${items.length === 1 ? `${items[0].n} جديدة في مزرعتك!` : `${ar(items.length)} أصدقاء جدد في مزرعتك!`}</span>` : ''}
-    ${extra}${wool ? `<span>🧶 ${sgn(wool)} صوف</span>` : ''}</div>`;
+  const goal = !wool || !o ? '' : R().wool >= o.price ? `<span class="goal-line">🎉 صوفك يكفي الآن لـ«${o.n}»! اذهب إلى خزانة صوفي.</span>`
+    : `<span class="goal-line">🎯 باقي ${ar(o.price - R().wool)} 🧶 لـ«${o.n}»</span>`;
+  return `<div class="rewards">${items.length ? `<span class="big">🎁 ${items.map(x => x.e).join(' ')}</span><span>${items.length === 1 ? `انضمّ إلى مزرعتك: ${items[0].n}!` : `${ar(items.length)} أصدقاء جدد في مزرعتك!`}</span>` : ''}
+    ${extra}${wool ? `<span>🧶 ${sgn(wool)} صوف</span>` : ''}${goal}</div>`;
+}
+/* the cheapest outfit Soufi does not have yet: a goal the child can see getting closer */
+function nextOutfit(){ const p = R(); return OUTFITS.filter(o => !p.owned.includes(o.id)).sort((a, b) => a.price - b.price)[0] || null; }
+/* a surprise box after every third finished session: the effort is fixed, only the gift varies */
+const RARE = [['🦄','حصان وحيد القرن'], ['🦩','فلامنغو'], ['🦒','زرافة'], ['🐼','باندا'], ['🦓','حمار وحشي'], ['🌈','قوس قزح']];
+function countSession(){ const p = R(); p.sessions = (p.sessions || 0) + 1; if (p.sessions % 3 === 0) p.giftReady = true; }
+const giftBtnHtml = () => R().giftReady ? `<button class="gift" data-gift>🎁 <b>صندوق مفاجآت!</b> <small>اضغط لتفتحه</small></button>` : '';
+function bindGift(root, after){
+  root.querySelectorAll('[data-gift]').forEach(b => onTap(b, () => {
+    const p = R(); if (!p.giftReady) return; p.giftReady = false;
+    let txt;
+    if (Math.random() < .4){ const it = addFarmItem(pick(RARE)); txt = `صديق نادر في مزرعتك: ${it.e} ${it.n}!`; }
+    else { const n = rnd(5, 15); p.wool += n; txt = `🧶 ${sgn(n)} صوف هدية!`; }
+    save(); SND.win(); haptic('ok');
+    b.outerHTML = `<div class="gift open">🎁 ${txt}</div>`;
+    after && after();
+  }));
+}
+/* gentle break reminder: every 20 minutes of play, once */
+let playStart = Date.now();
+function breakHtml(){
+  if (Date.now() - playStart < 20 * 60 * 1000) return '';
+  playStart = Date.now();
+  return `<p class="break-tip">👀 لعبت أكثر من ٢٠ دقيقة رائعة! أرِح عينيك قليلًا: انظر إلى شيء بعيد، واشرب ماءً، ثم عُد إلينا.</p>`;
 }
 function finish(){
   cancelAnimationFrame(rafId);
@@ -2630,7 +2736,7 @@ function finish(){
   const W = WORLDS[q.w], lv = W.levels[q.i];
   const avg = q.times.length ? q.times.reduce((x, y) => x + y, 0) / q.times.length : 0;
   const sec = s => ar(s.toFixed(1)).replace('.', '٫') + ' ث';
-  let html = '', win = true, earned = 0, items = [], raceLine = '';
+  let html = '', win = true, earned = 0, items = [], raceLine = '', bestLine = '';
   const actions = [];
   if (q.mode === 'challenge'){
     win = q.energy >= q.goal;
@@ -2638,16 +2744,18 @@ function finish(){
       earned = q.asked <= q.s3 && q.wrong === 0 ? 3 : q.asked <= q.s2 ? 2 : 1;
       const B = P().best[q.w] || (P().best[q.w] = {});
       items = grantStars(q.w, q.i, earned);
-      if (!B[q.i] || q.asked < B[q.i].q) B[q.i] = {q:q.asked, avg:+avg.toFixed(1)};
+      const prev = B[q.i];
+      if (prev && (q.asked < prev.q || (q.asked === prev.q && avg < prev.avg - .05))) bestLine = '<span>🚀 أفضل من محاولتك السابقة! أنت تتحسّن.</span>';
+      if (!prev || q.asked < prev.q || (q.asked === prev.q && avg < prev.avg)) B[q.i] = {q:q.asked, avg:+avg.toFixed(1)};
       if (!q.rivalDone){ R().wool += 5; raceLine = '<span>🏆 سبقتَ صوفي إلى خط النهاية!</span>'; }
       else raceLine = '<span>🐑 وصلت صوفي أولًا، ووصلتَ أنت أيضًا! أن تصل متأخرًا خيرٌ من ألّا تصل أبدًا 💚</span>';
     }
     const msgs = {3:'وصلت إلى خط النهاية بسرعة الصاعقة.', 2:'أجب أسرع قليلًا لتنال النجمة الثالثة.', 1:'كلما تدرّبت صرت أسرع ووصلت بأسئلة أقل.'};
     html += `<div class="r-emoji">${win ? '🏁' : W.runner}</div><h2>${win ? 'أحسنت يا ' + esc(kid().name) + '! تجاوزت «' + lv.title + '»' : 'اقتربت كثيرًا!'}</h2>`;
     if (win) html += `<div class="bigstars" aria-label="${ar(earned)} من ٣ نجوم">${[1, 2, 3].map(s => `<span class="${s <= earned ? 'on' : ''}" style="animation-delay:${s * 160}ms">★</span>`).join('')}</div>`;
-    html += `<p>${win ? msgs[earned] : 'انتهت الأسئلة قبل أن يمتلئ الشريط. راجع الشرح ثم حاول مجددًا.'}</p>`;
-    html += `<div class="r-stats">${ar(q.asked)} <span>أسئلة</span> · ${q.times.length ? sec(avg) : '—'} <span>متوسط الإجابة</span>${q.wrong ? ` · ${ar(q.wrong)} <span>أخطاء</span>` : ''}</div>`;
-    html += rewardsHtml(q, items, raceLine);
+    html += `<p>${win ? msgs[earned] : 'انتهت الأسئلة قبل أن يمتلئ الشريط. كل محاولة تقوّي دماغك: راجع الشرح ثم حاول مجددًا.'}</p>`;
+    html += `<div class="r-stats">${countN(q.asked, ['سؤال واحد', 'سؤالان', 'أسئلة', 'سؤالًا'])} · ${q.times.length ? sec(avg) : '—'} <span>متوسط الإجابة</span>${q.wrong ? ` · ${countN(q.wrong, ['خطأ واحد', 'خطآن', 'أخطاء', 'خطأً'])}` : ''}</div>`;
+    html += rewardsHtml(q, items, bestLine + raceLine);
     if (win && q.i < W.levels.length - 1 && unlocked(q.w, q.i + 1)) actions.push(['next', W.levels[q.i + 1].boss ? 'واجه الذئب 🐺' : 'المستوى التالي', true]);
     else if (!win) actions.push(['learn', 'راجع الشرح', true]);
     actions.push(['retry', win && earned < 3 ? 'حاول لـ ٣ نجوم' : 'أعد المحاولة', !actions.length]);
@@ -2662,9 +2770,11 @@ function finish(){
   }
   if (items.length) actions.push(['farm', '🏡 اذهب إلى مزرعتي']);
   actions.push(['map', 'العودة إلى الطريق']);
+  countSession();
+  html += giftBtnHtml() + breakHtml();
   html += `<div class="r-actions">${actions.map(([r, label, primary]) => `<button class="${primary ? 'btn block' : 'link'}" data-r="${r}">${label}</button>`).join('')}</div>`;
   save();
-  const box = $('result'); box.innerHTML = html;
+  const box = $('result'); box.innerHTML = html; bindGift(box);
   curWorld = q.w;
   show('result');
   if (win && (q.mode === 'challenge' || q.correct === q.total)){ SND.win(); confetti(q.w); }
@@ -2679,8 +2789,10 @@ function finish(){
   });
 }
 function showResult(html, q, onAction, celebrate){
+  countSession();
+  html = html.replace('<div class="r-actions">', giftBtnHtml() + breakHtml() + '<div class="r-actions">');
   save();
-  const box = $('result'); box.innerHTML = html;
+  const box = $('result'); box.innerHTML = html; bindGift(box);
   show('result');
   if (celebrate){ SND.win(); confetti(q.w); }
   box.querySelectorAll('[data-r]').forEach(b => b.onclick = () => onAction(b.dataset.r));
@@ -2698,7 +2810,7 @@ function finishBoss(q){
     html += `<div class="r-emoji">🐺💨</div><h2>هزمت الذئب المشاغب!</h2><div class="bigstars">${[1, 2, 3].map(s => `<span class="${s <= earned ? 'on' : ''}" style="animation-delay:${s * 160}ms">★</span>`).join('')}</div>
       <p>هرب الذئب وهو يضحك، ${W.m ? 'وعاد' : 'وعادت'} ${W.name} ${W.m ? 'آمنًا' : 'آمنة'}. ${earned < 3 ? 'حاول مرة أخرى بلا أخطاء لتنال ٣ نجوم.' : 'بلا خطأ واحد! أنت بطل.'}</p>`;
   } else {
-    html += `<div class="r-emoji">🐺😏</div><h2>الذئب ما زال يضحك!</h2><p>بقيت له ${ar(q.hp)} نقطة قوة فقط. تدرّب قليلًا ثم عُد إليه، أنت قادر عليه!</p>`;
+    html += `<div class="r-emoji">🐺😏</div><h2>الذئب ما زال يضحك!</h2><p>بقيت له ${countN(q.hp, ['نقطة قوة واحدة', 'نقطتا قوة', 'نقاط قوة', 'نقطة قوة'])} فقط. تدرّب قليلًا ثم عُد إليه، أنت قادر عليه!</p>`;
   }
   html += rewardsHtml(q, items, extra);
   const actions = [['retry', win ? 'واجهه مرة أخرى' : 'حاول مجددًا', !items.length], ...(items.length ? [['farm', '🏡 اذهب إلى مزرعتي', true]] : []), ['map', 'العودة إلى الطريق']];
@@ -2706,13 +2818,14 @@ function finishBoss(q){
 }
 function finishDaily(q){
   const good = q.correct >= 3, already = dailyDoneToday();
-  let items = [], extra = '';
+  let items = [], extra = '', extraShield = '';
   if (good && !already){
-    const d = R().daily, t = todayStr();
-    d.streak = d.date === dayBefore(t) ? d.streak + 1 : 1; d.date = t;
+    const d = R().daily, t = todayStr(), st = streakInfo();
+    d.streak = st.alive ? d.streak + 1 : 1; d.date = t;
+    if (st.shield){ d.shield = t; extraShield = '<span>🛡️ درع السلسلة حمى سلسلتك من يوم الغياب!</span>'; }
     R().wool += 15;
     if (d.streak % 3 === 0) items.push(addFarmItem());
-    extra = `<span>🔥 سلسلة ${ar(d.streak)} ${d.streak === 1 ? 'يوم' : d.streak === 2 ? 'يومان' : d.streak <= 10 ? 'أيام' : 'يومًا'}${d.streak % 3 === 0 ? ' · هدية لمزرعتك!' : ' · كل ٣ أيام هدية لمزرعتك'}</span>`;
+    extra = extraShield + `<span>🔥 سلسلة ${ar(d.streak)} ${d.streak === 1 ? 'يوم' : d.streak === 2 ? 'يومان' : d.streak <= 10 ? 'أيام' : 'يومًا'}${d.streak % 3 === 0 ? ' · هدية لمزرعتك!' : ' · كل ٣ أيام هدية لمزرعتك'}</span>`;
   }
   const html = `<div class="r-emoji">${good ? '☀️' : '🌱'}</div><h2>${ar(q.correct)} من ${ar(q.total)} صحيحة</h2>
     <p>${good ? (already ? 'أحسنت! لقد أنجزت تحدي اليوم من قبل، عُد غدًا لتحدٍّ جديد.' : 'أنجزت تحدي اليوم! عُد غدًا لتطيل سلسلتك.') : 'تحتاج ٣ إجابات صحيحة على الأقل لإنجاز تحدي اليوم. حاول مجددًا!'}</p>
@@ -2752,7 +2865,7 @@ function renderFarm(){
       const place = () => { it.x = Math.max(10, Math.min(90, it.x)); it.y = Math.max(47, Math.min(95, it.y));
         el.style.left = it.x + '%'; el.style.top = it.y + '%'; el.style.zIndex = 10 + Math.round(it.y); };
       place();
-      el.setAttribute('role', 'img'); el.setAttribute('aria-label', (FARM_ITEMS.find(f => f[0] === it.e) || ['', 'كأس'])[1]);
+      el.setAttribute('role', 'img'); el.setAttribute('aria-label', ([...FARM_ITEMS, ...RARE].find(f => f[0] === it.e) || ['', 'كأس'])[1]);
       el.addEventListener('pointerdown', e => {
         e.preventDefault(); el.setPointerCapture(e.pointerId); el.classList.add('held'); SND.tick();
         const move = ev => { const r = field.getBoundingClientRect();
