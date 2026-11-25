@@ -80,6 +80,7 @@ button,a,input{touch-action:manipulation}
 .gift.open{animation:pop .4s both;font-weight:800}
 .goal-line{color:var(--muted);font-size:.95rem}
 .break-tip{background:var(--soft);border-radius:16px;padding:10px 14px;text-align:center;line-height:1.55}
+.hint-small{margin:0;color:var(--muted);font-size:.85rem;line-height:1.5}
 .msg-state{flex-basis:100%;margin:0;color:var(--muted);font-size:.88rem}
 
 /* ---------- division bakery ---------- */
@@ -193,14 +194,15 @@ button,a,input{touch-action:manipulation}
 .hearts{font-size:1rem;letter-spacing:1px;white-space:nowrap}
 .rewards{display:grid;gap:4px;justify-items:center;background:var(--sun-soft);border-radius:18px;padding:12px 18px;font-weight:700}
 .rewards .big{font-size:2.2rem;line-height:1.1}
-.balloons{position:relative;height:300px;overflow:hidden;border-radius:22px;background:linear-gradient(180deg,color-mix(in srgb,#9fd8ff 35%,var(--surface)),var(--surface));margin-top:12px;display:block!important}
-.balloon{position:absolute;bottom:-90px;width:78px;height:92px;border-radius:50% 50% 46% 46%;color:#fff;font-family:var(--f-display);font-weight:800;font-size:1.5rem;display:grid;place-items:center;box-shadow:inset -8px -10px 0 rgba(0,0,0,.12);animation:float var(--dur,7s) linear infinite;animation-delay:var(--delay,0s)}
+.balloon-layer{position:fixed;inset:calc(72px + env(safe-area-inset-top,0px)) 0 0 0;z-index:30;pointer-events:none;overflow:hidden}
+.balloon{position:absolute;bottom:-150px;pointer-events:auto;width:min(19vw,108px);height:min(23vw,128px);touch-action:manipulation;border-radius:50% 50% 46% 46%;color:#fff;font-family:var(--f-display);font-weight:800;font-size:1.5rem;display:grid;place-items:center;box-shadow:inset -8px -10px 0 rgba(0,0,0,.12);animation:float var(--dur,7s) linear infinite;animation-delay:var(--delay,0s)}
 .balloon::after{content:"";position:absolute;bottom:-26px;left:50%;width:2px;height:26px;background:rgba(0,0,0,.25)}
-.balloons.stopped .balloon{animation-play-state:paused}
+.balloon-layer.stopped .balloon{animation-play-state:paused}
+.hud{position:relative;z-index:40}
 .balloon.ok{outline:5px solid var(--sun);outline-offset:2px}
 .balloon.picked.ok{animation:popb .4s ease-out forwards}
 .balloon.bad{animation:shake .3s;filter:grayscale(.7)}
-@keyframes float{from{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-200px) rotate(3deg)}to{transform:translateY(-420px) rotate(-3deg)}}
+@keyframes float{from{transform:translateY(0) rotate(-3deg)}25%{transform:translateY(calc(-25vh - 40px)) rotate(3deg)}50%{transform:translateY(calc(-50vh - 80px)) rotate(-3deg)}75%{transform:translateY(calc(-75vh - 120px)) rotate(3deg)}to{transform:translateY(calc(-100vh - 170px)) rotate(-3deg)}}
 @keyframes popb{to{transform:scale(1.8);opacity:0}}
 .builder{display:grid;gap:10px;margin:12px 0}
 .tray{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:10px;border-radius:18px;background:var(--soft)}
@@ -583,6 +585,7 @@ table.mg{border-collapse:separate;border-spacing:3px;margin:0 auto;font-family:v
 }
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+  .balloon-layer .balloon{animation:none!important;bottom:var(--still)}   /* still balloons instead of ones that vanish at once */
 }
 </style>
 </head>
@@ -593,12 +596,14 @@ table.mg{border-collapse:separate;border-spacing:3px;margin:0 auto;font-family:v
   <!-- ================= REGISTER ================= -->
   <section id="screen-register" hidden>
     <h1 class="title-xl" style="color:var(--accent)">مزرعة الأرقام</h1>
-    <div class="hello" style="margin-top:12px"><span class="hello-sheep" aria-hidden="true">🐑</span><p class="bubble">أهلًا! أنا صوفي. سجّلوا مرة واحدة فقط، ثم نتعلّم الضرب والجمع والطرح والمنازل والتقريب ونحن نلعب.</p></div>
+    <div class="hello" style="margin-top:12px"><span class="hello-sheep" aria-hidden="true">🐑</span><p class="bubble">أهلًا! أنا صوفي. سجّلوا مرة واحدة فقط، ثم نتعلّم الضرب والقسمة والجمع والطرح والمنازل والتقريب ونحن نلعب.</p></div>
     <form class="form" id="regForm" novalidate>
       <div class="card">
         <h3>👤 ولي الأمر</h3>
         <label class="field">الاسم<input id="regParent" autocomplete="name" placeholder="مثال: أم سارة"></label>
         <label class="field">رقم الهاتف<input id="regPhone" type="tel" inputmode="tel" autocomplete="tel" dir="ltr" placeholder="05xxxxxxxx"></label>
+        <label class="field">رمز سري لولي الأمر (٤ أرقام)<input id="regPin" type="password" inputmode="numeric" maxlength="4" autocomplete="new-password" dir="ltr" placeholder="••••"></label>
+        <p class="hint-small">يُطلب كلما فتحت صفحة ولي الأمر، فلا تخبر به الطفل.</p>
       </div>
       <div class="card">
         <h3>🧒 الطفل</h3>
@@ -647,7 +652,8 @@ table.mg{border-collapse:separate;border-spacing:3px;margin:0 auto;font-family:v
       <button class="pill" id="parentAddKid" style="justify-self:start">➕ أضف طفلًا</button>
     </div>
     <div style="margin-top:20px;display:grid;gap:4px;justify-items:center">
-      <button class="link" id="relockBtn">🔒 اقفل صفحة ولي الأمر مجددًا على هذا الجهاز</button>
+      <button class="link" id="pinBtn">🔑 تغيير الرمز السري</button>
+      <p class="hint-small" id="pinSaved" hidden>تم تغيير الرمز ✓</p>
       <button class="link danger" id="wipeBtn">حذف الحساب وكل البيانات من هذا الجهاز</button>
     </div>
   </section>
@@ -923,7 +929,7 @@ const KEY = 'numbers-farm-v2', OLD_KEY = 'multiplication-farm-v1';
 const AVATARS = ['🦁', '🐰', '🐼', '🦊', '🐸', '🐯', '🐨', '🐵', '🦄', '🐧'];
 const freshProg = () => ({stars:{}, best:{}, facts:{}, correct:0});
 let DB = {parent:null, kids:[], active:null, sound:true};
-function load(){ try { const d = JSON.parse(localStorage.getItem(KEY)); if (d && Array.isArray(d.kids)) DB = Object.assign({parent:null, kids:[], active:null, sound:true}, d); } catch(e){} }
+function load(){ try { const d = JSON.parse(localStorage.getItem(KEY)); if (d && Array.isArray(d.kids)) DB = Object.assign({parent:null, kids:[], active:null, sound:true}, d); delete DB.parentUnlocked; } catch(e){} }
 function save(){ try { localStorage.setItem(KEY, JSON.stringify(DB)); } catch(e){} }
 const kid = () => DB.kids.find(k => k.id === DB.active);
 const P = () => kid().prog;
@@ -1138,6 +1144,7 @@ const SCREENS = ['register', 'profiles', 'parent', 'worlds', 'map', 'learn', 'qu
 let curWorld = 'mult';
 function show(name){
   SCREENS.forEach(s => $('screen-' + s).hidden = s !== name);
+  if (name !== 'quiz') clearBalloons();
   window.scrollTo({top:0});
   paintSoufi();
   if (name === 'profiles') renderProfiles();
@@ -1171,13 +1178,14 @@ let regAvatar = avatarPicker($('regAvatars'));
 document.querySelectorAll('.field input').forEach(inp => inp.addEventListener('input', () => inp.removeAttribute('aria-invalid')));
 $('regForm').onsubmit = e => {
   e.preventDefault();
-  ['regParent', 'regPhone', 'regKid'].forEach(id => $(id).removeAttribute('aria-invalid'));
-  const pn = $('regParent').value.trim(), ph = validPhone($('regPhone').value), kn = $('regKid').value.trim();
+  ['regParent', 'regPhone', 'regPin', 'regKid'].forEach(id => $(id).removeAttribute('aria-invalid'));
+  const pn = $('regParent').value.trim(), ph = validPhone($('regPhone').value), kn = $('regKid').value.trim(), pin = toLatin($('regPin').value).replace(/\D/g, '');
   if (!pn) return fieldError($('regParent'), $('regErr'), 'اكتب اسم ولي الأمر.');
   if (!ph) return fieldError($('regPhone'), $('regErr'), 'رقم الهاتف قصير جدًا أو طويل جدًا. اكتب من ٧ إلى ١٥ رقمًا، مثل ٠٥٠١٢٣٤٥٦٧.');
+  if (pin.length !== 4) return fieldError($('regPin'), $('regErr'), 'اختر رمزًا سريًا من ٤ أرقام لصفحة ولي الأمر.');
   if (!kn) return fieldError($('regKid'), $('regErr'), 'اكتب اسم الطفل.');
   const k = {id:newId(), name:kn.slice(0, 30), avatar:regAvatar(), prog:oldProgress() || freshProg()};
-  DB.parent = {name:pn.slice(0, 40), phone:ph, created:Date.now()};
+  DB.parent = {name:pn.slice(0, 40), phone:ph, pin, created:Date.now()};
   DB.kids = [k]; DB.active = k.id; save();
   show('worlds');
 };
@@ -1202,24 +1210,57 @@ $('addKidForm').onsubmit = e => {
   const k = {id:newId(), name:n.slice(0, 30), avatar:newKidAvatar(), prog:freshProg()};
   DB.kids.push(k); save(); $('addKidForm').hidden = true; renderProfiles();
 };
-/* Parental gate (required for apps in the Kids category): the parent types the last 4 digits of their phone number. */
-function parentGate(onOk){
-  if (DB.parentUnlocked){ onOk(); return; }   // asked once per device; the parent can lock it again
-  const last4 = toLatin(DB.parent.phone).replace(/\D/g, '').slice(-4);
-  $('sheet').innerHTML = `<div class="s-head"><span class="big">🔒</span><div><h2>للوالدين فقط</h2><p>هذه الصفحة لولي الأمر</p></div><button class="icon-btn" data-close aria-label="إغلاق">✕</button></div>
+/* Parental gate (required for apps in the Kids category): the parent's own 4-digit PIN, asked every time
+   the parent page is opened. Three wrong tries lock it for 30 seconds. A forgotten PIN is reset with the full phone number. */
+let gateFails = 0, gateLockUntil = 0;
+const pinInput = (type = 'pin') => type === 'pin'
+  ? `<input id="gateIn" type="password" inputmode="numeric" maxlength="4" autocomplete="off" dir="ltr">`
+  : `<input id="gateIn" type="tel" inputmode="tel" autocomplete="off" dir="ltr" placeholder="05xxxxxxxx">`;
+function pinSheet({title = 'للوالدين فقط', prompt, button, type = 'pin', extra = '', onSubmit}){
+  $('sheet').innerHTML = `<div class="s-head"><span class="big">🔒</span><div><h2>${title}</h2><p>هذه الصفحة لولي الأمر</p></div><button class="icon-btn" data-close aria-label="إغلاق">✕</button></div>
     <form class="gate" id="gateForm" novalidate>
-      <p class="gate-q">اكتب آخر ٤ أرقام من رقم هاتف ولي الأمر</p>
-      <label class="field"><span class="sr">آخر ٤ أرقام</span><input id="gateIn" inputmode="numeric" maxlength="4" autocomplete="off"></label>
+      <p class="gate-q">${prompt}</p>
+      <label class="field"><span class="sr">${prompt}</span>${pinInput(type)}</label>
       <p class="err" id="gateErr" role="alert"></p>
-      <button class="btn block" type="submit">فتح</button>
+      <button class="btn block" type="submit">${button}</button>${extra}
     </form>`;
   $('sheet').querySelector('[data-close]').onclick = closeSheet;
   $('gateForm').onsubmit = e => {
     e.preventDefault();
-    if (toLatin($('gateIn').value).replace(/\D/g, '') === last4){ DB.parentUnlocked = true; save(); closeSheet(); onOk(); }
-    else { $('gateErr').textContent = 'الأرقام غير صحيحة. اطلب المساعدة من ولي الأمر.'; $('gateIn').value = ''; }
+    const raw = $('gateIn').value, err = onSubmit(toLatin(raw).replace(/\D/g, ''), raw);
+    if (err && $('gateErr')){ $('gateErr').textContent = err; $('gateIn').value = ''; $('gateIn').focus(); }
   };
   $('overlay').hidden = false; $('gateIn').focus();
+}
+function choosePin(onDone, title = 'رمز سري لولي الأمر'){
+  pinSheet({title, prompt:'اختر رمزًا من ٤ أرقام لا يعرفه الطفل', button:'التالي', onSubmit: v => {
+    if (v.length !== 4) return 'الرمز ٤ أرقام.';
+    pinSheet({title, prompt:'اكتب الرمز نفسه مرة أخرى للتأكيد', button:'حفظ', onSubmit: v2 => {
+      if (v2 !== v) return 'الرمزان غير متطابقين. اكتب الرمز نفسه.';
+      DB.parent.pin = v; save(); closeSheet(); onDone(); return null; }});
+    return null; }});
+}
+function forgotPin(onOk){
+  pinSheet({title:'نسيت الرمز؟', type:'phone', prompt:'اكتب رقم هاتف ولي الأمر كاملًا كما سجّلته', button:'التالي', onSubmit: (v, raw) => {
+    if (validPhone(raw) !== DB.parent.phone) return 'الرقم لا يطابق الرقم المسجّل.';
+    choosePin(onOk, 'اختر رمزًا جديدًا'); return null; }});
+}
+function parentGate(onOk){
+  if (!DB.parent.pin){   // accounts made before PINs existed: confirm once with the phone, then choose a PIN
+    const last4 = toLatin(DB.parent.phone).replace(/\D/g, '').slice(-4);
+    pinSheet({prompt:'لأمان أكثر سنضع رمزًا سريًا لصفحة ولي الأمر. أولًا: اكتب آخر ٤ أرقام من رقم الهاتف', button:'التالي', onSubmit: v => {
+      if (v !== last4) return 'الأرقام غير صحيحة. اطلب المساعدة من ولي الأمر.';
+      choosePin(onOk); return null; }});
+    return;
+  }
+  pinSheet({prompt:'اكتب الرمز السري لولي الأمر', button:'فتح', extra:'<button type="button" class="link" id="forgotPin">نسيت الرمز؟</button>', onSubmit: v => {
+    const wait = Math.ceil((gateLockUntil - Date.now()) / 1000);
+    if (wait > 0) return `محاولات كثيرة. انتظر ${countN(wait, ['ثانية واحدة', 'ثانيتين', 'ثوانٍ', 'ثانية'])} ثم حاول مجددًا.`;
+    if (v === DB.parent.pin){ gateFails = 0; closeSheet(); onOk(); return null; }
+    if (++gateFails >= 3){ gateFails = 0; gateLockUntil = Date.now() + 30000; return 'محاولات كثيرة. انتظر ٣٠ ثانية ثم حاول مجددًا.'; }
+    return 'الرمز غير صحيح. اطلب المساعدة من ولي الأمر.';
+  }});
+  $('forgotPin').onclick = () => forgotPin(onOk);
 }
 $('parentBtn').onclick = () => parentGate(() => show('parent'));
 $('whoBtn').onclick = () => show('profiles');
@@ -1257,7 +1298,7 @@ function renderNudges(){
 }
 
 function renderParent(){
-  $('pName').value = DB.parent.name; $('pPhone').value = DB.parent.phone; $('pErr').textContent = ''; $('pSaved').hidden = true;
+  $('pName').value = DB.parent.name; $('pPhone').value = DB.parent.phone; $('pErr').textContent = ''; $('pSaved').hidden = true; $('pinSaved').hidden = true;
   $('parentKids').innerHTML = DB.kids.map(k => `
     <div class="kid-row" data-id="${k.id}">
       <span class="av">${k.avatar}</span>
@@ -1302,7 +1343,7 @@ $('parentForm').onsubmit = e => {
   DB.parent.name = n.slice(0, 40); DB.parent.phone = ph; save();
   $('pErr').textContent = ''; $('pSaved').hidden = false;
 };
-$('relockBtn').onclick = () => { DB.parentUnlocked = false; save(); show('profiles'); };
+$('pinBtn').onclick = () => choosePin(() => { $('pinSaved').hidden = false; }, 'رمز سري جديد');
 $('wipeBtn').onclick = ev => twoStep(ev.currentTarget, 'متأكد؟ اضغط مرة أخرى لحذف كل شيء', () => {
   DB = {parent:null, kids:[], active:null, sound:DB.sound}; save();
   try { localStorage.removeItem(OLD_KEY); } catch(e){}
@@ -2448,7 +2489,7 @@ function nextQuestion(){
   $('wrongBox').hidden = true;
   $('hintBtn').hidden = !q.hint; $('hintBtn').classList.remove('hint-on');
   $('hintMsg').hidden = true; $('hintMsg').innerHTML = '';
-  $('choices').className = 'choices'; $('choices').innerHTML = '';   // clear balloons left from the last question
+  $('choices').className = 'choices'; $('choices').innerHTML = ''; clearBalloons();   // clear balloons left from the last question
   $('choices').hidden = q.input !== 'choices';
   $('pad').hidden = q.input === 'choices' || q.input === 'drag';
   $('quizCard').classList.toggle('split', q.input === 'pad' || q.input === 'column');
@@ -2542,7 +2583,7 @@ addEventListener('keydown', e => {
   if (!$('wrongBox').hidden && (e.key === 'Enter' || e.key === ' ')){ e.preventDefault(); $('wrongNext').click(); return; }
   if (!Q.q) return;
   if (Q.q.input === 'drag'){ if (!Q.busy && Q.q.goat && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')){ e.preventDefault(); Q.q.goat.pick(e.key === 'ArrowLeft' ? Q.q.goat.hi : Q.q.goat.lo); } else if (e.key === 'h' || e.key === '?') useHint(); return; }
-  if (Q.q.input === 'choices'){ if (/^[1-4]$/.test(e.key)) $('choices').children[+e.key - 1]?.click(); else if (e.key === 'h' || e.key === '?') useHint(); return; }
+  if (Q.q.input === 'choices'){ if (/^[1-4]$/.test(e.key)) (Q.q.balloon ? balloonLayer() : $('choices')).children[+e.key - 1]?.click(); else if (e.key === 'h' || e.key === '?') useHint(); return; }
   if ((e.key === 'Enter' || e.key === ' ') && e.target.classList && e.target.classList.contains('cbox')){ e.preventDefault(); e.target.click(); return; }
   let d = e.key; const i = AR.indexOf(d); if (i >= 0) d = String(i);
   if (/^\d$/.test(d)) padKey(d);
@@ -2600,14 +2641,29 @@ function genericChoices(ans){
   return shuffle([...set]).map(v => ({v, html:ar(v)}));
 }
 const balloonable = q => (q.input === 'choices' && !q.wide) || (q.input === 'pad' && q.answer < 1000);
+/* Balloons float slowly up the whole screen (not a small box), so they are easy to catch. */
+function balloonLayer(){
+  let l = $('balloonLayer');
+  if (!l){ l = document.createElement('div'); l.id = 'balloonLayer'; l.className = 'balloon-layer'; l.hidden = true; document.body.appendChild(l); }
+  return l;
+}
+function clearBalloons(){ const l = $('balloonLayer'); if (l){ l.innerHTML = ''; l.className = 'balloon-layer'; l.hidden = true; } }
 function renderBalloons(q){
   if (!q.choices) q.choices = genericChoices(q.answer);
   q.input = 'choices'; q.balloon = true;
-  const box = $('choices'); box.hidden = false; box.className = 'choices balloons';
-  const lefts = shuffle([4, 28, 52, 76]), colors = shuffle(['#E8505B', '#F2A93B', '#3E9B4F', '#2B7BD6', '#8A4FC2']);
-  box.innerHTML = q.choices.map((c, i) => { const dur = 6.5 + Math.random() * 2;
-    return `<button class="balloon" data-v="${c.v}" style="left:${lefts[i]}%;background:${colors[i]};--dur:${dur.toFixed(1)}s;--delay:-${(Math.random() * dur * .6).toFixed(1)}s">${c.html}</button>`; }).join('');
-  box.querySelectorAll('button').forEach(btn => btn.onclick = () => { btn.classList.add('picked'); box.classList.add('stopped'); answer(+btn.dataset.v, btn); });
+  $('choices').hidden = true; $('choices').innerHTML = '';
+  const box = balloonLayer(); box.hidden = false; box.className = 'balloon-layer';
+  const lanes = shuffle([2, 26.5, 51, 75.5]), colors = shuffle(['#E8505B', '#F2A93B', '#3E9B4F', '#2B7BD6', '#8A4FC2']);
+  const starts = shuffle([.24, .4, .56, .72]);                    // all four start on screen, at different heights
+  box.innerHTML = q.choices.map((c, i) => { const dur = 19 + Math.random() * 4;
+    return `<button class="balloon" data-v="${c.v}" aria-label="${c.html}" style="left:calc(${lanes[i]}% + (25% - min(19vw, 108px)) / 2 - 1%);background:${colors[i]};--dur:${dur.toFixed(1)}s;--delay:-${(starts[i] * dur).toFixed(1)}s;--still:${(18 + i * 17)}vh">${c.html}</button>`; }).join('');
+  box.querySelectorAll('button').forEach(btn => onTap(btn, () => {
+    if (!Q || Q.busy || Q.q !== q) return;
+    btn.classList.add('picked'); box.classList.add('stopped');
+    const ok = +btn.dataset.v === q.answer;
+    answer(+btn.dataset.v, btn);
+    setTimeout(() => { if (box.querySelector('.picked') === btn) clearBalloons(); }, ok ? 650 : 1100);
+  }));
   qtext('🎈 فرقع البالون الذي يحمل الجواب!');
 }
 const CHEERS = ['أحسنت!', 'تفكير ذكي!', 'تركيزك رائع!', 'تمرينك يثمر!', 'برافو!', 'هذا هو!'];   // praise effort and strategy, not "being clever"
@@ -2667,7 +2723,7 @@ function answer(v, btn){
     SND.bad(); haptic('bad');
     buddySay('sad', pick(COMFORT));
     if (Q.mode === 'boss'){ Q.lives = Math.max(0, Q.lives - 1); wolfSay('laugh', 'هاها! 😏'); }
-    if (btn){ btn.classList.add('bad'); $('choices').querySelector(`[data-v="${q.answer}"]`)?.classList.add('ok'); }
+    if (btn){ btn.classList.add('bad'); (btn.parentElement || $('choices')).querySelector(`[data-v="${q.answer}"]`)?.classList.add('ok'); }
     markAnswer(false);
     if (Q.mode === 'challenge') Q.energy = Math.max(0, Q.energy - WRONG_PENALTY);
     if (Q.mode !== 'review' && Q.mode !== 'daily') Q.retry.push({q, at:Q.asked + 2});
