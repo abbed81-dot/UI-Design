@@ -74,7 +74,7 @@ UI/UX Pro Max v2.13.0 by NextLevelBuilder, MIT licensed — see
 
 ## Numbers Farm (مزرعة الأرقام)
 
-An Arabic maths game for children (times tables, addition, subtraction, place value, rounding).
+An Arabic maths game for children (times tables, division, addition, subtraction, place value, rounding).
 
 - `multiplication-game/index.html`: the game itself, a single HTML file that runs in any browser.
 - `mobile-app/`: the same game packaged as iOS and Android apps with Capacitor, plus everything needed for the App Store and Google Play (icons, splash, screenshots, listing text, privacy policy). See `mobile-app/README.md`.

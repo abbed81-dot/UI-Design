@@ -19,7 +19,7 @@
 :root{
   --bg:#F5F7F2; --surface:#FFFFFF; --soft:#EDF1E8; --ink:#25362C; --muted:#7B8A80; --line:#E2E8DC; --road:#E3EAD6;
   --accent:#3E9B4F; --accent-ink:#FFFFFF; --sun:#F2B630; --sun-soft:#FDF1D3; --bad:#D9534F; --bad-soft:#FBE7E6; --focus:#3A86C8;
-  --w-mult:#3E9B4F; --w-add:#2B7BD6; --w-sub:#C9771E; --w-place:#8A4FC2; --w-round:#12999A;
+  --w-mult:#3E9B4F; --w-add:#2B7BD6; --w-sub:#C9771E; --w-place:#8A4FC2; --w-round:#12999A; --w-div:#C2477A;
   --p0:#2B7BD6; --p1:#2E9D57; --p2:#E07B1F; --p3:#8A4FC2; --p4:#D2457E; --p5:#12999A;
   --shadow:0 1px 2px rgba(37,54,44,.05),0 6px 20px rgba(37,54,44,.05);
   --f-display:"Baloo Bhaijaan 2","Tajawal","Segoe UI","Noto Sans Arabic",system-ui,sans-serif;
@@ -29,7 +29,7 @@
   :root:not([data-theme="light"]){
     --bg:#11181C; --surface:#182228; --soft:#1F2B31; --ink:#E6EEE7; --muted:#93A39A; --line:#26343B; --road:#22313A;
     --accent:#5DBB6C; --accent-ink:#0E1A12; --sun:#F5C451; --sun-soft:#3A3220; --bad:#F07470; --bad-soft:#3A2224; --focus:#6DB1EA;
-    --w-mult:#5DBB6C; --w-add:#5FA8F5; --w-sub:#E9A04E; --w-place:#B98CF0; --w-round:#3FCFCB;
+    --w-mult:#5DBB6C; --w-add:#5FA8F5; --w-sub:#E9A04E; --w-place:#B98CF0; --w-round:#3FCFCB; --w-div:#F07FAA;
     --p0:#6CB2FF; --p1:#62D08A; --p2:#FFA65A; --p3:#B98CF0; --p4:#FF7FB0; --p5:#4FD4D2;
     --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.18);
     color-scheme:dark;
@@ -38,7 +38,7 @@
 :root[data-theme="dark"]{
   --bg:#11181C; --surface:#182228; --soft:#1F2B31; --ink:#E6EEE7; --muted:#93A39A; --line:#26343B; --road:#22313A;
   --accent:#5DBB6C; --accent-ink:#0E1A12; --sun:#F5C451; --sun-soft:#3A3220; --bad:#F07470; --bad-soft:#3A2224; --focus:#6DB1EA;
-  --w-mult:#5DBB6C; --w-add:#5FA8F5; --w-sub:#E9A04E; --w-place:#B98CF0; --w-round:#3FCFCB;
+  --w-mult:#5DBB6C; --w-add:#5FA8F5; --w-sub:#E9A04E; --w-place:#B98CF0; --w-round:#3FCFCB; --w-div:#F07FAA;
   --p0:#6CB2FF; --p1:#62D08A; --p2:#FFA65A; --p3:#B98CF0; --p4:#FF7FB0; --p5:#4FD4D2;
   --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.18);
   color-scheme:dark;
@@ -62,6 +62,60 @@ p{margin:0}
 button,a,input{touch-action:manipulation}
 .gate-q{font-family:var(--f-display);font-weight:700;font-size:1.1rem;text-align:center;margin:6px 0 12px}
 .gate input{text-align:center;font-size:1.6rem;letter-spacing:.3em;direction:ltr}
+
+
+/* ---------- division bakery ---------- */
+.t-n{color:var(--p3)}.t-k{color:var(--p4)}.t-q{color:var(--p1)}.t-r{color:var(--bad)}
+.terms{display:flex;justify-content:center;flex-wrap:wrap;gap:6px;font-size:.92rem;font-weight:700;color:var(--muted);margin:6px 0}
+.terms span{background:var(--soft);border-radius:99px;padding:2px 12px}
+.terms b{font-family:var(--f-display);font-size:1.05rem}
+.div-eq .rem-word{white-space:nowrap;margin-inline-start:.2em;font-size:.55em;font-family:var(--f-body);font-weight:800;color:var(--muted);align-self:center}
+.share{display:grid;gap:10px;margin:10px 0}
+.pile{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:2px 4px;min-height:3rem;padding:8px 10px;border-radius:20px;background:var(--soft);font-size:1.6rem;line-height:1.2}
+.pile .ck{cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;padding:2px}
+.pile-label{flex-basis:100%;text-align:center;font-size:.88rem;color:var(--muted);font-weight:700;line-height:1.4}
+.plates{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
+.plate{flex:0 1 96px;min-width:76px;display:grid;justify-items:center;align-content:start;gap:0}
+.plate.no{animation:refuse .5s ease-in-out}
+.plate .fr{font-size:2rem;line-height:1.1;position:relative;z-index:1;margin-bottom:-6px}
+.plate .on{display:flex;flex-wrap:wrap;justify-content:center;align-content:center;gap:1px;width:92px;min-height:54px;padding:8px 10px;border-radius:50%;font-size:1.15rem;line-height:1.1;
+  background:radial-gradient(ellipse at center,var(--surface) 0 58%,color-mix(in srgb,var(--line) 70%,var(--surface)) 60%,var(--surface) 72%);box-shadow:var(--shadow);border:2px dashed transparent;transition:border-color .15s,background .15s}
+.plate.over .on{border-color:var(--sun)}
+.plate .on .fresh{animation:pop .35s both}
+.plate .cnt{font-family:var(--f-display);font-weight:800;color:var(--muted);line-height:1.2}
+.share.sm .pile{font-size:1.15rem}.share.sm .plate .on{font-size:.92rem}
+.m{white-space:nowrap}
+.leftover{display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;padding:6px 14px;border-radius:16px;border:2px dashed var(--bad);color:var(--bad);font-weight:800;background:var(--bad-soft)}
+.family{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;margin:10px 0}
+.tri{position:relative;width:120px;height:100px;flex:none;color:var(--ink);font-family:var(--f-display);font-weight:800;font-size:1.25rem}
+.tri svg{position:absolute;inset:0;width:100%;height:100%}
+.tri b{position:absolute;transform:translate(-50%,-50%);background:var(--bg);padding:0 4px;line-height:1.2}
+.tri .t-top{left:50%;top:14%}.tri .t-l{left:12%;top:86%}.tri .t-r{left:88%;top:86%}
+.fam-eqs{display:grid;gap:2px;font-family:var(--f-display);font-weight:700;font-size:1.05rem;color:var(--muted)}
+.fam-eqs .hl{color:var(--ink);background:var(--sun-soft);border-radius:10px;padding:0 8px}
+.divsel{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin:4px 0 6px}
+.divsel button{min-height:42px;min-width:56px;border-radius:12px;background:var(--soft);font-family:var(--f-display);font-weight:800;font-size:1.05rem;color:var(--muted)}
+.divsel button.on{background:var(--wc,var(--accent));color:#fff}
+.ld{display:grid;grid-template-rows:minmax(1.3em,auto);justify-content:center;direction:ltr;font-family:var(--f-display);font-weight:800;font-size:clamp(1.8rem,8vw,2.5rem);line-height:1.3;font-variant-numeric:tabular-nums;margin:10px auto 6px;width:max-content;max-width:100%}
+.ld > span{position:relative;text-align:center;min-width:.82em;padding:0 .06em}
+.ld .dv{color:var(--p4);padding-right:.3em}
+.ld .dd{border-top:3px solid currentColor}
+.ld .dd.first{border-left:3px solid currentColor;border-top-left-radius:.45em;padding-left:.12em}
+.ld .qd{color:var(--p1)}
+.ld .pr{color:var(--muted);border-bottom:2px solid currentColor}
+.ld .pr.minus::before{content:"−";position:absolute;right:100%;top:0;font-weight:500}
+.ld .rm.down{color:var(--p0)}
+.ld .cur{background:var(--sun-soft);background-clip:padding-box;outline:2px dashed var(--sun);outline-offset:2px}
+.ld .new{animation:pop .35s both}
+.mults{display:grid;grid-template-columns:repeat(9,1fr);gap:3px;direction:ltr;margin:6px 0}
+.mults span{display:grid;justify-items:center;border-radius:10px;background:var(--soft);padding:3px 0;line-height:1.15;color:var(--muted)}
+.mults small{font-size:.62rem;font-weight:700}
+.mults b{font-family:var(--f-display);font-size:1rem}
+.mults .fits{background:color-mix(in srgb,var(--accent) 16%,var(--surface));color:var(--ink)}
+.mults .pick{box-shadow:inset 0 0 0 2px var(--accent);background:color-mix(in srgb,var(--accent) 30%,var(--surface))}
+.ld-steps{display:flex;justify-content:center;flex-wrap:wrap;gap:6px;margin:6px 0}
+.ld-steps span{border-radius:99px;padding:2px 12px;background:var(--soft);font-weight:700;font-size:.92rem;color:var(--muted)}
+.ld-steps span.on{background:var(--sun);color:#3A2A00}
 
 /* ---------- fun layer: Soufi, wool, farm, wardrobe, buddy, race, boss, balloons, builders ---------- */
 .soufi{position:relative;display:inline-block;line-height:1;vertical-align:-.15em}
@@ -156,6 +210,7 @@ button,a,input{touch-action:manipulation}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:54px;padding:0 26px;border-radius:14px;font-family:var(--f-display);font-weight:700;font-size:1.15rem;background:var(--accent);color:var(--accent-ink)}
 .btn:active{transform:scale(.98)}
 .btn.block{width:100%}
+.btn.small{min-height:46px;padding:0 18px;font-size:1.02rem}
 .link{min-height:44px;padding:0 14px;border-radius:12px;font-weight:700;color:var(--muted)}
 .link:hover{background:var(--soft);color:var(--ink)}
 .link:disabled{opacity:.3;pointer-events:none}
@@ -811,12 +866,23 @@ const WORLDS = {
           decos:['🚩','🧱','👑','🛡️','🗝️','⭐','🏳️'],
           intro:'في قلعة المنازل لكل رقم بيت: آحاد، عشرات، مئات… ونتعلّم كيف نقرأ الأعداد بالعربية.',
           levels:[2, 3, 4, 5, 6].map((d, i) => ({d, title: d === 2 ? 'الآحاد والعشرات' : LEVEL_NAMES[d], label: d === 2 ? 'آحاد وعشرات' : LEVEL_NAMES[d], desc:`أعداد من ${DIGITS[d]}`, emoji:['🛖','🏠','🏡','🏘️','🏰'][i], badge:ar(i + 1)})).concat([BOSS()])},
-  round: {name:'جبل التقريب', emoji:'⛰️', color:'--w-round', runner:'🐐', sub:'من أقرب عشرة إلى أقرب مئة ألف',
+  round: {m:true, name:'جبل التقريب', emoji:'⛰️', color:'--w-round', runner:'🐐', sub:'من أقرب عشرة إلى أقرب مئة ألف',
           decos:['☁️','🌲','🦅','❄️','⛅','🌿','🌤️'],
           intro:'على جبل التقريب نسأل: هل العدد أقرب إلى الأسفل أم إلى الأعلى؟',
           levels:[1, 2, 3, 4, 5].map((k, i) => ({k, title:'التقريب إلى ' + ROUND_TO[k], label:ROUND_TO[k], desc:`ننظر إلى رقم ${PLACE[k - 1]}`, emoji:['🌱','🌿','🌲','⛰️','🏔️'][i], badge:ar(i + 1)})).concat([BOSS()])},
 };
-const WORLD_ORDER = ['mult', 'add', 'sub', 'place', 'round'];
+WORLDS.div = {m:true, name:'مخبز القسمة', emoji:'🧁', color:'--w-div', runner:'🍪', sub:'نوزّع بالتساوي، والقسمة عكس الضرب',
+  decos:['🥐','🍪','🍩','🥖','🍰','🍓','🧁'],
+  intro:'في مخبز القسمة نوزّع الحلوى على الأصدقاء بالتساوي، ونتعلّم أن القسمة عكس الضرب!',
+  levels:[
+    {kind:'share', title:'التوزيع بالتساوي', label:'التوزيع بالتساوي', desc:'نوزّع على الأصدقاء جولة بعد جولة', emoji:'🍪', badge:ar(1)},
+    {kind:'fact', set:[2, 3, 4, 5], title:'القسمة على ٢ و٣ و٤ و٥', label:'÷ ٢ إلى ٥', desc:'القسمة عكس الضرب', emoji:'🥐', badge:ar(2)},
+    {kind:'fact', set:[6, 7, 8, 9, 10], title:'القسمة على ٦ إلى ١٠', label:'÷ ٦ إلى ١٠', desc:'القسمة عكس الضرب', emoji:'🍩', badge:ar(3)},
+    {kind:'rem', title:'القسمة مع باقٍ', label:'مع باقٍ', desc:'ما يبقى ولا يكفي لجولة كاملة', emoji:'🍰', badge:ar(4)},
+    {kind:'long', d:2, title:'القسمة الطويلة: عدد من رقمين', label:'قسمة طويلة ٢', desc:'اقسم، اضرب، اطرح، أنزل', emoji:'🥖', badge:ar(5)},
+    {kind:'long', d:3, title:'القسمة الطويلة: عدد من ثلاثة أرقام', label:'قسمة طويلة ٣', desc:'اقسم، اضرب، اطرح، أنزل', emoji:'🎂', badge:ar(6)},
+  ].concat([BOSS()])};
+const WORLD_ORDER = ['mult', 'div', 'add', 'sub', 'place', 'round'];
 
 const SPEED = [
   {max:3,  pts:20, label:'⚡ صاعقة!'},
@@ -827,7 +893,8 @@ const SPEED = [
 const WRONG_PENALTY = 8, HINT_PTS = 6;
 const levelCfg = (w, i) => ({goal:100, maxQ:18, s3:7, s2:10});
 const levelTF = (w, lv) => w === 'add' || w === 'sub' ? (lv.d === 1 ? 1 : 1 + (lv.d - 1) * 1.1)
-  : w === 'place' ? 1.7 : w === 'round' ? 1.4 + lv.k * .2 : 1;
+  : w === 'place' ? 1.7 : w === 'round' ? 1.4 + lv.k * .2
+  : w === 'div' ? ({share:1.6, fact:1, rem:2.2, long:lv.d === 2 ? 2.6 : 3.6})[lv.kind] || 1 : 1;
 
 /* =====================================================================
    storage: one parent account, several children on this device
@@ -1196,7 +1263,8 @@ function renderWorlds(){
   $('worldsBubble').textContent = kidStars(k) === 0 ? `أهلًا يا ${k.name}! اختر عالمًا نلعب فيه. أنصحك أن تبدأ بقلعة المنازل أو جزيرة الجمع.` : `أهلًا يا ${k.name}! إلى أين نذهب اليوم؟`;
   $('worldList').innerHTML = WORLD_ORDER.map((w, i) => {
     const W = WORLDS[w], max = W.levels.length * 3, got = worldStars(w);
-    return `<button class="world ${i === 0 ? 'wide' : ''}" data-w="${w}" style="--wc:var(${W.color})">
+    const wide = i === 0 || (i === WORLD_ORDER.length - 1 && i % 2 === 1);   // keep the two-column grid even
+    return `<button class="world ${wide ? 'wide' : ''}" data-w="${w}" style="--wc:var(${W.color})">
       <span class="w-emoji">${W.emoji}</span><b>${W.name}</b><small>${W.sub}</small>
       <span class="w-stars">★ ${ar(got)} من ${ar(max)}</span><span class="w-bar"><i style="width:${got / max * 100}%"></i></span></button>`;
   }).join('');
@@ -1510,7 +1578,8 @@ function openLearn(w, i, extra = {}){
   learnCtx = {w, i, ...extra};
   $('learnTitle').textContent = `${WORLDS[w].emoji} ${WORLDS[w].levels[i].title}`;
   show('learn');
-  ({mult:learnMult, add:learnArith, sub:learnArith, place:learnPlace, round:learnRound})[w]();
+  learnKey = null;
+  ({mult:learnMult, div:learnDiv, add:learnArith, sub:learnArith, place:learnPlace, round:learnRound})[w]();
 }
 $('learnBack').onclick = () => show('map');
 const startPracticeBtn = () => `<button class="btn block" id="toPractice">ابدأ التدريب</button>`;
@@ -1856,6 +1925,315 @@ function roundQ(k){
 }
 
 /* =====================================================================
+   division bakery: sharing equally, division as the opposite of multiplying, remainders, long division
+   ===================================================================== */
+const DIV_ITEMS = [
+  {e:'🍪', f:['كعكة','كعكتان','كعكات','كعكتين']}, {e:'🍎', f:['تفاحة','تفاحتان','تفاحات','تفاحتين']},
+  {e:'🍌', f:['موزة','موزتان','موزات','موزتين']}, {e:'🍬', f:['قطعة حلوى','قطعتا حلوى','قطع حلوى','قطعتي حلوى']}];
+const FRIENDS = ['🐰','🐼','🦊','🐸','🐯','🐨','🐵','🦁','🐧'];
+const FRIEND_F = ['صديق','صديقان','أصدقاء'];
+const DIV_TIPS = {
+  2: 'القسمة على ٢ تعني نصف العدد: ١٦ ÷ ٢ = ٨.',
+  3: 'عُدّ قفزًا بثلاث حتى تصل إلى العدد، وعدد القفزات هو الناتج: ٣، ٦، ٩، ١٢ ← ٤ قفزات، إذن ١٢ ÷ ٣ = ٤.',
+  4: 'القسمة على ٤ = نصّف مرتين: ٢٨ ← ١٤ ← ٧.',
+  5: 'كل عدد آحاده ٥ أو ٠ يُقسم على ٥. اسأل: ٥ × كم؟ ٣٥ ÷ ٥ = ٧ لأن ٥ × ٧ = ٣٥.',
+  6: 'القسمة على ٦ = اقسم على ٢ ثم على ٣: ٤٢ ← ٢١ ← ٧.',
+  7: 'تذكّر حقائق جدول ٧: ٥٦ ÷ ٧ = ٨ لأن ٥٦ = ٧ × ٨ (٥، ٦، ٧، ٨ بالترتيب).',
+  8: 'القسمة على ٨ = نصّف ثلاث مرات: ٤٨ ← ٢٤ ← ١٢ ← ٦.',
+  9: 'في جدول ٩ الناتج أكبر من رقم العشرات بواحد: ٦٣ ÷ ٩ = ٧ لأن ٦ + ١ = ٧.',
+  10: 'القسمة على ١٠ = احذف الصفر من الآحاد: ٧٠ ÷ ١٠ = ٧.',
+};
+// counted noun with the Arabic number rules: 1 and 2 by the noun itself, 3–10 plural, 11 and up singular
+function cnt(n, forms, acc = false){
+  if (n === 1) return forms[0] + ' واحدة';
+  if (n === 2) return acc && forms[3] ? forms[3] : forms[1];
+  return ar(n) + ' ' + (n <= 10 ? forms[2] : forms[0]);
+}
+const friendsTxt = k => k === 2 ? 'صديقين' : `${ar(k)} ${k <= 10 ? 'أصدقاء' : 'صديقًا'}`;
+const termsHtml = (n, k, q, r) => `<p class="terms"><span>المقسوم <b class="t-n">${ar(n)}</b></span><span>المقسوم عليه <b class="t-k">${ar(k)}</b></span><span>الناتج <b class="t-q">${q == null ? '؟' : ar(q)}</b></span>${r ? `<span>الباقي <b class="t-r">${ar(r)}</b></span>` : ''}</p>`;
+const divEq = (n, k, q, r) => `<div class="eq div-eq"><span class="t-n">${ar(n)}</span><span class="op">÷</span><span class="t-k">${ar(k)}</span><span class="op">=</span><span class="t-q">${ar(q)}</span>${r ? `<span class="rem-word">والباقي <b class="t-r">${ar(r)}</b></span>` : ''}</div>`;
+
+/* --- sharing picture: a basket, one plate per friend, and (when it does not divide) what is left over --- */
+function shareHtml(s, opts = {}){
+  const {n, k, item, friends, dealt} = s, given = dealt.reduce((a, b) => a + b, 0), left = n - given;
+  const big = n > 24 ? ' sm' : '';
+  const done = s.finished && left > 0;
+  return `<div class="share${big}">
+    <div class="pile" ${opts.live ? 'data-pile' : ''}>${done ? '' : [...Array(left)].map((_, j) => `<span class="ck" data-ck="${j}">${item.e}</span>`).join('')}
+      <span class="pile-label">${left && !done ? `في السلة ${cnt(left, item.f)}` : done ? 'السلة' : 'السلة فارغة ✓'}</span></div>
+    <div class="plates">${friends.map((f, j) => `<div class="plate" ${opts.live ? 'data-drop' : ''} data-j="${j}"><span class="fr">${f}</span><div class="on">${[...Array(dealt[j])].map((_, m) => `<span class="${opts.fresh === j && m === dealt[j] - 1 ? 'fresh' : ''}">${item.e}</span>`).join('')}</div><b class="cnt">${ar(dealt[j])}</b></div>`).join('')}</div>
+    ${done ? `<div class="leftover"><span>الباقي <b>${ar(left)}</b></span><span>${item.e.repeat(left)}</span><span>لا تكفي لجولة أخرى</span></div>` : ''}</div>`;
+}
+function newShare(n, k){
+  return {n, k, item: pick(DIV_ITEMS), friends: shuffle(FRIENDS.slice()).slice(0, k), dealt: Array(k).fill(0), finished:false};
+}
+const dealAll = s => { const q = Math.floor(s.n / s.k); s.dealt = s.dealt.map(() => q); s.finished = true; return s; };
+
+/* --- the fact family: one multiplication fact gives two division facts --- */
+function familyHtml(a, b, hiDiv = true){
+  const n = a * b;
+  return `<div class="family"><div class="tri" aria-hidden="true"><svg viewBox="0 0 120 100"><path d="M60 10 L112 90 L8 90 Z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round" opacity=".35"/></svg>
+      <b class="t-top t-n">${ar(n)}</b><b class="t-l">${ar(a)}</b><b class="t-r">${ar(b)}</b></div>
+    <div class="fam-eqs"><span>${ar(a)} × ${ar(b)} = ${ar(n)}</span><span>${ar(b)} × ${ar(a)} = ${ar(n)}</span>
+      <span class="${hiDiv ? 'hl' : ''}">${ar(n)} ÷ ${ar(a)} = ${ar(b)}</span><span>${ar(n)} ÷ ${ar(b)} = ${ar(a)}</span></div></div>`;
+}
+
+/* --- long division: divide, multiply, subtract, bring down --- */
+function longSteps(n, k){
+  const ds = [...String(n)].map(Number), steps = [];
+  let cur = 0, started = false;
+  ds.forEach((d, i) => {
+    cur = cur * 10 + d;
+    if (!started && cur < k && i < ds.length - 1) return;      // too small: take one more digit
+    started = true;
+    const qd = Math.floor(cur / k), prod = qd * k, rem = cur - prod;
+    steps.push({i, cur, qd, prod, rem});
+    cur = rem;
+  });
+  return steps;
+}
+// done = steps finished (their quotient digit, product and remainder are written); cur = step whose number is highlighted
+function ldHtml(n, k, done = 0, cur = -1){
+  const S = longSteps(n, k), ds = [...String(n)], cells = [];
+  const at = (r, c, txt, cls = '') => cells.push(`<span class="${cls}" style="grid-row:${r};grid-column:${c + 2}">${txt}</span>`);
+  cells.push(`<span class="dv" style="grid-row:2;grid-column:1">${ar(k)}</span>`);
+  const firstLen = String(S[0].cur).length;
+  ds.forEach((d, i) => at(2, i, ar(d), 'dd' + (i === 0 ? ' first' : '') + (cur === 0 && i < firstLen ? ' cur' : '')));
+  S.forEach((st, s) => {
+    if (s >= done) return;
+    at(1, st.i, ar(st.qd), 'qd' + (s === done - 1 ? ' new' : ''));
+    const ps = String(st.prod);
+    [...ps].forEach((d, j) => at(3 + 2 * s, st.i - ps.length + 1 + j, ar(d), 'pr' + (j === 0 ? ' minus' : '') + (s === done - 1 ? ' new' : '')));
+    const next = S[s + 1];
+    const row = 4 + 2 * s, hl = cur === s + 1 ? ' cur' : '';
+    if (next){
+      const txt = st.rem ? String(next.cur) : ds[next.i];
+      [...txt].forEach((d, j) => at(row, next.i - txt.length + 1 + j, ar(d), 'rm' + (j === txt.length - 1 ? ' down' : '') + hl + (s === done - 1 ? ' new' : '')));
+    } else at(row, st.i, ar(st.rem), 'rm last' + (s === done - 1 ? ' new' : ''));
+  });
+  return `<div class="ld" style="grid-template-columns:auto repeat(${ds.length},1fr)" role="img" aria-label="${ar(n)} ÷ ${ar(k)}">${cells.join('')}</div>`;
+}
+const multiplesHtml = (k, upTo = -1, chosen = -1) => `<div class="mults" aria-label="جدول ${ar(k)}">${[...Array(9)].map((_, j) => { const m = k * (j + 1);
+  return `<span class="${upTo >= 0 && m <= upTo ? 'fits' : ''} ${chosen === j + 1 ? 'pick' : ''}"><small>${ar(k)}×${ar(j + 1)}</small><b>${ar(m)}</b></span>`; }).join('')}</div>`;
+const LD_WORDS = [['➗', 'اقسم'], ['✖️', 'اضرب'], ['➖', 'اطرح'], ['⬇️', 'أنزل']];
+const ldChips = on => `<div class="ld-steps">${LD_WORDS.map(([e, t], j) => `<span class="${on.includes(j) ? 'on' : ''}">${e} ${t}</span>`).join('')}</div>`;
+function ldAsk(n, k, S, s){
+  const st = S[s];
+  let pre = '';
+  if (s === 0 && String(st.cur).length > 1) pre = `الرقم الأول ${ar(+String(n)[0])} أصغر من ${ar(k)}، فنأخذ ${String(st.cur).length === 2 ? 'رقمين' : 'ثلاثة أرقام'}: <b>${ar(st.cur)}</b>. `;
+  return pre + `<b>اقسم:</b> كم مرة يدخل ${ar(k)} في <b>${ar(st.cur)}</b>؟ ابحث في جدول ${ar(k)} عن أكبر عدد لا يزيد على ${ar(st.cur)}.`;
+}
+function ldSay(n, k, S, s){
+  const st = S[s], next = S[s + 1];
+  let t = st.qd === 0 ? `${ar(st.cur)} أصغر من ${ar(k)}، فنكتب <b>٠</b> في الناتج. ` : `نكتب <b>${ar(st.qd)}</b> في الناتج. `;
+  t += `<b>اضرب:</b> <span class="m">${ar(st.qd)} × ${ar(k)} = ${ar(st.prod)}</span>. <b>اطرح:</b> <span class="m">${ar(st.cur)} − ${ar(st.prod)} = ${ar(st.rem)}</span>. `;
+  if (next) t += `<b>أنزل</b> الرقم التالي ${ar(+String(n)[next.i])} فيصبح عندنا ${ar(next.cur)}.`;
+  else t += st.rem ? `لا توجد أرقام أخرى، والباقي ${ar(st.rem)}.` : `لا توجد أرقام أخرى، والباقي صفر. انتهينا! 🎉`;
+  return t;
+}
+
+/* --- question makers --- */
+function genDiv(lv){
+  if (lv.kind === 'share'){ const k = rnd(2, 5), q = rnd(2, 5); return {k, q, n:k * q, r:0}; }
+  if (lv.kind === 'fact'){ const k = pick(lv.set), q = rnd(1, 10); return {k, q, n:k * q, r:0}; }
+  if (lv.kind === 'rem'){ const k = rnd(3, 6), q = rnd(2, 6), r = rnd(1, k - 1); return {k, q, r, n:k * q + r}; }
+  const k = rnd(2, 9);
+  const q = lv.d === 2 ? rnd(10, Math.floor(99 / k)) : rnd(Math.ceil(100 / k), Math.floor(999 / k));
+  return {k, q, n:k * q, r:0};
+}
+function divChoices(q, k){
+  const set = new Set([q]);
+  for (const c of shuffle([q + 1, q - 1, q + 2, q - 2, k, q + 10, q * 2])){ if (set.size >= 4) break; if (c > 0 && c !== q) set.add(c); }
+  while (set.size < 4) set.add(q + set.size + 2);
+  return shuffle([...set]).map(v => ({v, html:ar(v)}));
+}
+function remChoices(q, r, k){
+  const opts = [[q, r]], add = (a, b) => { if (a >= 1 && b >= 0 && !opts.some(o => o[0] === a && o[1] === b)) opts.push([a, b]); };
+  add(q - 1, r + k);                 // remainder too big: the classic mistake
+  add(q + 1, r);
+  add(q, (r + 1) % k || k - 1);
+  add(q, 0); add(q + 1, Math.max(0, r - 1));
+  return shuffle(opts.slice(0, 4)).map(([a, b]) => ({v:a * 100 + b, html:`${ar(a)} والباقي ${ar(b)}`}));
+}
+function divQ(lv, mode, w, i){
+  const {n, k, q, r} = genDiv(lv);
+  if (lv.kind === 'share' || lv.kind === 'rem'){
+    const s = newShare(n, k), rem = lv.kind === 'rem';
+    const ask = `وزّع ${cnt(n, s.item.f, true)} ${s.item.e} على ${friendsTxt(k)} بالتساوي.${rem ? ' كم لكل صديق، وكم يبقى؟' : ' كم لكل صديق؟'}`;
+    const base = {tf: rem ? 2.2 : 1.6,
+      view: () => `<p class="qtext">${ask}</p>${eqHtml([ar(n), '÷', ar(k)])}`,
+      visual: () => { vis().innerHTML = shareHtml(s); },
+      hint: () => { vis().innerHTML = shareHtml(dealAll({...s, dealt:[...s.dealt]}));
+        return rem ? `وزّعنا جولة بعد جولة: كل صديق أخذ ${cnt(q, s.item.f, true)}، وما بقي في السلة لا يكفي لجولة أخرى، فهو الباقي. والباقي دائمًا أصغر من ${ar(k)}.`
+                   : `في كل جولة يأخذ كل صديق ${s.item.f[0]} واحدة، أي ${ar(k)} في الجولة. عُدّ ما على طبق واحد.`; },
+      explain: () => { vis().innerHTML = shareHtml(dealAll(s));
+        qtext(rem ? `${ar(n)} ÷ ${ar(k)} = ${ar(q)} والباقي ${ar(r)}، لأن ${ar(k)} × ${ar(q)} = ${ar(n - r)} و ${ar(n)} − ${ar(n - r)} = ${ar(r)}`
+                  : `كل صديق أخذ ${cnt(q, s.item.f, true)}: ${ar(n)} ÷ ${ar(k)} = ${ar(q)}، لأن ${ar(k)} × ${ar(q)} = ${ar(n)}`); },
+      teach: () => openLearn(w, i, {n, k})};
+    return rem ? {...base, answer:q * 100 + r, input:'choices', wide:true, choices:remChoices(q, r, k)} : {...base, answer:q, input:'pad'};
+  }
+  if (lv.kind === 'fact'){
+    const input = mode === 'practice' ? 'choices' : 'pad';
+    return {answer:q, input, tf:1, choices: input === 'choices' ? divChoices(q, k) : null,
+      view: () => eqHtml([ar(n), '÷', ar(k)]),
+      visual: () => qtext(`فكّر في الضرب: ${ar(k)} × ؟ = ${ar(n)}`),
+      hint: () => { const el = vis(); renderScene(el, q, k); countAlong(el, true);
+        return `القسمة عكس الضرب: ${ar(k)} × كم = ${ar(n)}؟ عُدّ قفزًا بـ ${ar(k)}: ${skipList(k, Math.min(q, 3))}${q > 3 ? '… حتى تصل إلى ' + ar(n) + '، وعدد القفزات هو الجواب' : ''}`; },
+      explain: () => { vis().innerHTML = familyHtml(k, q); qtext(`${ar(k)} × ${ar(q)} = ${ar(n)}، إذن ${ar(n)} ÷ ${ar(k)} = ${ar(q)}`); },
+      teach: () => openLearn(w, i, {k, q})};
+  }
+  const S = longSteps(n, k);
+  const ldNow = (done, cur) => { const el = $('qPrompt').querySelector('.ld'); if (el) el.outerHTML = ldHtml(n, k, done, cur); };
+  return {answer:q, input:'pad', tf: lv.d === 2 ? 2.6 : 3.6,
+    view: () => `<p class="qtext">اقسم خطوة خطوة</p>${ldHtml(n, k)}${eqHtml([ar(n), '÷', ar(k)])}`,
+    hint: () => { const s = Math.min(Q.typed.length, S.length - 1);
+      ldNow(s, s); vis().innerHTML = multiplesHtml(k, S[s].cur);
+      return ldAsk(n, k, S, s) + ' الأعداد الملوّنة في جدول ' + ar(k) + ' هي التي لا تزيد عليه.'; },
+    explain: () => { ldNow(S.length, -1); qtext(`${ar(n)} ÷ ${ar(k)} = ${ar(q)}. تحقّق: ${ar(q)} × ${ar(k)} = ${ar(n)} ✓`); },
+    teach: () => openLearn(w, i, {n, k})};
+}
+
+/* --- learn screens --- */
+function learnDiv(){
+  const lv = WORLDS.div.levels[learnCtx.i];
+  if (lv.kind === 'share' || lv.kind === 'rem') return learnShare(lv);
+  if (lv.kind === 'fact') return learnFact(lv);
+  return learnLong(lv);
+}
+function learnShare(lv){
+  const rem = lv.kind === 'rem';
+  if (!learnCtx.s){ const g = learnCtx.n ? {n:learnCtx.n, k:learnCtx.k} : genDiv(lv); learnCtx.s = newShare(g.n, g.k); }
+  const s = learnCtx.s, {n, k, item} = s, q = Math.floor(n / k), r = n % k;
+  const given = () => s.dealt.reduce((a, b) => a + b, 0);
+  const paint = (msg, fresh) => {
+    $('shareBox').innerHTML = shareHtml(s, {live: !s.finished, fresh});
+    if (msg != null) $('shareMsg').innerHTML = msg;
+    $('roundBtn').hidden = s.finished;
+    $('shareDone').hidden = !s.finished;
+    if (s.finished) $('shareDone').innerHTML = `${divEq(n, k, q, r)}${termsHtml(n, k, q, r)}<p class="sentence">تحقّق بالضرب: ${ar(k)} × ${ar(q)}${r ? ` + ${ar(r)}` : ''} = ${ar(n)} ✓</p>`;
+    if (!s.finished){
+      $('shareBox').querySelectorAll('.ck').forEach(c => dragToken(c, plate => give(+plate.dataset.j), () => give(-1)));
+    }
+  };
+  const finish = () => {
+    s.finished = true; SND.win(); haptic('ok');
+    paint(rem ? `🎉 كل صديق أخذ ${cnt(q, item.f, true)}، وبقي ${cnt(r, item.f)} لا تكفي لجولة أخرى: هذا هو <b class="t-r">الباقي</b>. الباقي دائمًا أصغر من عدد الأصدقاء (${ar(k)}).`
+              : `🎉 فرغت السلة! كل صديق أخذ ${cnt(q, item.f, true)}. هذا معنى القسمة: ${ar(n)} ÷ ${ar(k)} = ${ar(q)}.`);
+  };
+  const give = j => {
+    if (s.finished) return;
+    const left = n - given(), min = Math.min(...s.dealt);
+    if (left === 0) return;
+    const roundOpen = s.dealt.some(d => d > min);           // some friends already got one more in this round
+    if (!roundOpen && left < k){ finish(); return; }       // not enough for a whole round: the rest is the remainder
+    if (j < 0) j = s.dealt.indexOf(min);
+    if (s.dealt[j] > min){
+      SND.bad(); haptic('bad');
+      const el = $('shareBox').querySelector(`.plate[data-j="${j}"]`); if (el){ el.classList.remove('no'); void el.offsetWidth; el.classList.add('no'); }
+      $('shareMsg').innerHTML = `${s.friends[j]} أخذ أكثر من غيره! أعطِ الأصدقاء الآخرين أولًا حتى يكون التوزيع <b>عادلًا</b>.`;
+      return;
+    }
+    s.dealt[j]++; SND.tick();
+    const nowLeft = n - given(), nowMin = Math.min(...s.dealt), even = s.dealt.every(d => d === nowMin);
+    if (nowLeft === 0 && even){ finish(); return; }
+    if (even && nowLeft < k && rem){ paint(`مع كل صديق ${cnt(nowMin, item.f)}. بقي ${cnt(nowLeft, item.f)} فقط… هل تكفي لجولة كاملة على ${friendsTxt(k)}؟ اضغط على السلة لتعرف.`, j); return; }
+    paint(even ? `جولة كاملة ✓ مع كل صديق ${cnt(nowMin, item.f)}، وفي السلة ${cnt(nowLeft, item.f)}.` : `أحسنت، أكمل الجولة: أعطِ كل صديق ${item.f[0]} واحدة.`, j);
+  };
+  $('learnBody').innerHTML = `
+    <p class="lesson">${rem ? 'أحيانًا لا تكفي الأشياء لجولة كاملة، فيبقى شيء في السلة. نسمّيه <b>الباقي</b>.' : '<b>القسمة توزيع بالتساوي:</b> نعطي كل صديق العدد نفسه، جولة بعد جولة.'}</p>
+    <p class="qtext">وزّع ${cnt(n, item.f, true)} على ${friendsTxt(k)} بالتساوي</p>
+    <div id="shareBox"></div>
+    <div class="row" style="margin:6px 0"><button class="btn small" id="roundBtn">🤲 وزّع جولة كاملة</button></div>
+    <div class="step-msg" id="shareMsg" aria-live="polite">اسحب ${item.e} من السلة إلى طبق صديق، أو اضغط عليها لتذهب إلى الصديق التالي.</div>
+    <div id="shareDone" hidden></div>
+    <div class="row" style="margin-top:6px"><button class="link" id="newEx">🔄 مثال جديد</button></div>
+    <div class="learn-foot">${startPracticeBtn()}</div>`;
+  $('roundBtn').onclick = () => {
+    if (s.finished) return;
+    const left = n - given(), min = Math.min(...s.dealt);
+    if (!s.dealt.some(d => d > min) && left < k){ finish(); return; }
+    s.dealt.forEach((d, j) => { if (s.dealt[j] === min && n - given() > 0) s.dealt[j]++; });
+    SND.tick();
+    const nowLeft = n - given(), nowMin = Math.min(...s.dealt);
+    if (nowLeft === 0){ finish(); return; }
+    if (rem && nowLeft < k){ paint(`مع كل صديق ${cnt(nowMin, item.f)}. بقي ${cnt(nowLeft, item.f)} فقط، ولا تكفي لجولة كاملة. اضغط على الزر مرة أخرى.`); return; }
+    paint(`جولة كاملة ✓ مع كل صديق ${cnt(nowMin, item.f)}، وفي السلة ${cnt(nowLeft, item.f)}.`);
+  };
+  paint(null);
+  if (s.finished) finish();
+  speakText = `${n} تقسيم ${k} يساوي ${q}${r ? ' والباقي ' + r : ''}`;
+  $('newEx').onclick = () => { learnCtx.s = null; learnCtx.n = null; learnShare(lv); };
+  bindPractice();
+}
+function learnFact(lv){
+  if (!lv.set.includes(learnCtx.k)) learnCtx.k = lv.set[0];
+  if (!learnCtx.q) learnCtx.q = 4;
+  const k = learnCtx.k, q = learnCtx.q, n = k * q;
+  $('learnBody').innerHTML = `
+    <p class="lesson"><b>القسمة عكس الضرب.</b> لتحلّ <span class="m">${ar(n)} ÷ ${ar(k)}</span> اسأل نفسك: <span class="m">${ar(k)} × كم = ${ar(n)}؟</span></p>
+    <div class="divsel" role="group" aria-label="اختر المقسوم عليه">${lv.set.map(d => `<button class="${d === k ? 'on' : ''}" data-d="${d}">÷ ${ar(d)}</button>`).join('')}</div>
+    <div class="learn-eq"><button class="arrow" id="prevBtn" aria-label="السابق">→</button>
+      ${divEq(n, k, q)}
+      <button class="arrow" id="nextBtn" aria-label="التالي">←</button></div>
+    ${termsHtml(n, k, q)}
+    <div class="scene" id="learnScene"></div>
+    <p class="sentence">${ar(n)} مقسومة إلى مجموعات، في كل مجموعة ${ar(k)}، تعطي ${q === 1 ? 'مجموعة واحدة' : q === 2 ? 'مجموعتين' : ar(q) + (q <= 10 ? ' مجموعات' : ' مجموعة')}</p>
+    ${familyHtml(k, q)}
+    <div class="row" style="margin:10px 0 6px"><button class="link" id="countBtn">👆 عُدّ معي</button><button class="link" id="tipBtn" aria-expanded="${!!learnCtx.tip}">💡 حيلة</button></div>
+    <div class="tip" ${learnCtx.tip ? '' : 'hidden'} id="tipBox"><p>${DIV_TIPS[k]}</p></div>
+    <p class="skip-label">أعداد تُقسم على ${ar(k)} بلا باقٍ</p>
+    <div class="skip" id="skipRow">${[...Array(10)].map((_, j) => `<button class="${j + 1 === q ? 'on' : ''}" data-q="${j + 1}" aria-label="${ar(k * (j + 1))} ÷ ${ar(k)} = ${ar(j + 1)}">${ar(k * (j + 1))}</button>`).join('')}</div>
+    <div class="learn-foot">${startPracticeBtn()}</div>`;
+  renderScene($('learnScene'), q, k);
+  speakText = `${n} تقسيم ${k} يساوي ${q}`;
+  $('prevBtn').disabled = q === 1; $('nextBtn').disabled = q === 10;
+  $('prevBtn').onclick = () => { learnCtx.q = q - 1; learnFact(lv); };
+  $('nextBtn').onclick = () => { learnCtx.q = q + 1; learnFact(lv); };
+  $('skipRow').querySelectorAll('button').forEach(b => b.onclick = () => { learnCtx.q = +b.dataset.q; learnFact(lv); });
+  document.querySelectorAll('.divsel button').forEach(b => b.onclick = () => { learnCtx.k = +b.dataset.d; learnFact(lv); });
+  $('countBtn').onclick = () => countAlong($('learnScene'));
+  $('tipBtn').onclick = () => { learnCtx.tip = !learnCtx.tip; $('tipBox').hidden = !learnCtx.tip; $('tipBtn').setAttribute('aria-expanded', learnCtx.tip); };
+  bindPractice();
+}
+function learnLong(lv){
+  if (!learnCtx.n || !learnCtx.k){ const g = genDiv(lv); learnCtx.n = g.n; learnCtx.k = g.k; }
+  if (learnCtx.step == null) learnCtx.step = 0;
+  const n = learnCtx.n, k = learnCtx.k, S = longSteps(n, k), s = learnCtx.step, q = Math.floor(n / k);
+  const solved = learnCtx.shown;                 // the current step has been answered and written down
+  const done = solved ? s + 1 : s, last = s === S.length - 1;
+  $('learnBody').innerHTML = `
+    <p class="lesson">في القسمة الطويلة نكرّر أربع خطوات لكل رقم: <b>اقسم، اضرب، اطرح، أنزل</b>. نبدأ من اليسار، من أكبر منزلة.</p>
+    ${termsHtml(n, k, solved && last ? q : null)}
+    ${ldChips(solved ? (last ? [1, 2] : [1, 2, 3]) : [0])}
+    ${ldHtml(n, k, done, solved ? (last ? -1 : s + 1) : s)}
+    ${multiplesHtml(k, solved ? -1 : S[s].cur, solved ? S[s].qd : -1)}
+    <div class="step-msg" id="learnMsg" aria-live="polite">${solved ? ldSay(n, k, S, s) + (last ? `<br><span class="m">${ar(n)} ÷ ${ar(k)} = <b class="t-q">${ar(q)}</b></span>. تحقّق: <span class="m">${ar(q)} × ${ar(k)} = ${ar(n)} ✓</span>` : '') : ldAsk(n, k, S, s)}</div>
+    ${solved ? (last ? '' : `<div class="row"><button class="btn small" id="nextStep">الخطوة التالية ⬅</button></div>`) : miniPad() + `<div class="row"><button class="link" id="showAns">أرني الخطوة</button></div>`}
+    <div class="row" style="margin-top:6px"><button class="link" id="newEx">🔄 مثال جديد</button></div>
+    <div class="learn-foot">${startPracticeBtn()}</div>`;
+  if (!solved){
+    const st = S[s];
+    learnKey = d => {
+      const v = +d;
+      if (v === st.qd){ SND.ok(); haptic('ok'); learnCtx.shown = true; learnKey = null; learnLong(lv); return; }
+      SND.bad(); haptic('bad');
+      $('learnMsg').innerHTML = v * k > st.cur
+        ? `<span class="m">${ar(v)} × ${ar(k)} = ${ar(v * k)}</span>، وهذا أكبر من ${ar(st.cur)}. جرّب عددًا أصغر.`
+        : `<span class="m">${ar(v)} × ${ar(k)} = ${ar(v * k)}</span>، ويبقى ${ar(st.cur - v * k)} وهو يكفي لمرة أخرى. جرّب عددًا أكبر.`;
+    };
+    $('miniPad').querySelectorAll('button').forEach(b => b.onclick = () => learnKey && learnKey(b.dataset.k));
+    $('showAns').onclick = () => { learnCtx.shown = true; learnKey = null; learnLong(lv); };
+  } else {
+    learnKey = null;
+    if (last) SND.win();
+    else $('nextStep').onclick = () => { learnCtx.step = s + 1; learnCtx.shown = false; learnLong(lv); };
+  }
+  speakText = solved ? ldSay(n, k, S, s).replace(/<[^>]+>/g, '') : ldAsk(n, k, S, s).replace(/<[^>]+>/g, '');
+  $('newEx').onclick = () => { learnCtx.n = null; learnCtx.step = 0; learnCtx.shown = false; learnLong(lv); };
+  bindPractice();
+}
+
+/* =====================================================================
    quiz engine
    ===================================================================== */
 let Q = null, rafId = 0;
@@ -1877,6 +2255,7 @@ function levelGen(w, i, mode){
   }
   if (w === 'add' || w === 'sub') return () => arithQ(w === 'add' ? '+' : '-', lv.d, w, i);
   if (w === 'place') return () => placeQ(lv.d);
+  if (w === 'div') return () => divQ(lv, mode, w, i);
   return () => roundQ(lv.k);
 }
 const bossHP = w => w === 'mult' ? 14 : 12;
@@ -1967,6 +2346,7 @@ function nextQuestion(){
   $('wrongBox').hidden = true;
   $('hintBtn').hidden = !q.hint; $('hintBtn').classList.remove('hint-on');
   $('hintMsg').hidden = true; $('hintMsg').innerHTML = '';
+  $('choices').className = 'choices'; $('choices').innerHTML = '';   // clear balloons left from the last question
   $('choices').hidden = q.input !== 'choices';
   $('pad').hidden = q.input === 'choices' || q.input === 'drag';
   $('quizCard').classList.toggle('split', q.input === 'pad' || q.input === 'column');
@@ -2288,7 +2668,7 @@ function finishBoss(q){
     items = grantStars(q.w, q.i, earned);
     if (firstWin){ R().bossWins[q.w] = true; items.push(addFarmItem(['🏆', 'كأس الفوز على الذئب'])); R().wool += 30; extra = '<span>🏆 جائزة خاصة لهزيمة الذئب!</span>'; }
     html += `<div class="r-emoji">🐺💨</div><h2>هزمت الذئب المشاغب!</h2><div class="bigstars">${[1, 2, 3].map(s => `<span class="${s <= earned ? 'on' : ''}" style="animation-delay:${s * 160}ms">★</span>`).join('')}</div>
-      <p>هرب الذئب وهو يضحك، وعادت ${W.name} آمنة. ${earned < 3 ? 'حاول مرة أخرى بلا أخطاء لتنال ٣ نجوم.' : 'بلا خطأ واحد! أنت بطل.'}</p>`;
+      <p>هرب الذئب وهو يضحك، ${W.m ? 'وعاد' : 'وعادت'} ${W.name} ${W.m ? 'آمنًا' : 'آمنة'}. ${earned < 3 ? 'حاول مرة أخرى بلا أخطاء لتنال ٣ نجوم.' : 'بلا خطأ واحد! أنت بطل.'}</p>`;
   } else {
     html += `<div class="r-emoji">🐺😏</div><h2>الذئب ما زال يضحك!</h2><p>بقيت له ${ar(q.hp)} نقطة قوة فقط. تدرّب قليلًا ثم عُد إليه، أنت قادر عليه!</p>`;
   }
