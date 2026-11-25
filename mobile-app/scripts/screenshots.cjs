@@ -13,15 +13,15 @@ const DEVICES = {
   'android-tablet': {w:800,  h:1280, dsf:2},   // 1600 x 2560 (Google Play 10" tablet)
 };
 const CAPTIONS = [
-  'خمسة عوالم لتعلّم الأرقام',
+  'ستة عوالم لتعلّم الأرقام',
   'طريق ممتع، وكلما أسرعت تجاوزت المرحلة',
   'جدول الضرب بالصور: ٨ خراف مع كل خروف ٨',
   'الجمع والطرح خطوة بخطوة',
-  'المنازل وقراءة الأعداد بالعربية',
+  'القسمة: نوزّع على الأصدقاء بالتساوي',
   'التقريب مع العنزة المرحة',
 ];
 const DEMO = {parent:{name:'أم سارة', phone:'0500000000', created:Date.now()}, active:'demo', sound:true,
-  kids:[{id:'demo', name:'سارة', avatar:'🦁', prog:{stars:{mult:{0:3,1:3,2:2}, add:{0:3,1:2}, sub:{0:2}, place:{0:3,1:1}}, best:{}, facts:{}, correct:120}}]};
+  kids:[{id:'demo', name:'سارة', avatar:'🦁', prog:{stars:{mult:{0:3,1:3,2:2}, div:{0:2}, add:{0:3,1:2}, sub:{0:2}, place:{0:3,1:1}}, best:{}, facts:{}, correct:120, wool:18, farm:[], owned:[], wear:'', last:{w:'mult', i:3}}}]};
 
 async function shoot(page, dir, i){ await page.waitForTimeout(700); await page.screenshot({path: path.join(dir, `raw-${i}.png`)}); }
 
@@ -43,9 +43,11 @@ async function shoot(page, dir, i){ await page.waitForTimeout(700); await page.s
     await p.locator('.node').nth(2).click(); await p.click('[data-act="learn"]');
     await p.click('#stepBtn'); await p.evaluate(() => window.__nf.learn.S.steps[window.__nf.learn.step].w).then(w => p.click(`#miniPad button[data-k="${w}"]`)); await p.click('#stepBtn');
     await shoot(p, dir, 4);                                                     // column addition
-    await p.click('#learnBack'); await p.click('#mapBack'); await p.click('[data-w="place"]'); await p.waitForTimeout(300);
-    await p.locator('.node').nth(2).click(); await p.click('[data-act="learn"]');
-    await shoot(p, dir, 5);                                                     // place value
+    await p.click('#learnBack'); await p.click('#mapBack'); await p.click('[data-w="div"]'); await p.waitForTimeout(300);
+    await p.locator('.node').nth(0).click(); await p.click('[data-act="learn"]'); await p.waitForTimeout(300);
+    await p.click('#roundBtn'); await p.waitForTimeout(120); await p.click('#roundBtn'); await p.waitForTimeout(200);
+    await p.evaluate(() => scrollTo(0, 0));
+    await shoot(p, dir, 5);                                                     // division: sharing treats
     await p.click('#learnBack'); await p.click('#mapBack'); await p.click('[data-w="round"]'); await p.waitForTimeout(300);
     await p.locator('.node').nth(1).click(); await p.click('[data-act="learn"]'); await p.waitForTimeout(300);
     const toLeft = await p.evaluate(() => { const n = +document.querySelector('.nl').dataset.pos; return n >= 50; });
