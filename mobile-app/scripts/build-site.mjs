@@ -8,6 +8,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const app = dirname(dirname(fileURLToPath(import.meta.url)));
+const ICON_V = 2;   // bump when the home-screen icons change
 const repo = dirname(app);
 const docs = join(repo, 'docs');
 mkdirSync(join(docs, 'privacy'), { recursive: true });
@@ -20,9 +21,12 @@ let game = readFileSync(join(repo, 'multiplication-game', 'index.html'), 'utf8')
     '<meta name="description" content="لعبة عربية لتعلّم جدول الضرب والقسمة والجمع والطرح والمنازل والتقريب للأطفال.">',
     '<meta name="theme-color" content="#3E9B4F">',
     // "Add to Home Screen": the Numbers Farm icon and name, opening full screen like an app
-    '<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">',
-    '<link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">',
-    '<link rel="manifest" href="manifest.webmanifest">',
+    // ?v= changes the address whenever the icons change, so phones cannot reuse an old cached copy
+    `<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png?v=${ICON_V}">`,
+    `<link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=${ICON_V}">`,
+    `<link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png?v=${ICON_V}">`,
+    `<link rel="apple-touch-icon-precomposed" href="icons/apple-touch-icon.png?v=${ICON_V}">`,
+    `<link rel="manifest" href="manifest.webmanifest?v=${ICON_V}">`,
     '<meta name="apple-mobile-web-app-title" content="مزرعة الأرقام">',
     '<meta name="application-name" content="مزرعة الأرقام">',
     '<meta name="apple-mobile-web-app-capable" content="yes">',
@@ -37,10 +41,10 @@ writeFileSync(join(docs, 'manifest.webmanifest'), JSON.stringify({
   lang: 'ar', dir: 'rtl', start_url: './', scope: './', display: 'standalone', orientation: 'any',
   background_color: '#F5F7F2', theme_color: '#3E9B4F',
   icons: [
-    { src: 'icons/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
-    { src: 'icons/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
-    { src: 'icons/icon-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
-    { src: 'icons/apple-touch-icon.png', sizes: '180x180', type: 'image/png', purpose: 'any' },
+    { src: 'icons/icon-192.png?v=' + ICON_V, sizes: '192x192', type: 'image/png', purpose: 'any' },
+    { src: 'icons/icon-512.png?v=' + ICON_V, sizes: '512x512', type: 'image/png', purpose: 'any' },
+    { src: 'icons/icon-maskable-512.png?v=' + ICON_V, sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+    { src: 'icons/apple-touch-icon.png?v=' + ICON_V, sizes: '180x180', type: 'image/png', purpose: 'any' },
   ],
 }, null, 2) + '\n');
 // Optional custom domain for GitHub Pages: set SITE_DOMAIN (e.g. games.basesolution.me) once its DNS record
