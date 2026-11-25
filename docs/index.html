@@ -4,8 +4,18 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>مزرعة الأرقام</title>
-<meta name="description" content="لعبة عربية لتعلّم جدول الضرب والجمع والطرح والمنازل والتقريب للأطفال.">
+<meta name="description" content="لعبة عربية لتعلّم جدول الضرب والقسمة والجمع والطرح والمنازل والتقريب للأطفال.">
 <meta name="theme-color" content="#3E9B4F">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png?v=2">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=2">
+<link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png?v=2">
+<link rel="apple-touch-icon-precomposed" href="icons/apple-touch-icon.png?v=2">
+<link rel="manifest" href="manifest.webmanifest?v=2">
+<meta name="apple-mobile-web-app-title" content="مزرعة الأرقام">
+<meta name="application-name" content="مزرعة الأرقام">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <!--WEB-FONTS-->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,7 +29,7 @@
 :root{
   --bg:#F5F7F2; --surface:#FFFFFF; --soft:#EDF1E8; --ink:#25362C; --muted:#7B8A80; --line:#E2E8DC; --road:#E3EAD6;
   --accent:#3E9B4F; --accent-ink:#FFFFFF; --sun:#F2B630; --sun-soft:#FDF1D3; --bad:#D9534F; --bad-soft:#FBE7E6; --focus:#3A86C8;
-  --w-mult:#3E9B4F; --w-add:#2B7BD6; --w-sub:#C9771E; --w-place:#8A4FC2; --w-round:#12999A;
+  --w-mult:#3E9B4F; --w-add:#2B7BD6; --w-sub:#C9771E; --w-place:#8A4FC2; --w-round:#12999A; --w-div:#C2477A;
   --p0:#2B7BD6; --p1:#2E9D57; --p2:#E07B1F; --p3:#8A4FC2; --p4:#D2457E; --p5:#12999A;
   --shadow:0 1px 2px rgba(37,54,44,.05),0 6px 20px rgba(37,54,44,.05);
   --f-display:"Baloo Bhaijaan 2","Tajawal","Segoe UI","Noto Sans Arabic",system-ui,sans-serif;
@@ -29,7 +39,7 @@
   :root:not([data-theme="light"]){
     --bg:#11181C; --surface:#182228; --soft:#1F2B31; --ink:#E6EEE7; --muted:#93A39A; --line:#26343B; --road:#22313A;
     --accent:#5DBB6C; --accent-ink:#0E1A12; --sun:#F5C451; --sun-soft:#3A3220; --bad:#F07470; --bad-soft:#3A2224; --focus:#6DB1EA;
-    --w-mult:#5DBB6C; --w-add:#5FA8F5; --w-sub:#E9A04E; --w-place:#B98CF0; --w-round:#3FCFCB;
+    --w-mult:#5DBB6C; --w-add:#5FA8F5; --w-sub:#E9A04E; --w-place:#B98CF0; --w-round:#3FCFCB; --w-div:#F07FAA;
     --p0:#6CB2FF; --p1:#62D08A; --p2:#FFA65A; --p3:#B98CF0; --p4:#FF7FB0; --p5:#4FD4D2;
     --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.18);
     color-scheme:dark;
@@ -38,7 +48,7 @@
 :root[data-theme="dark"]{
   --bg:#11181C; --surface:#182228; --soft:#1F2B31; --ink:#E6EEE7; --muted:#93A39A; --line:#26343B; --road:#22313A;
   --accent:#5DBB6C; --accent-ink:#0E1A12; --sun:#F5C451; --sun-soft:#3A3220; --bad:#F07470; --bad-soft:#3A2224; --focus:#6DB1EA;
-  --w-mult:#5DBB6C; --w-add:#5FA8F5; --w-sub:#E9A04E; --w-place:#B98CF0; --w-round:#3FCFCB;
+  --w-mult:#5DBB6C; --w-add:#5FA8F5; --w-sub:#E9A04E; --w-place:#B98CF0; --w-round:#3FCFCB; --w-div:#F07FAA;
   --p0:#6CB2FF; --p1:#62D08A; --p2:#FFA65A; --p3:#B98CF0; --p4:#FF7FB0; --p5:#4FD4D2;
   --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.18);
   color-scheme:dark;
@@ -63,11 +73,86 @@ button,a,input{touch-action:manipulation}
 .gate-q{font-family:var(--f-display);font-weight:700;font-size:1.1rem;text-align:center;margin:6px 0 12px}
 .gate input{text-align:center;font-size:1.6rem;letter-spacing:.3em;direction:ltr}
 
+
+/* ---------- motivation: next step, goal, surprise box, break, parent message ---------- */
+#nudges{display:grid;gap:10px;margin-top:12px}
+#nudges:empty{display:none}
+.continue{display:flex;align-items:center;gap:12px;text-align:start;padding:12px 14px;border-radius:20px;background:color-mix(in srgb,var(--wc) 14%,var(--surface));box-shadow:var(--shadow)}
+.continue .c-play{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:var(--wc);color:#fff;font-size:1.1rem;flex:none}
+.continue b{display:block;font-family:var(--f-display);font-size:1.08rem;line-height:1.3}
+.continue small{display:block;color:var(--muted);line-height:1.35}
+.goal-bar{display:flex;align-items:center;gap:10px;text-align:start;padding:10px 14px;border-radius:20px;background:var(--surface);box-shadow:var(--shadow)}
+.goal-bar .g-s{font-size:2rem;flex:none}
+.goal-bar .g-t{flex:1;min-width:0;display:grid;gap:5px}
+.goal-bar .g-t b{font-size:.95rem;line-height:1.3}
+.goal-bar .gb{height:9px;border-radius:99px;background:var(--soft);overflow:hidden}
+.goal-bar .gb i{display:block;height:100%;border-radius:99px;background:var(--sun)}
+.goal-bar .g-n{font-weight:800;color:var(--muted);white-space:nowrap;font-size:.92rem}
+.gift{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;width:100%;padding:12px 14px;border-radius:20px;background:linear-gradient(135deg,#FFE7A3,#FFC8DD);color:#4A2A00;font-size:1.05rem;box-shadow:var(--shadow);animation:hop 1.6s ease-in-out infinite}
+.gift small{opacity:.8}
+.gift.open{animation:pop .4s both;font-weight:800}
+.goal-line{color:var(--muted);font-size:.95rem}
+.break-tip{background:var(--soft);border-radius:16px;padding:10px 14px;text-align:center;line-height:1.55}
+.hint-small{margin:0;color:var(--muted);font-size:.85rem;line-height:1.5}
+.msg-state{flex-basis:100%;margin:0;color:var(--muted);font-size:.88rem}
+
+/* ---------- division bakery ---------- */
+.t-n{color:var(--p3)}.t-k{color:var(--p4)}.t-q{color:var(--p1)}.t-r{color:var(--bad)}
+.terms{display:flex;justify-content:center;flex-wrap:wrap;gap:6px;font-size:.92rem;font-weight:700;color:var(--muted);margin:6px 0}
+.terms span{background:var(--soft);border-radius:99px;padding:2px 12px}
+.terms b{font-family:var(--f-display);font-size:1.05rem}
+.div-eq .rem-word{white-space:nowrap;margin-inline-start:.2em;font-size:.55em;font-family:var(--f-body);font-weight:800;color:var(--muted);align-self:center}
+.share{display:grid;gap:10px;margin:10px 0}
+.pile{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:2px 4px;min-height:3rem;padding:8px 10px;border-radius:20px;background:var(--soft);font-size:1.6rem;line-height:1.2}
+.pile .ck{cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;padding:2px}
+.pile-label{flex-basis:100%;text-align:center;font-size:.88rem;color:var(--muted);font-weight:700;line-height:1.4}
+.plates{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
+.plate{flex:0 1 96px;min-width:76px;display:grid;justify-items:center;align-content:start;gap:0}
+.plate.no{animation:refuse .5s ease-in-out}
+.plate .fr{font-size:2rem;line-height:1.1;position:relative;z-index:1;margin-bottom:-6px}
+.plate .on{display:flex;flex-wrap:wrap;justify-content:center;align-content:center;gap:1px;width:92px;min-height:54px;padding:8px 10px;border-radius:50%;font-size:1.15rem;line-height:1.1;
+  background:radial-gradient(ellipse at center,var(--surface) 0 58%,color-mix(in srgb,var(--line) 70%,var(--surface)) 60%,var(--surface) 72%);box-shadow:var(--shadow);border:2px dashed transparent;transition:border-color .15s,background .15s}
+.plate.over .on{border-color:var(--sun)}
+.plate .on .fresh{animation:pop .35s both}
+.plate .cnt{font-family:var(--f-display);font-weight:800;color:var(--muted);line-height:1.2}
+.share.sm .pile{font-size:1.15rem}.share.sm .plate .on{font-size:.92rem}
+.m{white-space:nowrap}
+.share-say{text-align:center;color:var(--muted);font-weight:700;margin:4px 0 0;line-height:1.5}
+.leftover{display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;padding:6px 14px;border-radius:16px;border:2px dashed var(--bad);color:var(--bad);font-weight:800;background:var(--bad-soft)}
+.family{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;margin:10px 0}
+.tri{position:relative;width:120px;height:100px;flex:none;color:var(--ink);font-family:var(--f-display);font-weight:800;font-size:1.25rem}
+.tri svg{position:absolute;inset:0;width:100%;height:100%}
+.tri b{position:absolute;transform:translate(-50%,-50%);background:var(--bg);padding:0 4px;line-height:1.2}
+.tri .t-top{left:50%;top:14%}.tri .t-l{left:12%;top:86%}.tri .t-r{left:88%;top:86%}
+.fam-eqs{display:grid;gap:2px;font-family:var(--f-display);font-weight:700;font-size:1.05rem;color:var(--muted)}
+.fam-eqs .hl{color:var(--ink);background:var(--sun-soft);border-radius:10px;padding:0 8px}
+.divsel{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin:4px 0 6px}
+.divsel button{min-height:42px;min-width:56px;border-radius:12px;background:var(--soft);font-family:var(--f-display);font-weight:800;font-size:1.05rem;color:var(--muted)}
+.divsel button.on{background:var(--wc,var(--accent));color:#fff}
+.ld{display:grid;grid-template-rows:minmax(1.3em,auto);justify-content:center;direction:ltr;font-family:var(--f-display);font-weight:800;font-size:clamp(1.8rem,8vw,2.5rem);line-height:1.3;font-variant-numeric:tabular-nums;margin:10px auto 6px;width:max-content;max-width:100%}
+.ld > span{position:relative;text-align:center;min-width:.82em;padding:0 .06em}
+.ld .dv{color:var(--p4);padding-right:.3em}
+.ld .dd{border-top:3px solid currentColor}
+.ld .dd.first{border-left:3px solid currentColor;border-top-left-radius:.45em;padding-left:.12em}
+.ld .qd{color:var(--p1)}
+.ld .pr{color:var(--muted);border-bottom:2px solid currentColor}
+.ld .pr.minus::before{content:"−";position:absolute;right:100%;top:0;font-weight:500}
+.ld .rm.down{color:var(--p0)}
+.ld .cur{background:var(--sun-soft);background-clip:padding-box;outline:2px dashed var(--sun);outline-offset:2px}
+.ld .new{animation:pop .35s both}
+.mults{display:grid;grid-template-columns:repeat(9,1fr);gap:3px;direction:ltr;margin:6px 0}
+.mults span{display:grid;justify-items:center;border-radius:10px;background:var(--soft);padding:3px 0;line-height:1.15;color:var(--muted)}
+.mults small{font-size:.62rem;font-weight:700}
+.mults b{font-family:var(--f-display);font-size:1rem}
+.mults .fits{background:color-mix(in srgb,var(--accent) 16%,var(--surface));color:var(--ink)}
+.mults .pick{box-shadow:inset 0 0 0 2px var(--accent);background:color-mix(in srgb,var(--accent) 30%,var(--surface))}
+.ld-steps{display:flex;justify-content:center;flex-wrap:wrap;gap:6px;margin:6px 0}
+.ld-steps span{border-radius:99px;padding:2px 12px;background:var(--soft);font-weight:700;font-size:.92rem;color:var(--muted)}
+.ld-steps span.on{background:var(--sun);color:#3A2A00}
+
 /* ---------- fun layer: Soufi, wool, farm, wardrobe, buddy, race, boss, balloons, builders ---------- */
-.soufi{position:relative;display:inline-block;line-height:1}
-.soufi .wear{position:absolute;font-style:normal;line-height:1;pointer-events:none}
-.soufi .wear.head{font-size:.55em;top:-.34em;left:-.02em}
-.soufi .wear.face{font-size:.36em;top:.2em;left:.02em}
+.soufi{position:relative;display:inline-block;line-height:1;vertical-align:-.15em}
+.soufi svg{display:block;width:1.18em;height:1.1em;overflow:visible}
 .hello-sheep .soufi,.mascot .soufi{font-size:1em}
 .wool-chip{display:inline-flex;align-items:center;gap:4px;font-family:var(--f-display);font-weight:700;color:var(--muted)}
 .extras{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
@@ -80,19 +165,21 @@ button,a,input{touch-action:manipulation}
 .tabs{display:flex;gap:6px;background:var(--soft);border-radius:99px;padding:4px;margin:6px 0 12px}
 .tabs button{flex:1;min-height:42px;border-radius:99px;font-weight:700;color:var(--muted)}
 .tabs button[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
-.field{position:relative;width:100%;aspect-ratio:4/3;max-height:70vh;border-radius:24px;overflow:hidden;touch-action:none;
+.farm-field{position:relative;width:100%;aspect-ratio:4/3.3;max-height:70vh;border-radius:24px;overflow:hidden;touch-action:none;
   background:linear-gradient(180deg,#BFE6FF 0,#DDF2FF 30%,#9BD67F 30%,#7CC35F 100%);box-shadow:var(--shadow)}
-.field::before{content:"☀️";position:absolute;top:4%;inset-inline-end:6%;font-size:2.4rem}
-.field::after{content:"";position:absolute;inset-inline:0;top:30%;height:8px;background:repeating-linear-gradient(90deg,#B5824D 0 6px,transparent 6px 26px);opacity:.7}
-.field .item{position:absolute;transform:translate(-50%,-50%);font-size:clamp(1.9rem,8vw,2.6rem);line-height:1;cursor:grab;user-select:none;-webkit-user-select:none;touch-action:none;filter:drop-shadow(0 3px 2px rgba(0,0,0,.18));z-index:1}
-.field .item.held{cursor:grabbing;transform:translate(-50%,-50%) scale(1.25);z-index:3}
-.field .item.new{animation:pop .5s both}
+.farm-field::before{content:"☀️";position:absolute;top:4%;inset-inline-end:6%;font-size:2.4rem}
+.farm-field::after{content:"";position:absolute;inset-inline:0;top:30%;height:8px;background:repeating-linear-gradient(90deg,#B5824D 0 6px,transparent 6px 26px);opacity:.7}
+.farm-field .item{position:absolute;transform:translate(-50%,-86%);display:grid;place-items:center;width:1.5em;height:1.5em;font-size:clamp(2rem,8.5vw,3.8rem);line-height:1;overflow:visible;cursor:grab;user-select:none;-webkit-user-select:none;touch-action:none;transition:transform .15s}
+.farm-field .item::after{content:"";position:absolute;inset-inline:22%;bottom:.24em;height:.15em;border-radius:50%;background:rgba(36,70,20,.22);z-index:-1}
+.farm-field .item.held{cursor:grabbing;transform:translate(-50%,-86%) scale(1.2);z-index:300!important}
+.farm-field .item.new{animation:farmPop .6s cubic-bezier(.3,1.5,.5,1) both}
+@keyframes farmPop{from{transform:translate(-50%,-86%) scale(.3);opacity:0}}
 .field-empty{position:absolute;inset:auto 0 12%;text-align:center;font-weight:700;color:#2E5A22;padding:0 18px}
 .farm-note{color:var(--muted);text-align:center;font-size:.9rem;margin-top:8px}
 .wardrobe-preview{display:grid;place-items:center;font-size:6rem;padding:16px 0 4px}
-.outfits{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.outfits{display:grid;grid-template-columns:repeat(auto-fill,minmax(122px,1fr));gap:10px}
 .outfit{display:grid;justify-items:center;gap:2px;padding:12px 8px;border-radius:18px;background:var(--surface);box-shadow:var(--shadow);text-align:center}
-.outfit .o-e{font-size:2.2rem;line-height:1.2}
+.outfit .o-e{font-size:3rem;line-height:1.1;padding-top:10px}
 .outfit b{font-family:var(--f-display)}
 .outfit small{color:var(--muted)}
 .outfit.on{box-shadow:0 0 0 3px var(--sun),var(--shadow)}
@@ -101,6 +188,7 @@ button,a,input{touch-action:manipulation}
 .buddy .b-s{font-size:2rem;line-height:1}
 .buddy .b-say{background:var(--surface);box-shadow:var(--shadow);border-radius:12px;padding:2px 10px;font-weight:700;font-size:.85rem;white-space:nowrap;opacity:0;transform:translateY(4px);transition:opacity .2s,transform .2s}
 .buddy .b-say.on{opacity:1;transform:none}
+.buddy .b-say.long{white-space:normal;width:max-content;max-width:min(72vw,300px);line-height:1.45;padding:6px 12px}
 .buddy.happy .b-s{animation:hop .6s ease-out}
 .buddy.sad .b-s{animation:refuse .6s ease-in-out}
 .boss-top{position:absolute;top:-8px;inset-inline-end:0;display:flex;flex-direction:row-reverse;align-items:flex-start;gap:4px;pointer-events:none;z-index:2}
@@ -110,18 +198,24 @@ button,a,input{touch-action:manipulation}
 .boss-top .b-say{background:var(--surface);box-shadow:var(--shadow);border-radius:12px;padding:2px 10px;font-weight:800;font-size:.85rem;white-space:nowrap;opacity:0;transition:opacity .2s}
 .boss-top .b-say.on{opacity:1}
 .bar.boss .fill{background:var(--bad)}
-.bar .rival{position:absolute;top:50%;inset-inline-start:0;transform:translate(40%,-58%);font-size:1.25rem;opacity:.9;transition:inset-inline-start .2s linear}
+.bar .rival{position:absolute;top:50%;inset-inline-start:0;transform:translateY(-78%);font-size:1.25rem;z-index:2;transition:inset-inline-start .2s linear}
+.bar .rival{line-height:0}
+.bar .rival .soufi{display:block}
+.bar .rival.home .soufi{animation:hop .7s ease-out 3}
+.race-msg{display:flex;align-items:center;gap:8px;margin:-6px 0 12px;padding:8px 14px;border-radius:16px;background:var(--sun-soft);font-weight:700;line-height:1.45;animation:pop .4s both}
+.race-msg .soufi{font-size:1.8rem;flex:none}
 .hearts{font-size:1rem;letter-spacing:1px;white-space:nowrap}
 .rewards{display:grid;gap:4px;justify-items:center;background:var(--sun-soft);border-radius:18px;padding:12px 18px;font-weight:700}
 .rewards .big{font-size:2.2rem;line-height:1.1}
-.balloons{position:relative;height:300px;overflow:hidden;border-radius:22px;background:linear-gradient(180deg,color-mix(in srgb,#9fd8ff 35%,var(--surface)),var(--surface));margin-top:12px;display:block!important}
-.balloon{position:absolute;bottom:-90px;width:78px;height:92px;border-radius:50% 50% 46% 46%;color:#fff;font-family:var(--f-display);font-weight:800;font-size:1.5rem;display:grid;place-items:center;box-shadow:inset -8px -10px 0 rgba(0,0,0,.12);animation:float var(--dur,7s) linear infinite;animation-delay:var(--delay,0s)}
+.balloon-layer{position:fixed;inset:calc(72px + env(safe-area-inset-top,0px)) 0 0 0;z-index:30;pointer-events:none;overflow:hidden}
+.balloon{position:absolute;bottom:-150px;pointer-events:auto;width:min(19vw,108px);height:min(23vw,128px);touch-action:manipulation;border-radius:50% 50% 46% 46%;color:#fff;font-family:var(--f-display);font-weight:800;font-size:1.5rem;display:grid;place-items:center;box-shadow:inset -8px -10px 0 rgba(0,0,0,.12);animation:float var(--dur,7s) linear infinite;animation-delay:var(--delay,0s)}
 .balloon::after{content:"";position:absolute;bottom:-26px;left:50%;width:2px;height:26px;background:rgba(0,0,0,.25)}
-.balloons.stopped .balloon{animation-play-state:paused}
+.balloon-layer.stopped .balloon{animation-play-state:paused}
+.hud{position:relative;z-index:40}
 .balloon.ok{outline:5px solid var(--sun);outline-offset:2px}
 .balloon.picked.ok{animation:popb .4s ease-out forwards}
 .balloon.bad{animation:shake .3s;filter:grayscale(.7)}
-@keyframes float{from{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-200px) rotate(3deg)}to{transform:translateY(-420px) rotate(-3deg)}}
+@keyframes float{from{transform:translateY(0) rotate(-3deg)}25%{transform:translateY(calc(-25vh - 40px)) rotate(3deg)}50%{transform:translateY(calc(-50vh - 80px)) rotate(-3deg)}75%{transform:translateY(calc(-75vh - 120px)) rotate(3deg)}to{transform:translateY(calc(-100vh - 170px)) rotate(-3deg)}}
 @keyframes popb{to{transform:scale(1.8);opacity:0}}
 .builder{display:grid;gap:10px;margin:12px 0}
 .tray{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:10px;border-radius:18px;background:var(--soft)}
@@ -150,6 +244,7 @@ button,a,input{touch-action:manipulation}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:54px;padding:0 26px;border-radius:14px;font-family:var(--f-display);font-weight:700;font-size:1.15rem;background:var(--accent);color:var(--accent-ink)}
 .btn:active{transform:scale(.98)}
 .btn.block{width:100%}
+.btn.small{min-height:46px;padding:0 18px;font-size:1.02rem}
 .link{min-height:44px;padding:0 14px;border-radius:12px;font-weight:700;color:var(--muted)}
 .link:hover{background:var(--soft);color:var(--ink)}
 .link:disabled{opacity:.3;pointer-events:none}
@@ -280,6 +375,21 @@ details[open] summary::before{transform:rotate(-90deg)}
 .pill.hint-on{background:var(--sun-soft)}
 .qtext{text-align:center;font-weight:700;font-size:1.15rem}
 .bignum{text-align:center;font-family:var(--f-display);font-weight:800;font-size:clamp(2.4rem,11vw,3.6rem);line-height:1.2;font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.rnum{display:flex;justify-content:center;align-items:stretch;direction:ltr;gap:3px;font-family:var(--f-display);font-weight:800;font-size:clamp(2.1rem,10vw,3.3rem);line-height:1.15;font-variant-numeric:tabular-nums;padding:2.4rem 0 2.6rem}
+.rnum .rd{position:relative;display:grid;place-items:center;min-width:.72em;padding:0 .08em;border-radius:.2em}
+.rnum .rd.keep{color:var(--c);box-shadow:inset 0 0 0 3px var(--c);background:repeating-linear-gradient(135deg,transparent 0 6px,color-mix(in srgb,var(--c) 10%,transparent) 6px 12px)}
+.rnum .rd.look{color:var(--c);background:color-mix(in srgb,var(--c) 20%,var(--surface));box-shadow:inset 0 0 0 3px var(--c);animation:pulse 1.6s ease-in-out infinite}
+.rnum .rd.gone{opacity:.4}
+.rnum .sep{align-self:end;font-style:normal;opacity:.5;margin:0 -1px}
+.rnum .tag{position:absolute;left:50%;transform:translateX(-50%);font-family:var(--f-body);font-size:.82rem;font-weight:800;white-space:nowrap;line-height:1.5;padding:1px 9px;border-radius:99px;background:var(--surface);color:var(--c);border:2px solid var(--c)}
+.rnum .tag.below{top:calc(100% + 7px)}
+.rnum .tag.above{bottom:calc(100% + 7px)}
+.rnum .tag.below::before,.rnum .tag.above::before{content:"";position:absolute;left:50%;transform:translateX(-50%);border:6px solid transparent}
+.rnum .tag.below::before{bottom:100%;border-bottom-color:var(--c)}
+.rnum .tag.above::before{top:100%;border-top-color:var(--c)}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+.watch{display:flex;justify-content:center;flex-wrap:wrap;gap:4px 8px;font-weight:700;color:var(--muted);text-align:center;margin:2px 0 4px}
+.watch b{border-radius:99px;padding:0 10px;background:var(--soft)}
 .bignum .hl{color:var(--accent);text-decoration:underline;text-decoration-thickness:4px;text-underline-offset:8px}
 .words{text-align:center;font-family:var(--f-display);font-weight:700;font-size:clamp(1.3rem,5vw,1.7rem);line-height:1.5;max-width:28ch;margin:4px auto 0}
 .colorwords{font-family:var(--f-display);font-weight:700;font-size:1.35rem;line-height:1.6;text-align:center}
@@ -356,7 +466,8 @@ details[open] summary::before{transform:rotate(-90deg)}
 .nl-goat.jump .g{animation:goatJump .5s ease-out}
 .nl-goat.no .g{animation:refuse .6s ease-in-out 2}
 @keyframes refuse{0%,100%{transform:translateX(0) rotate(0)}20%{transform:translateX(-7px) rotate(-14deg)}40%{transform:translateX(7px) rotate(14deg)}60%{transform:translateX(-5px) rotate(-8deg)}80%{transform:translateX(5px) rotate(8deg)}}
-.nl-say{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:var(--surface);color:var(--bad);box-shadow:var(--shadow);border-radius:12px;padding:2px 10px;font-family:var(--f-display);font-weight:800;font-size:1rem;white-space:nowrap;font-style:normal;pointer-events:none;animation:pop .2s both}
+.nl-say{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:var(--surface);color:var(--bad);box-shadow:var(--shadow);border-radius:12px;padding:2px 10px;font-family:var(--f-display);font-weight:800;font-size:1rem;white-space:nowrap;font-style:normal;pointer-events:none;animation:sayPop .25s both}
+@keyframes sayPop{from{transform:translateX(-50%) scale(.6);opacity:0}}
 .nl-end.nope{background:var(--bad-soft);color:var(--bad)}
 @keyframes wiggle{0%,100%{transform:rotate(0)}20%{transform:rotate(-10deg)}40%{transform:rotate(8deg)}60%{transform:rotate(0)}}
 @keyframes goatJump{0%{transform:translateY(0)}40%{transform:translateY(-22px) rotate(-12deg)}100%{transform:translateY(0)}}
@@ -383,15 +494,15 @@ details[open] summary::before{transform:rotate(-90deg)}
 .hud{display:flex;align-items:center;gap:12px;min-height:44px;margin-bottom:14px}
 .bar{flex:1;position:relative;height:10px;background:var(--soft);border-radius:99px}
 .bar .fill{position:absolute;inset-block:0;inset-inline-start:0;width:0;border-radius:99px;background:var(--accent);transition:width .45s cubic-bezier(.3,1.3,.5,1)}
-.bar .runner{position:absolute;top:50%;inset-inline-start:0;transform:translate(40%,-58%);font-size:1.3rem;transition:inset-inline-start .45s cubic-bezier(.3,1.3,.5,1)}
-.bar .barn{position:absolute;inset-inline-end:-4px;top:50%;transform:translateY(-58%);font-size:1.25rem}
+.bar .runner{position:absolute;top:50%;inset-inline-start:0;transform:translateY(-58%);font-size:1.3rem;z-index:3;transition:inset-inline-start .45s cubic-bezier(.3,1.3,.5,1)}
+.bar .barn{position:absolute;inset-inline-end:-.15em;top:50%;transform:translateY(-70%);font-size:1.25rem;z-index:1}
 .qcount{font-family:var(--f-display);font-weight:700;color:var(--muted);font-size:.95rem;white-space:nowrap}
 .timer{width:30px;height:30px;flex:none}
 .timer svg{width:100%;height:100%;transform:rotate(-90deg)}
 .timer circle{fill:none;stroke-width:7}
 .timer .bg{stroke:var(--soft)}
 .timer .fg{stroke:var(--accent);stroke-linecap:round;transition:stroke .2s}
-.stage{position:relative;padding-top:16px;display:grid;gap:4px}
+.stage{position:relative;padding-top:52px;display:grid;gap:4px}
 .float{position:absolute;inset-inline:0;top:-8px;text-align:center;font-family:var(--f-display);font-weight:700;font-size:1.2rem;color:var(--accent);pointer-events:none;animation:rise 1s ease-out forwards;z-index:2}
 .float.bad{color:var(--bad)}
 @keyframes rise{from{transform:translateY(8px);opacity:0}25%{opacity:1}to{transform:translateY(-22px);opacity:0}}
@@ -487,6 +598,7 @@ table.mg{border-collapse:separate;border-spacing:3px;margin:0 auto;font-family:v
 }
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+  .balloon-layer .balloon{animation:none!important;bottom:var(--still)}   /* still balloons instead of ones that vanish at once */
 }
 </style>
 </head>
@@ -497,12 +609,14 @@ table.mg{border-collapse:separate;border-spacing:3px;margin:0 auto;font-family:v
   <!-- ================= REGISTER ================= -->
   <section id="screen-register" hidden>
     <h1 class="title-xl" style="color:var(--accent)">مزرعة الأرقام</h1>
-    <div class="hello" style="margin-top:12px"><span class="hello-sheep" aria-hidden="true">🐑</span><p class="bubble">أهلًا! أنا صوفي. سجّلوا مرة واحدة فقط، ثم نتعلّم الضرب والجمع والطرح والمنازل والتقريب ونحن نلعب.</p></div>
+    <div class="hello" style="margin-top:12px"><span class="hello-sheep" aria-hidden="true">🐑</span><p class="bubble">أهلًا! أنا صوفي. سجّلوا مرة واحدة فقط، ثم نتعلّم الضرب والقسمة والجمع والطرح والمنازل والتقريب ونحن نلعب.</p></div>
     <form class="form" id="regForm" novalidate>
       <div class="card">
         <h3>👤 ولي الأمر</h3>
         <label class="field">الاسم<input id="regParent" autocomplete="name" placeholder="مثال: أم سارة"></label>
         <label class="field">رقم الهاتف<input id="regPhone" type="tel" inputmode="tel" autocomplete="tel" dir="ltr" placeholder="05xxxxxxxx"></label>
+        <label class="field">رمز سري لولي الأمر (٤ أرقام)<input id="regPin" type="password" inputmode="numeric" maxlength="4" autocomplete="new-password" dir="ltr" placeholder="••••"></label>
+        <p class="hint-small">يُطلب كلما فتحت صفحة ولي الأمر، فلا تخبر به الطفل.</p>
       </div>
       <div class="card">
         <h3>🧒 الطفل</h3>
@@ -551,7 +665,8 @@ table.mg{border-collapse:separate;border-spacing:3px;margin:0 auto;font-family:v
       <button class="pill" id="parentAddKid" style="justify-self:start">➕ أضف طفلًا</button>
     </div>
     <div style="margin-top:20px;display:grid;gap:4px;justify-items:center">
-      <button class="link" id="relockBtn">🔒 اقفل صفحة ولي الأمر مجددًا على هذا الجهاز</button>
+      <button class="link" id="pinBtn">🔑 تغيير الرمز السري</button>
+      <p class="hint-small" id="pinSaved" hidden>تم تغيير الرمز ✓</p>
       <button class="link danger" id="wipeBtn">حذف الحساب وكل البيانات من هذا الجهاز</button>
     </div>
   </section>
@@ -565,6 +680,7 @@ table.mg{border-collapse:separate;border-spacing:3px;margin:0 auto;font-family:v
     </div>
     <div class="hello" style="margin-top:16px"><span class="hello-sheep" aria-hidden="true">🐑</span><p class="bubble" id="worldsBubble"></p></div>
     <div class="extras" id="extras"></div>
+    <div id="nudges"></div>
     <div class="worlds" id="worldList"></div>
   </section>
 
@@ -580,7 +696,7 @@ table.mg{border-collapse:separate;border-spacing:3px;margin:0 auto;font-family:v
       <button role="tab" id="tabWear" aria-selected="false">👕 خزانة صوفي</button>
     </div>
     <div id="farmPane">
-      <div class="field" id="field"></div>
+      <div class="farm-field" id="field"></div>
       <p class="farm-note" id="farmNote"></p>
     </div>
     <div id="wearPane" hidden>
@@ -627,6 +743,7 @@ table.mg{border-collapse:separate;border-spacing:3px;margin:0 auto;font-family:v
         <svg viewBox="0 0 40 40"><circle class="bg" cx="20" cy="20" r="16"/><circle class="fg" id="timerFg" cx="20" cy="20" r="16"/></svg>
       </div>
     </div>
+    <p class="race-msg" id="raceMsg" hidden aria-live="polite"></p>
     <div class="stage" id="quizCard">
       <div class="buddy" id="buddy" aria-hidden="true"><span class="b-s" id="buddyS">🐑</span><span class="b-say" id="buddySay"></span></div>
       <div class="boss-top" id="bossTop" hidden aria-hidden="true"><span class="w-e">🐺</span><span class="b-say" id="bossSay"></span></div>
@@ -720,13 +837,13 @@ function readPhrases(n){
       const h = Math.floor(k / 100), r2 = k % 100;
       ph = [[{t: r2 === 0 && h === 2 ? 'مئتا' : HUNDS[h], p:5}]];
       if (r2 === 0) ph[0].push(U('ألف'));
-      else if (r2 === 1) ph.push([U('ألف')]);
-      else if (r2 === 2) ph.push([U('ألفان')]);
+      else if (r2 <= 2){ ph = [[{t: h === 2 ? 'مئتا' : HUNDS[h], p:5}, U('ألف')], [U(r2 === 1 ? 'ألف' : 'ألفان')]]; }
       else { const sub = under1000(r2, 3); sub[sub.length - 1].push(U(r2 <= 10 ? 'آلاف' : 'ألفًا')); ph = ph.concat(sub); }
     }
   }
   return ph.concat(under1000(rest, 0));
 }
+const countN = (n, f) => n === 1 ? f[0] : n === 2 ? f[1] : `${ar(n)} ${n <= 10 ? f[2] : f[3]}`;
 const words = n => readPhrases(n).map(ph => ph.map(s => s.t).join(' ')).join(' و');
 const wordsHtml = n => readPhrases(n).map(ph => ph.map(s => `<span class="pc${s.p}">${s.t}</span>`).join(' ')).join(' و');
 const numHtml = (n, hiP = -1, colour = false) => {
@@ -788,12 +905,23 @@ const WORLDS = {
           decos:['🚩','🧱','👑','🛡️','🗝️','⭐','🏳️'],
           intro:'في قلعة المنازل لكل رقم بيت: آحاد، عشرات، مئات… ونتعلّم كيف نقرأ الأعداد بالعربية.',
           levels:[2, 3, 4, 5, 6].map((d, i) => ({d, title: d === 2 ? 'الآحاد والعشرات' : LEVEL_NAMES[d], label: d === 2 ? 'آحاد وعشرات' : LEVEL_NAMES[d], desc:`أعداد من ${DIGITS[d]}`, emoji:['🛖','🏠','🏡','🏘️','🏰'][i], badge:ar(i + 1)})).concat([BOSS()])},
-  round: {name:'جبل التقريب', emoji:'⛰️', color:'--w-round', runner:'🐐', sub:'من أقرب عشرة إلى أقرب مئة ألف',
+  round: {m:true, name:'جبل التقريب', emoji:'⛰️', color:'--w-round', runner:'🐐', sub:'من أقرب عشرة إلى أقرب مئة ألف',
           decos:['☁️','🌲','🦅','❄️','⛅','🌿','🌤️'],
           intro:'على جبل التقريب نسأل: هل العدد أقرب إلى الأسفل أم إلى الأعلى؟',
           levels:[1, 2, 3, 4, 5].map((k, i) => ({k, title:'التقريب إلى ' + ROUND_TO[k], label:ROUND_TO[k], desc:`ننظر إلى رقم ${PLACE[k - 1]}`, emoji:['🌱','🌿','🌲','⛰️','🏔️'][i], badge:ar(i + 1)})).concat([BOSS()])},
 };
-const WORLD_ORDER = ['mult', 'add', 'sub', 'place', 'round'];
+WORLDS.div = {m:true, name:'مخبز القسمة', emoji:'🧁', color:'--w-div', runner:'🍪', sub:'نوزّع بالتساوي، والقسمة عكس الضرب',
+  decos:['🥐','🍪','🍩','🥖','🍰','🍓','🧁'],
+  intro:'في مخبز القسمة نوزّع الحلوى على الأصدقاء بالتساوي، ونتعلّم أن القسمة عكس الضرب!',
+  levels:[
+    {kind:'share', title:'التوزيع بالتساوي', label:'التوزيع بالتساوي', desc:'نوزّع على الأصدقاء جولة بعد جولة', emoji:'🍪', badge:ar(1)},
+    {kind:'fact', set:[2, 3, 4, 5], title:'القسمة على ٢ و٣ و٤ و٥', label:'÷ ٢ إلى ٥', desc:'القسمة عكس الضرب', emoji:'🥐', badge:ar(2)},
+    {kind:'fact', set:[6, 7, 8, 9, 10], title:'القسمة على ٦ إلى ١٠', label:'÷ ٦ إلى ١٠', desc:'القسمة عكس الضرب', emoji:'🍩', badge:ar(3)},
+    {kind:'rem', title:'القسمة مع باقٍ', label:'مع باقٍ', desc:'ما يبقى ولا يكفي لجولة كاملة', emoji:'🍰', badge:ar(4)},
+    {kind:'long', d:2, title:'القسمة الطويلة: عدد من رقمين', label:'قسمة طويلة ٢', desc:'اقسم، اضرب، اطرح، أنزل', emoji:'🥖', badge:ar(5)},
+    {kind:'long', d:3, title:'القسمة الطويلة: عدد من ثلاثة أرقام', label:'قسمة طويلة ٣', desc:'اقسم، اضرب، اطرح، أنزل', emoji:'🎂', badge:ar(6)},
+  ].concat([BOSS()])};
+const WORLD_ORDER = ['mult', 'div', 'add', 'sub', 'place', 'round'];
 
 const SPEED = [
   {max:3,  pts:20, label:'⚡ صاعقة!'},
@@ -804,7 +932,8 @@ const SPEED = [
 const WRONG_PENALTY = 8, HINT_PTS = 6;
 const levelCfg = (w, i) => ({goal:100, maxQ:18, s3:7, s2:10});
 const levelTF = (w, lv) => w === 'add' || w === 'sub' ? (lv.d === 1 ? 1 : 1 + (lv.d - 1) * 1.1)
-  : w === 'place' ? 1.7 : w === 'round' ? 1.4 + lv.k * .2 : 1;
+  : w === 'place' ? 1.7 : w === 'round' ? 1.4 + lv.k * .2
+  : w === 'div' ? ({share:1.6, fact:1, rem:2.2, long:lv.d === 2 ? 2.6 : 3.6})[lv.kind] || 1 : 1;
 
 /* =====================================================================
    storage: one parent account, several children on this device
@@ -813,7 +942,7 @@ const KEY = 'numbers-farm-v2', OLD_KEY = 'multiplication-farm-v1';
 const AVATARS = ['🦁', '🐰', '🐼', '🦊', '🐸', '🐯', '🐨', '🐵', '🦄', '🐧'];
 const freshProg = () => ({stars:{}, best:{}, facts:{}, correct:0});
 let DB = {parent:null, kids:[], active:null, sound:true};
-function load(){ try { const d = JSON.parse(localStorage.getItem(KEY)); if (d && Array.isArray(d.kids)) DB = Object.assign({parent:null, kids:[], active:null, sound:true}, d); } catch(e){} }
+function load(){ try { const d = JSON.parse(localStorage.getItem(KEY)); if (d && Array.isArray(d.kids)) DB = Object.assign({parent:null, kids:[], active:null, sound:true}, d); delete DB.parentUnlocked; } catch(e){} }
 function save(){ try { localStorage.setItem(KEY, JSON.stringify(DB)); } catch(e){} }
 const kid = () => DB.kids.find(k => k.id === DB.active);
 const P = () => kid().prog;
@@ -844,10 +973,40 @@ const FARM_ITEMS = [
   ['🌻','عبّاد شمس'],['🐫','جمل'],['🌴','نخلة'],['🦃','ديك رومي'],['🐣','كتكوت'],['🌷','زهرة'],['🦢','بجعة'],['🐝','نحلة'],
   ['🌲','صنوبرة'],['🐿️','سنجاب'],['🍄','فطر'],['🦚','طاووس'],['🐢','سلحفاة'],['🌼','أقحوانة'],['🦔','قنفذ'],['🦜','ببغاء'],['🏡','بيت']];
 const OUTFITS = [
-  {id:'flower', e:'🌸', n:'وردة', price:10, pos:'head'}, {id:'bow', e:'🎀', n:'فيونكة', price:15, pos:'head'},
-  {id:'cap', e:'🧢', n:'قبعة رياضية', price:25, pos:'head'}, {id:'glasses', e:'🕶️', n:'نظارة شمسية', price:30, pos:'face'},
-  {id:'tophat', e:'🎩', n:'قبعة الساحر', price:45, pos:'head'}, {id:'grad', e:'🎓', n:'قبعة التخرّج', price:60, pos:'head'},
-  {id:'party', e:'🥳', n:'قبعة الحفلة', price:75, pos:'face'}, {id:'crown', e:'👑', n:'تاج', price:100, pos:'head'}];
+  {id:'flower', n:'وردة', price:10}, {id:'bow', n:'فيونكة', price:15}, {id:'cap', n:'قبعة رياضية', price:25},
+  {id:'glasses', n:'نظارة شمسية', price:30}, {id:'tophat', n:'قبعة الساحر', price:45}, {id:'grad', n:'قبعة التخرّج', price:60},
+  {id:'party', n:'قبعة الحفلة', price:75}, {id:'crown', n:'تاج', price:100}];
+/* Soufi is drawn here rather than with the 🐑 emoji: emoji look different on every phone, so a hat or glasses
+   placed on top of one never lands in the same spot. With one drawing every outfit fits her head and eyes exactly. */
+const WEAR_SVG = {
+  flower: '<g transform="translate(23 37)"><circle cx="0" cy="-6" r="5" fill="#FF8FB8"/><circle cx="5.7" cy="-1.9" r="5" fill="#FF8FB8"/><circle cx="3.5" cy="4.9" r="5" fill="#FF8FB8"/><circle cx="-3.5" cy="4.9" r="5" fill="#FF8FB8"/><circle cx="-5.7" cy="-1.9" r="5" fill="#FF8FB8"/><circle r="3.6" fill="#FFD23F"/></g>',
+  bow: '<g transform="rotate(-12 38 30)"><path d="M38 31 L25 23 Q22 31 25 39 Z" fill="#E53950"/><path d="M38 31 L51 23 Q54 31 51 39 Z" fill="#E53950"/><path d="M27 26 L33 30 M49 26 L43 30" stroke="#B8243A" stroke-width="1.6" stroke-linecap="round"/><circle cx="38" cy="31" r="4" fill="#C42840"/></g>',
+  cap: '<g transform="rotate(-6 38 34)"><path d="M24 38 A14 14 0 0 1 52 38 Z" fill="#2F80ED"/><path d="M38 24 V38" stroke="#1F5FBF" stroke-width="1.4"/><path d="M27 37 Q15 36 9 41 Q20 43 31 40 Z" fill="#1F5FBF"/><circle cx="38" cy="24.5" r="2.2" fill="#1F5FBF"/></g>',
+  glasses: '<g><rect x="23.5" y="50.5" width="12.5" height="10" rx="4" fill="#1D1D24"/><rect x="37" y="50.5" width="12.5" height="10" rx="4" fill="#1D1D24"/><path d="M35.5 54 H37.5 M49.5 54 L55 52" stroke="#1D1D24" stroke-width="2" stroke-linecap="round"/><path d="M26 53 l3 -1.5 M39.5 53 l3 -1.5" stroke="#fff" stroke-width="1.4" stroke-linecap="round" opacity=".8"/></g>',
+  tophat: '<g transform="rotate(-10 38 36)"><rect x="27" y="11" width="22" height="25" rx="2.5" fill="#2B2B33"/><rect x="27" y="28" width="22" height="5" fill="#E53950"/><ellipse cx="38" cy="36.5" rx="17" ry="4" fill="#1D1D24"/><path d="M30 14 V26" stroke="#fff" stroke-width="1.5" opacity=".25" stroke-linecap="round"/></g>',
+  grad: '<g transform="rotate(-6 38 30)"><path d="M28 30 H48 V37 Q38 41 28 37 Z" fill="#1D1D24"/><path d="M38 17 L59 25 L38 33 L17 25 Z" fill="#2B2B33"/><path d="M38 25 L56 29 V39" stroke="#F2C94C" stroke-width="1.8" fill="none" stroke-linecap="round"/><path d="M54 38 h4 l1 6 h-6 Z" fill="#F2C94C"/><circle cx="38" cy="25" r="2" fill="#F2C94C"/></g>',
+  party: '<g transform="rotate(-16 38 37)"><path d="M26 38 L50 38 L38 7 Z" fill="#9B51E0"/><path d="M29.7 28.5 L46.3 28.5 L44.2 23 L31.8 23 Z M34.2 17 L41.8 17 L40 12.3 L36 12.3 Z" fill="#FFD23F"/><path d="M26 38 L50 38" stroke="#7A35C4" stroke-width="2.4" stroke-linecap="round"/><circle cx="38" cy="7" r="4.4" fill="#FF5C8A"/><circle cx="31" cy="33" r="1.6" fill="#fff"/><circle cx="44" cy="33.5" r="1.6" fill="#fff"/></g>',
+  crown: '<g><path d="M24 39 L23 21 L31 29 L38 16 L45 29 L53 21 L52 39 Z" fill="#F7C531" stroke="#D99A13" stroke-width="1.6" stroke-linejoin="round"/><circle cx="23" cy="21" r="2.4" fill="#F7C531"/><circle cx="38" cy="16" r="2.6" fill="#F7C531"/><circle cx="53" cy="21" r="2.4" fill="#F7C531"/><circle cx="38" cy="32" r="2.8" fill="#E53950"/><circle cx="30" cy="34" r="2" fill="#2F80ED"/><circle cx="46" cy="34" r="2" fill="#27AE60"/></g>',
+};
+const WOOL = [[60,62,20],[78,55,20],[96,62,18],[70,77,18],[90,77,17],[54,75,14],[103,73,13],[111,59,6]];
+function soufiSvg(wear){
+  const puff = (list, grow, fill) => list.map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r + grow}" fill="${fill}"/>`).join('');
+  const tuft = [[29,41,7],[37,38,8],[45,42,6.5]];
+  return `<svg viewBox="4 6 116 96" aria-hidden="true" focusable="false">
+    ${[48, 61, 82, 95].map(x => `<rect x="${x}" y="80" width="8.5" height="18" rx="4.2" fill="#4B4453"/>`).join('')}
+    ${puff(WOOL, 2, '#D8D2C8')}${puff(WOOL, 0, '#FFFFFF')}
+    <ellipse cx="53" cy="49" rx="9" ry="4.5" transform="rotate(28 53 49)" fill="#5B5262"/>
+    <ellipse cx="36" cy="59" rx="16" ry="18" fill="#5B5262"/>
+    <ellipse cx="20" cy="50" rx="9.5" ry="4.6" transform="rotate(-28 20 50)" fill="#5B5262"/>
+    <ellipse cx="20.5" cy="50.3" rx="5.5" ry="2.2" transform="rotate(-28 20 50)" fill="#F4A6BE"/>
+    ${puff(tuft, 2, '#D8D2C8')}${puff(tuft, 0, '#FFFFFF')}
+    <circle cx="30" cy="55.5" r="4.4" fill="#fff"/><circle cx="43" cy="55.5" r="4.4" fill="#fff"/>
+    <circle cx="29.4" cy="56.4" r="2.5" fill="#1D1D24"/><circle cx="42.4" cy="56.4" r="2.5" fill="#1D1D24"/>
+    <circle cx="28.6" cy="55.4" r=".9" fill="#fff"/><circle cx="41.6" cy="55.4" r=".9" fill="#fff"/>
+    <ellipse cx="25" cy="64" rx="3.2" ry="2.1" fill="#F48FB1" opacity=".75"/><ellipse cx="47.5" cy="64" rx="3.2" ry="2.1" fill="#F48FB1" opacity=".75"/>
+    <path d="M32.5 67 Q36.5 71 40.5 67" stroke="#F4C9D6" stroke-width="2" fill="none" stroke-linecap="round"/>
+    ${WEAR_SVG[wear] || ''}</svg>`;
+}
 function R(){ // reward fields on the active child's progress (older saves get them on first use)
   const p = P();
   if (p.wool == null) p.wool = 0;
@@ -858,20 +1017,28 @@ function R(){ // reward fields on the active child's progress (older saves get t
   if (!p.bossWins) p.bossWins = {};
   return p;
 }
-function soufiHtml(){
-  let wear = '';
-  try { const o = kid() && OUTFITS.find(x => x.id === R().wear); if (o) wear = `<i class="wear ${o.pos}">${o.e}</i>`; } catch(e){}
-  return `<span class="soufi">🐑${wear}</span>`;
+function soufiHtml(wear){
+  if (wear == null){ wear = ''; try { if (kid()) wear = R().wear; } catch(e){} }
+  return `<span class="soufi">${soufiSvg(wear)}</span>`;
 }
-function paintSoufi(){ document.querySelectorAll('#screen-worlds .hello-sheep, #screen-map .hello-sheep').forEach(el => el.innerHTML = soufiHtml()); }
+function paintSoufi(){ document.querySelectorAll('.hello-sheep').forEach(el => el.innerHTML = soufiHtml()); }
 function addFarmItem(special){
   const p = R(), [e, n] = special || FARM_ITEMS[p.farm.length % FARM_ITEMS.length];
-  p.farm.push({e, x: rnd(8, 92), y: rnd(42, 90), t: Date.now()});
+  p.farm.push({e, x: rnd(12, 88), y: rnd(46, 92), t: Date.now()});
   return {e, n};
 }
 const todayStr = () => new Date().toLocaleDateString('en-CA');
 const dayBefore = d => { const t = new Date(d + 'T12:00:00'); t.setDate(t.getDate() - 1); return t.toLocaleDateString('en-CA'); };
 function dailyDoneToday(){ return R().daily.date === todayStr(); }
+const daysBetween = (a, b) => Math.round((new Date(b + 'T12:00:00') - new Date(a + 'T12:00:00')) / 864e5);
+/* A streak survives one missed day once a week (a "shield"): losing a long streak to one busy day makes children give up. */
+function streakInfo(){
+  const d = R().daily, t = todayStr(), y = dayBefore(t);
+  if (!d.streak) return {alive:false, shield:false};
+  if (d.date === t || d.date === y) return {alive:true, shield:false};
+  const shieldOk = !d.shield || daysBetween(d.shield, t) >= 7;
+  return d.date === dayBefore(y) && shieldOk ? {alive:true, shield:true} : {alive:false, shield:false};
+}
 
 /* multiplication fact memory (for smart review & mastery grid) */
 function record(a, b, ok, t){
@@ -926,7 +1093,7 @@ const SND = {
 // Two real goat bleats, free to use: "Single Goat Bleating 2x" by Kinoton on Freesound (freesound.org/s/581240),
 // released under CC0 1.0 (public domain). Cut into two calls, pitched up slightly and embedded so they work offline.
 // They are decoded into Web Audio buffers on the first touch, so they can also play on iPhone/iPad after a short delay.
-const GOAT_MP3 = ['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Uvi2iGniSINUlBvCHHEpScmTETzLWta6wrlUuidHEkRJRDTxJEDmSpKiFNJfR6TJbDSUOgaBpZ0FSwdErwV///rOgrDtTEFNRTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxJCAEJ2BOnmaAAEfC9iDnvAAVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxH+DwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV', 'SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjYwLjE2LjEwMAAAAAAAAAAAAAAA//tUwAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAAmAAAdQAANDRMTExoaICAgJycnLS00NDQ7OztBQUhISE5OVVVVW1tbYmJpaWlvb292dnx8fIODiYmJkJCQlpadnZ2kpKSqqrGxsbe3t76+xMTEy8vS0tLY2Njf3+Xl5ezs7PLy+fn5//8AAAAATGF2YzYwLjMxAAAAAAAAIi8AAAAAJAWgAAAAAAAAHUDRWlpyAAAAAAAAAAAAAAAAAAAA//tUxAADwAABpAAAACAAADSAAAAETEFMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxFWDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV'];
+const GOAT_MP3 = ['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Uvi2iGniSINUlBvCHHEpScmTETzLWta6wrlUuidHEkRJRDTxJEDmSpKiFNJfR6TJbDSUOgaBpZ0FSwdErwV///rOgrDtTEFNRTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxJCAEJ2BOnmaAAEfC9iDnvAAVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxH+DwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tUxKoDwAABpAAAACAAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV', 'SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjYwLjE2LjEwMAAAAAAAAAAAAAAA//tQwAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAAgAAAa7wAPDw8XFxceHh4mJiYuLi42NjY+Pj5FRUVNTU1NVVVVXV1dZGRkbGxsdHR0fHx8g4ODi4uLi5OTk5ubm6KioqqqqrKysrq6usHBwcnJycnR0dHZ2dng4ODo6Ojw8PD4+Pj///8AAAAATGF2YzYwLjMxAAAAAAAAIi8AAAAAJASTAAAAAAAAGu/zyxPSAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP/7UMQAAAYUMvxhhG4RPI+jHJYYeCAUW5DSmhB2EADmlMnSpVhAWxoEQ0bws7JhGzq9I7+nrN/6Tm1/XrR5ioBkP93+TPmEABJDjUBAZFQBCYAIFBXUr17wgAQLBUUNvJUEQCYVz84L/YhN/+IkmT2I55OiGWn/dREEIADlvnzgRPlJCEQQJ1v/+n1dcnX+pxRP//5RDBK8gITx5yXKMyHVk7ckh4LbSWvE9KNUPKqxdMMs4XFQBoXpKBiHIfSPQvTttObmkfUdOGmdkgwPh8P/+1LEHYAQ9N8YzDB3AY+Y5vWWGaT1LyepmJIVDSB+E+XpTZ8fDyPj/DWLYCqoVhQ/EXDyJDKCuM8cXdAac81x0SXlHw8QwjZqdnuwcqD4mTWeh8WRpijuvZxmxXxlOs//TDm+oC4Uk4yEtYNCoJljniWYYbN2vs75feiAFO3oUjWZHLrjB0YlNMRTMpxrEgdCw7XqSHxre7x4m07tkOhHaJ3G73/uf1Z83v+iXJ7rpvHztjlzzgkMEYIhoXAa15eFz8dW/pUBA0AAAhFOMM9AJv/7UsQFgQsYdzWtYMOBhw4n9ZeYsMxKg/SYArOAiBEWYBVZs7UpijaQdQ23ffN1JagNAG3BhQQkh2aug5GM0pgxdwz/Z4DRMFXAyTUu0uB0icSGcPZTVT5wg9Z9wectj3N/oQAfITbt2VTOBwuUARimwwhR2FWpwtSEEgY4iAdIpdnQcyVW154wV5JHFEJRjTszGfGajQM72b7RY+FvWmsLsUKA+wVPNg6Fz580bVM0iIWJ6FOZ+whogOqlAFK6HsMx79CFYANaBMMtl1EIC6o8//tSxAYAC5TRTa0gbaF8Ginpowo0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ASOxtAwByjtRBkqO2f/7UsSpgApUpT+nmK8BThjlWPYNcTkwUwBHgJZqOVTkXZ0TrIlJMSvK5pGZ0SiJp0jkp4s9eHZUYHd6wViV3oXZ9JX/yX6vr/1VTEFNRTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tSxLQACbR7Gyeww8C+hyT0MIh8VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX/+1LExQPIzGzyB7DCAAAANIAAAARVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVQ=='];
 let goatBufs = [], goatLoading = false;
 function loadGoat(){
   if (goatBufs.length || goatLoading) return; goatLoading = true;
@@ -990,7 +1157,9 @@ const SCREENS = ['register', 'profiles', 'parent', 'worlds', 'map', 'learn', 'qu
 let curWorld = 'mult';
 function show(name){
   SCREENS.forEach(s => $('screen-' + s).hidden = s !== name);
+  if (name !== 'quiz') clearBalloons();
   window.scrollTo({top:0});
+  paintSoufi();
   if (name === 'profiles') renderProfiles();
   if (name === 'parent') renderParent();
   if (name === 'worlds') renderWorlds();
@@ -1022,13 +1191,14 @@ let regAvatar = avatarPicker($('regAvatars'));
 document.querySelectorAll('.field input').forEach(inp => inp.addEventListener('input', () => inp.removeAttribute('aria-invalid')));
 $('regForm').onsubmit = e => {
   e.preventDefault();
-  ['regParent', 'regPhone', 'regKid'].forEach(id => $(id).removeAttribute('aria-invalid'));
-  const pn = $('regParent').value.trim(), ph = validPhone($('regPhone').value), kn = $('regKid').value.trim();
+  ['regParent', 'regPhone', 'regPin', 'regKid'].forEach(id => $(id).removeAttribute('aria-invalid'));
+  const pn = $('regParent').value.trim(), ph = validPhone($('regPhone').value), kn = $('regKid').value.trim(), pin = toLatin($('regPin').value).replace(/\D/g, '');
   if (!pn) return fieldError($('regParent'), $('regErr'), 'اكتب اسم ولي الأمر.');
   if (!ph) return fieldError($('regPhone'), $('regErr'), 'رقم الهاتف قصير جدًا أو طويل جدًا. اكتب من ٧ إلى ١٥ رقمًا، مثل ٠٥٠١٢٣٤٥٦٧.');
+  if (pin.length !== 4) return fieldError($('regPin'), $('regErr'), 'اختر رمزًا سريًا من ٤ أرقام لصفحة ولي الأمر.');
   if (!kn) return fieldError($('regKid'), $('regErr'), 'اكتب اسم الطفل.');
   const k = {id:newId(), name:kn.slice(0, 30), avatar:regAvatar(), prog:oldProgress() || freshProg()};
-  DB.parent = {name:pn.slice(0, 40), phone:ph, created:Date.now()};
+  DB.parent = {name:pn.slice(0, 40), phone:ph, pin, created:Date.now()};
   DB.kids = [k]; DB.active = k.id; save();
   show('worlds');
 };
@@ -1053,24 +1223,57 @@ $('addKidForm').onsubmit = e => {
   const k = {id:newId(), name:n.slice(0, 30), avatar:newKidAvatar(), prog:freshProg()};
   DB.kids.push(k); save(); $('addKidForm').hidden = true; renderProfiles();
 };
-/* Parental gate (required for apps in the Kids category): the parent types the last 4 digits of their phone number. */
-function parentGate(onOk){
-  if (DB.parentUnlocked){ onOk(); return; }   // asked once per device; the parent can lock it again
-  const last4 = toLatin(DB.parent.phone).replace(/\D/g, '').slice(-4);
-  $('sheet').innerHTML = `<div class="s-head"><span class="big">🔒</span><div><h2>للوالدين فقط</h2><p>هذه الصفحة لولي الأمر</p></div><button class="icon-btn" data-close aria-label="إغلاق">✕</button></div>
+/* Parental gate (required for apps in the Kids category): the parent's own 4-digit PIN, asked every time
+   the parent page is opened. Three wrong tries lock it for 30 seconds. A forgotten PIN is reset with the full phone number. */
+let gateFails = 0, gateLockUntil = 0;
+const pinInput = (type = 'pin') => type === 'pin'
+  ? `<input id="gateIn" type="password" inputmode="numeric" maxlength="4" autocomplete="off" dir="ltr">`
+  : `<input id="gateIn" type="tel" inputmode="tel" autocomplete="off" dir="ltr" placeholder="05xxxxxxxx">`;
+function pinSheet({title = 'للوالدين فقط', prompt, button, type = 'pin', extra = '', onSubmit}){
+  $('sheet').innerHTML = `<div class="s-head"><span class="big">🔒</span><div><h2>${title}</h2><p>هذه الصفحة لولي الأمر</p></div><button class="icon-btn" data-close aria-label="إغلاق">✕</button></div>
     <form class="gate" id="gateForm" novalidate>
-      <p class="gate-q">اكتب آخر ٤ أرقام من رقم هاتف ولي الأمر</p>
-      <label class="field"><span class="sr">آخر ٤ أرقام</span><input id="gateIn" inputmode="numeric" maxlength="4" autocomplete="off"></label>
+      <p class="gate-q">${prompt}</p>
+      <label class="field"><span class="sr">${prompt}</span>${pinInput(type)}</label>
       <p class="err" id="gateErr" role="alert"></p>
-      <button class="btn block" type="submit">فتح</button>
+      <button class="btn block" type="submit">${button}</button>${extra}
     </form>`;
   $('sheet').querySelector('[data-close]').onclick = closeSheet;
   $('gateForm').onsubmit = e => {
     e.preventDefault();
-    if (toLatin($('gateIn').value).replace(/\D/g, '') === last4){ DB.parentUnlocked = true; save(); closeSheet(); onOk(); }
-    else { $('gateErr').textContent = 'الأرقام غير صحيحة. اطلب المساعدة من ولي الأمر.'; $('gateIn').value = ''; }
+    const raw = $('gateIn').value, err = onSubmit(toLatin(raw).replace(/\D/g, ''), raw);
+    if (err && $('gateErr')){ $('gateErr').textContent = err; $('gateIn').value = ''; $('gateIn').focus(); }
   };
   $('overlay').hidden = false; $('gateIn').focus();
+}
+function choosePin(onDone, title = 'رمز سري لولي الأمر'){
+  pinSheet({title, prompt:'اختر رمزًا من ٤ أرقام لا يعرفه الطفل', button:'التالي', onSubmit: v => {
+    if (v.length !== 4) return 'الرمز ٤ أرقام.';
+    pinSheet({title, prompt:'اكتب الرمز نفسه مرة أخرى للتأكيد', button:'حفظ', onSubmit: v2 => {
+      if (v2 !== v) return 'الرمزان غير متطابقين. اكتب الرمز نفسه.';
+      DB.parent.pin = v; save(); closeSheet(); onDone(); return null; }});
+    return null; }});
+}
+function forgotPin(onOk){
+  pinSheet({title:'نسيت الرمز؟', type:'phone', prompt:'اكتب رقم هاتف ولي الأمر كاملًا كما سجّلته', button:'التالي', onSubmit: (v, raw) => {
+    if (validPhone(raw) !== DB.parent.phone) return 'الرقم لا يطابق الرقم المسجّل.';
+    choosePin(onOk, 'اختر رمزًا جديدًا'); return null; }});
+}
+function parentGate(onOk){
+  if (!DB.parent.pin){   // accounts made before PINs existed: confirm once with the phone, then choose a PIN
+    const last4 = toLatin(DB.parent.phone).replace(/\D/g, '').slice(-4);
+    pinSheet({prompt:'لأمان أكثر سنضع رمزًا سريًا لصفحة ولي الأمر. أولًا: اكتب آخر ٤ أرقام من رقم الهاتف', button:'التالي', onSubmit: v => {
+      if (v !== last4) return 'الأرقام غير صحيحة. اطلب المساعدة من ولي الأمر.';
+      choosePin(onOk); return null; }});
+    return;
+  }
+  pinSheet({prompt:'اكتب الرمز السري لولي الأمر', button:'فتح', extra:'<button type="button" class="link" id="forgotPin">نسيت الرمز؟</button>', onSubmit: v => {
+    const wait = Math.ceil((gateLockUntil - Date.now()) / 1000);
+    if (wait > 0) return `محاولات كثيرة. انتظر ${countN(wait, ['ثانية واحدة', 'ثانيتين', 'ثوانٍ', 'ثانية'])} ثم حاول مجددًا.`;
+    if (v === DB.parent.pin){ gateFails = 0; closeSheet(); onOk(); return null; }
+    if (++gateFails >= 3){ gateFails = 0; gateLockUntil = Date.now() + 30000; return 'محاولات كثيرة. انتظر ٣٠ ثانية ثم حاول مجددًا.'; }
+    return 'الرمز غير صحيح. اطلب المساعدة من ولي الأمر.';
+  }});
+  $('forgotPin').onclick = () => forgotPin(onOk);
 }
 $('parentBtn').onclick = () => parentGate(() => show('parent'));
 $('whoBtn').onclick = () => show('profiles');
@@ -1082,13 +1285,39 @@ function twoStep(btn, label, action){
   btn.dataset.armed = '1'; const old = btn.textContent; btn.textContent = label;
   setTimeout(() => { if (btn.isConnected){ delete btn.dataset.armed; btn.textContent = old; } }, 4000);
 }
+/* The next step, so the child never has to wonder what to do: the first level of the last world that still has stars to win. */
+function suggestion(){
+  const last = R().last; if (!last || !WORLDS[last.w]) return null;
+  const order = [last.w, ...WORLD_ORDER.filter(w => w !== last.w)];
+  for (const w of order){
+    const L = WORLDS[w].levels;
+    let j = L.findIndex((lv, x) => unlocked(w, x) && stars(w, x) === 0);
+    if (j < 0) j = L.findIndex((lv, x) => unlocked(w, x) && stars(w, x) < 3 && !lv.boss);
+    if (j >= 0) return {w, i:j};
+  }
+  return null;
+}
+function renderNudges(){
+  const sg = suggestion(), o = nextOutfit(), p = R();
+  let h = giftBtnHtml();
+  if (sg){ const W = WORLDS[sg.w], lv = W.levels[sg.i];
+    h += `<button class="continue" id="contBtn" style="--wc:var(${W.color})"><span class="c-play">▶</span><span><b>${stars(sg.w, sg.i) ? 'نجوم أكثر في' : 'خطوتك التالية'}</b><small>${W.emoji} ${W.name} · ${lv.emoji} ${lv.title}</small></span></button>`; }
+  if (o){ const pct = Math.min(100, p.wool / o.price * 100);
+    h += `<button class="goal-bar" id="goalBtn"><span class="g-s">${soufiHtml(o.id)}</span><span class="g-t"><b>${p.wool >= o.price ? `صوفك يكفي لـ«${o.n}»! 🎉` : `الهدف التالي: ${o.n}`}</b><span class="gb"><i style="width:${pct}%"></i></span></span><span class="g-n num">🧶 ${ar(Math.min(p.wool, o.price))}/${ar(o.price)}</span></button>`; }
+  $('nudges').innerHTML = h;
+  bindGift($('nudges'), () => { $('woolTotal').textContent = ar(R().wool); });
+  if (sg) $('contBtn').onclick = () => { curWorld = sg.w; show('map'); openSheet(sg.w, sg.i); };
+  if (o) $('goalBtn').onclick = () => { farmTab = 'wear'; show('farm'); };
+}
+
 function renderParent(){
-  $('pName').value = DB.parent.name; $('pPhone').value = DB.parent.phone; $('pErr').textContent = ''; $('pSaved').hidden = true;
+  $('pName').value = DB.parent.name; $('pPhone').value = DB.parent.phone; $('pErr').textContent = ''; $('pSaved').hidden = true; $('pinSaved').hidden = true;
   $('parentKids').innerHTML = DB.kids.map(k => `
     <div class="kid-row" data-id="${k.id}">
       <span class="av">${k.avatar}</span>
       <div class="info"><b>${esc(k.name)}</b><small>${WORLD_ORDER.map(w => `${WORLDS[w].emoji} ${ar(Object.values(k.prog.stars[w] || {}).reduce((x, y) => x + y, 0))}`).join(' · ')}</small></div>
-      <div class="acts2"><button class="link" data-rename>تعديل الاسم</button><button class="link danger" data-del>حذف</button></div>
+      <div class="acts2"><button class="link" data-msg>✉️ رسالة تشجيع</button><button class="link" data-rename>تعديل الاسم</button><button class="link danger" data-del>حذف</button></div>
+      ${k.msg ? `<p class="msg-state">آخر رسالة: «${esc(k.msg.text)}» · ${k.msg.seen ? 'قرأها ✓' : 'لم تُقرأ بعد'}</p>` : ''}
     </div>`).join('');
   $('parentKids').querySelectorAll('.kid-row').forEach(row => {
     const k = DB.kids.find(x => x.id === row.dataset.id);
@@ -1096,9 +1325,20 @@ function renderParent(){
       const info = row.querySelector('.info');
       info.innerHTML = `<label class="field"><span class="sr">الاسم الجديد</span><input value="${esc(k.name)}" id="rn-${k.id}"></label>`;
       const inp = info.querySelector('input'); inp.focus(); inp.select();
-      const done = () => { const v = inp.value.trim(); if (v){ k.name = v.slice(0, 30); save(); } renderParent(); };
-      inp.onkeydown = ev => { if (ev.key === 'Enter') done(); if (ev.key === 'Escape') renderParent(); };
+      let closed = false;
+      const done = () => { if (closed) return; closed = true; const v = inp.value.trim(); if (v){ k.name = v.slice(0, 30); save(); } renderParent(); };
+      inp.onkeydown = ev => { if (ev.key === 'Enter') done(); if (ev.key === 'Escape'){ closed = true; renderParent(); } };
       inp.onblur = done;
+    };
+    row.querySelector('[data-msg]').onclick = () => {
+      const info = row.querySelector('.info');
+      info.innerHTML = `<label class="field"><span class="sr">رسالة تشجيع</span><input maxlength="80" placeholder="مثلًا: فخورة بك يا بطل! 💚" id="msg-${k.id}"></label>
+        <div class="row" style="justify-content:flex-start"><button class="link" data-send>إرسال</button><button class="link" data-cancel>إلغاء</button></div>
+        <small>تظهر الرسالة لطفلك في صفحة العوالم حتى يقرأها.</small>`;
+      const inp = info.querySelector('input'); inp.focus();
+      const send = () => { const v = inp.value.trim(); if (v){ k.msg = {text:v.slice(0, 80), seen:false, at:Date.now()}; save(); } renderParent(); };
+      inp.onkeydown = ev => { if (ev.key === 'Enter') send(); if (ev.key === 'Escape') renderParent(); };
+      info.querySelector('[data-send]').onclick = send; info.querySelector('[data-cancel]').onclick = () => renderParent();
     };
     row.querySelector('[data-del]').onclick = ev => twoStep(ev.currentTarget, 'اضغط مرة أخرى للتأكيد', () => {
       DB.kids = DB.kids.filter(x => x.id !== k.id);
@@ -1116,7 +1356,7 @@ $('parentForm').onsubmit = e => {
   DB.parent.name = n.slice(0, 40); DB.parent.phone = ph; save();
   $('pErr').textContent = ''; $('pSaved').hidden = false;
 };
-$('relockBtn').onclick = () => { DB.parentUnlocked = false; save(); show('profiles'); };
+$('pinBtn').onclick = () => choosePin(() => { $('pinSaved').hidden = false; }, 'رمز سري جديد');
 $('wipeBtn').onclick = ev => twoStep(ev.currentTarget, 'متأكد؟ اضغط مرة أخرى لحذف كل شيء', () => {
   DB = {parent:null, kids:[], active:null, sound:DB.sound}; save();
   try { localStorage.removeItem(OLD_KEY); } catch(e){}
@@ -1132,18 +1372,24 @@ function renderWorlds(){
   $('starTotal').textContent = ar(kidStars(k));
   $('woolTotal').textContent = ar(R().wool);
   paintSoufi();
-  const d = R().daily, done = dailyDoneToday(), streakAlive = done || d.date === dayBefore(todayStr());
+  const d = R().daily, done = dailyDoneToday(), streakAlive = done || streakInfo().alive;
   $('extras').innerHTML = `
     <button class="extra ${done ? 'done' : ''}" id="dailyBtn"><span class="x-emoji">${done ? '✅' : '☀️'}</span><b>تحدي اليوم</b>
       <small>${done ? 'أنجزته اليوم! عُد غدًا' : '٥ أسئلة من كل العوالم'}</small>${streakAlive && d.streak ? `<span class="flame">🔥 ${ar(d.streak)} ${d.streak === 1 ? 'يوم' : d.streak === 2 ? 'يومان' : d.streak <= 10 ? 'أيام' : 'يومًا'}</span>` : ''}</button>
     <button class="extra" id="farmBtn"><span class="x-emoji">🏡</span><b>مزرعتي</b><small>${R().farm.length ? `${ar(R().farm.length)} في مزرعتك · خزانة صوفي` : 'كل نجمة تضيف حيوانًا · خزانة صوفي'}</small></button>`;
   $('dailyBtn').onclick = startDaily;
   $('farmBtn').onclick = () => show('farm');
+  renderNudges();
   $('soundBtn').textContent = DB.sound ? '🔊' : '🔇';
-  $('worldsBubble').textContent = kidStars(k) === 0 ? `أهلًا يا ${k.name}! اختر عالمًا نلعب فيه. أنصحك أن تبدأ بقلعة المنازل أو جزيرة الجمع.` : `أهلًا يا ${k.name}! إلى أين نذهب اليوم؟`;
+  const msg = k.msg && !k.msg.seen ? k.msg : null;
+  if (msg){
+    $('worldsBubble').innerHTML = `📩 رسالة من ${esc(DB.parent.name)}: «${esc(msg.text)}» <button class="link" id="msgThanks">شكرًا 💚</button>`;
+    $('msgThanks').onclick = () => { k.msg.seen = true; k.msg.seenAt = Date.now(); save(); SND.ok(); renderWorlds(); };
+  } else $('worldsBubble').textContent = kidStars(k) === 0 ? `أهلًا يا ${k.name}! اختر عالمًا نلعب فيه. أنصحك أن تبدأ بقلعة المنازل أو جزيرة الجمع.` : `أهلًا يا ${k.name}! إلى أين نذهب اليوم؟`;
   $('worldList').innerHTML = WORLD_ORDER.map((w, i) => {
     const W = WORLDS[w], max = W.levels.length * 3, got = worldStars(w);
-    return `<button class="world ${i === 0 ? 'wide' : ''}" data-w="${w}" style="--wc:var(${W.color})">
+    const wide = i === 0 || (i === WORLD_ORDER.length - 1 && i % 2 === 1);   // keep the two-column grid even
+    return `<button class="world ${wide ? 'wide' : ''}" data-w="${w}" style="--wc:var(${W.color})">
       <span class="w-emoji">${W.emoji}</span><b>${W.name}</b><small>${W.sub}</small>
       <span class="w-stars">★ ${ar(got)} من ${ar(max)}</span><span class="w-bar"><i style="width:${got / max * 100}%"></i></span></button>`;
   }).join('');
@@ -1221,13 +1467,13 @@ $('mapBack').onclick = () => show('worlds');
 /* =====================================================================
    level sheet
    ===================================================================== */
-const ruleSec = (s, tf) => s > 100 ? 'أبطأ من ذلك' : `أقل من ${ar(Math.round(s * tf))} ثوانٍ`;
+const ruleSec = (s, tf) => s > 100 ? 'أبطأ من ذلك' : `أقل من ${countN(Math.round(s * tf), ['ثانية واحدة', 'ثانيتين', 'ثوانٍ', 'ثانية'])}`;
 function openBossSheet(w, i){
   const W = WORLDS[w], lv = W.levels[i], lock = !unlocked(w, i), st = stars(w, i);
   $('sheet').innerHTML = `<div class="s-head"><span class="big">🐺</span><div><h2>الذئب المشاغب</h2><p>${st ? `<span style="color:var(--sun)">${'★'.repeat(st)}</span> · هزمته من قبل` : 'يحرس نهاية ' + W.name}</p></div><button class="icon-btn" data-close aria-label="إغلاق">✕</button></div>
     ${lock ? `<div class="locked-note">🔒 احصل على نجمة واحدة على الأقل في كل مستويات ${W.name}، ثم تعال لمواجهته.</div>`
       : `<div class="acts"><button class="act primary" data-act="boss"><span class="ai">⚔️</span><span><b>واجه الذئب</b><small>كل إجابة صحيحة تُضعفه، والسريعة تُضعفه أكثر</small></span></button></div>`}
-    <p class="note">للذئب ${ar(bossHP(w))} نقطة قوة، ولك ٣ قلوب ❤️. الإجابة الصحيحة تنقص قوته، والإجابة الصاعقة ⚡ تنقصها مرتين، والخطأ يكلّفك قلبًا. إذا هزمته تحصل على جائزة خاصة لمزرعتك 🏆</p>`;
+    <p class="note">للذئب ${countN(bossHP(w), ['نقطة قوة واحدة', 'نقطتا قوة', 'نقاط قوة', 'نقطة قوة'])}، ولك ٣ قلوب ❤️. الإجابة الصحيحة تنقص قوته، والإجابة الصاعقة ⚡ تنقصها مرتين، والخطأ يكلّفك قلبًا. إذا هزمته تحصل على جائزة خاصة لمزرعتك 🏆</p>`;
   $('sheet').querySelector('[data-close]').onclick = closeSheet;
   const b = $('sheet').querySelector('[data-act="boss"]'); if (b) b.onclick = () => { closeSheet(); startBoss(w, i); };
   $('overlay').hidden = false;
@@ -1236,7 +1482,7 @@ function openBossSheet(w, i){
 function openSheet(w, i){
   if (WORLDS[w].levels[i].boss) return openBossSheet(w, i);
   const W = WORLDS[w], lv = W.levels[i], lock = !unlocked(w, i), best = (P().best[w] || {})[i], cfg = levelCfg(w, i), tf = levelTF(w, lv);
-  const starLine = stars(w, i) ? `<span style="color:var(--sun)">${'★'.repeat(stars(w, i))}</span>` + (best ? ` · أفضل رقم ${ar(best.q)} أسئلة` : '') : (lv.desc || 'لم تبدأ بعد');
+  const starLine = stars(w, i) ? `<span style="color:var(--sun)">${'★'.repeat(stars(w, i))}</span>` + (best ? ` · أفضل رقم: ${countN(best.q, ['سؤال واحد', 'سؤالان', 'أسئلة', 'سؤالًا'])}` : '') : (lv.desc || 'لم تبدأ بعد');
   let body = '';
   if (lock){
     body += `<div class="locked-note">🔒 أكمل «${W.levels[i - 1].title}» أولًا. وإن كنت تعرف هذا المستوى، اقفز إليه باختبار التحدي.</div>`;
@@ -1395,6 +1641,7 @@ function attachGoat(el, n, k, onPick, opts = {}){
   const pickVal = v => {
     if (done) return; done = true;
     const right = v === target;
+    if (right || !opts.retry) opts.onPicked && opts.onPicked();
     goat.classList.remove('drag', 'held', 'no'); goat.classList.add('jump');
     setPos(v === hi ? 1 : 0); SND.tick();
     nl.querySelectorAll('[data-v]').forEach(b => { b.classList.toggle('win', right && +b.dataset.v === v); b.classList.toggle('nope', !right && +b.dataset.v === v); });
@@ -1434,6 +1681,16 @@ function revealLine(el, target){
   const goat = nl.querySelector('.nl-goat'), isHi = +nl.querySelectorAll('[data-v]')[1].dataset.v === target;
   requestAnimationFrame(() => requestAnimationFrame(() => goat.style.right = isHi ? '100%' : '0%'));
 }
+/* The number with the two places that matter labelled: the place we round to (dashed frame) and,
+   to its right, the digit we look at (👀, in its place colour). Smaller places fade: they become 0. */
+function roundNumHtml(n, k){
+  const s = String(n), L = s.length, look = k - 1;
+  return `<div class="rnum" role="img" aria-label="${fmt(n)}: ننظر إلى رقم ${PLACE[look]}">${[...s].map((d, i) => { const p = L - 1 - i;
+    const cls = p === look ? 'look' : p === k ? 'keep' : p < look ? 'gone' : '';
+    const tag = p === look ? `<span class="tag below">👀 ${PLACE[p]}</span>` : p === k ? `<span class="tag above">نقرّب إلى ${PLACE[p]}</span>` : '';
+    return `<span class="rd ${cls}" style="--c:var(--p${p})">${ar(d)}${tag}</span>${p > 0 && p % 3 === 0 ? '<i class="sep">٬</i>' : ''}`; }).join('')}</div>`;
+}
+const watchHtml = k => `<p class="watch">👀 ننظر إلى رقم <b class="pc${k - 1}">${PLACE[k - 1]}</b> لنقرّب إلى ${ROUND_TO[k]}</p>`;
 function roundExplain(n, k){
   const {d, target} = roundInfo(n, k);
   return `ننظر إلى رقم ${PLACE[k - 1]}: <b class="pc${k - 1}">${ar(d)}</b>. ${d >= 5 ? 'هو ٥ أو أكثر، فنقرّب إلى الأعلى' : 'هو أقل من ٥، فنقرّب إلى الأسفل'}: ${fmt(n)} ← <b>${fmt(target)}</b>`;
@@ -1444,10 +1701,12 @@ function roundExplain(n, k){
    ===================================================================== */
 let learnCtx = null;
 function openLearn(w, i, extra = {}){
+  curWorld = w;
   learnCtx = {w, i, ...extra};
   $('learnTitle').textContent = `${WORLDS[w].emoji} ${WORLDS[w].levels[i].title}`;
   show('learn');
-  ({mult:learnMult, add:learnArith, sub:learnArith, place:learnPlace, round:learnRound})[w]();
+  learnKey = null;
+  ({mult:learnMult, div:learnDiv, add:learnArith, sub:learnArith, place:learnPlace, round:learnRound})[w]();
 }
 $('learnBack').onclick = () => show('map');
 const startPracticeBtn = () => `<button class="btn block" id="toPractice">ابدأ التدريب</button>`;
@@ -1579,17 +1838,17 @@ function buildGroups(el, n, k){
   const filled = [];
   const fill = pen => {
     const j = +pen.dataset.j;
-    if (filled[j]){ $('buildTotal').textContent = `هذه ${th.p[0]} ممتلئة، اختر غيرها!`; SND.tick(); return; }
+    if (filled[j]){ $('buildTotal').textContent = th.pg === 'm' ? `هذا ال${th.p[0]} ممتلئ، اختر غيره!` : `هذه ال${th.p[0]} ممتلئة، اختر غيرها!`; SND.tick(); return; }
     filled[j] = true; pen.classList.add('full');
     pen.querySelector('.p-items').innerHTML = [...Array(k)].map((_, m) => `<span style="animation-delay:${m * 30}ms">${th.ce}</span>`).join('');
     const c = filled.filter(Boolean).length;
     SND.tick(); haptic('ok');
     if (c === n){
       $('buildTotal').innerHTML = `🎉 ${ar(n)} × ${ar(k)} = ${ar(n * k)}`; SND.win();
-      buddyLearn(`رائع! بنيت ${ar(n)} مجموعات، في كل واحدة ${ar(k)}`);
+      buddyLearn(`رائع! بنيت ${countN(n, ['مجموعة واحدة', 'مجموعتين', 'مجموعات', 'مجموعة'])}، في كل واحدة ${ar(k)}`);
     } else $('buildTotal').textContent = `المجموع: ${[...Array(c)].map((_, m) => ar(k * (m + 1))).join(' ← ')}`;
   };
-  el.querySelectorAll('.pen').forEach(pen => { pen.onclick = () => fill(pen); pen.onkeydown = e => { if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); fill(pen); } }; });
+  el.querySelectorAll('.pen').forEach(pen => { onTap(pen, () => fill(pen)); pen.onkeydown = e => { if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); fill(pen); } }; });
   dragToken($('groupToken'), t => fill(t), () => { const free = el.querySelector('.pen:not(.full)'); if (free) fill(free); });
 }
 function buddyLearn(text){ const m = document.querySelector('#learnBody .step-msg'); if (m) m.innerHTML = '🐑 ' + text; }
@@ -1643,7 +1902,7 @@ function buildNumber(){
     cnt[p]++; SND.tick(); update();
   };
   document.querySelectorAll('#learnBody .token').forEach(t => dragToken(t, h => add(+t.dataset.p, +h.dataset.p), () => add(+t.dataset.p)));
-  document.querySelectorAll('#learnBody .h-minus').forEach(b => b.onclick = () => { const p = +b.dataset.m; if (cnt[p]){ cnt[p]--; update(); } });
+  document.querySelectorAll('#learnBody .h-minus').forEach(b => onTap(b, () => { const p = +b.dataset.m; if (cnt[p]){ cnt[p]--; update(); } }));
   $('buildNew').onclick = () => { learnCtx.n = null; learnPlace(); };
   $('buildBack').onclick = () => { learnCtx.build = false; learnPlace(); };
   speakText = words(n);
@@ -1657,10 +1916,10 @@ function learnRound(){
   $('learnBody').innerHTML = `
     <p class="lesson">التقريب يعني أن نختار أقرب عدد «مدوّر». على الخط يكون الأصغر على اليمين والأكبر على اليسار، ونسأل: هل العدد أقرب إلى اليمين أم إلى اليسار؟</p>
     <p class="qtext">قرّب ${fmt(n)} إلى ${ROUND_TO[k]}</p>
-    <div class="bignum">${numHtml(n, k - 1)}</div>
+    ${roundNumHtml(n, k)}
     <div id="learnLine">${lineHtml(n, k, true)}</div>
     <div class="step-msg" id="roundMsg" aria-live="polite">جرّب أنت: حرّك العنزة إلى العدد الذي تراه أقرب.</div>
-    <div class="tip"><p>القاعدة: انظر إلى الرقم في المنزلة الأصغر مباشرةً (${PLACE[k - 1]}). إذا كان ٥ أو أكثر نقرّب للأعلى، وإذا كان أقل من ٥ نقرّب للأسفل.</p></div>
+    <div class="tip"><p>القاعدة: لنقرّب إلى ${ROUND_TO[k]} ننظر إلى الرقم الذي على يمين منزلة <b class="pc${k}">${PLACE[k]}</b>، أي رقم <b class="pc${k - 1}">${PLACE[k - 1]}</b> 👀. إذا كان ٥ أو أكثر نقرّب للأعلى، وإذا كان أقل من ٥ نقرّب للأسفل، وكل ما على يمينه يصبح صفرًا.</p></div>
     <div class="row" style="margin-top:6px"><button class="link" id="newEx">🔄 مثال جديد</button></div>
     <div class="learn-foot">${startPracticeBtn()}</div>`;
   attachGoat($('learnLine'), n, k, () => {
@@ -1716,8 +1975,8 @@ function arithQ(op, d, w, i){
     view: () => eqHtml([ar(a), opS, ar(b)]),
     visual: () => { vis().innerHTML = emojiArith(a, b, op); },
     hint: () => { vis().innerHTML = emojiArith(a, b, op);
-      return op === '+' ? `ابدأ من ${ar(a)} وعُدّ ${ar(b)} خطوات إلى الأمام: ${[...Array(Math.min(b, 2))].map((_, j) => ar(a + j + 1)).join('، ')}…`
-                        : `ابدأ من ${ar(a)} وعُدّ ${ar(b)} خطوات إلى الخلف: ${[...Array(Math.min(b, 2))].map((_, j) => ar(a - j - 1)).join('، ')}…`; },
+      return op === '+' ? `ابدأ من ${ar(a)} وعُدّ ${countN(b, ['خطوة واحدة', 'خطوتين', 'خطوات', 'خطوة'])} إلى الأمام: ${[...Array(Math.min(b, 2))].map((_, j) => ar(a + j + 1)).join('، ')}…`
+                        : `ابدأ من ${ar(a)} وعُدّ ${countN(b, ['خطوة واحدة', 'خطوتين', 'خطوات', 'خطوة'])} إلى الخلف: ${[...Array(Math.min(b, 2))].map((_, j) => ar(a - j - 1)).join('، ')}…`; },
     explain: () => { vis().innerHTML = emojiArith(a, b, op); qtext(emojiSentence(a, b, op)); }};
   const S = arithSteps(a, b, op), fin = S.steps[S.steps.length - 1];
   return {answer:res, input:'column', tf: 1 + (d - 1) * 1.1, ansLen:len(res),
@@ -1782,14 +2041,347 @@ function placeQ(d){
 function roundQ(k){
   const n = genRoundNum(k), {U, lo, hi, target} = roundInfo(n, k);
   const q = {answer:target, input:'drag', tf:1.4 + k * .2,
-    view: () => `<p class="qtext">قرّب إلى ${ROUND_TO[k]}</p><div class="bignum">${numHtml(n)}</div>`,
+    view: () => `<p class="qtext">قرّب إلى ${ROUND_TO[k]}</p><div class="bignum">${numHtml(n)}</div>${watchHtml(k)}`,
     visual: () => { const el = vis(); el.innerHTML = lineHtml(n, k, true);
-      q.goat = attachGoat(el, n, k, v => answer(v), {retry: Q.mode === 'practice',
+      q.goat = attachGoat(el, n, k, v => { if (Q && Q.q === q && !Q.busy) answer(v); }, {retry: Q.mode === 'practice', onPicked: () => { q.pickedAt = performance.now(); },
         onRefuse: () => { q.refused = true; qtext('العنزة لا تريد الذهاب إلى هناك، فهذا ليس العدد الأقرب. جرّب الجهة الأخرى!'); }}); },
-    hint: () => { $('qPrompt').querySelector('.bignum').innerHTML = numHtml(n, k - 1);
-      return `انظر إلى الرقم المسطّر (${PLACE[k - 1]}): إذا كان ٥ أو أكثر نقرّب إلى ${fmt(hi)}، وإذا كان أقل من ٥ نقرّب إلى ${fmt(lo)}. وعلى الخط: أين النقطة أقرب؟`; },
+    hint: () => { const b = $('qPrompt').querySelector('.bignum'); if (b) b.outerHTML = roundNumHtml(n, k);
+      return `انظر إلى الرقم الذي عليه 👀، إنه رقم ${PLACE[k - 1]}: إذا كان ٥ أو أكثر نقرّب إلى ${fmt(hi)}، وإذا كان أقل من ٥ نقرّب إلى ${fmt(lo)}. وعلى الخط: أين النقطة أقرب؟`; },
     explain: () => { const el = vis(); el.innerHTML = lineHtml(n, k); revealLine(el, target); qtext(roundExplain(n, k)); }};
   return q;
+}
+
+/* =====================================================================
+   division bakery: sharing equally, division as the opposite of multiplying, remainders, long division
+   ===================================================================== */
+const DIV_ITEMS = [
+  {e:'🍪', f:['كعكة','كعكتان','كعكات','كعكتين']}, {e:'🍎', f:['تفاحة','تفاحتان','تفاحات','تفاحتين']},
+  {e:'🍌', f:['موزة','موزتان','موزات','موزتين']}, {e:'🍬', f:['قطعة حلوى','قطعتا حلوى','قطع حلوى','قطعتي حلوى']}];
+const FRIENDS = ['🐰','🐼','🦊','🐸','🐯','🐨','🐵','🦁','🐧'];
+const FRIEND_F = ['صديق','صديقان','أصدقاء'];
+const DIV_TIPS = {
+  2: 'القسمة على ٢ تعني نصف العدد: ١٦ ÷ ٢ = ٨.',
+  3: 'عُدّ قفزًا بثلاث حتى تصل إلى العدد، وعدد القفزات هو الناتج: ٣، ٦، ٩، ١٢ ← ٤ قفزات، إذن ١٢ ÷ ٣ = ٤.',
+  4: 'القسمة على ٤ = نصّف مرتين: ٢٨ ← ١٤ ← ٧.',
+  5: 'كل عدد آحاده ٥ أو ٠ يُقسم على ٥. اسأل: ٥ × كم؟ ٣٥ ÷ ٥ = ٧ لأن ٥ × ٧ = ٣٥.',
+  6: 'القسمة على ٦ = اقسم على ٢ ثم على ٣: ٤٢ ← ٢١ ← ٧.',
+  7: 'تذكّر حقائق جدول ٧: ٥٦ ÷ ٧ = ٨ لأن ٥٦ = ٧ × ٨ (٥، ٦، ٧، ٨ بالترتيب).',
+  8: 'القسمة على ٨ = نصّف ثلاث مرات: ٤٨ ← ٢٤ ← ١٢ ← ٦.',
+  9: 'في جدول ٩ الناتج أكبر من رقم العشرات بواحد: ٦٣ ÷ ٩ = ٧ لأن ٦ + ١ = ٧.',
+  10: 'القسمة على ١٠ = احذف الصفر من الآحاد: ٧٠ ÷ ١٠ = ٧.',
+};
+// counted noun with the Arabic number rules: 1 and 2 by the noun itself, 3–10 plural, 11 and up singular
+function cnt(n, forms, acc = false){
+  if (n === 1) return forms[0] + ' واحدة';
+  if (n === 2) return acc && forms[3] ? forms[3] : forms[1];
+  return ar(n) + ' ' + (n <= 10 ? forms[2] : forms[0]);
+}
+const friendsTxt = k => k === 2 ? 'صديقين' : `${ar(k)} ${k <= 10 ? 'أصدقاء' : 'صديقًا'}`;
+const termsHtml = (n, k, q, r) => `<p class="terms"><span>المقسوم <b class="t-n">${ar(n)}</b></span><span>المقسوم عليه <b class="t-k">${ar(k)}</b></span><span>الناتج <b class="t-q">${q == null ? '؟' : ar(q)}</b></span>${r ? `<span>الباقي <b class="t-r">${ar(r)}</b></span>` : ''}</p>`;
+const divEq = (n, k, q, r) => `<div class="eq div-eq"><span class="t-n">${ar(n)}</span><span class="op">÷</span><span class="t-k">${ar(k)}</span><span class="op">=</span><span class="t-q">${ar(q)}</span>${r ? `<span class="rem-word">والباقي <b class="t-r">${ar(r)}</b></span>` : ''}</div>`;
+
+/* --- sharing picture: a basket, one plate per friend, and (when it does not divide) what is left over --- */
+function shareHtml(s, opts = {}){
+  const {n, k, item, friends, dealt} = s, given = dealt.reduce((a, b) => a + b, 0), left = n - given;
+  const big = n > 24 ? ' sm' : '';
+  const done = s.finished && left > 0;
+  return `<div class="share${big}">
+    <div class="pile" ${opts.live ? 'data-pile' : ''}>${done ? '' : [...Array(left)].map((_, j) => `<span class="ck" data-ck="${j}">${item.e}</span>`).join('')}
+      <span class="pile-label">${left && !done ? `في السلة ${cnt(left, item.f)}` : done ? 'السلة' : 'السلة فارغة ✓'}</span></div>
+    <div class="plates">${friends.map((f, j) => `<div class="plate" ${opts.live ? 'data-drop' : ''} data-j="${j}"><span class="fr">${f}</span><div class="on">${[...Array(dealt[j])].map((_, m) => `<span class="${opts.fresh === j && m === dealt[j] - 1 ? 'fresh' : ''}">${item.e}</span>`).join('')}</div><b class="cnt">${ar(dealt[j])}</b></div>`).join('')}</div>
+    ${done ? `<div class="leftover"><span>الباقي <b>${ar(left)}</b></span><span>${item.e.repeat(left)}</span><span>لا تكفي لجولة أخرى</span></div>` : ''}</div>`;
+}
+function newShare(n, k){
+  return {n, k, item: pick(DIV_ITEMS), friends: shuffle(FRIENDS.slice()).slice(0, k), dealt: Array(k).fill(0), finished:false};
+}
+const dealAll = s => { const q = Math.floor(s.n / s.k); s.dealt = s.dealt.map(() => q); s.finished = true; return s; };
+
+/* --- the fact family: one multiplication fact gives two division facts --- */
+function familyHtml(a, b, hiDiv = true){
+  const n = a * b;
+  return `<div class="family"><div class="tri" aria-hidden="true"><svg viewBox="0 0 120 100"><path d="M60 10 L112 90 L8 90 Z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round" opacity=".35"/></svg>
+      <b class="t-top t-n">${ar(n)}</b><b class="t-l">${ar(a)}</b><b class="t-r">${ar(b)}</b></div>
+    <div class="fam-eqs"><span>${ar(a)} × ${ar(b)} = ${ar(n)}</span><span>${ar(b)} × ${ar(a)} = ${ar(n)}</span>
+      <span class="${hiDiv ? 'hl' : ''}">${ar(n)} ÷ ${ar(a)} = ${ar(b)}</span><span>${ar(n)} ÷ ${ar(b)} = ${ar(a)}</span></div></div>`;
+}
+
+/* --- long division: divide, multiply, subtract, bring down --- */
+function longSteps(n, k){
+  const ds = [...String(n)].map(Number), steps = [];
+  let cur = 0, started = false;
+  ds.forEach((d, i) => {
+    cur = cur * 10 + d;
+    if (!started && cur < k && i < ds.length - 1) return;      // too small: take one more digit
+    started = true;
+    const qd = Math.floor(cur / k), prod = qd * k, rem = cur - prod;
+    steps.push({i, cur, qd, prod, rem});
+    cur = rem;
+  });
+  return steps;
+}
+// done = steps finished (their quotient digit, product and remainder are written); cur = step whose number is highlighted
+function ldHtml(n, k, done = 0, cur = -1){
+  const S = longSteps(n, k), ds = [...String(n)], cells = [];
+  const at = (r, c, txt, cls = '') => cells.push(`<span class="${cls}" style="grid-row:${r};grid-column:${c + 2}">${txt}</span>`);
+  cells.push(`<span class="dv" style="grid-row:2;grid-column:1">${ar(k)}</span>`);
+  const firstLen = String(S[0].cur).length;
+  ds.forEach((d, i) => at(2, i, ar(d), 'dd' + (i === 0 ? ' first' : '') + (cur === 0 && i < firstLen ? ' cur' : '')));
+  S.forEach((st, s) => {
+    if (s >= done) return;
+    at(1, st.i, ar(st.qd), 'qd' + (s === done - 1 ? ' new' : ''));
+    const ps = String(st.prod);
+    [...ps].forEach((d, j) => at(3 + 2 * s, st.i - ps.length + 1 + j, ar(d), 'pr' + (j === 0 ? ' minus' : '') + (s === done - 1 ? ' new' : '')));
+    const next = S[s + 1];
+    const row = 4 + 2 * s, hl = cur === s + 1 ? ' cur' : '';
+    if (next){
+      const txt = st.rem ? String(next.cur) : ds[next.i];
+      [...txt].forEach((d, j) => at(row, next.i - txt.length + 1 + j, ar(d), 'rm' + (j === txt.length - 1 ? ' down' : '') + hl + (s === done - 1 ? ' new' : '')));
+    } else at(row, st.i, ar(st.rem), 'rm last' + (s === done - 1 ? ' new' : ''));
+  });
+  return `<div class="ld" style="grid-template-columns:auto repeat(${ds.length},1fr)" role="img" aria-label="${ar(n)} ÷ ${ar(k)}">${cells.join('')}</div>`;
+}
+const multiplesHtml = (k, upTo = -1, chosen = -1) => `<div class="mults" aria-label="جدول ${ar(k)}">${[...Array(9)].map((_, j) => { const m = k * (j + 1);
+  return `<span class="${upTo >= 0 && m <= upTo ? 'fits' : ''} ${chosen === j + 1 ? 'pick' : ''}"><small>${ar(k)}×${ar(j + 1)}</small><b>${ar(m)}</b></span>`; }).join('')}</div>`;
+const LD_WORDS = [['➗', 'اقسم'], ['✖️', 'اضرب'], ['➖', 'اطرح'], ['⬇️', 'أنزل']];
+const ldChips = on => `<div class="ld-steps">${LD_WORDS.map(([e, t], j) => `<span class="${on.includes(j) ? 'on' : ''}">${e} ${t}</span>`).join('')}</div>`;
+function ldAsk(n, k, S, s){
+  const st = S[s];
+  let pre = '';
+  if (s === 0 && String(st.cur).length > 1) pre = `الرقم الأول ${ar(+String(n)[0])} أصغر من ${ar(k)}، فنأخذ ${String(st.cur).length === 2 ? 'رقمين' : 'ثلاثة أرقام'}: <b>${ar(st.cur)}</b>. `;
+  return pre + `<b>اقسم:</b> كم مرة يدخل ${ar(k)} في <b>${ar(st.cur)}</b>؟ ابحث في جدول ${ar(k)} عن أكبر عدد لا يزيد على ${ar(st.cur)}.`;
+}
+function ldSay(n, k, S, s){
+  const st = S[s], next = S[s + 1];
+  let t = st.qd === 0 ? `${ar(st.cur)} أصغر من ${ar(k)}، فنكتب <b>٠</b> في الناتج. ` : `نكتب <b>${ar(st.qd)}</b> في الناتج. `;
+  t += `<b>اضرب:</b> <span class="m">${ar(st.qd)} × ${ar(k)} = ${ar(st.prod)}</span>. <b>اطرح:</b> <span class="m">${ar(st.cur)} − ${ar(st.prod)} = ${ar(st.rem)}</span>. `;
+  if (next) t += `<b>أنزل</b> الرقم التالي ${ar(+String(n)[next.i])} فيصبح عندنا ${ar(next.cur)}.`;
+  else t += st.rem ? `لا توجد أرقام أخرى، والباقي ${ar(st.rem)}.` : `لا توجد أرقام أخرى، والباقي صفر. انتهينا! 🎉`;
+  return t;
+}
+
+/* --- question makers --- */
+function genDiv(lv){
+  if (lv.kind === 'share'){ const k = rnd(2, 5), q = rnd(2, 5); return {k, q, n:k * q, r:0}; }
+  if (lv.kind === 'fact'){ const k = pick(lv.set), q = rnd(1, 10); return {k, q, n:k * q, r:0}; }
+  if (lv.kind === 'rem'){ const k = rnd(3, 6), q = rnd(2, 6), r = rnd(1, k - 1); return {k, q, r, n:k * q + r}; }
+  const k = rnd(2, 9);
+  const q = lv.d === 2 ? rnd(10, Math.floor(99 / k)) : rnd(Math.ceil(100 / k), Math.floor(999 / k));
+  return {k, q, n:k * q, r:0};
+}
+function divChoices(q, k){
+  const set = new Set([q]);
+  for (const c of shuffle([q + 1, q - 1, q + 2, q - 2, k, q + 10, q * 2])){ if (set.size >= 4) break; if (c > 0 && c !== q) set.add(c); }
+  while (set.size < 4) set.add(q + set.size + 2);
+  return shuffle([...set]).map(v => ({v, html:ar(v)}));
+}
+function remChoices(q, r, k){
+  const opts = [[q, r]], add = (a, b) => { if (a >= 1 && b >= 0 && !opts.some(o => o[0] === a && o[1] === b)) opts.push([a, b]); };
+  add(q - 1, r + k);                 // remainder too big: the classic mistake
+  add(q + 1, r);
+  add(q, (r + 1) % k || k - 1);
+  add(q, 0); add(q + 1, Math.max(0, r - 1));
+  return shuffle(opts.slice(0, 4)).map(([a, b]) => ({v:a * 100 + b, html:`${ar(a)} والباقي ${ar(b)}`}));
+}
+function divQ(lv, mode, w, i){
+  const {n, k, q, r} = genDiv(lv);
+  if (lv.kind === 'share' || lv.kind === 'rem'){
+    const s = newShare(n, k), rem = lv.kind === 'rem';
+    const ask = `وزّع ${cnt(n, s.item.f, true)} ${s.item.e} على ${friendsTxt(k)} بالتساوي.${rem ? ' كم لكل صديق، وكم يبقى؟' : ' كم لكل صديق؟'}`;
+    const base = {tf: rem ? 2.2 : 1.6,
+      view: () => `<p class="qtext">${ask}</p>${eqHtml([ar(n), '÷', ar(k)])}`,
+      visual: () => { const el = vis(); s.dealt = s.dealt.map(() => 0); s.finished = false;
+        el.innerHTML = `<div id="qShare"></div><div class="row"><button class="btn small" id="qRound">🤲 وزّع جولة</button></div><p class="share-say" id="qSay">وزّع لتعرف الجواب: اضغط على ${s.item.e} أو على طبق صديق.</p>`;
+        mountShare($('qShare'), s, {roundBtn: $('qRound'), say: h => { if ($('qSay')) $('qSay').innerHTML = h; },
+          onFinish: () => { if ($('qSay')) $('qSay').innerHTML = rem ? `انتهى التوزيع! كم مع كل صديق، وكم بقي في صندوق الباقي؟ اختر الجواب.` : `انتهى التوزيع! كم مع كل صديق؟ اكتب الجواب.`; }}); },
+      hint: () => { vis().innerHTML = shareHtml(dealAll({...s, dealt:[...s.dealt]}));
+        return rem ? `وزّعنا جولة بعد جولة: كل صديق أخذ ${cnt(q, s.item.f, true)}، وما بقي في السلة لا يكفي لجولة أخرى، فهو الباقي. والباقي دائمًا أصغر من ${ar(k)}.`
+                   : `في كل جولة يأخذ كل صديق ${s.item.f[0]} واحدة، أي ${ar(k)} في الجولة. عُدّ ما على طبق واحد.`; },
+      explain: () => { vis().innerHTML = shareHtml(dealAll({...s, dealt:[...s.dealt]}));
+        qtext(rem ? `${ar(n)} ÷ ${ar(k)} = ${ar(q)} والباقي ${ar(r)}، لأن ${ar(k)} × ${ar(q)} = ${ar(n - r)} و ${ar(n)} − ${ar(n - r)} = ${ar(r)}`
+                  : `كل صديق أخذ ${cnt(q, s.item.f, true)}: ${ar(n)} ÷ ${ar(k)} = ${ar(q)}، لأن ${ar(k)} × ${ar(q)} = ${ar(n)}`); },
+      teach: () => openLearn(w, i, {n, k})};
+    return rem ? {...base, answer:q * 100 + r, input:'choices', wide:true, choices:remChoices(q, r, k)} : {...base, answer:q, input:'pad'};
+  }
+  if (lv.kind === 'fact'){
+    const input = mode === 'practice' ? 'choices' : 'pad';
+    return {answer:q, input, tf:1, choices: input === 'choices' ? divChoices(q, k) : null,
+      view: () => eqHtml([ar(n), '÷', ar(k)]),
+      visual: () => qtext(`فكّر في الضرب: ${ar(k)} × ؟ = ${ar(n)}`),
+      hint: () => { const el = vis(); renderScene(el, q, k); countAlong(el, true);
+        return `القسمة عكس الضرب: ${ar(k)} × كم = ${ar(n)}؟ عُدّ قفزًا بـ ${ar(k)}: ${skipList(k, Math.min(q, 3))}${q > 3 ? '… حتى تصل إلى ' + ar(n) + '، وعدد القفزات هو الجواب' : ''}`; },
+      explain: () => { vis().innerHTML = familyHtml(k, q); qtext(`${ar(k)} × ${ar(q)} = ${ar(n)}، إذن ${ar(n)} ÷ ${ar(k)} = ${ar(q)}`); },
+      teach: () => openLearn(w, i, {k, q})};
+  }
+  const S = longSteps(n, k);
+  const ldNow = (done, cur) => { const el = $('qPrompt').querySelector('.ld'); if (el) el.outerHTML = ldHtml(n, k, done, cur); };
+  return {answer:q, input:'pad', tf: lv.d === 2 ? 2.6 : 3.6,
+    view: () => `<p class="qtext">اقسم خطوة خطوة</p>${ldHtml(n, k)}${eqHtml([ar(n), '÷', ar(k)])}`,
+    hint: () => { const s = Math.min(Q.typed.length, S.length - 1);
+      ldNow(s, s); vis().innerHTML = multiplesHtml(k, S[s].cur);
+      return ldAsk(n, k, S, s) + ' الأعداد الملوّنة في جدول ' + ar(k) + ' هي التي لا تزيد عليه.'; },
+    explain: () => { ldNow(S.length, -1); qtext(`${ar(n)} ÷ ${ar(k)} = ${ar(q)}. تحقّق: ${ar(q)} × ${ar(k)} = ${ar(n)} ✓`); },
+    teach: () => openLearn(w, i, {n, k})};
+}
+
+/* --- learn screens --- */
+function learnDiv(){
+  const lv = WORLDS.div.levels[learnCtx.i];
+  if (lv.kind === 'share' || lv.kind === 'rem') return learnShare(lv);
+  if (lv.kind === 'fact') return learnFact(lv);
+  return learnLong(lv);
+}
+/* Sharing that works with the finger: tap a treat (it goes to the next friend), tap a friend's plate,
+   drag a treat onto a plate, or deal a whole round with the button. A plate refuses an unfair extra. */
+/* A tap that does not wait for the browser's click: right after a drag, phones can drop the next click,
+   and children tap fast. Keyboard and screen-reader activation still arrive as a click. */
+function onTap(el, fn){
+  let sx = 0, sy = 0, down = false, at = 0;
+  el.addEventListener('pointerdown', e => { down = true; sx = e.clientX; sy = e.clientY; });
+  el.addEventListener('pointerup', e => { if (down && Math.hypot(e.clientX - sx, e.clientY - sy) < 14){ at = Date.now(); fn(); } down = false; });
+  el.addEventListener('pointercancel', () => { down = false; });
+  el.addEventListener('click', () => { if (Date.now() - at > 700) fn(); });
+}
+function mountShare(box, s, o){
+  const {n, k, item} = s, given = () => s.dealt.reduce((a, b) => a + b, 0);
+  const paint = (msg, fresh) => {
+    box.innerHTML = shareHtml(s, {live: !s.finished, fresh});
+    if (msg != null) o.say(msg);
+    if (o.roundBtn) o.roundBtn.hidden = s.finished;
+    if (s.finished) return;
+    box.querySelectorAll('.ck').forEach(c => dragToken(c, plate => give(+plate.dataset.j), () => give(-1)));
+    box.querySelectorAll('.plate').forEach(pl => { pl.setAttribute('role', 'button'); pl.setAttribute('tabindex', '0');
+      pl.setAttribute('aria-label', `أعطِ ${s.friends[+pl.dataset.j]} ${item.f[0]}`);
+      onTap(pl, () => give(+pl.dataset.j));
+      pl.onkeydown = e => { if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); give(+pl.dataset.j); } }; });
+  };
+  const finish = () => { s.finished = true; paint(null); o.onFinish(); };
+  const give = j => {
+    if (s.finished) return;
+    const left = n - given(), min = Math.min(...s.dealt);
+    if (left === 0) return;
+    const roundOpen = s.dealt.some(d => d > min);           // some friends already got one more in this round
+    if (!roundOpen && left < k){ finish(); return; }       // not enough for a whole round: the rest is the remainder
+    if (j < 0) j = s.dealt.indexOf(min);
+    if (s.dealt[j] > min){
+      SND.bad(); haptic('bad');
+      const el = box.querySelector(`.plate[data-j="${j}"]`); if (el){ el.classList.remove('no'); void el.offsetWidth; el.classList.add('no'); }
+      o.say(`${s.friends[j]} أخذ أكثر من غيره! أعطِ الأصدقاء الآخرين أولًا حتى يكون التوزيع <b>عادلًا</b>.`);
+      return;
+    }
+    s.dealt[j]++; SND.tick();
+    const nowLeft = n - given(), nowMin = Math.min(...s.dealt), even = s.dealt.every(d => d === nowMin);
+    if (nowLeft === 0 && even){ finish(); return; }
+    if (even && nowLeft < k){ paint(`مع كل صديق ${cnt(nowMin, item.f)}. بقي ${cnt(nowLeft, item.f)} فقط… هل تكفي لجولة كاملة على ${friendsTxt(k)}؟ اضغط على السلة أو على الزر لتعرف.`, j); return; }
+    paint(even ? `جولة كاملة ✓ مع كل صديق ${cnt(nowMin, item.f)}، وفي السلة ${cnt(nowLeft, item.f)}.` : `أحسنت، أكمل الجولة: أعطِ كل صديق ${item.f[0]} واحدة.`, j);
+  };
+  const round = () => {
+    if (s.finished) return;
+    const left = n - given(), min = Math.min(...s.dealt);
+    if (!s.dealt.some(d => d > min) && left < k){ finish(); return; }
+    s.dealt.forEach((d, j) => { if (d === min && n - given() > 0) s.dealt[j]++; });
+    SND.tick();
+    const nowLeft = n - given(), nowMin = Math.min(...s.dealt);
+    if (nowLeft === 0){ finish(); return; }
+    if (nowLeft < k){ paint(`مع كل صديق ${cnt(nowMin, item.f)}. بقي ${cnt(nowLeft, item.f)} فقط، ولا تكفي لجولة كاملة. اضغط على الزر مرة أخرى.`); return; }
+    paint(`جولة كاملة ✓ مع كل صديق ${cnt(nowMin, item.f)}، وفي السلة ${cnt(nowLeft, item.f)}.`);
+  };
+  // tapping the empty part of the basket also deals to the next friend (treat taps are handled by dragToken)
+  box.addEventListener('click', e => { if (!s.finished && e.target.closest('.pile') && !e.target.closest('.ck') && e.target.isConnected) give(-1); });
+  if (o.roundBtn) onTap(o.roundBtn, round);
+  paint(null);
+  if (s.finished) o.onFinish();
+}
+function learnShare(lv){
+  const rem = lv.kind === 'rem';
+  if (!learnCtx.s){ const g = learnCtx.n ? {n:learnCtx.n, k:learnCtx.k} : genDiv(lv); learnCtx.s = newShare(g.n, g.k); }
+  const s = learnCtx.s, {n, k, item} = s, q = Math.floor(n / k), r = n % k;
+  $('learnBody').innerHTML = `
+    <p class="lesson">${rem ? 'أحيانًا لا تكفي الأشياء لجولة كاملة، فيبقى شيء في السلة. نسمّيه <b>الباقي</b>.' : '<b>القسمة توزيع بالتساوي:</b> نعطي كل صديق العدد نفسه، جولة بعد جولة.'}</p>
+    <p class="qtext">وزّع ${cnt(n, item.f, true)} على ${friendsTxt(k)} بالتساوي</p>
+    <div id="shareBox"></div>
+    <div class="row" style="margin:6px 0"><button class="btn small" id="roundBtn">🤲 وزّع جولة كاملة</button></div>
+    <div class="step-msg" id="shareMsg" aria-live="polite">اضغط على ${item.e} في السلة لتذهب إلى الصديق التالي، أو اضغط على طبق صديق، أو اسحبها إليه.</div>
+    <div id="shareDone" hidden></div>
+    <div class="row" style="margin-top:6px"><button class="link" id="newEx">🔄 مثال جديد</button></div>
+    <div class="learn-foot">${startPracticeBtn()}</div>`;
+  mountShare($('shareBox'), s, {roundBtn: $('roundBtn'), say: h => { $('shareMsg').innerHTML = h; },
+    onFinish: () => {
+      SND.win(); haptic('ok');
+      $('shareMsg').innerHTML = rem ? `🎉 كل صديق أخذ ${cnt(q, item.f, true)}، وبقي ${cnt(r, item.f)} لا تكفي لجولة أخرى: هذا هو <b class="t-r">الباقي</b>. الباقي دائمًا أصغر من عدد الأصدقاء (${ar(k)}).`
+                                    : `🎉 فرغت السلة! كل صديق أخذ ${cnt(q, item.f, true)}. هذا معنى القسمة: ${ar(n)} ÷ ${ar(k)} = ${ar(q)}.`;
+      $('shareDone').hidden = false;
+      $('shareDone').innerHTML = `${divEq(n, k, q, r)}${termsHtml(n, k, q, r)}<p class="sentence">تحقّق بالضرب: ${ar(k)} × ${ar(q)}${r ? ` + ${ar(r)}` : ''} = ${ar(n)} ✓</p>`;
+    }});
+  speakText = `${n} تقسيم ${k} يساوي ${q}${r ? ' والباقي ' + r : ''}`;
+  $('newEx').onclick = () => { learnCtx.s = null; learnCtx.n = null; learnShare(lv); };
+  bindPractice();
+}
+function learnFact(lv){
+  if (!lv.set.includes(learnCtx.k)) learnCtx.k = lv.set[0];
+  if (!learnCtx.q) learnCtx.q = 4;
+  const k = learnCtx.k, q = learnCtx.q, n = k * q;
+  $('learnBody').innerHTML = `
+    <p class="lesson"><b>القسمة عكس الضرب.</b> لتحلّ <span class="m">${ar(n)} ÷ ${ar(k)}</span> اسأل نفسك: <span class="m">${ar(k)} × كم = ${ar(n)}؟</span></p>
+    <div class="divsel" role="group" aria-label="اختر المقسوم عليه">${lv.set.map(d => `<button class="${d === k ? 'on' : ''}" data-d="${d}">÷ ${ar(d)}</button>`).join('')}</div>
+    <div class="learn-eq"><button class="arrow" id="prevBtn" aria-label="السابق">→</button>
+      ${divEq(n, k, q)}
+      <button class="arrow" id="nextBtn" aria-label="التالي">←</button></div>
+    ${termsHtml(n, k, q)}
+    <div class="scene" id="learnScene"></div>
+    <p class="sentence">${ar(n)} مقسومة إلى مجموعات، في كل مجموعة ${ar(k)}، تعطي ${q === 1 ? 'مجموعة واحدة' : q === 2 ? 'مجموعتين' : ar(q) + (q <= 10 ? ' مجموعات' : ' مجموعة')}</p>
+    ${familyHtml(k, q)}
+    <div class="row" style="margin:10px 0 6px"><button class="link" id="countBtn">👆 عُدّ معي</button><button class="link" id="tipBtn" aria-expanded="${!!learnCtx.tip}">💡 حيلة</button></div>
+    <div class="tip" ${learnCtx.tip ? '' : 'hidden'} id="tipBox"><p>${DIV_TIPS[k]}</p></div>
+    <p class="skip-label">أعداد تُقسم على ${ar(k)} بلا باقٍ</p>
+    <div class="skip" id="skipRow">${[...Array(10)].map((_, j) => `<button class="${j + 1 === q ? 'on' : ''}" data-q="${j + 1}" aria-label="${ar(k * (j + 1))} ÷ ${ar(k)} = ${ar(j + 1)}">${ar(k * (j + 1))}</button>`).join('')}</div>
+    <div class="learn-foot">${startPracticeBtn()}</div>`;
+  renderScene($('learnScene'), q, k);
+  speakText = `${n} تقسيم ${k} يساوي ${q}`;
+  $('prevBtn').disabled = q === 1; $('nextBtn').disabled = q === 10;
+  $('prevBtn').onclick = () => { learnCtx.q = q - 1; learnFact(lv); };
+  $('nextBtn').onclick = () => { learnCtx.q = q + 1; learnFact(lv); };
+  $('skipRow').querySelectorAll('button').forEach(b => b.onclick = () => { learnCtx.q = +b.dataset.q; learnFact(lv); });
+  document.querySelectorAll('.divsel button').forEach(b => b.onclick = () => { learnCtx.k = +b.dataset.d; learnFact(lv); });
+  $('countBtn').onclick = () => countAlong($('learnScene'));
+  $('tipBtn').onclick = () => { learnCtx.tip = !learnCtx.tip; $('tipBox').hidden = !learnCtx.tip; $('tipBtn').setAttribute('aria-expanded', learnCtx.tip); };
+  bindPractice();
+}
+function learnLong(lv){
+  if (!learnCtx.n || !learnCtx.k){ const g = genDiv(lv); learnCtx.n = g.n; learnCtx.k = g.k; }
+  if (learnCtx.step == null) learnCtx.step = 0;
+  const n = learnCtx.n, k = learnCtx.k, S = longSteps(n, k), s = learnCtx.step, q = Math.floor(n / k);
+  const solved = learnCtx.shown;                 // the current step has been answered and written down
+  const done = solved ? s + 1 : s, last = s === S.length - 1;
+  $('learnBody').innerHTML = `
+    <p class="lesson">في القسمة الطويلة نكرّر أربع خطوات لكل رقم: <b>اقسم، اضرب، اطرح، أنزل</b>. نبدأ من اليسار، من أكبر منزلة.</p>
+    ${termsHtml(n, k, solved && last ? q : null)}
+    ${ldChips(solved ? (last ? [1, 2] : [1, 2, 3]) : [0])}
+    ${ldHtml(n, k, done, solved ? (last ? -1 : s + 1) : s)}
+    ${multiplesHtml(k, solved ? -1 : S[s].cur, solved ? S[s].qd : -1)}
+    <div class="step-msg" id="learnMsg" aria-live="polite">${solved ? ldSay(n, k, S, s) + (last ? `<br><span class="m">${ar(n)} ÷ ${ar(k)} = <b class="t-q">${ar(q)}</b></span>. تحقّق: <span class="m">${ar(q)} × ${ar(k)} = ${ar(n)} ✓</span>` : '') : ldAsk(n, k, S, s)}</div>
+    ${solved ? (last ? '' : `<div class="row"><button class="btn small" id="nextStep">الخطوة التالية ⬅</button></div>`) : miniPad() + `<div class="row"><button class="link" id="showAns">أرني الخطوة</button></div>`}
+    <div class="row" style="margin-top:6px"><button class="link" id="newEx">🔄 مثال جديد</button></div>
+    <div class="learn-foot">${startPracticeBtn()}</div>`;
+  if (!solved){
+    const st = S[s];
+    learnKey = d => {
+      const v = +d;
+      if (v === st.qd){ SND.ok(); haptic('ok'); learnCtx.shown = true; learnKey = null; learnLong(lv); return; }
+      SND.bad(); haptic('bad');
+      $('learnMsg').innerHTML = v * k > st.cur
+        ? `<span class="m">${ar(v)} × ${ar(k)} = ${ar(v * k)}</span>، وهذا أكبر من ${ar(st.cur)}. جرّب عددًا أصغر.`
+        : `<span class="m">${ar(v)} × ${ar(k)} = ${ar(v * k)}</span>، ويبقى ${ar(st.cur - v * k)} وهو يكفي لمرة أخرى. جرّب عددًا أكبر.`;
+    };
+    $('miniPad').querySelectorAll('button').forEach(b => b.onclick = () => learnKey && learnKey(b.dataset.k));
+    $('showAns').onclick = () => { learnCtx.shown = true; learnKey = null; learnLong(lv); };
+  } else {
+    learnKey = null;
+    if (last) SND.win();
+    else $('nextStep').onclick = () => { learnCtx.step = s + 1; learnCtx.shown = false; learnLong(lv); };
+  }
+  speakText = solved ? ldSay(n, k, S, s).replace(/<[^>]+>/g, '') : ldAsk(n, k, S, s).replace(/<[^>]+>/g, '');
+  $('newEx').onclick = () => { learnCtx.n = null; learnCtx.step = 0; learnCtx.shown = false; learnLong(lv); };
+  bindPractice();
 }
 
 /* =====================================================================
@@ -1801,6 +2393,7 @@ function weightedDeck(facts){ return shuffle(facts.slice()).map(f => [f, weaknes
 
 function startQuizFor(w, i, mode){
   const lv = WORLDS[w].levels[i], cfg = levelCfg(w, i);
+  R().last = {w, i};
   let gen;
   gen = levelGen(w, i, mode);
   startQuiz({w, i, mode, gen, title:lv.title, total:10, ...cfg, raceTime: (cfg.goal / 15) * 4.5 * levelTF(w, lv)}, mode === 'challenge');
@@ -1814,6 +2407,7 @@ function levelGen(w, i, mode){
   }
   if (w === 'add' || w === 'sub') return () => arithQ(w === 'add' ? '+' : '-', lv.d, w, i);
   if (w === 'place') return () => placeQ(lv.d);
+  if (w === 'div') return () => divQ(lv, mode, w, i);
   return () => roundQ(lv.k);
 }
 const bossHP = w => w === 'mult' ? 14 : 12;
@@ -1833,7 +2427,8 @@ function startDaily(){
   const gens = [];
   WORLD_ORDER.forEach(w => WORLDS[w].levels.forEach((lv, j) => { if (!lv.boss && unlocked(w, j)) gens.push([w, levelGen(w, j, 'challenge')]); }));
   const byWorld = WORLD_ORDER.map(w => gens.filter(g => g[0] === w)).filter(a => a.length);
-  const plan = shuffle([...Array(5)].map((_, n) => pick(byWorld[n % byWorld.length])[1]));
+  const worlds = shuffle(byWorld.slice());                      // a different set of worlds each day, round robin
+  const plan = shuffle([...Array(5)].map((_, n) => pick(worlds[n % worlds.length])[1]));
   startQuiz({w:'mult', i:-1, mode:'daily', home:'worlds', title:'تحدي اليوم', total:5, gen: () => plan.shift()()});
 }
 function startReview(){
@@ -1845,14 +2440,16 @@ function startReview(){
   startQuiz({w:'mult', i:-1, mode:'review', title:'مراجعة ذكية', total:10, gen: () => { const [a, b] = deck.shift(); return multQ(a, b, 'review'); }});
 }
 function startQuiz(cfg, countdown){
-  Q = Object.assign({asked:0, correct:0, wrong:0, energy:0, times:[], combo:0, zaps:0, typed:'', busy:true, hinted:false, missed:0, retry:[], raceAcc:0, rivalDone:false, woolStart:R().wool}, cfg);
+  Q = Object.assign({asked:0, correct:0, wrong:0, energy:0, times:[], combo:0, zaps:0, typed:'', busy:true, hinted:false, missed:0, retry:[], raceAcc:0, rivalDone:false, woolStart:R().wool, q:null}, cfg);
+  $('wrongBox').hidden = true; $('qPrompt').innerHTML = ''; $('qVisual').hidden = true; $('qVisual').innerHTML = ''; $('qText').hidden = true;
+  $('choices').hidden = true; $('choices').innerHTML = ''; $('hintMsg').hidden = true;
   show('quiz');
   const race = cfg.mode === 'challenge', boss = cfg.mode === 'boss';
   $('runner').textContent = kid().avatar;                       // you…
   $('rival').innerHTML = soufiHtml();                            // …against Soufi
   $('runner').hidden = $('barn').hidden = !race;
   $('rival').hidden = !race;
-  $('rival').style.insetInlineStart = '0%';
+  $('rival').style.insetInlineStart = '0%'; $('rival').classList.remove('home'); $('raceMsg').hidden = true;
   $('hudBar').classList.toggle('boss', boss);
   $('bossTop').hidden = !boss;
   $('buddyS').innerHTML = soufiHtml();
@@ -1883,10 +2480,10 @@ function updateHud(){
   let pct;
   if (Q.mode === 'boss'){
     pct = Math.max(0, Q.hp / Q.hpMax * 100);
-    $('qcount').innerHTML = `<span class="hearts" aria-label="${ar(Q.lives)} قلوب">${'❤️'.repeat(Q.lives)}${'🤍'.repeat(3 - Q.lives)}</span>`;
+    $('qcount').innerHTML = `<span class="hearts" aria-label="${countN(Q.lives, ['قلب واحد', 'قلبان', 'قلوب', 'قلبًا'])}">${'❤️'.repeat(Q.lives)}${'🤍'.repeat(3 - Q.lives)}</span>`;
   } else if (Q.mode === 'challenge'){
     pct = Math.min(100, Q.energy / Q.goal * 100);
-    $('runner').style.insetInlineStart = `calc(${pct * .9}%)`;
+    $('runner').style.insetInlineStart = `calc((100% - 1.4em) * ${pct / 100})`;   // the flag is at 100%
     $('qcount').textContent = `${ar(Q.asked)} من ${ar(Q.maxQ)}`;
   } else { pct = Q.asked / Q.total * 100; $('qcount').textContent = `${ar(Math.min(Q.asked + 1, Q.total))} من ${ar(Q.total)}`; }
   $('energyFill').style.width = pct + '%';
@@ -1898,12 +2495,14 @@ function nextQuestion(){
   else if (Q.asked >= Q.total) return finish();
   const due = Q.retry.findIndex(r => r.at <= Q.asked);
   const q = Q.q = due >= 0 ? Q.retry.splice(due, 1)[0].q : Q.gen();
+  q.pickedAt = 0; q.refused = false;
   Q.typed = ''; Q.busy = false; Q.hinted = false;
   $('qPrompt').innerHTML = q.view();
   $('qVisual').hidden = true; $('qVisual').innerHTML = ''; $('qText').hidden = true;
   $('wrongBox').hidden = true;
   $('hintBtn').hidden = !q.hint; $('hintBtn').classList.remove('hint-on');
   $('hintMsg').hidden = true; $('hintMsg').innerHTML = '';
+  $('choices').className = 'choices'; $('choices').innerHTML = ''; clearBalloons();   // clear balloons left from the last question
   $('choices').hidden = q.input !== 'choices';
   $('pad').hidden = q.input === 'choices' || q.input === 'drag';
   $('quizCard').classList.toggle('split', q.input === 'pad' || q.input === 'column');
@@ -1930,11 +2529,14 @@ function tickTimer(){
     if (!Q || Q.busy) return;
     const t = (performance.now() - Q.t0) / 1000 / tf;
     fg.style.strokeDashoffset = C * Math.min(1, t / 8);
-    fg.style.stroke = t <= 3 ? 'var(--accent)' : t <= 8 ? 'var(--sun)' : 'var(--bad)';
+    fg.style.stroke = t <= 3 ? 'var(--accent)' : 'var(--sun)';   // no red: a red countdown adds stress, not learning
     if (Q.mode === 'challenge' && Q.raceTime){
       const pr = Math.min(1, (Q.raceAcc + (performance.now() - Q.t0) / 1000) / Q.raceTime);
-      $('rival').style.insetInlineStart = `calc(${pr * 90}%)`;
-      if (pr >= 1 && !Q.rivalDone){ Q.rivalDone = true; buddySay('sad', 'وصلتُ قبلك! أسرِع 😜'); }
+      $('rival').style.insetInlineStart = `calc((100% - 1.45em) * ${pr})`;      // Soufi stops right on the flag
+      if (pr >= 1 && !Q.rivalDone){ Q.rivalDone = true; $('rival').classList.add('home');
+        buddySay('happy', 'وصلتُ! 🏁');
+        $('raceMsg').innerHTML = `${soufiHtml()}<span>وصلت صوفي إلى خط النهاية 🏁 أن تصل متأخرًا خيرٌ من ألّا تصل أبدًا، أكمل، نحن بانتظارك! 💚</span>`;
+        $('raceMsg').hidden = false; }
     }
     rafId = requestAnimationFrame(loop);
   };
@@ -1994,7 +2596,7 @@ addEventListener('keydown', e => {
   if (!$('wrongBox').hidden && (e.key === 'Enter' || e.key === ' ')){ e.preventDefault(); $('wrongNext').click(); return; }
   if (!Q.q) return;
   if (Q.q.input === 'drag'){ if (!Q.busy && Q.q.goat && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')){ e.preventDefault(); Q.q.goat.pick(e.key === 'ArrowLeft' ? Q.q.goat.hi : Q.q.goat.lo); } else if (e.key === 'h' || e.key === '?') useHint(); return; }
-  if (Q.q.input === 'choices'){ if (/^[1-4]$/.test(e.key)) $('choices').children[+e.key - 1]?.click(); else if (e.key === 'h' || e.key === '?') useHint(); return; }
+  if (Q.q.input === 'choices'){ if (/^[1-4]$/.test(e.key)) (Q.q.balloon ? balloonLayer() : $('choices')).children[+e.key - 1]?.click(); else if (e.key === 'h' || e.key === '?') useHint(); return; }
   if ((e.key === 'Enter' || e.key === ' ') && e.target.classList && e.target.classList.contains('cbox')){ e.preventDefault(); e.target.click(); return; }
   let d = e.key; const i = AR.indexOf(d); if (i >= 0) d = String(i);
   if (/^\d$/.test(d)) padKey(d);
@@ -2035,7 +2637,10 @@ function dragToken(el, onDrop, onTap){
     const up = ev => {
       document.removeEventListener('pointermove', mv); document.removeEventListener('pointerup', up); document.removeEventListener('pointercancel', up);
       over && over.classList.remove('over'); ghost && ghost.remove();
-      if (moved){ const t = dropAt(ev.clientX, ev.clientY); if (t) onDrop(t); } else if (onTap) onTap();
+      // act after the touch has fully ended: redrawing (and removing) the touched element mid-gesture
+      // makes some phones swallow the next tap
+      const t = moved ? dropAt(ev.clientX, ev.clientY) : null;
+      setTimeout(() => { if (moved){ if (t) onDrop(t); } else if (onTap) onTap(); }, 0);
     };
     document.addEventListener('pointermove', mv); document.addEventListener('pointerup', up); document.addEventListener('pointercancel', up);
   });
@@ -2049,24 +2654,40 @@ function genericChoices(ans){
   return shuffle([...set]).map(v => ({v, html:ar(v)}));
 }
 const balloonable = q => (q.input === 'choices' && !q.wide) || (q.input === 'pad' && q.answer < 1000);
+/* Balloons float slowly up the whole screen (not a small box), so they are easy to catch. */
+function balloonLayer(){
+  let l = $('balloonLayer');
+  if (!l){ l = document.createElement('div'); l.id = 'balloonLayer'; l.className = 'balloon-layer'; l.hidden = true; document.body.appendChild(l); }
+  return l;
+}
+function clearBalloons(){ const l = $('balloonLayer'); if (l){ l.innerHTML = ''; l.className = 'balloon-layer'; l.hidden = true; } }
 function renderBalloons(q){
   if (!q.choices) q.choices = genericChoices(q.answer);
   q.input = 'choices'; q.balloon = true;
-  const box = $('choices'); box.hidden = false; box.className = 'choices balloons';
-  const lefts = shuffle([4, 28, 52, 76]), colors = shuffle(['#E8505B', '#F2A93B', '#3E9B4F', '#2B7BD6', '#8A4FC2']);
-  box.innerHTML = q.choices.map((c, i) => { const dur = 6.5 + Math.random() * 2;
-    return `<button class="balloon" data-v="${c.v}" style="left:${lefts[i]}%;background:${colors[i]};--dur:${dur.toFixed(1)}s;--delay:-${(Math.random() * dur * .6).toFixed(1)}s">${c.html}</button>`; }).join('');
-  box.querySelectorAll('button').forEach(btn => btn.onclick = () => { btn.classList.add('picked'); box.classList.add('stopped'); answer(+btn.dataset.v, btn); });
+  $('choices').hidden = true; $('choices').innerHTML = '';
+  const box = balloonLayer(); box.hidden = false; box.className = 'balloon-layer';
+  const lanes = shuffle([2, 26.5, 51, 75.5]), colors = shuffle(['#E8505B', '#F2A93B', '#3E9B4F', '#2B7BD6', '#8A4FC2']);
+  const starts = shuffle([.24, .4, .56, .72]);                    // all four start on screen, at different heights
+  box.innerHTML = q.choices.map((c, i) => { const dur = 19 + Math.random() * 4;
+    return `<button class="balloon" data-v="${c.v}" aria-label="${c.html}" style="left:calc(${lanes[i]}% + (25% - min(19vw, 108px)) / 2 - 1%);background:${colors[i]};--dur:${dur.toFixed(1)}s;--delay:-${(starts[i] * dur).toFixed(1)}s;--still:${(18 + i * 17)}vh">${c.html}</button>`; }).join('');
+  box.querySelectorAll('button').forEach(btn => onTap(btn, () => {
+    if (!Q || Q.busy || Q.q !== q) return;
+    btn.classList.add('picked'); box.classList.add('stopped');
+    const ok = +btn.dataset.v === q.answer;
+    answer(+btn.dataset.v, btn);
+    setTimeout(() => { if (box.querySelector('.picked') === btn) clearBalloons(); }, ok ? 650 : 1100);
+  }));
   qtext('🎈 فرقع البالون الذي يحمل الجواب!');
 }
-const CHEERS = ['أحسنت!', 'رائع!', 'ممتاز!', 'برافو!', 'شاطر!', 'هذا هو!'];
-const COMFORT = ['لا بأس، جرّب!', 'كدت تصيب!', 'نتعلّم من الخطأ', 'انظر إلى الشرح'];
+const CHEERS = ['أحسنت!', 'تفكير ذكي!', 'تركيزك رائع!', 'تمرينك يثمر!', 'برافو!', 'هذا هو!'];   // praise effort and strategy, not "being clever"
+const COMFORT = ['الخطأ يعلّمنا', 'كدت تصيب!', 'لنفهمها معًا', 'دماغك يتمرّن 💪'];
 let buddyT = 0, bossT = 0;
-function buddySay(mood, text){
+function buddySay(mood, text, ms = 1600){
   const b = $('buddy'); if (!b) return;
+  if (ms <= 1600 && $('buddySay').classList.contains('long')) return;   // let the finish-line message be read
   b.className = 'buddy'; void b.offsetWidth; b.className = 'buddy ' + mood;
-  $('buddySay').textContent = text; $('buddySay').classList.add('on');
-  clearTimeout(buddyT); buddyT = setTimeout(() => $('buddySay').classList.remove('on'), 1600);
+  $('buddySay').textContent = text; $('buddySay').classList.add('on'); $('buddySay').classList.toggle('long', ms > 1600);
+  clearTimeout(buddyT); buddyT = setTimeout(() => $('buddySay').classList.remove('on', 'long'), ms);
 }
 function wolfSay(mood, text){
   const b = $('bossTop'); b.classList.remove('hit', 'laugh'); void b.offsetWidth; b.classList.add(mood);
@@ -2074,10 +2695,10 @@ function wolfSay(mood, text){
   clearTimeout(bossT); bossT = setTimeout(() => $('bossSay').classList.remove('on'), 1400);
 }
 function answer(v, btn){
-  if (Q.busy) return;
+  if (!Q || Q.busy) return;
   Q.busy = true; cancelAnimationFrame(rafId);
   $('hintBtn').hidden = true;
-  const q = Q.q, ok = v === q.answer, t = (performance.now() - Q.t0) / 1000, tf = q.tf || 1;
+  const q = Q.q, ok = v === q.answer, t = ((q.pickedAt || performance.now()) - Q.t0) / 1000, tf = q.tf || 1;
   Q.asked++; Q.raceAcc += t;
   q.record && q.record(ok, Q.hinted ? 9 : t / tf);
   if (ok && q.refused){ // practice: right on the second try
@@ -2115,7 +2736,7 @@ function answer(v, btn){
     SND.bad(); haptic('bad');
     buddySay('sad', pick(COMFORT));
     if (Q.mode === 'boss'){ Q.lives = Math.max(0, Q.lives - 1); wolfSay('laugh', 'هاها! 😏'); }
-    if (btn){ btn.classList.add('bad'); $('choices').querySelector(`[data-v="${q.answer}"]`)?.classList.add('ok'); }
+    if (btn){ btn.classList.add('bad'); (btn.parentElement || $('choices')).querySelector(`[data-v="${q.answer}"]`)?.classList.add('ok'); }
     markAnswer(false);
     if (Q.mode === 'challenge') Q.energy = Math.max(0, Q.energy - WRONG_PENALTY);
     if (Q.mode !== 'review' && Q.mode !== 'daily') Q.retry.push({q, at:Q.asked + 2});
@@ -2142,10 +2763,36 @@ function grantStars(w, i, newStars){
   return items;
 }
 function rewardsHtml(q, items, extra = ''){
-  const wool = R().wool - q.woolStart;
+  const wool = R().wool - q.woolStart, o = nextOutfit();
   if (!wool && !items.length && !extra) return '';
-  return `<div class="rewards">${items.length ? `<span class="big">🎁 ${items.map(x => x.e).join(' ')}</span><span>${items.length === 1 ? `${items[0].n} جديدة في مزرعتك!` : `${ar(items.length)} أصدقاء جدد في مزرعتك!`}</span>` : ''}
-    ${extra}${wool ? `<span>🧶 ${sgn(wool)} صوف</span>` : ''}</div>`;
+  const goal = !wool || !o ? '' : R().wool >= o.price ? `<span class="goal-line">🎉 صوفك يكفي الآن لـ«${o.n}»! اذهب إلى خزانة صوفي.</span>`
+    : `<span class="goal-line">🎯 باقي ${ar(o.price - R().wool)} 🧶 لـ«${o.n}»</span>`;
+  return `<div class="rewards">${items.length ? `<span class="big">🎁 ${items.map(x => x.e).join(' ')}</span><span>${items.length === 1 ? `انضمّ إلى مزرعتك: ${items[0].n}!` : `${ar(items.length)} أصدقاء جدد في مزرعتك!`}</span>` : ''}
+    ${extra}${wool ? `<span>🧶 ${sgn(wool)} صوف</span>` : ''}${goal}</div>`;
+}
+/* the cheapest outfit Soufi does not have yet: a goal the child can see getting closer */
+function nextOutfit(){ const p = R(); return OUTFITS.filter(o => !p.owned.includes(o.id)).sort((a, b) => a.price - b.price)[0] || null; }
+/* a surprise box after every third finished session: the effort is fixed, only the gift varies */
+const RARE = [['🦄','حصان وحيد القرن'], ['🦩','فلامنغو'], ['🦒','زرافة'], ['🐼','باندا'], ['🦓','حمار وحشي'], ['🌈','قوس قزح']];
+function countSession(){ const p = R(); p.sessions = (p.sessions || 0) + 1; if (p.sessions % 3 === 0) p.giftReady = true; }
+const giftBtnHtml = () => R().giftReady ? `<button class="gift" data-gift>🎁 <b>صندوق مفاجآت!</b> <small>اضغط لتفتحه</small></button>` : '';
+function bindGift(root, after){
+  root.querySelectorAll('[data-gift]').forEach(b => onTap(b, () => {
+    const p = R(); if (!p.giftReady) return; p.giftReady = false;
+    let txt;
+    if (Math.random() < .4){ const it = addFarmItem(pick(RARE)); txt = `صديق نادر في مزرعتك: ${it.e} ${it.n}!`; }
+    else { const n = rnd(5, 15); p.wool += n; txt = `🧶 ${sgn(n)} صوف هدية!`; }
+    save(); SND.win(); haptic('ok');
+    b.outerHTML = `<div class="gift open">🎁 ${txt}</div>`;
+    after && after();
+  }));
+}
+/* gentle break reminder: every 20 minutes of play, once */
+let playStart = Date.now();
+function breakHtml(){
+  if (Date.now() - playStart < 20 * 60 * 1000) return '';
+  playStart = Date.now();
+  return `<p class="break-tip">👀 لعبت أكثر من ٢٠ دقيقة رائعة! أرِح عينيك قليلًا: انظر إلى شيء بعيد، واشرب ماءً، ثم عُد إلينا.</p>`;
 }
 function finish(){
   cancelAnimationFrame(rafId);
@@ -2155,7 +2802,7 @@ function finish(){
   const W = WORLDS[q.w], lv = W.levels[q.i];
   const avg = q.times.length ? q.times.reduce((x, y) => x + y, 0) / q.times.length : 0;
   const sec = s => ar(s.toFixed(1)).replace('.', '٫') + ' ث';
-  let html = '', win = true, earned = 0, items = [], raceLine = '';
+  let html = '', win = true, earned = 0, items = [], raceLine = '', bestLine = '';
   const actions = [];
   if (q.mode === 'challenge'){
     win = q.energy >= q.goal;
@@ -2163,16 +2810,18 @@ function finish(){
       earned = q.asked <= q.s3 && q.wrong === 0 ? 3 : q.asked <= q.s2 ? 2 : 1;
       const B = P().best[q.w] || (P().best[q.w] = {});
       items = grantStars(q.w, q.i, earned);
-      if (!B[q.i] || q.asked < B[q.i].q) B[q.i] = {q:q.asked, avg:+avg.toFixed(1)};
+      const prev = B[q.i];
+      if (prev && (q.asked < prev.q || (q.asked === prev.q && avg < prev.avg - .05))) bestLine = '<span>🚀 أفضل من محاولتك السابقة! أنت تتحسّن.</span>';
+      if (!prev || q.asked < prev.q || (q.asked === prev.q && avg < prev.avg)) B[q.i] = {q:q.asked, avg:+avg.toFixed(1)};
       if (!q.rivalDone){ R().wool += 5; raceLine = '<span>🏆 سبقتَ صوفي إلى خط النهاية!</span>'; }
-      else raceLine = '<span>🐑 سبقتك صوفي هذه المرة، أسرِع أكثر!</span>';
+      else raceLine = '<span>🐑 وصلت صوفي أولًا، ووصلتَ أنت أيضًا! أن تصل متأخرًا خيرٌ من ألّا تصل أبدًا 💚</span>';
     }
     const msgs = {3:'وصلت إلى خط النهاية بسرعة الصاعقة.', 2:'أجب أسرع قليلًا لتنال النجمة الثالثة.', 1:'كلما تدرّبت صرت أسرع ووصلت بأسئلة أقل.'};
     html += `<div class="r-emoji">${win ? '🏁' : W.runner}</div><h2>${win ? 'أحسنت يا ' + esc(kid().name) + '! تجاوزت «' + lv.title + '»' : 'اقتربت كثيرًا!'}</h2>`;
     if (win) html += `<div class="bigstars" aria-label="${ar(earned)} من ٣ نجوم">${[1, 2, 3].map(s => `<span class="${s <= earned ? 'on' : ''}" style="animation-delay:${s * 160}ms">★</span>`).join('')}</div>`;
-    html += `<p>${win ? msgs[earned] : 'انتهت الأسئلة قبل أن يمتلئ الشريط. راجع الشرح ثم حاول مجددًا.'}</p>`;
-    html += `<div class="r-stats">${ar(q.asked)} <span>أسئلة</span> · ${q.times.length ? sec(avg) : '—'} <span>متوسط الإجابة</span>${q.wrong ? ` · ${ar(q.wrong)} <span>أخطاء</span>` : ''}</div>`;
-    html += rewardsHtml(q, items, raceLine);
+    html += `<p>${win ? msgs[earned] : 'انتهت الأسئلة قبل أن يمتلئ الشريط. كل محاولة تقوّي دماغك: راجع الشرح ثم حاول مجددًا.'}</p>`;
+    html += `<div class="r-stats">${countN(q.asked, ['سؤال واحد', 'سؤالان', 'أسئلة', 'سؤالًا'])} · ${q.times.length ? sec(avg) : '—'} <span>متوسط الإجابة</span>${q.wrong ? ` · ${countN(q.wrong, ['خطأ واحد', 'خطآن', 'أخطاء', 'خطأً'])}` : ''}</div>`;
+    html += rewardsHtml(q, items, bestLine + raceLine);
     if (win && q.i < W.levels.length - 1 && unlocked(q.w, q.i + 1)) actions.push(['next', W.levels[q.i + 1].boss ? 'واجه الذئب 🐺' : 'المستوى التالي', true]);
     else if (!win) actions.push(['learn', 'راجع الشرح', true]);
     actions.push(['retry', win && earned < 3 ? 'حاول لـ ٣ نجوم' : 'أعد المحاولة', !actions.length]);
@@ -2187,9 +2836,11 @@ function finish(){
   }
   if (items.length) actions.push(['farm', '🏡 اذهب إلى مزرعتي']);
   actions.push(['map', 'العودة إلى الطريق']);
+  countSession();
+  html += giftBtnHtml() + breakHtml();
   html += `<div class="r-actions">${actions.map(([r, label, primary]) => `<button class="${primary ? 'btn block' : 'link'}" data-r="${r}">${label}</button>`).join('')}</div>`;
   save();
-  const box = $('result'); box.innerHTML = html;
+  const box = $('result'); box.innerHTML = html; bindGift(box);
   curWorld = q.w;
   show('result');
   if (win && (q.mode === 'challenge' || q.correct === q.total)){ SND.win(); confetti(q.w); }
@@ -2204,8 +2855,10 @@ function finish(){
   });
 }
 function showResult(html, q, onAction, celebrate){
+  countSession();
+  html = html.replace('<div class="r-actions">', giftBtnHtml() + breakHtml() + '<div class="r-actions">');
   save();
-  const box = $('result'); box.innerHTML = html;
+  const box = $('result'); box.innerHTML = html; bindGift(box);
   show('result');
   if (celebrate){ SND.win(); confetti(q.w); }
   box.querySelectorAll('[data-r]').forEach(b => b.onclick = () => onAction(b.dataset.r));
@@ -2221,9 +2874,9 @@ function finishBoss(q){
     items = grantStars(q.w, q.i, earned);
     if (firstWin){ R().bossWins[q.w] = true; items.push(addFarmItem(['🏆', 'كأس الفوز على الذئب'])); R().wool += 30; extra = '<span>🏆 جائزة خاصة لهزيمة الذئب!</span>'; }
     html += `<div class="r-emoji">🐺💨</div><h2>هزمت الذئب المشاغب!</h2><div class="bigstars">${[1, 2, 3].map(s => `<span class="${s <= earned ? 'on' : ''}" style="animation-delay:${s * 160}ms">★</span>`).join('')}</div>
-      <p>هرب الذئب وهو يضحك، وعادت ${W.name} آمنة. ${earned < 3 ? 'حاول مرة أخرى بلا أخطاء لتنال ٣ نجوم.' : 'بلا خطأ واحد! أنت بطل.'}</p>`;
+      <p>هرب الذئب وهو يضحك، ${W.m ? 'وعاد' : 'وعادت'} ${W.name} ${W.m ? 'آمنًا' : 'آمنة'}. ${earned < 3 ? 'حاول مرة أخرى بلا أخطاء لتنال ٣ نجوم.' : 'بلا خطأ واحد! أنت بطل.'}</p>`;
   } else {
-    html += `<div class="r-emoji">🐺😏</div><h2>الذئب ما زال يضحك!</h2><p>بقيت له ${ar(q.hp)} نقطة قوة فقط. تدرّب قليلًا ثم عُد إليه، أنت قادر عليه!</p>`;
+    html += `<div class="r-emoji">🐺😏</div><h2>الذئب ما زال يضحك!</h2><p>بقيت له ${countN(q.hp, ['نقطة قوة واحدة', 'نقطتا قوة', 'نقاط قوة', 'نقطة قوة'])} فقط. تدرّب قليلًا ثم عُد إليه، أنت قادر عليه!</p>`;
   }
   html += rewardsHtml(q, items, extra);
   const actions = [['retry', win ? 'واجهه مرة أخرى' : 'حاول مجددًا', !items.length], ...(items.length ? [['farm', '🏡 اذهب إلى مزرعتي', true]] : []), ['map', 'العودة إلى الطريق']];
@@ -2231,13 +2884,14 @@ function finishBoss(q){
 }
 function finishDaily(q){
   const good = q.correct >= 3, already = dailyDoneToday();
-  let items = [], extra = '';
+  let items = [], extra = '', extraShield = '';
   if (good && !already){
-    const d = R().daily, t = todayStr();
-    d.streak = d.date === dayBefore(t) ? d.streak + 1 : 1; d.date = t;
+    const d = R().daily, t = todayStr(), st = streakInfo();
+    d.streak = st.alive ? d.streak + 1 : 1; d.date = t;
+    if (st.shield){ d.shield = t; extraShield = '<span>🛡️ درع السلسلة حمى سلسلتك من يوم الغياب!</span>'; }
     R().wool += 15;
     if (d.streak % 3 === 0) items.push(addFarmItem());
-    extra = `<span>🔥 سلسلة ${ar(d.streak)} ${d.streak === 1 ? 'يوم' : d.streak === 2 ? 'يومان' : d.streak <= 10 ? 'أيام' : 'يومًا'}${d.streak % 3 === 0 ? ' · هدية لمزرعتك!' : ' · كل ٣ أيام هدية لمزرعتك'}</span>`;
+    extra = extraShield + `<span>🔥 سلسلة ${ar(d.streak)} ${d.streak === 1 ? 'يوم' : d.streak === 2 ? 'يومان' : d.streak <= 10 ? 'أيام' : 'يومًا'}${d.streak % 3 === 0 ? ' · هدية لمزرعتك!' : ' · كل ٣ أيام هدية لمزرعتك'}</span>`;
   }
   const html = `<div class="r-emoji">${good ? '☀️' : '🌱'}</div><h2>${ar(q.correct)} من ${ar(q.total)} صحيحة</h2>
     <p>${good ? (already ? 'أحسنت! لقد أنجزت تحدي اليوم من قبل، عُد غدًا لتحدٍّ جديد.' : 'أنجزت تحدي اليوم! عُد غدًا لتطيل سلسلتك.') : 'تحتاج ٣ إجابات صحيحة على الأقل لإنجاز تحدي اليوم. حاول مجددًا!'}</p>
@@ -2273,13 +2927,15 @@ function renderFarm(){
     p.farm.forEach((it, idx) => {
       const el = document.createElement('span');
       el.className = 'item' + (it.t > fresh ? ' new' : ''); el.textContent = it.e;
-      el.style.left = it.x + '%'; el.style.top = it.y + '%';
-      el.setAttribute('role', 'img'); el.setAttribute('aria-label', (FARM_ITEMS.find(f => f[0] === it.e) || ['', 'كأس'])[1]);
+      // keep every animal fully inside the field (older saves could sit on the edge and look cut off)
+      const place = () => { it.x = Math.max(10, Math.min(90, it.x)); it.y = Math.max(47, Math.min(95, it.y));
+        el.style.left = it.x + '%'; el.style.top = it.y + '%'; el.style.zIndex = 10 + Math.round(it.y); };
+      place();
+      el.setAttribute('role', 'img'); el.setAttribute('aria-label', ([...FARM_ITEMS, ...RARE].find(f => f[0] === it.e) || ['', 'كأس'])[1]);
       el.addEventListener('pointerdown', e => {
         e.preventDefault(); el.setPointerCapture(e.pointerId); el.classList.add('held'); SND.tick();
         const move = ev => { const r = field.getBoundingClientRect();
-          it.x = Math.max(4, Math.min(96, (ev.clientX - r.left) / r.width * 100)); it.y = Math.max(36, Math.min(95, (ev.clientY - r.top) / r.height * 100));
-          el.style.left = it.x + '%'; el.style.top = it.y + '%'; };
+          it.x = (ev.clientX - r.left) / r.width * 100; it.y = (ev.clientY - r.top) / r.height * 100; place(); };
         const up = () => { el.classList.remove('held'); el.removeEventListener('pointermove', move); el.removeEventListener('pointerup', up); el.removeEventListener('pointercancel', up); save(); };
         el.addEventListener('pointermove', move); el.addEventListener('pointerup', up); el.addEventListener('pointercancel', up);
       });
@@ -2288,9 +2944,9 @@ function renderFarm(){
     $('farmNote').textContent = p.farm.length ? `في مزرعتك ${ar(p.farm.length)}. اسحب أي حيوان أو شجرة لترتّب مزرعتك كما تحب.` : 'العب وتعلّم لتجمع النجوم ⭐';
   } else {
     $('wearPreview').innerHTML = soufiHtml();
-    $('outfits').innerHTML = `<button class="outfit ${!p.wear ? 'on' : ''}" data-o=""><span class="o-e">🐑</span><b>بلا ملابس</b><small>${!p.wear ? 'تلبسها الآن' : 'اخلع الملابس'}</small></button>` +
+    $('outfits').innerHTML = `<button class="outfit ${!p.wear ? 'on' : ''}" data-o=""><span class="o-e">${soufiHtml('')}</span><b>بلا ملابس</b><small>${!p.wear ? 'تلبسها الآن' : 'اخلع الملابس'}</small></button>` +
       OUTFITS.map(o => { const own = p.owned.includes(o.id), on = p.wear === o.id, can = own || p.wool >= o.price;
-        return `<button class="outfit ${on ? 'on' : ''}" data-o="${o.id}" ${can ? '' : 'disabled'}><span class="o-e">${o.e}</span><b>${o.n}</b><small>${on ? 'تلبسها الآن ✓' : own ? 'البسها' : `🧶 ${ar(o.price)}${can ? ' · اشترِ' : ''}`}</small></button>`; }).join('');
+        return `<button class="outfit ${on ? 'on' : ''}" data-o="${o.id}" ${can ? '' : 'disabled'}><span class="o-e">${soufiHtml(o.id)}</span><b>${o.n}</b><small>${on ? 'تلبسها الآن ✓' : own ? 'البسها' : `🧶 ${ar(o.price)}${can ? ' · اشترِ' : ''}`}</small></button>`; }).join('');
     $('outfits').querySelectorAll('[data-o]').forEach(b => b.onclick = () => {
       const id = b.dataset.o, o = OUTFITS.find(x => x.id === id);
       if (o && !p.owned.includes(id)){ if (p.wool < o.price) return; p.wool -= o.price; p.owned.push(id); SND.win(); }

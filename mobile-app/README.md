@@ -11,7 +11,7 @@ The Arabic maths game from `../multiplication-game/index.html`, packaged as a na
   - Splash screen.
   - Status bar that follows light and dark mode.
   - The question timer pauses while the app is in the background.
-  - A parental gate in front of the parent page.
+  - A parental gate in front of the parent page: a 4-digit PIN the parent chooses, asked every time.
 
 ```
 mobile-app/

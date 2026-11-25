@@ -14,7 +14,7 @@ These answers match how the app is built today: offline, no network permission o
   - No third-party analytics or advertising.
   - No external links.
   - No purchases.
-  - The parent page sits behind a **parental gate**: the parent types the last 4 digits of their phone number. The device remembers it after the first time; the parent can lock it again from the parent page.
+  - The parent page sits behind a **parental gate**: a 4-digit PIN that the parent chooses at sign-up. It is asked **every time** the parent page is opened (nothing stays unlocked). Three wrong tries lock the gate for 30 seconds. A forgotten PIN is reset by typing the full phone number given at sign-up. The parent can change the PIN on the parent page.
   - Nothing else in the app leaves it, so no other gate is needed.
 
 ### Age rating questionnaire
@@ -26,7 +26,7 @@ These answers match how the app is built today: offline, no network permission o
 - `ITSAppUsesNonExemptEncryption` is set to **false** in `ios/App/App/Info.plist`, so App Store Connect will not ask about encryption at upload.
 
 ### Review notes (paste into "Notes for Review")
-> The app is fully offline. On first launch, enter any parent name, an 8–15 digit phone number and a child name. The parent page is behind a parental gate: enter the last 4 digits of the phone number you typed at sign-up. No data leaves the device.
+> The app is fully offline. On first launch, enter any parent name, a 7–15 digit phone number, a 4-digit parent PIN of your choice and a child name. The parent page (child profiles → «ولي الأمر») is behind a parental gate that asks for that PIN every time. If you forget the PIN, tap «نسيت الرمز؟» and type the full phone number you entered. No data leaves the device.
 
 ## Google Play
 
@@ -52,7 +52,7 @@ These answers match how the app is built today: offline, no network permission o
 - The expected result is **Everyone / PEGI 3**.
 
 ### App access
-- All functionality is available without special access. Mention the parental gate (last 4 digits of the phone typed at sign-up) in the "App access" notes.
+- All functionality is available without special access. Mention the parental gate (the 4-digit PIN chosen at sign-up, asked every time) in the "App access" notes.
 
 ## Assets in this folder
 

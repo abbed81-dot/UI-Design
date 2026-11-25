@@ -13,15 +13,15 @@ Character limits are noted per field; every text below fits its limit (checked w
 | --- | --- | --- |
 | Name | 30 | مزرعة الأرقام |
 | Subtitle | 30 | الضرب والجمع والطرح للأطفال |
-| Keywords | 100 | جدول الضرب,رياضيات,جمع,طرح,تقريب,منازل,حساب,أطفال,تعليم,أرقام,ألعاب تعليمية |
-| Promotional text | 170 | تعلّم جدول الضرب والجمع والطرح والمنازل والتقريب مع صوفي الخروفة، واجمع حيوانات لمزرعتك واهزم الذئب في نهاية كل عالم! |
+| Keywords | 100 | جدول الضرب,قسمة,رياضيات,جمع,طرح,تقريب,منازل,حساب,أطفال,تعليم,أرقام,ألعاب تعليمية |
+| Promotional text | 170 | تعلّم جدول الضرب والقسمة والجمع والطرح والمنازل والتقريب مع صوفي الخروفة، واجمع حيوانات لمزرعتك واهزم الذئب في نهاية كل عالم! |
 
 ### Google Play
 
 | Field | Limit | Text |
 | --- | --- | --- |
 | App name | 30 | مزرعة الأرقام: رياضيات للأطفال |
-| Short description | 80 | جدول الضرب والجمع والطرح والمنازل والتقريب بالصور، في لعبة عربية ممتعة للأطفال |
+| Short description | 80 | الضرب والقسمة والجمع والطرح والمنازل والتقريب بالصور في لعبة عربية للأطفال |
 
 ### Description (both stores, limit 4000)
 
@@ -29,6 +29,9 @@ Character limits are noted per field; every text below fits its limit (checked w
 
 🐑 حظيرة الضرب
 كل عملية ضرب تظهر كمجموعات من الحيوانات: ٨ × ٨ تعني ٨ خراف، مع كل خروف ٨ خراف صغيرة، والمجموع ٦٤. يعدّ الطفل المجموعات، ويتعلّم حيلة لحفظ كل جدول.
+
+🧁 مخبز القسمة
+يوزّع الطفل الحلوى على أصدقائه بالتساوي، جولة بعد جولة، فيفهم معنى القسمة. ثم يتعلّم أن القسمة عكس الضرب، والقسمة مع باقٍ، والقسمة الطويلة خطوة خطوة: اقسم، اضرب، اطرح، أنزل.
 
 🏝️ جزيرة الجمع و🌲 غابة الطرح
 من خانة واحدة حتى مئات الألوف. المسائل تُكتب عموديًا ويُشرح الحل عمودًا عمودًا: متى نحمل، ومتى نستلف من المنزلة المجاورة.
@@ -63,21 +66,23 @@ Character limits are noted per field; every text below fits its limit (checked w
 | --- | --- | --- |
 | Name | 30 | Numbers Farm: Kids Math |
 | Subtitle | 30 | Arabic maths games for kids |
-| Keywords | 100 | times tables,multiplication,addition,subtraction,place value,rounding,arabic,kids,math |
-| Promotional text | 170 | Learn times tables, adding, subtracting, place value and rounding with Soufi the sheep. The faster you answer, the faster you clear each level! |
+| Keywords | 100 | times tables,multiplication,division,addition,subtraction,place value,rounding,arabic,kids |
+| Promotional text | 170 | Learn times tables, division, adding, subtracting, place value and rounding with Soufi the sheep. The faster you answer, the faster you clear each level! |
 
 ### Google Play
 
 | Field | Limit | Text |
 | --- | --- | --- |
 | App name | 30 | Numbers Farm: Kids Math |
-| Short description | 80 | Arabic maths game: times tables, addition, subtraction, place value, rounding |
+| Short description | 80 | Arabic maths game: times tables, division, adding, subtracting, rounding |
 
 ### Description (limit 4000)
 
 Numbers Farm is a playful Arabic maths game that helps children understand numbers and learn their times tables with pictures.
 
 🐑 Multiplication barn: every fact is drawn as groups of animals. 8 × 8 is 8 sheep, each with 8 lambs: 64 in all. Children count the groups and learn a memory trick for every table.
+
+🧁 Division bakery: children share treats equally among friends, round by round, to see what division means. Then they learn that division undoes multiplication, division with remainders, and long division step by step: divide, multiply, subtract, bring down.
 
 🏝️ Addition island and 🌲 Subtraction forest: from one digit up to hundreds of thousands, worked in columns with each step explained: when to carry and when to borrow.
 
