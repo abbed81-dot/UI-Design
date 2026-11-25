@@ -82,6 +82,7 @@ button,a,input{touch-action:manipulation}
 .plate .cnt{font-family:var(--f-display);font-weight:800;color:var(--muted);line-height:1.2}
 .share.sm .pile{font-size:1.15rem}.share.sm .plate .on{font-size:.92rem}
 .m{white-space:nowrap}
+.share-say{text-align:center;color:var(--muted);font-weight:700;margin:4px 0 0;line-height:1.5}
 .leftover{display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;padding:6px 14px;border-radius:16px;border:2px dashed var(--bad);color:var(--bad);font-weight:800;background:var(--bad-soft)}
 .family{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;margin:10px 0}
 .tri{position:relative;width:120px;height:100px;flex:none;color:var(--ink);font-family:var(--f-display);font-weight:800;font-size:1.25rem}
@@ -465,7 +466,7 @@ details[open] summary::before{transform:rotate(-90deg)}
 .timer circle{fill:none;stroke-width:7}
 .timer .bg{stroke:var(--soft)}
 .timer .fg{stroke:var(--accent);stroke-linecap:round;transition:stroke .2s}
-.stage{position:relative;padding-top:16px;display:grid;gap:4px}
+.stage{position:relative;padding-top:52px;display:grid;gap:4px}
 .float{position:absolute;inset-inline:0;top:-8px;text-align:center;font-family:var(--f-display);font-weight:700;font-size:1.2rem;color:var(--accent);pointer-events:none;animation:rise 1s ease-out forwards;z-index:2}
 .float.bad{color:var(--bad)}
 @keyframes rise{from{transform:translateY(8px);opacity:0}25%{opacity:1}to{transform:translateY(-22px);opacity:0}}
@@ -1718,7 +1719,7 @@ function buildGroups(el, n, k){
       buddyLearn(`رائع! بنيت ${ar(n)} مجموعات، في كل واحدة ${ar(k)}`);
     } else $('buildTotal').textContent = `المجموع: ${[...Array(c)].map((_, m) => ar(k * (m + 1))).join(' ← ')}`;
   };
-  el.querySelectorAll('.pen').forEach(pen => { pen.onclick = () => fill(pen); pen.onkeydown = e => { if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); fill(pen); } }; });
+  el.querySelectorAll('.pen').forEach(pen => { onTap(pen, () => fill(pen)); pen.onkeydown = e => { if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); fill(pen); } }; });
   dragToken($('groupToken'), t => fill(t), () => { const free = el.querySelector('.pen:not(.full)'); if (free) fill(free); });
 }
 function buddyLearn(text){ const m = document.querySelector('#learnBody .step-msg'); if (m) m.innerHTML = '🐑 ' + text; }
@@ -1772,7 +1773,7 @@ function buildNumber(){
     cnt[p]++; SND.tick(); update();
   };
   document.querySelectorAll('#learnBody .token').forEach(t => dragToken(t, h => add(+t.dataset.p, +h.dataset.p), () => add(+t.dataset.p)));
-  document.querySelectorAll('#learnBody .h-minus').forEach(b => b.onclick = () => { const p = +b.dataset.m; if (cnt[p]){ cnt[p]--; update(); } });
+  document.querySelectorAll('#learnBody .h-minus').forEach(b => onTap(b, () => { const p = +b.dataset.m; if (cnt[p]){ cnt[p]--; update(); } }));
   $('buildNew').onclick = () => { learnCtx.n = null; learnPlace(); };
   $('buildBack').onclick = () => { learnCtx.build = false; learnPlace(); };
   speakText = words(n);
@@ -2059,7 +2060,10 @@ function divQ(lv, mode, w, i){
     const ask = `وزّع ${cnt(n, s.item.f, true)} ${s.item.e} على ${friendsTxt(k)} بالتساوي.${rem ? ' كم لكل صديق، وكم يبقى؟' : ' كم لكل صديق؟'}`;
     const base = {tf: rem ? 2.2 : 1.6,
       view: () => `<p class="qtext">${ask}</p>${eqHtml([ar(n), '÷', ar(k)])}`,
-      visual: () => { vis().innerHTML = shareHtml(s); },
+      visual: () => { const el = vis();
+        el.innerHTML = `<div id="qShare"></div><div class="row"><button class="btn small" id="qRound">🤲 وزّع جولة</button></div><p class="share-say" id="qSay">وزّع لتعرف الجواب: اضغط على ${s.item.e} أو على طبق صديق.</p>`;
+        mountShare($('qShare'), s, {roundBtn: $('qRound'), say: h => { if ($('qSay')) $('qSay').innerHTML = h; },
+          onFinish: () => { if ($('qSay')) $('qSay').innerHTML = rem ? `انتهى التوزيع! كم مع كل صديق، وكم بقي في صندوق الباقي؟ اختر الجواب.` : `انتهى التوزيع! كم مع كل صديق؟ اكتب الجواب.`; }}); },
       hint: () => { vis().innerHTML = shareHtml(dealAll({...s, dealt:[...s.dealt]}));
         return rem ? `وزّعنا جولة بعد جولة: كل صديق أخذ ${cnt(q, s.item.f, true)}، وما بقي في السلة لا يكفي لجولة أخرى، فهو الباقي. والباقي دائمًا أصغر من ${ar(k)}.`
                    : `في كل جولة يأخذ كل صديق ${s.item.f[0]} واحدة، أي ${ar(k)} في الجولة. عُدّ ما على طبق واحد.`; },
@@ -2097,26 +2101,31 @@ function learnDiv(){
   if (lv.kind === 'fact') return learnFact(lv);
   return learnLong(lv);
 }
-function learnShare(lv){
-  const rem = lv.kind === 'rem';
-  if (!learnCtx.s){ const g = learnCtx.n ? {n:learnCtx.n, k:learnCtx.k} : genDiv(lv); learnCtx.s = newShare(g.n, g.k); }
-  const s = learnCtx.s, {n, k, item} = s, q = Math.floor(n / k), r = n % k;
-  const given = () => s.dealt.reduce((a, b) => a + b, 0);
+/* Sharing that works with the finger: tap a treat (it goes to the next friend), tap a friend's plate,
+   drag a treat onto a plate, or deal a whole round with the button. A plate refuses an unfair extra. */
+/* A tap that does not wait for the browser's click: right after a drag, phones can drop the next click,
+   and children tap fast. Keyboard and screen-reader activation still arrive as a click. */
+function onTap(el, fn){
+  let sx = 0, sy = 0, down = false, at = 0;
+  el.addEventListener('pointerdown', e => { down = true; sx = e.clientX; sy = e.clientY; });
+  el.addEventListener('pointerup', e => { if (down && Math.hypot(e.clientX - sx, e.clientY - sy) < 14){ at = Date.now(); fn(); } down = false; });
+  el.addEventListener('pointercancel', () => { down = false; });
+  el.addEventListener('click', () => { if (Date.now() - at > 700) fn(); });
+}
+function mountShare(box, s, o){
+  const {n, k, item} = s, given = () => s.dealt.reduce((a, b) => a + b, 0);
   const paint = (msg, fresh) => {
-    $('shareBox').innerHTML = shareHtml(s, {live: !s.finished, fresh});
-    if (msg != null) $('shareMsg').innerHTML = msg;
-    $('roundBtn').hidden = s.finished;
-    $('shareDone').hidden = !s.finished;
-    if (s.finished) $('shareDone').innerHTML = `${divEq(n, k, q, r)}${termsHtml(n, k, q, r)}<p class="sentence">تحقّق بالضرب: ${ar(k)} × ${ar(q)}${r ? ` + ${ar(r)}` : ''} = ${ar(n)} ✓</p>`;
-    if (!s.finished){
-      $('shareBox').querySelectorAll('.ck').forEach(c => dragToken(c, plate => give(+plate.dataset.j), () => give(-1)));
-    }
+    box.innerHTML = shareHtml(s, {live: !s.finished, fresh});
+    if (msg != null) o.say(msg);
+    if (o.roundBtn) o.roundBtn.hidden = s.finished;
+    if (s.finished) return;
+    box.querySelectorAll('.ck').forEach(c => dragToken(c, plate => give(+plate.dataset.j), () => give(-1)));
+    box.querySelectorAll('.plate').forEach(pl => { pl.setAttribute('role', 'button'); pl.setAttribute('tabindex', '0');
+      pl.setAttribute('aria-label', `أعطِ ${s.friends[+pl.dataset.j]} ${item.f[0]}`);
+      onTap(pl, () => give(+pl.dataset.j));
+      pl.onkeydown = e => { if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); give(+pl.dataset.j); } }; });
   };
-  const finish = () => {
-    s.finished = true; SND.win(); haptic('ok');
-    paint(rem ? `🎉 كل صديق أخذ ${cnt(q, item.f, true)}، وبقي ${cnt(r, item.f)} لا تكفي لجولة أخرى: هذا هو <b class="t-r">الباقي</b>. الباقي دائمًا أصغر من عدد الأصدقاء (${ar(k)}).`
-              : `🎉 فرغت السلة! كل صديق أخذ ${cnt(q, item.f, true)}. هذا معنى القسمة: ${ar(n)} ÷ ${ar(k)} = ${ar(q)}.`);
-  };
+  const finish = () => { s.finished = true; paint(null); o.onFinish(); };
   const give = j => {
     if (s.finished) return;
     const left = n - given(), min = Math.min(...s.dealt);
@@ -2126,38 +2135,54 @@ function learnShare(lv){
     if (j < 0) j = s.dealt.indexOf(min);
     if (s.dealt[j] > min){
       SND.bad(); haptic('bad');
-      const el = $('shareBox').querySelector(`.plate[data-j="${j}"]`); if (el){ el.classList.remove('no'); void el.offsetWidth; el.classList.add('no'); }
-      $('shareMsg').innerHTML = `${s.friends[j]} أخذ أكثر من غيره! أعطِ الأصدقاء الآخرين أولًا حتى يكون التوزيع <b>عادلًا</b>.`;
+      const el = box.querySelector(`.plate[data-j="${j}"]`); if (el){ el.classList.remove('no'); void el.offsetWidth; el.classList.add('no'); }
+      o.say(`${s.friends[j]} أخذ أكثر من غيره! أعطِ الأصدقاء الآخرين أولًا حتى يكون التوزيع <b>عادلًا</b>.`);
       return;
     }
     s.dealt[j]++; SND.tick();
     const nowLeft = n - given(), nowMin = Math.min(...s.dealt), even = s.dealt.every(d => d === nowMin);
     if (nowLeft === 0 && even){ finish(); return; }
-    if (even && nowLeft < k && rem){ paint(`مع كل صديق ${cnt(nowMin, item.f)}. بقي ${cnt(nowLeft, item.f)} فقط… هل تكفي لجولة كاملة على ${friendsTxt(k)}؟ اضغط على السلة لتعرف.`, j); return; }
+    if (even && nowLeft < k){ paint(`مع كل صديق ${cnt(nowMin, item.f)}. بقي ${cnt(nowLeft, item.f)} فقط… هل تكفي لجولة كاملة على ${friendsTxt(k)}؟ اضغط على السلة أو على الزر لتعرف.`, j); return; }
     paint(even ? `جولة كاملة ✓ مع كل صديق ${cnt(nowMin, item.f)}، وفي السلة ${cnt(nowLeft, item.f)}.` : `أحسنت، أكمل الجولة: أعطِ كل صديق ${item.f[0]} واحدة.`, j);
   };
+  const round = () => {
+    if (s.finished) return;
+    const left = n - given(), min = Math.min(...s.dealt);
+    if (!s.dealt.some(d => d > min) && left < k){ finish(); return; }
+    s.dealt.forEach((d, j) => { if (d === min && n - given() > 0) s.dealt[j]++; });
+    SND.tick();
+    const nowLeft = n - given(), nowMin = Math.min(...s.dealt);
+    if (nowLeft === 0){ finish(); return; }
+    if (nowLeft < k){ paint(`مع كل صديق ${cnt(nowMin, item.f)}. بقي ${cnt(nowLeft, item.f)} فقط، ولا تكفي لجولة كاملة. اضغط على الزر مرة أخرى.`); return; }
+    paint(`جولة كاملة ✓ مع كل صديق ${cnt(nowMin, item.f)}، وفي السلة ${cnt(nowLeft, item.f)}.`);
+  };
+  // tapping the empty part of the basket also deals to the next friend (treat taps are handled by dragToken)
+  box.addEventListener('click', e => { if (!s.finished && e.target.closest('.pile') && !e.target.closest('.ck') && e.target.isConnected) give(-1); });
+  if (o.roundBtn) onTap(o.roundBtn, round);
+  paint(null);
+  if (s.finished) o.onFinish();
+}
+function learnShare(lv){
+  const rem = lv.kind === 'rem';
+  if (!learnCtx.s){ const g = learnCtx.n ? {n:learnCtx.n, k:learnCtx.k} : genDiv(lv); learnCtx.s = newShare(g.n, g.k); }
+  const s = learnCtx.s, {n, k, item} = s, q = Math.floor(n / k), r = n % k;
   $('learnBody').innerHTML = `
     <p class="lesson">${rem ? 'أحيانًا لا تكفي الأشياء لجولة كاملة، فيبقى شيء في السلة. نسمّيه <b>الباقي</b>.' : '<b>القسمة توزيع بالتساوي:</b> نعطي كل صديق العدد نفسه، جولة بعد جولة.'}</p>
     <p class="qtext">وزّع ${cnt(n, item.f, true)} على ${friendsTxt(k)} بالتساوي</p>
     <div id="shareBox"></div>
     <div class="row" style="margin:6px 0"><button class="btn small" id="roundBtn">🤲 وزّع جولة كاملة</button></div>
-    <div class="step-msg" id="shareMsg" aria-live="polite">اسحب ${item.e} من السلة إلى طبق صديق، أو اضغط عليها لتذهب إلى الصديق التالي.</div>
+    <div class="step-msg" id="shareMsg" aria-live="polite">اضغط على ${item.e} في السلة لتذهب إلى الصديق التالي، أو اضغط على طبق صديق، أو اسحبها إليه.</div>
     <div id="shareDone" hidden></div>
     <div class="row" style="margin-top:6px"><button class="link" id="newEx">🔄 مثال جديد</button></div>
     <div class="learn-foot">${startPracticeBtn()}</div>`;
-  $('roundBtn').onclick = () => {
-    if (s.finished) return;
-    const left = n - given(), min = Math.min(...s.dealt);
-    if (!s.dealt.some(d => d > min) && left < k){ finish(); return; }
-    s.dealt.forEach((d, j) => { if (s.dealt[j] === min && n - given() > 0) s.dealt[j]++; });
-    SND.tick();
-    const nowLeft = n - given(), nowMin = Math.min(...s.dealt);
-    if (nowLeft === 0){ finish(); return; }
-    if (rem && nowLeft < k){ paint(`مع كل صديق ${cnt(nowMin, item.f)}. بقي ${cnt(nowLeft, item.f)} فقط، ولا تكفي لجولة كاملة. اضغط على الزر مرة أخرى.`); return; }
-    paint(`جولة كاملة ✓ مع كل صديق ${cnt(nowMin, item.f)}، وفي السلة ${cnt(nowLeft, item.f)}.`);
-  };
-  paint(null);
-  if (s.finished) finish();
+  mountShare($('shareBox'), s, {roundBtn: $('roundBtn'), say: h => { $('shareMsg').innerHTML = h; },
+    onFinish: () => {
+      SND.win(); haptic('ok');
+      $('shareMsg').innerHTML = rem ? `🎉 كل صديق أخذ ${cnt(q, item.f, true)}، وبقي ${cnt(r, item.f)} لا تكفي لجولة أخرى: هذا هو <b class="t-r">الباقي</b>. الباقي دائمًا أصغر من عدد الأصدقاء (${ar(k)}).`
+                                    : `🎉 فرغت السلة! كل صديق أخذ ${cnt(q, item.f, true)}. هذا معنى القسمة: ${ar(n)} ÷ ${ar(k)} = ${ar(q)}.`;
+      $('shareDone').hidden = false;
+      $('shareDone').innerHTML = `${divEq(n, k, q, r)}${termsHtml(n, k, q, r)}<p class="sentence">تحقّق بالضرب: ${ar(k)} × ${ar(q)}${r ? ` + ${ar(r)}` : ''} = ${ar(n)} ✓</p>`;
+    }});
   speakText = `${n} تقسيم ${k} يساوي ${q}${r ? ' والباقي ' + r : ''}`;
   $('newEx').onclick = () => { learnCtx.s = null; learnCtx.n = null; learnShare(lv); };
   bindPractice();
@@ -2478,7 +2503,10 @@ function dragToken(el, onDrop, onTap){
     const up = ev => {
       document.removeEventListener('pointermove', mv); document.removeEventListener('pointerup', up); document.removeEventListener('pointercancel', up);
       over && over.classList.remove('over'); ghost && ghost.remove();
-      if (moved){ const t = dropAt(ev.clientX, ev.clientY); if (t) onDrop(t); } else if (onTap) onTap();
+      // act after the touch has fully ended: redrawing (and removing) the touched element mid-gesture
+      // makes some phones swallow the next tap
+      const t = moved ? dropAt(ev.clientX, ev.clientY) : null;
+      setTimeout(() => { if (moved){ if (t) onDrop(t); } else if (onTap) onTap(); }, 0);
     };
     document.addEventListener('pointermove', mv); document.addEventListener('pointerup', up); document.addEventListener('pointercancel', up);
   });
